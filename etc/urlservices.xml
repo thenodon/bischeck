@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<urlservices>
+
+  <urlproperty>
+    <key>jdbc</key>
+    <value>JDBCService</value>
+  </urlproperty>
+
+  <urlproperty>
+    <key>bischeck</key>
+    <value>LastCacheService</value>
+  </urlproperty>
+
+</urlservices>

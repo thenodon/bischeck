@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<properties>
+
+  <property>
+    <key>nscaserver</key>
+    <value>localhost</value>
+  </property>
+
+  <property>
+    <key>nscaencryption</key>
+    <value>XOR</value>
+  </property>
+
+  <property>
+    <key>nscapassword</key>
+    <value>change this</value>
+  </property>
+
+  <property>
+    <key>nscaport</key>
+    <value>5667</value>
+  </property>
+
+  <property>
+    <key>pidfile</key>
+    <value>/var/tmp/bischeck.pid</value>
+  </property>
+
+  <property>
+    <key>JDBCSerivce.querytimeout</key>
+    <value>5</value>
+  </property>
+
+<!-- Already the default values to have week numbering according to ISO 8601  
+  <property>
+    <key>mindaysinfirstweek</key>
+    <value>4</value>
+  </property>
+  
+  <property>
+    <key>firstdayofweek</key>
+    <value>2</value>
+  </property>
+-->
+
+</properties>

@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<bischeck>
+
+  <host>
+  <name>testhost</name>
+  <desc>test host</desc>
+
+    <service>
+      <name>testservice</name>
+      <desc>test service</desc>
+      <!-- Run every 10 minute, but with 15 sec into the first minute -->
+      <schedule>15 */10 * * * ?</schedule>
+      <!-- Run every 2 minute interval -->
+      <schedule>2M</schedule>
+      <url>jdbc:mysql://localhost/bischecktest?user=bischeck&amp;password=bischeck</url>
+      <driver>com.mysql.jdbc.Driver</driver>
+
+      <serviceitem>
+        <name>testitem</name>
+        <desc>test item</desc>
+        <execstatement>select sum(value) from test where createdate=&apos;%%yyyy-MM-dd%%&apos;</execstatement>
+        <thresholdclass>Twenty4HourThreshold</thresholdclass>
+        <serviceitemclass>SQLServiceItem</serviceitemclass>
+      </serviceitem>
+
+    </service>
+
+  </host>
+
+</bischeck>
+

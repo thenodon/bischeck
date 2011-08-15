@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<servers>
+
+  <server name="NSCA">
+    <class>
+    com.ingby.socbox.bischeck.servers.NSCAServer</class>
+    
+    <property>
+      <key>class</key>
+      <value>com.ingby.socbox.bischeck.servers.NSCAServer</value>
+    </property>
+
+    <property>
+      <key>nscaserver</key>
+      <value>localhost</value>
+    </property>
+
+    <property>
+      <key>nscaencryption</key>
+      <value>XOR</value>
+    </property>
+
+    <property>
+      <key>nscapassword</key>
+      <value>change this</value>
+    </property>
+
+    <property>
+      <key>nscaport</key>
+      <value>5667</value>
+    </property>
+
+
+  </server>
+
+  <server name="OpenTSDB">
+    <class>com.ingby.socbox.bischeck.servers.OpenTSDBServer</class>
+    <property>
+      <key>class</key>
+      <value>com.ingby.socbox.bischeck.servers.OpenTSDBServer</value>
+    </property>
+
+    <property>
+      <key>hostname</key>
+      <value>localhost</value>
+    </property>
+
+    <property>
+      <key>port</key>
+      <value>4242</value>
+    </property>
+  </server>  
+
+ <server name="XYZ">
+    <class>com.ingby.socbox.bischeck.servers.OpenTSDBServer</class>
+    
+    <property>
+      <key>class</key>
+      <value>com.ingby.socbox.bischeck.servers.OpenTSDBServer</value>
+    </property>
+
+    <property>
+      <key>hostname</key>
+      <value>localhost</value>
+    </property>
+
+    <property>
+      <key>port</key>
+      <value>4242</value>
+    </property>
+
+  </server>  
+
+</servers>
