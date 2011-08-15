@@ -1,0 +1,7 @@
+BISHOME="."
+
+rm -rf $BISHOME/src/main/generated/*
+
+for pack in bischeck properties urlservices twenty4threshold ; do
+   xjc -d $BISHOME/src/main/generated/ -p com.ingby.socbox.bischeck.xsd.$pack -xmlschema $BISHOME/src/main/resources/$pack.xsd -b $BISHOME/src/main/resources/$pack.xjb
+done

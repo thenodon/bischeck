@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="bischeck">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="host"  minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="host">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="name"/>
+				<xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
+			    <xsd:element ref="service" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="service">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="name"/>
+				<xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="schedule" minOccurs="1" maxOccurs="unbounded"/>
+				<xsd:element ref="url"/>
+				<xsd:element ref="driver" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="serviceitem" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="serviceitem">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="name"/>
+				<xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="execstatement"/>
+				<xsd:element ref="thresholdclass" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="serviceitemclass"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="name" type="xsd:string"/>
+	<xsd:element name="desc" type="xsd:string"/>
+	<xsd:element name="schedule" type="xsd:string"/>
+	<xsd:element name="url" type="xsd:string"/>
+	<xsd:element name="driver" type="xsd:string"/>
+	<xsd:element name="execstatement" type="xsd:string"/>
+	<xsd:element name="thresholdclass" type="xsd:string"/>
+	<xsd:element name="serviceitemclass" type="xsd:string"/>
+
+</xsd:schema>

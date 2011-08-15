@@ -1,0 +1,80 @@
+#!/bin/bash
+# Todo:
+# Fix holiday exception
+# Read also from ndodb database - servcie history
+
+tmp=tmprrdcsv
+rm ${tmp}*
+
+daysinweek=("Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" "Sunday")
+today=$(date +%Y-%m-%d)
+
+while getopts r:d:u name
+do
+  case $name in
+    r)  rrdfile="$OPTARG";;
+    d)  daysback="$OPTARG";;
+    u)  usage; exit 0;;
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+#Run the rrdtool with xml dump for rrd file and DS 1 and 2 
+rrdtool xport DEF:value=${rrdfile}:1:AVERAGE \
+    DEF:threshold=${rrdfile}:2:AVERAGE \
+    XPORT:value:"edishipments" \
+    XPORT:threshold:"Threshold" \
+    --start now-${daysback}d -e now > ${tmp}_dump.xml
+
+#Name of the rrd file
+title=$(basename ${rrdfile} .rrd)
+
+# Take the xml export and turn it to a csv : formatted file
+cat ${tmp}_dump.xml | \
+    grep  '<row>' | \
+    sed -e 's/^    //' -e 's/<[a-z]*>/:/g' -e 's/<\/[a-z]*>/:/g' | \
+    tr -s ":" | \
+    sed -e 's/^://' | \
+    grep -v 'NaN' > ${tmp}.csv
+
+# Use the csv file where the date is just in sec since 1970 and caclulate the 
+# day in the week and hour of the day for that date in sec. 
+# The result is written as new csv file but written sorted to day specific files 
+while read line ; do
+    sec=$(echo $line| cut -d: -f1)
+    value=$(echo $line| cut -d: -f2)
+    threshold=$(echo $line| cut -d: -f3)
+
+    day=$(date -d @$sec +%u)
+    hour=$(date -d @$sec +%k)
+    echo "$hour $value $threshold" >> ${tmp}day_${day}.plot
+done < ${tmp}.csv
+
+# For each day file use gnuplot to plot each measure and threshold and also
+# plot a approximation of the curve
+count=0
+for i in  1 2 3 4 5 6 7
+do
+  day=${tmp}day_${i}.plot
+  count=$(expr $i - 1 )
+  echo "set terminal png size 800,600; \
+    set output \"${title}-${i}.png\"; \
+    set key below; \
+    set style line 1 lt 1 lw 3 pt 3 linecolor rgb \"red\"; \
+    set style line 2 lt 1 lw 3 pt 3 linecolor rgb \"green\"; \
+    set xlabel \"Hours\"; \
+    set title \"$title - ${daysback} days from $today\n${daysinweek[$count]}\"; \
+    set yrange [0:*]; \
+    set xrange [7:24]; \
+    set grid; \
+    plot \"$day\" using 1:2 pointtype 5 title \"Value\", \
+        \"$day\" using 1:3 title \"Threshold\", \
+        \"$day\" using 1:2 ls 1 smooth csplines t \"Value approx\", \
+        \"$day\" using 1:3 ls 2 smooth csplines t \"Threshold approx\"" | \
+    gnuplot 2>/dev/null
+done
+
+#Take all day png files and create one pdf file sorted from monday to Sunday
+convert  -page A4 -gravity northwest *[1-7].png ${title}_now-${daysback}.pdf
+
