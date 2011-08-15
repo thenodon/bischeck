@@ -93,6 +93,8 @@ public class Twenty4HourThreshold implements Threshold {
 			System.exit(0);
 		}
 
+		ConfigurationManager.init();
+		
 		if (line.hasOption("list")) {
 			Twenty4HourThreshold current = new Twenty4HourThreshold();
 			current.dumpConfig();
@@ -127,10 +129,7 @@ public class Twenty4HourThreshold implements Threshold {
 			}
 			System.exit(0);
 		}  	 	
-
-		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp( "Twenty4HourThreshold", options );
-		System.exit(1);		
+		
 	}
 
 	
