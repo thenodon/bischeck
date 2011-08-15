@@ -1,0 +1,21 @@
+<jxb:bindings version="2.1" 
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
+  >
+
+    <jxb:bindings schemaLocation="properties.xsd" node="/xsd:schema">
+      <!--
+      <jxb:globalBindings
+         generateIsSetMethod="false"/>
+      -->
+        <jxb:schemaBindings>
+            <jxb:nameXmlTransform>
+              <!--  <jxb:typeName prefix="XML"/> -->
+                <jxb:elementName prefix="XML"/>
+              <!--  <jxb:anonymousTypeName prefix="XML"/> -->
+            </jxb:nameXmlTransform>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+
+</jxb:bindings>
