@@ -1,0 +1,116 @@
+insert into hosts values (1, "dax", "Dax server",1);
+insert into hosts values (2, "dc","DC server",0);
+
+insert into services values (1,1,"Shipments","Shipment processing in DAX","jdbc:mysql://localhost/check?user=aha&password=test","com.mysql.jdbc.Driver",1);
+insert into services values (2,1,"DCerrors","DC processing in DAX","jdbc:mysql://localhost/check?user=aha&password=test","com.mysql.jdbc.Driver",1);
+insert into services values (3,2,"Shipments","dcShipment processing in DAX","jdbc:mysql://localhost/check?user=aha&password=test","com.mysql.jdbc.Driver",1);
+insert into services values (4,2,"DCerrors","dcDC processing in DAX","jdbc:mysql://localhost/check?user=aha&password=test","com.mysql.jdbc.Driver",1);
+
+insert into items values (1,1,"shipments","Number of shipments","select value1 from shipments where mydate='%%yyyy-MM-dd%[D-1]%%'","com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold",1); 
+insert into items values (2,1,"shiperror","Shipments errors","select value2 from shipments where mydate='%%yyyy-MM-dd%[D-1]%%'","com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold",1); 
+insert into items values (3,2,"DCin","Number of DC in","select value1 from dc","com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold",1); 
+insert into items values (4,2,"DCout","DC errors","select value2 from dc","com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold",1); 
+insert into items values (5,3,"shipments","Number of shipments","select sum(value1) from shipments","com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold",1); 
+insert into items values (6,3,"shiperror","Shipments errors","select sum(value2) from shipments","com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold",1); 
+insert into items values (7,4,"DCin","Number of DC in","select value1 from dc","com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold",1); 
+insert into items values (8,4,"DCout","DC errors","select value2 from dc","com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold",1); 
+
+
+// Threshold database
+insert into services values (1,"Shipments");
+insert into services values (2,"DCerrors");
+
+insert into items values (1,1,"shipments","10","30",">"); 
+insert into items values (2,1,"shiperror","5","20",">"); 
+
+
+Twenty4Hour - ....
+// Order - (day in month and month) (day in week and week) 
+                             si  type   
+insert into interval values (1,"M",  "*","7",NULL,NULL,NULL 
+insert into interval values (1,"W",  "1","3",
+
+If 2010-12-13
+Calendar now = Calendar.getInstance();
+now.get(Calendar.MONTH)
+now.get(Calendar.DAY_OF_MONTH)
+now.get(Calendar.WEEK_OF_YEAR)
+now.get(Calendar.DAY_OF_WEEK)
+
+select count(*) from interval where servicitemid=1 period="M" and MW=12 and DAY=13 
+select count(*) from interval where servicitemid=1 period="W" and MW=x and DAY=x
+select count(*) from interval where servicitemid=1 period="M" and DAY=13  
+select count(*) from interval where servicitemid=1 period="W" and DAY=13  
+select count(*) from interval where servicitemid=1 period="M" and MW=12
+select count(*) from interval where servicitemid=1 period="W" and MW=x
+select count(*) from interval where servicitemid=1 
+if not find no larm.
+
+drop table servicedef;
+drop table period;
+drop table hour;
+create table servicedef (id int  NOT NULL, hostname varchar(128) NOT NULL, servicename varchar(128) NOT NULL, serviceitemname varchar(128) NOT NULL,PRIMARY KEY (hostname, servicename ,serviceitemname)); 
+create table period (id int NOT NULL, servicedefid int NOT NULL, type varchar(128), interval varchar(128), day varchar(128),calcmethod varchar(128),warning int, critical int, FOREIGN KEY(servicedefid) REFERENCES servicedefid(id),PRIMARY KEY (id,servicedefid));
+create table hour (id int, periodid int NOT NULL, H00 float ,H01 float, H02 float,H03 float,H04 float,H05 float,H06 float,H07 float,H08 float,H09 float,H10 float,H11 float,H12 float,H13 float,H14 float,H15 float,H16 float,H17 float,H18 float,H19 float,H20 float,H21 float,H22 float,H23 float,FOREIGN KEY(periodid) REFERENCES period(id),PRIMARY KEY (id,periodid));
+
+insert into servicedef values (1,"dax", "Shipments","shipments"); 
+insert into servicedef values (2,"dax", "Shipments","shiperror");
+insert into period values (1,1,'M','1','25','>',10,30);
+insert into period values (2,1,'M','2','10','>',10,30);
+insert into period values (3,1,'M','1',null,'>',10,30);
+insert into hour values(3,3,0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000,21000,22000,23000);
+
+insert into period values (8,2,'M','1','7','>',10,30);
+insert into period values (5,2,'W','2','6','>',10,30);
+insert into period values (6,2,'M',null,'7','>',10,30);
+insert into period values (7,2,'W',null,'6','>',10,30);
+insert into period values (4,2,'M',1,null,'>',10,30);
+insert into period values (9,2,'W',2,null,'>',10,30);
+insert into period values (10,2,null,null,null,'>',10,30);
+insert into hour values(1,10,0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000,21000,22000,23000);
+insert into hour values(2,4,0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000,21000,22000,23000);
+
+type only M, W or null - null means default and interval or day has no meaning
+interval only 1-12 if type is M or null 
+interval only 1-52 if type is W or null 
+
+day only 1-31 if type M or null 
+day only 1-7 if type W or null 
+
+If 2010-12-13
+
+Calendar now = Calendar.getInstance();
+mon=now.get(Calendar.MONTH)
+dayofmonth=now.get(Calendar.DAY_OF_MONTH)
+week=now.get(Calendar.WEEK_OF_YEAR)
+dayofweek=now.get(Calendar.DAY_OF_WEEK)
+
+select * from servicedef where servicename=1 and serviceitemname=2
+select * from period where servicedefid=x type="M" and interval=mon and day=dayofmonth
+if null  
+select * from period where servicedefid=x type="W" and interval=week and day=dayofweek
+if null
+select * from period where servicedefid=x type="M" and interval=null and day=dayofmonth
+if null
+select * from period where servicedefid=x type="W" and interval=null and day=dayofweek
+if null
+select * from period where servicedefid=x type="M" and interval=mon and day=null
+if null
+select * from period where servicedefid=x type="W" and interval=week and day=null
+if null
+select * from period where servicedefid=x type=null and interval=null
+
+
+
+///////////////////
+GRANT SELECT ON db2.invoice TO 'jeffrey'@'localhost';
+GRANT USAGE ON *.* TO 'jeffrey'@'localhost' WITH MAX_QUERIES_PER_HOUR 90;
+
+
+
+
+
+Todo 
+Date parse in sql
+
+
