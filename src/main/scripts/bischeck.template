@@ -1,0 +1,10 @@
+#!/bin/sh
+
+program=$1
+shift
+arg=$@
+bishome=%BISHOME%
+sqlite=/usr/lib/javasqlite/sqlite.jar
+# resources must be before the bischeck-x.x.x.jar in the classpath
+java -Dbishome=$bishome -classpath $bishome/resources:$bishome:$bishome/lib/*:$bishome/customlib/*:$sqlite com.ingby.socbox.bischeck.$program $arg 
+

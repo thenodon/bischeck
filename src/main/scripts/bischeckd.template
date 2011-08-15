@@ -1,0 +1,135 @@
+#!/bin/sh
+#
+# chkconfig: 3 99 10
+# description: bischeckd init script
+
+JAVA_HOME=%JAVA_HOME%
+PATH=$JAVA_HOME/bin:$PATH
+
+bishome=%BISHOME%
+user=%USERINIT%
+
+processName=Execute
+
+pidFile=/var/tmp/bischeck.pid
+
+isrunning() {
+    ps -fu $user | grep $1 | grep java| tr -s " "| cut -f2 -d" " 
+}
+
+# Source function library.
+if [ -f /etc/init.d/functions ] ; then
+    . /etc/init.d/functions
+elif [ -f /etc/rc.d/init.d/functions ] ; then
+    . /etc/rc.d/init.d/functions
+else
+    exit 0
+fi
+# Avoid using root's TMPDIR
+unset TMPDIR
+RETVAL=0
+
+
+
+start() {
+    echo -n "bischeckd startup"
+    status=`isrunning $processName` 
+    if [ "x$status" = "x" ] ; then
+        sudo -b -u $user $bishome/bin/bischeck Execute -d > /dev/null 2>&1
+        sleep 5
+        status=`isrunning $processName`
+        
+        echo $status > $pidFile
+        chown $user:`id -gn $user` $pidFile
+        
+        status=`isrunning $processName`
+        if [ ! "x$status" = "x" ] ; then
+            RETVAL=0
+        else
+            RETVAL=1
+        fi
+    else
+       RETVAL=2
+    fi
+    if [ $RETVAL -eq 0 ] ; then
+        echo_success
+    else
+        echo_failure
+    fi
+    echo
+}
+
+stop() {
+    echo -n "bischeck stopping"
+    status=`isrunning $processName` 
+    if [ ! "x$status" = "x" ] ; then
+        kill `cat $pidFile`
+        sleep 5
+        status=`isrunning $processName`
+        if [ "x$status" = "x" ] ; then
+            RETVAL=0
+        else
+            RETVAL=1
+        fi
+    else
+        RETVAL=2
+    fi
+
+    if [ $RETVAL -eq 0 ] ; then
+        echo_success
+    else 
+        echo_failure
+    fi 
+    echo
+
+}
+
+status() {
+    status=`isrunning $processName` 
+    if [  ! "x$status" = "x" ] ; then
+        echo -n "$scriptName is running, pid $status"
+        RETVAL=0
+    else
+        echo -n "$scriptName is not running"
+        RETVAL=1
+    fi
+    if [ $RETVAL -eq 0 ] ; then
+        echo_success
+    else
+        echo_failure
+    fi
+    echo
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop) 
+        stop
+        ;;
+    status)
+        status 
+        ;;
+    pidstatus)
+        status=`isrunning $processName` 
+        if [  ! "x$status" = "x" ] ; then
+           echo $status
+        else
+           echo "not running"
+        fi
+        ;;
+    restart)
+        stop  
+        start
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|pidstatus|restart}"
+        exit 1
+esac
+
+if [ $RETVAL -eq 0 ] ; then
+    exit 0
+else
+    exit 1
+fi

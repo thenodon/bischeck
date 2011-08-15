@@ -1,0 +1,421 @@
+﻿bischeck - passive business check command server for Nagios 
+=========================================================== 
+
+Author: Anders Håål 
+
+Version 0.1.0 2011-01-xx 
+
+1. Introduction 
+=============== 
+bischeck is targeted to provide business application service checks to be 
+integrated with Nagios. The goal is initially to provide checks that do 
+database queries and interface response time measuring. bischeck also have the 
+capability to set thresholds for warning and critical levels based on 
+time-of-day. This feature is important since many businesses have business 
+markers that change during the day so monitoring the number of orders at 
+11:00-12:00 is different to monitoring the number of orders expected in the 
+interval between 15:00-16:00. 
+
+bischeck runs as a stand-alone daemon and communicates with Nagios over the 
+nsca protocol. bischeck is written in Java and utilize the jsendnsca package to 
+communicate with the nsca daemon. bischeck can of course run on the same server 
+as Nagios or on a remote server. 
+
+Service configuration 
+--------------------- 
+Configuration of bischeck is done by describing hosts, services and service 
+items. The host and service names are the same you need to configure in Nagios. 
+Since bischeck work with passive checks the check_dummy check command should be 
+used. The service item describe the  parameter/marker you want to monitor for 
+the service. As an example we have host sapserver and we define a service 
+called orders. For the order service we define a connection url describing how 
+to connect to the hosts service. For the order service we have as an example 
+two service items defined as edi_orders and post_orders. The service items use 
+the service connection url to execute the check that is defined for the service 
+item. This check is described in the field called execstatement.
+                  
+The service url is used by bischeck to instantiate the right service class to 
+manage the service. If the url has a schema part that is jdbc, the JDBCService 
+is created and used. Each service class must implement the Service interface. 
+The creation of the specific service class is done in the ServiceFactory class. 
+The same structure is also used for the instantiation of service items. Hence, 
+the SQLServiceItem class is used if jdbc is the schema part of the service url. 
+In the future there could be a parsing of the execstatement to support multiple 
+service item classes for the same service class. The execstatement is only 
+allowed to return on single value. 
+ 
+A service item class must implement the interface Serviceitem and is created 
+through the ServiceItemFactory class. 
+
+All host, service and service items are defined in a SQL configuration file 
+hosted in a sqlite3 database. 
+
+Date formatting 
+--------------- 
+Many service items that execute statements will typically execute something 
+depending on a date. For this reason bischeck supports date macros in the 
+execstatement string. For example, if this is a sql select statement that using 
+a date condition, the formatting could be done like this: 
+ 
+select count(orders) from order where fromdate='%%yyyy-MM-dd%[M-1]%%' 
+and todate='%%yy.MM.dd%[D2]%%'; 
+
+bischeck will replace anything between %% and %% with the current date 
+according to the format string. The formatting follows the structure of the 
+java SimpleDateFormatter class. If the format string includes a %[] macro, the 
+current date will be calculated based on the operation. Y means year, M means 
+month and D means day. So D-1 means subtract one day from the current date  and 
+M2 means add two months to the current date. A construction like D-1Y-1 is not 
+supported. 
+
+Threshold configuration 
+----------------------- 
+To define if the service item value(s) retrieved are okay or on a warning or 
+critical level, a threshold class is specified for a specific service' service 
+item(s). The thresholds are stored in a cache that is valid for a period of a 
+day. Every new day the threshold cache is invalidated and bischeck looks for 
+new valid threshold classes to instantiate for the service item for the period 
+of a day. 
+
+The reason that the period is a day is that there may be a need to configure 
+the threshold object differently depending on the day of the week or month. 
+
+A valid threshold class must implement the interface Threshold. The creation of 
+Threshold objects are done through the ThresholdFactory class that also manages 
+the cache of currently valid threshold objects. 
+
+This structure enables a flexible implementation of very different ways to 
+calculate or specify the threshold. In the simplest form a threshold class 
+could just return a constant value and in the more complex solution be based on 
+algorithms, database content, time of the month, etc or some complex 
+combination. 
+
+In future versions. different threshold classes may be used for different days 
+or other time defined periods. 
+ 
+Since the threshold calculation can vary it is not trivial to define a common 
+format for the messages sent to the remote NSCA daemon. For that reason the 
+Service class is responsible for formatting  the output to a format that makes 
+sense to the specific Service class. 
+
+Twenty4HourThreshold class 
+-------------------------- 
+The Twenty4Hour threshold class configuration divides the day into 24 hours - 
+surprised or :)? For each hour, a "threshold" value is defined. The two 
+threshold values that are next to each other are used to calculate a slope of a 
+linear equation between the two closest hours. For example, if the threshold 
+value at 14:00 is 1000 and 1600 at 15:00, the calculation for a threshold value 
+between 14:00 and 15:00 is y=x*(1600-1000)/60 + 1000. So at 14:20 the threshold 
+is 20*(1600-1000)/60+1000 = 1200. 
+
+
+The threshold model gives a linear equation with one hour granularity but over 
+24 hours it can "look" like a curve. This behavior is typical in business 
+systems where the key business values av some “curve” distribution over a 
+period of a day, e.g incoming orders over a day is probably not constant over 
+the day. 
+ 
+Since the threshold for a service item can be different depending on day of 
+week or day of month, the configuration supports thresholds to be described on 
+a granularity depending on day of week or month. To support that thresholds can 
+change per day, the thresholds will be reloaded every day at 00:00. To find the 
+right threshold, the systems look for threshold specification for a service 
+item in the following order: 
+1 - Month and day of month 
+2 - Week and day of week 
+3 - Day in month
+4 - Day in the week
+5 - Month 
+6 - Week 
+7 - Default 
+Where month is between 1-12, week 1-53, day of month 1-31 and day of week 1-7 
+(1-Sun). The default threshold is used if no other matching occurs. If no 
+thresholds are specified for a service item there will not be any notification 
+but the service item will still be monitored and reported.
+Since holidays ar often days where the business are not operational there is a 
+way to describe days that should no have any threshold. These exclude days are 
+are checked before any other rule. 
+If we just need to check part of a day for thresholds, just set the hour time 
+to NULL and no calculation will be done for that time interval.  So to not do 
+any thresholds checks for a weekend just define rule number 4 for day 1 and 6 
+with all hours threshold to NULL.
+
+TODO - database description
+
+Basic configuration file 
+------------------------ 
+The basic configuration file is a sqlite version 3 database file. The database 
+called bischeck.conf include the following tables: 
+
+properties - holds property values for bischeck 
+++++++++++ 
+* key varchar(128) - property name 
+* value varchar(256)) - property value 
+
+The following properties must probably be changed from the defaults: 
+nscaserver - the IP/hostname of the server running the nsca server, e.g. 
+"172.25.1.56", default is "localhost". 
+nscaencryption - the encryption used in the transfer, e.g. "XOR", default is 
+"XOR". 
+nscapassword - the password for the nsca server, default is "". 
+nscaport - the server port for the nsca server, default is "5667" 
+checkinterval - the interval in seconds to run the bischeck, e.g. "300" 
+pidfile - the pid file for bischeck, default is "/var/tmp/bischeck.pid" - 
+should not be changed!
+
+The properties table can also include service and service item specific 
+properties. A class specific property should have the format of the key as: 
+classname.propertyname 
+
+Any class specific properties must have a default value implemented by the 
+class itself. E.g. for SQLServiceItem there is a property, querytimeout, that 
+sets the max time in seconds before aborting the query. This property has the 
+name SQLServiceItem.querytimeout and have a default value of 10 seconds. 
+
+The class specific properties are always static fields in the class and should 
+have a default value. 
+
+hosts - Host attributes 
++++++++++++++++++++++++ 
+* id (int) - the internally used identification of the host 
+* name (varchar (128)) -- the name of the host. Must be the same name as 
+configured on the nagios server 
+* desc (varchar(256)) - a free description field 
+* active (int) - 1 if the the object should be configured, 0 if not. 
+
+services - Service attributes 
++++++++++++++++++++++++++++++ 
+* id (int) - the internally used identification of the service 
+* hostid (int) - the id of the host that this service is configured for, 
+created as a FOREIGN KEY(hostid) REFERENCES host(id) 
+* name (varchar(128)) - name of the service. Must be the same name as the 
+configured service on the nagios server 
+* desc (varchar(256)) - a free description field 
+* url varchar(256)- the connection specification for the server/service to 
+monitor in a url format 
+* driver (varchar(256)) - a class name if a specific class is needed by the url 
+specification 
+* active (int) - 1 if the object should be configured, 0 if not. 
+
+
+items - Service items attributes 
+++++++++++++++++++++++++++++++++ 
+* id (int) - the internally used identification of the service item 
+* serviceid (int) - the id of the service that this service item is configured 
+for, created as a FOREIGN KEY(serviceid) REFERENCES service(id) 
+* name (varchar(128)) - name of the service item 
+* desc (varchar(256)) - a free description field 
+* execstatement (varchar(256)) - the specification of what to be executed to 
+monitor the service item 
+* thresholdclass (varchar(256)) - the threshold class to use for the specific 
+combination of service and service item. 
+* active (int) - 1 if the the object should be configured, 0 if not. 
+
+To generate the tables and basic info run: 
+TODO
+
+Configuration tools 
+------------------- 
+The initial version provides no additional tools for configuration other than 
+the normal command line interface of sqlite3. Use normal DML statements to 
+create configurations. 
+Example: Set up an order rate check service on a host called jupiter with two 
+service items for total orders today and faulty orders with yesterdays date. 
+
+insert into hosts values (1, "jupiter","Order server", 1); 
+insert into services values (1,1,"Orders","Order 
+processing","jdbc:mysql://jupiter/orderdb?user=aha&password=test","com.mysql.jdb
+c.Driver",1); 
+insert into items values (1,1,"total orders","Total number of orders","select 
+sum(*) from orders where 
+order_date='%%yyyy-MM-dd%%'","com.ingby.socbox.bischeck.threshold.Twenty4HourThr
+eshold",1); 
+insert into items values (2,1,"fault orders","Faulty orders","select sum(*) 
+from orders where order_date='%%yyyy-MM-dd%[D-1]%%' and orderstate ='F' 
+","com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold",1); 
+
+The example in detail: 
+The first line creates a host, including description, called jupiter. This is 
+the host name that also must be configured in the nagios server. The first 
+column is just an internal id for jupiter. The third column is the description 
+of the host and used only as documentation. The last column specifies that the 
+entry is active and should be configured by bischeck. The usage of the “active” 
+column is the same for service and service items. The second line is the 
+specification of the service. The name “Orders” must be configured as a passive 
+check in nagios for the host jupiter. The forth field in this line is a 
+connection url to connect to the service source. Depending on the url the 
+correct service class will be used. For a jdbc url the JDBCService will be 
+instantiated. The fifth field is used depending on the url field but in the 
+jdbc case it defines the driver class used. 
+
+The third and forth lines describe two service items that will be checked for 
+this service. From a nagios perspective, both service items will be in the 
+performance part of the message sent to nagios which will result in separate 
+graphs if pnp4nagios is used. The first field is the internal unique id of the 
+service item and the second field is the service id it is related to. The third 
+field is the name of the service item. This will be the name used in the 
+performance message and the name of the graph in nagios. The forth field is the 
+description and the fifth is the execute statement to be used to retrieve the 
+data to monitor. Since the service is a jdbc service, the service item must be 
+something that can be executed in sql. In this case is is a select that returns 
+a single value. The sixth field is the class name used to calculate the 
+threshold for the service. The threshold class is responsible of calculating if 
+the value returned by the execute statement is ok, warning och critical. 
+
+Data reporting and performance data 
+----------------------------------- 
+The data format between bischeck and nagios follow the standard nsca format. 
+The data is packaged using the methods in jsendnsca. For a service in bischeck 
+the data is split in the plugin output and the performance output. The plugin 
+output has the following format: 
+<level> <service item name> = <measured value> (<threshold> / w<warning value / 
+c<critical value>), <service item name> = ... 
+
+Since a service can have multiple service items, the output is presented as a 
+concatenated string of service items. The <measured value> is the value that 
+was retrieved from the execution of the specific service item query/code. The 
+<threshold> is the current threshold value that the measured value has been 
+compared against. The calculated warning and critical levels are also presented 
+marked with a w and a c. Example plugin output: 
+OK orders = 12000 (11000 / w9900 / c7700) 
+In this case the threshold value is 11000 and warning and critical levels has 
+been set to 10% and 30 % of the current threshold. Since the warning and 
+critical level are fixed the calculated level will changed with the current 
+threshold.
+
+   
+If there are no threshold values defined for the current period in which the 
+check is done, the threshold is reported as null and no calculation is done 
+that can be used for notification. Null can also be reported as the measured 
+value. This can occur if a none/null value is retrieved for the service item, 
+for example a from a faulty sql statement. 
+
+Service connection problems will be reported as critical. 
+
+Warning and critical notification will be based on the service item that has 
+the highest level of severity. If one service item reports critical and the 
+other reports OK the service will report critical.  
+
+For the performance data, which graphs are based upon, each service is included 
+with the addition of the average execution time for the service items that is 
+part of the service. The execution time is always reported in milliseconds. The 
+performance data has the following format: 
+
+ 
+bischeck internal surveillance   
+------------------------------ 
+- bischeck_connection (TODO) 
+If a service related connection fails, the bischeck_connection nagios service 
+will be called for the host running the bischeck daemon. The message output 
+will have the format: 
+<service name> - <connection string> <error message> 
+
+
+Design notes 
+------------ 
+The bischeck main class is Execute. This class executes all service items on 
+period intervals defined by the property "checkinterval". The execution is done 
+in sequence by a single thread. This means that any remote connection must be 
+made safe not to get "stuck" and hang. Methods for time out should always be 
+used. E.g. the SQLServiceItem class has a property called 
+SQLServiceItem.querytimeout that by default allows a query to take 10 seconds. 
+
+The bischeck sleep interval is implemented as a wait(checkinterval'1000). 
+
+2. Building bischeck 
+==================== 
+Bischeck is built using Apache buildr. To install buildr on Redhat type of 
+distributions do: 
+$ sudo yum install ruby rubygems ruby-devel 
+$ export JAVA_HOME=<java home> 
+$ sudo env JAVA_HOME=$JAVA_HOME gem install buildr 
+
+Check out the bischeck trunk from gforge.ingby.com:
+$ svn checkout --username anonymous 
+http://gforge.ingby.com/svn/socbox//trunk/src/bischeck
+
+To build bischeck run from the directory where you checked out the bischeck 
+code:  
+$ buildr clean; buildr build; buildr package 
+
+This will create a compressed tar file in the target directory, named 
+bischeck-x.y.z.tgz where x.y.z is the version number. 
+
+3. Installation 
+=============== 
+The latest version of bischeck is avilable on 
+http://gforge.ingby.com/gf/project/socbox/frs. To down load click the link or 
+from the command line:
+$ wget  http://gforge.ingby.com/gf/project/socbox/frs/bischeck-x.y.z.tgz
+
+Untar the distribution file in a directory and then run the install script. 
+Make sure you have root privileges doing this.
+# tar xzvf bischeck-x.y.z.tgz 
+# cd bischeck-x.y.z 
+#  sh install -u
+# sh install -U nagios -I /opt/socbox/addons/bischeck 
+# service bischeckd start 
+
+The last command starts the service running it as the user given with -U. 
+
+Logging is described in the log4.properties file and by default writes log info 
+at level INFO to file /var/tmp/bischeck.log. 
+ 
+The process id  of the java process running bischeck is located in 
+/var/tmp/bischeck.pid. This file is used by bischeckd to stop the java program 
+running bischeckd and make sure only one program is started.
+
+To support custom jar files please place them in installation directory sub 
+directory customlib. This would typical be jdbc drivers, custom thresholds,
+etc.
+
+4. Upgrading 
+============ 
+N/A 
+
+5. Releases 
+=========== 
+Release 0.1.0 - 
+
+New features: 
+
+Bugs fixed and important issues: 
+
+6. System requirements 
+====================== 
+Runs basically on any OS that supports java. Tests have been done on Java 6. 
+The installation script is only supported on Redhat type distributions. 
+
+The following rpm packages needs to be installed: 
+- sqlite3 
+- javasqlite 
+
+The jars related to these packages are on a redhat type distribution located 
+in: 
+- javasqlite.jar - /usr/lib/javasqlite 
+- mysql-connector-java.jar - /usr/share/java 
+
+
+The following jar packages are distributed as part of the bischeck 
+distribution. All these packages have their own open source licenses. 
+ 
+commons-lang-2.5.jar - http://commons.apache.org/lang/ 
+Apache project - http://www.apache.org/licenses/LICENSE-2.0.html 
+
+log4j-1.2.16.jar - http://logging.apache.org/log4j/ 
+Apache project - http://www.apache.org/licenses/LICENSE-2.0.html    
+
+quartz-1.8.4.jar - http://www.quartz-scheduler.org/ 
+Apache project - http://www.apache.org/licenses/LICENSE-2.0.html    
+
+jsendnsca-2.0.1.jar - http://code.google.com/p/jsendnsca/ 
+Apache project - http://www.apache.org/licenses/LICENSE-2.0.html    
+
+All jars distributed as part of bischeck are located in the lib directory. 
+
+. Tips and trick 
+================= 
+If the service item name is changes 
+
+
+
