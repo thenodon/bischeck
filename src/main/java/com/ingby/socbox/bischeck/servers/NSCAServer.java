@@ -50,6 +50,7 @@ public class NSCAServer implements Server {
 		.withPort(Integer.parseInt(prop.getProperty("nscaport","5667")))
 		.withEncryption(Encryption.valueOf(prop.getProperty("nscaencryption","XOR")))
 		.withPassword(prop.getProperty("nscapassword",""))
+		.withConnectionTimeout(Integer.parseInt(prop.getProperty("connectionTimeout","5000")))
 		.create();
 	}
 	

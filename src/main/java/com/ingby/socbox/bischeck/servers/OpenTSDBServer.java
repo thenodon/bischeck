@@ -2,7 +2,10 @@ package com.ingby.socbox.bischeck.servers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +28,13 @@ public class OpenTSDBServer implements Server {
 	private String instanceName;
 	private int port;
 	private String host;
-
+	private int connectionTimeout;
 	
 	private OpenTSDBServer (String name) {
 		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
 		host = prop.getProperty("hostname","localhost");
 		port = Integer.parseInt(prop.getProperty("port","4242"));
+		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout","5000"));
 		instanceName = name;
 	}
 	
@@ -68,7 +72,14 @@ public class OpenTSDBServer implements Server {
 		long duration = 0;
 		try {
 			long start = TimeMeasure.start();
-			opentsdbSocket = new Socket(host, port);
+			InetAddress addr = InetAddress.getByName(host);
+			SocketAddress sockaddr = new InetSocketAddress(addr, port);
+
+			//opentsdbSocket = new Socket(host, port);
+			opentsdbSocket = new Socket();
+			
+			opentsdbSocket.connect(sockaddr,connectionTimeout);
+						
 			out = new PrintWriter(opentsdbSocket.getOutputStream(), true);
 			out.println(message);
 			out.flush();
