@@ -143,43 +143,22 @@ public class Execute implements ExecuteMBean {
 			e1.printStackTrace();
 			System.exit(1);
 		}
-		//confmgr = ConfigurationManager.getInstance();
 		
 		if (line.hasOption("host") && line.hasOption("service")) {
 			// Not implemented
 		}
 		
 		
-		int retStat = 0;
+		int retStat = Execute.getInstance().daemon();
 		
-		
-		//if (line.hasOption("deamon"))
-			retStat = Execute.getInstance().daemon();
-		//else 
-			//retStat = Execute.getInstance().once();
-	
 		System.exit(retStat);
 	}
 	
 	private static Execute getInstance() {
 		return exec;
 	}
-/*
-	private static Execute getInstance(ConfigurationManager configMgr) {
-		exec.setConfigMgr(configMgr); 
-		return exec;
-	}
+
 	
-	
-	private void setConfigMgr(ConfigurationManager configMgr) {
-		this.confMgr = configMgr;	
-	}
-	
-	
-	private ConfigurationManager getConfigMgr() {
-		return this.confMgr;	
-	}
-	*/
 	@SuppressWarnings("unchecked")
 	private int daemon() {
 		
