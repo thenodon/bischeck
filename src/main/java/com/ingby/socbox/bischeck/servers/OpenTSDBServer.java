@@ -27,12 +27,12 @@ public class OpenTSDBServer implements Server {
 	
 	private String instanceName;
 	private int port;
-	private String host;
+	private String hostAddress;
 	private int connectionTimeout;
 	
 	private OpenTSDBServer (String name) {
 		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
-		host = prop.getProperty("hostname","localhost");
+		hostAddress = prop.getProperty("hostAddress","localhost");
 		port = Integer.parseInt(prop.getProperty("port","4242"));
 		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout","5000"));
 		instanceName = name;
@@ -72,10 +72,9 @@ public class OpenTSDBServer implements Server {
 		long duration = 0;
 		try {
 			long start = TimeMeasure.start();
-			InetAddress addr = InetAddress.getByName(host);
+			InetAddress addr = InetAddress.getByName(hostAddress);
 			SocketAddress sockaddr = new InetSocketAddress(addr, port);
 
-			//opentsdbSocket = new Socket(host, port);
 			opentsdbSocket = new Socket();
 			
 			opentsdbSocket.connect(sockaddr,connectionTimeout);
@@ -86,9 +85,8 @@ public class OpenTSDBServer implements Server {
 			
 			duration = TimeMeasure.stop(start);
 			logger.info("OpenTSDB send execute: " + duration + " ms");
-
 		} catch (UnknownHostException e) {
-			logger.error("Don't know about host: " + host);
+			logger.error("Don't know about host: " + hostAddress);
 		} catch (IOException e) {
 			logger.error("Network error - check OpenTSDB server and that service is started - " + e);
 		}

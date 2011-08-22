@@ -46,10 +46,10 @@ public class NSCAServer implements Server {
 	private NagiosSettings getNSCAConnection(String name)  {
 		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
 		return new NagiosSettingsBuilder()
-		.withNagiosHost(prop.getProperty("nscaserver","localhost"))
-		.withPort(Integer.parseInt(prop.getProperty("nscaport","5667")))
-		.withEncryption(Encryption.valueOf(prop.getProperty("nscaencryption","XOR")))
-		.withPassword(prop.getProperty("nscapassword",""))
+		.withNagiosHost(prop.getProperty("hostAddress","localhost"))
+		.withPort(Integer.parseInt(prop.getProperty("port","5667")))
+		.withEncryption(Encryption.valueOf(prop.getProperty("encryptionMode","XOR")))
+		.withPassword(prop.getProperty("password",""))
 		.withConnectionTimeout(Integer.parseInt(prop.getProperty("connectionTimeout","5000")))
 		.create();
 	}
