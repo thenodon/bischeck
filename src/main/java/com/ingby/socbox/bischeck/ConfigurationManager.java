@@ -761,7 +761,7 @@ public class ConfigurationManager {
 	
 
 	public  String getCacheClearCron() {
-		return prop.getProperty("cacheclear","10 0 00 * * ? *");
+		return prop.getProperty("thresholdCacheClear","10 0 00 * * ? *");
 	}
  
 	

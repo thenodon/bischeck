@@ -3,28 +3,14 @@
 <properties>
 
   <property>
-    <key>nscaserver</key>
-    <value>localhost</value>
-  </property>
-
-  <property>
-    <key>nscaencryption</key>
-    <value>XOR</value>
-  </property>
-
-  <property>
-    <key>nscapassword</key>
-    <value>change this</value>
-  </property>
-
-  <property>
-    <key>nscaport</key>
-    <value>5667</value>
-  </property>
-
-  <property>
     <key>pidfile</key>
     <value>/var/tmp/bischeck.pid</value>
+  </property>
+
+  <!-- Clear the threshold cache every day 10 sec after midnight -->
+  <property>
+    <key>thresholdCacheClear</key>
+    <value>10 0 00 * * ? *</value>
   </property>
 
   <property>
@@ -32,7 +18,8 @@
     <value>5</value>
   </property>
 
-<!-- Already the default values to have week numbering according to ISO 8601  
+  
+<!-- Already the default values to have week numbering according to ISO 8601 -->  
   <property>
     <key>mindaysinfirstweek</key>
     <value>4</value>
@@ -42,6 +29,5 @@
     <key>firstdayofweek</key>
     <value>2</value>
   </property>
--->
 
 </properties>
