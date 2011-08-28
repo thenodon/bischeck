@@ -4,45 +4,42 @@
 
   <server name="NSCA">
     <class>
-    com.ingby.socbox.bischeck.servers.NSCAServer</class>
+       com.ingby.socbox.bischeck.servers.NSCAServer
+    </class>
+    
     
     <property>
-      <key>class</key>
-      <value>com.ingby.socbox.bischeck.servers.NSCAServer</value>
-    </property>
-
-    <property>
-      <key>nscaserver</key>
+      <key>hostAddress</key>
       <value>localhost</value>
     </property>
 
     <property>
-      <key>nscaencryption</key>
+      <key>encryptionMode</key>
       <value>XOR</value>
     </property>
 
     <property>
-      <key>nscapassword</key>
+      <key>password</key>
       <value>change this</value>
     </property>
 
     <property>
-      <key>nscaport</key>
+      <key>port</key>
       <value>5667</value>
     </property>
 
+    <property>
+      <key>connectionTimeout</key>
+      <value>5000</value>
+    </property>
 
   </server>
 
   <server name="OpenTSDB">
     <class>com.ingby.socbox.bischeck.servers.OpenTSDBServer</class>
+    
     <property>
-      <key>class</key>
-      <value>com.ingby.socbox.bischeck.servers.OpenTSDBServer</value>
-    </property>
-
-    <property>
-      <key>hostname</key>
+      <key>hostAddress</key>
       <value>localhost</value>
     </property>
 
@@ -50,24 +47,30 @@
       <key>port</key>
       <value>4242</value>
     </property>
+
+    <property>
+      <key>connectionTimeout</key>
+      <value>5000</value>
+    </property>
+
   </server>  
 
  <server name="XYZ">
     <class>com.ingby.socbox.bischeck.servers.OpenTSDBServer</class>
     
     <property>
-      <key>class</key>
-      <value>com.ingby.socbox.bischeck.servers.OpenTSDBServer</value>
-    </property>
-
-    <property>
-      <key>hostname</key>
+      <key>hostAddress</key>
       <value>localhost</value>
     </property>
 
     <property>
       <key>port</key>
       <value>4242</value>
+    </property>
+
+    <property>
+      <key>connectionTimeout</key>
+      <value>5000</value>
     </property>
 
   </server>  
