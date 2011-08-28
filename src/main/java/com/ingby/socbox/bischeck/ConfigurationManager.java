@@ -422,17 +422,34 @@ public class ConfigurationManager {
 
 		while (iter.hasNext()) {
 			XMLServer serverconfig = iter.next(); 
-			Properties prop = new Properties();
-			Iterator<com.ingby.socbox.bischeck.xsd.servers.XMLProperty> propIter = serverconfig.getProperty().iterator();
-			while (propIter.hasNext()) {
-				com.ingby.socbox.bischeck.xsd.servers.XMLProperty propertyconfig = propIter.next();
-				prop.put(propertyconfig.getKey(),propertyconfig.getValue());
-			}
-			servermap.put(serverconfig.getName(), prop);			
-			
-			serversclass.put(serverconfig.getName(), Class.forName(serverconfig.getClazz().trim()));
+			setServers(serverconfig);
 			
 		}
+	}
+
+
+	private void setServers(XMLServer serverconfig)
+			throws ClassNotFoundException {
+		
+		Iterator<com.ingby.socbox.bischeck.xsd.servers.XMLProperty> propIter = serverconfig.getProperty().iterator();
+		
+		Properties prop = setServerProperties(propIter);
+		
+		servermap.put(serverconfig.getName(), prop);			
+		
+		serversclass.put(serverconfig.getName(), Class.forName(serverconfig.getClazz().trim()));
+	}
+
+
+	private Properties setServerProperties(
+			Iterator<com.ingby.socbox.bischeck.xsd.servers.XMLProperty> propIter) {
+		Properties prop = new Properties();
+		
+		while (propIter.hasNext()) {
+			com.ingby.socbox.bischeck.xsd.servers.XMLProperty propertyconfig = propIter.next();
+			prop.put(propertyconfig.getKey(),propertyconfig.getValue());
+		}
+		return prop;
 	}
 
 	
