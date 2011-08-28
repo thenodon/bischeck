@@ -85,11 +85,11 @@ A business activity check command server for Nagios
 \end_layout
 
 \begin_layout Date
-Version 0.3.2 
+Version 0.3.3 
 \begin_inset Newline newline
 \end_inset
 
-2011-07-29
+2011-
 \end_layout
 
 \begin_layout Standard
@@ -160,8 +160,8 @@ Support for custom threshold classes to enable any way to define threshold
 \end_layout
 
 \begin_layout Itemize
-Standard integration with nagios over the nsca protocol for passive checks.
- 
+Integrates with multiple monitoring and surveillance tools like Nagios and
+ OpenTSDB.
 \end_layout
 
 \begin_layout Standard
@@ -225,12 +225,8 @@ Example 3 – Monitor the current number of orders and if the inflow is zero
 \begin_inset Newline newline
 \end_inset
 
-bischeck runs as a stand-alone daemon and communicates with Nagios over
- the NSCA protocol.
- bischeck is written in Java and utilize the excellent jsendnsca package
- to communicate with the nsca daemon on the nagios server.
- bischeck can of course run on the same server as Nagios or on a remote
- server.
+bischeck is written in Java and runs as a stand-alone daemon.
+ It communicates with different monitoring and surveillance tools.
  
 \begin_inset Newline newline
 \end_inset
@@ -835,18 +831,20 @@ Data reporting and performance data
 \end_layout
 
 \begin_layout Standard
-Since the threshold calculation can vary it is not trivial to define a common
- format for the messages sent to the remote NSCA daemon.
- For that reason the Service class is responsible for formatting the output
- to a format that makes sense to the specific Service class.
- A default format is provided in the ServiceAbstract class but can be overridden
- by the Service class implementation.
- The below description is the default implementation of the ServiceAbstract
- class.
+Since bischeck support integration with multiple monitoring its not possible
+ to define a single message format.
+ For that reason each Server class implementation is responsible for formatting
+ the output to a format that makes sense to the specific reciving monitor
+ tool.
+ 
+\end_layout
+
+\begin_layout Section
+NSCA Nagios formatting 
 \end_layout
 
 \begin_layout Standard
-The data format between bischeck and nagios follow the standard NSCA format.
+The data format between bischeck and Nagios follow the standard NSCA format.
  The data is packaged using the methods in jsendnsca.
  For a service in bischeck the data is split in the plugin output and the
  performance output.
@@ -951,6 +949,14 @@ The execution time of the service execute statement is always part of the
  
 \end_layout
 
+\begin_layout Section
+OpenTSDB
+\end_layout
+
+\begin_layout Standard
+To be done
+\end_layout
+
 \begin_layout Chapter
 \begin_inset CommandInset label
 LatexCommand label
@@ -1036,27 +1042,16 @@ status open
 \begin_layout Standard
 The following properties should be changed depending on your installation:
  
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+SHOULD be moved
 \end_layout
 
-\begin_layout Itemize
-nscaserver - the IP/hostname of the server running the nsca server, e.g.
- "172.25.1.56", default is "localhost".
- 
-\end_layout
+\end_inset
 
-\begin_layout Itemize
-nscaencryption - the encryption used in the transfer, e.g.
- "XOR", default is "XOR".
- 
-\end_layout
 
-\begin_layout Itemize
-nscapassword - the password for the nsca server, default is "".
- 
-\end_layout
-
-\begin_layout Itemize
-nscaport - the server port for the nsca server, default is "5667".
 \end_layout
 
 \begin_layout Itemize
@@ -1354,8 +1349,8 @@ urlservice.xml
 \end_layout
 
 \begin_layout Standard
-The configuration fil holds information of the mapping between service url
- schema and Service class.
+The configuration file holds information of the mapping between service
+ url schema and Service class.
  The urlservice xml has a structure of: 
 \end_layout
 
@@ -1434,6 +1429,202 @@ value – the Service class name.
 \begin_layout Standard
 Important is that the name field for host, service and service item are
  not allowed to include the dash (-) character.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:server.xml"
+
+\end_inset
+
+server.xml 
+\end_layout
+
+\begin_layout Standard
+The configuration file holds information of the mapping between service
+ url schema and Service class.
+ The urlservice xml has a structure of: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<servers>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<server name="Nagios1">     
+\end_layout
+
+\begin_layout Plain Layout
+
+		<class>
+\end_layout
+
+\begin_layout Plain Layout
+
+	       com.ingby.socbox.bischeck.servers.NSCAServer     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</class>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<property>
+\end_layout
+
+\begin_layout Plain Layout
+
+	      <key>hostAddress</key>
+\end_layout
+
+\begin_layout Plain Layout
+
+	      <value>localhost</value>
+\end_layout
+
+\begin_layout Plain Layout
+
+	    </property>
+\end_layout
+
+\begin_layout Plain Layout
+
+    	<property>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<key>encryptionMode</key>
+\end_layout
+
+\begin_layout Plain Layout
+
+		    <value>XOR</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+    	<property>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<key>password</key>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<value>change this</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+    	<property>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<key>port</key>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<value>5667</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+    	<property>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<key>connectionTimeout</key>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<value>5000</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</property> 
+\end_layout
+
+\begin_layout Plain Layout
+
+	</server>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	<server name="Nagios2">     
+\end_layout
+
+\begin_layout Plain Layout
+
+	......
+\end_layout
+
+\begin_layout Plain Layout
+
+	</server>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+</servers>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each server that are to recive data is defined with the server tag and with
+ a unique attribute name.
+ This solution enable bischeck to send data to multiple servers of the same
+ type like multiple nagios servers.
+ The class tag define what Server class implemntation to use.
+ The class must be found in the classpath of bischeck and is validated at
+ startup.
+ Each Server implementation can have different numbers of properties.
 \end_layout
 
 \begin_layout Section
@@ -2905,6 +3096,59 @@ name "label:Releases"
 \end_inset
 
 Releases
+\end_layout
+
+\begin_layout Section
+Release 0.3.3 - 2011-
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+bischeck are no longer limited to just be integrated with a single Nagios
+ server over the NSCA protocol.
+ Now is it possible to integrate with multiple monitoring servers over different
+ protocols.
+ Currently Nagios/NSCA and OpenTSDB is support.
+ To enable this a new class component called Server has been introduced.
+ The class is responsible for communication and formatting for the specific
+ monitoring server it integrate against.
+ A new configuration file, server.xml is used for configuration of server
+ integration.
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+All the nsca related properties has been moved from properties.xml to servers.xml
+ when used for the NSCAServer class.
+ The new property names has also gone through some minor changes.
+ When upgrading a manual update is needed of the servers.xml file with the
+ current setting of nsca related properties in properties.xml.
+ Recommended that these are later removed.
+\end_layout
+
+\begin_layout Itemize
+Property 
+\emph on
+cacheclear
+\emph default
+ is renamed to 
+\emph on
+thresholdCacheClear
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+The implementation of running bischeck once, none daemon mode, is changed
+ so the same code is used as running in daemon mode.
+ The only difference is that the initialization of triggers are different
+ so all service items are just ran directly and once.
 \end_layout
 
 \begin_layout Section
