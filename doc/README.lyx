@@ -3119,6 +3119,13 @@ bischeck are no longer limited to just be integrated with a single Nagios
  integration.
 \end_layout
 
+\begin_layout Itemize
+[FR-202] The implementation of running bischeck once, none daemon mode,
+ is changed so the same code is used as running in daemon mode.
+ The only difference is that the initialization of triggers are different
+ so all service items are just ran directly and once.
+\end_layout
+
 \begin_layout Subsection
 Bugs fixed and important issues
 \end_layout
@@ -3145,10 +3152,7 @@ thresholdCacheClear
 \end_layout
 
 \begin_layout Itemize
-The implementation of running bischeck once, none daemon mode, is changed
- so the same code is used as running in daemon mode.
- The only difference is that the initialization of triggers are different
- so all service items are just ran directly and once.
+[TR-207] sudo in bischeckd script cause problem at boot
 \end_layout
 
 \begin_layout Section
