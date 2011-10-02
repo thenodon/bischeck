@@ -16,8 +16,15 @@ public class ServerExecutor {
 	static Logger  logger = Logger.getLogger(ServerExecutor.class);
 	
 	private static ServerExecutor serverexeutor= null;
+	/**
+	 * The serverSet holds all server configuration from servers.xml where 
+	 * the key is the name of the configuration, server name="NSCA">, the 
+	 * value is the class. The class must implement the Server class. 
+	 * The serverSet is provided through the ConfigurationManager.
+	 */
 	private Map<String,Class<?>> serverSet = new HashMap<String,Class<?>>();
 	private static final String GETINSTANCE = "getInstance";
+	
 	
 	private ServerExecutor() {
 		try {
@@ -27,6 +34,11 @@ public class ServerExecutor {
 		}
 	}
 
+	
+	/**
+	 * Factory to get a ServerExecutor instance.
+	 * @return
+	 */
 	synchronized public static ServerExecutor getInstance() {
 		if (serverexeutor == null) {
 			serverexeutor= new ServerExecutor();
@@ -34,6 +46,16 @@ public class ServerExecutor {
 		return serverexeutor;
 	}
 
+	
+	/**
+	 * The execute method is called every time a ServiceJob has been execute 
+	 * according to Service configured schedule.  
+	 * The method iterate through the ServerSet map and retrieve each server 
+	 * object and invoke the send(Service service) method define in the Server 
+	 * interface for each server in the maps. 
+	 * @param service the Service object that contain data to be send to the 
+	 * servers.
+	 */
 	synchronized public void execute(Service service) {
 
 		Iterator<String> iter = serverSet.keySet().iterator();

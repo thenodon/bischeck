@@ -21,26 +21,51 @@ import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceAbstract;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
-
+/**
+ * Nagios server integration over NSCA protocol, using the jnscasend package.
+ * @author andersh
+ *
+ */
 public class NSCAServer implements Server {
 
 	static Logger  logger = Logger.getLogger(NSCAServer.class);
-	static Map<String,NSCAServer> server = new HashMap<String,NSCAServer>();
+	/**
+	 * The server map is used to manage multiple configuration based on the 
+	 * same NSCAServer class.
+	 */
+	static Map<String,NSCAServer> nscaServers = new HashMap<String,NSCAServer>();
 	
 	private NagiosPassiveCheckSender sender = null;
 	private String instanceName;
 	
+	/**
+	 * Retrieve the Server object. The method is invoked from class ServerExecutor
+	 * execute method. The created Server object is placed in the class internal 
+	 * Server object list.
+	 * @param name the name of the configuration in server.xml, server name="myNSCA">
+	 * @return Server object
+	 */
 	synchronized public static Server getInstance(String name) {
 
-		if (!server.containsKey(name) ) {
-			server.put(name,new NSCAServer(name));
-			server.get(name).init(name);
+		if (!nscaServers.containsKey(name) ) {
+			nscaServers.put(name,new NSCAServer(name));
+			nscaServers.get(name).init(name);
 		}
-		return server.get(name);
+		return nscaServers.get(name);
 	}
 	
+	/**
+	 * Constructor 
+	 * @param name
+	 */
 	private NSCAServer(String name) {
 		instanceName=name;
+	}
+	
+	
+	private void init(String name) {
+		NagiosSettings settings = getNSCAConnection(name);
+		sender = new NagiosPassiveCheckSender(settings);
 	}
 	
 	private NagiosSettings getNSCAConnection(String name)  {
@@ -54,23 +79,18 @@ public class NSCAServer implements Server {
 		.create();
 	}
 	
-	private void init(String name) {
-		
-		
-		NagiosSettings settings = getNSCAConnection(name);
-		sender = new NagiosPassiveCheckSender(settings);
-	}
-	
 	@Override
 	synchronized public void send(Service service) {
 		NAGIOSSTAT level;
 	
 		MessagePayload payload = new MessagePayloadBuilder()
 		.withHostname(service.getHost().getHostname())
-		//.withLevel(level.val())
 		.withServiceName(service.getServiceName())
 		.create();
 		
+		/*
+		 * Check the last connection status for the Service
+		 */
 		if ( ((ServiceAbstract) service).statusConnection() ) {
 			try {
 				level = ((ServiceAbstract) service).getLevel();
@@ -80,7 +100,7 @@ public class NSCAServer implements Server {
 				payload.setMessage(level + " " + e.getMessage());
 			}
 		} else {
-			// If no connection established still write a value 
+			// If no connection is established still write a value 
 			//of null value=null;
 			level=NAGIOSSTAT.CRITICAL;
 			payload.setMessage(level + " " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
@@ -115,7 +135,12 @@ public class NSCAServer implements Server {
 	}// for service
 	
 	
-	
+	/**
+	 * Formatting the data according to Nagios specification, including performance
+	 * data. 
+	 * @param service
+	 * @return
+	 */
 	private String getMessage(Service service) {
 		String message = "";
 		String perfmessage = "";
@@ -125,9 +150,9 @@ public class NSCAServer implements Server {
 		for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
 			ServiceItem serviceItem = serviceItementry.getValue();
 		
-			Float warnValue = new Float(0);//null;
-			Float critValue = new Float(0);//null;
-			String method = "NA";//null;
+			Float warnValue = new Float(0);
+			Float critValue = new Float(0);
+			String method = "NA";;
 			
 			Float currentThreshold = Util.roundOneDecimals(serviceItem.getThreshold().getThreshold());
 			
@@ -186,7 +211,6 @@ public class NSCAServer implements Server {
 		return " " + message + " | " + 
 			perfmessage +
 			" avg-exec-time=" + ((totalexectime/count)+"ms");
-
 	}
 
 }
