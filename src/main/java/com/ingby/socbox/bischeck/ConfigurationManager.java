@@ -24,6 +24,7 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -46,10 +47,13 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.quartz.CronExpression;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.impl.StdSchedulerFactory;
 
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
@@ -67,9 +71,20 @@ import com.ingby.socbox.bischeck.xsd.servers.XMLServers;
 import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlproperty;
 import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlservices;
 
+/**
+ * The ConfigurationManager class is responsible for all core configuration of bischeck.
+ * The ConfigurationManager is shared and only instantiated once through the class factory.
+ *
+ * @author andersh
+ *
+ */
 
 public class ConfigurationManager {
 
+	/*
+	 * Enum definition of all xml file configuration including xml and xsd name, and JAXB class
+	 * name.
+	 */
 	public enum XMLCONFIG  { 
 		BISCHECK { 
 			public String toString() {
@@ -146,9 +161,17 @@ public class ConfigurationManager {
 
 	static Logger  logger = Logger.getLogger(ConfigurationManager.class);
 
+	/*
+	 * The ConfigurationManager 
+	 */
 	private static ConfigurationManager configMgr = null;
+	
+	/*
+	 * Cache to hold all unmarshalled xml configuration files. 
+	 */
 	private Map<String,Object> xmlcache = new HashMap<String,Object>();	
 
+	
 	private Properties prop = new Properties();	
 	private Properties url2service = new Properties();
 	private Map<String,Host> hostsmap = new HashMap<String,Host>();
@@ -183,9 +206,10 @@ public class ConfigurationManager {
 			System.exit(0);
 		}
 
-		ConfigurationManager.init();
+		ConfigurationManager.initonce();
 		ConfigurationManager confMgmr = ConfigurationManager.getInstance();
 		
+		logger.setLevel(Level.WARN);
 		
 		if (line.hasOption("verify")) {
 			System.exit(confMgmr.verify());
@@ -209,6 +233,11 @@ public class ConfigurationManager {
 		if (line.hasOption("pidfile")) {
 			System.out.println("PidFile:"+confMgmr.getPidFile().getPath());	
 		}
+		
+		
+		/* Since this is running from command line stop all existing schedulers */
+		StdSchedulerFactory.getDefaultScheduler().shutdown();
+		
 	}
 
 	
@@ -325,68 +354,14 @@ public class ConfigurationManager {
 		XMLBischeck bischeckconfig  =
 	  		  (XMLBischeck) getXMLConfiguration(ConfigurationManager.XMLCONFIG.BISCHECK);
 
-		Iterator<XMLHost> iterhost = bischeckconfig.getHost().iterator();
-		
-		while (iterhost.hasNext() ) {
-			XMLHost hostconfig = iterhost.next(); 
-
-			Host host= null;
-			if (hostsmap.containsKey(hostconfig.getName())) {
-				host = hostsmap.get(hostconfig.getName());
-			}
-			else {
-				host = new Host(hostconfig.getName());   
-				hostsmap.put(hostconfig.getName(),host);
-			}
-			
-			host.setDecscription(hostconfig.getDesc());
-
-			Iterator<XMLService> iterservice = hostconfig.getService().iterator();
-			
-			while (iterservice.hasNext()) {
-				XMLService serviceconfig = iterservice.next();
-				Service service = ServiceFactory.createService(
-						serviceconfig.getName(),
-						serviceconfig.getUrl());
-
-				//Check for null - not supported logger.error
-				service.setHost(host);
-				service.setDecscription(serviceconfig.getDesc());
-				service.setSchedules(serviceconfig.getSchedule());
-				service.setConnectionUrl(serviceconfig.getUrl());
-				service.setDriverClassName(serviceconfig.getDriver());	
-				if (service.getDriverClassName() != null) {
-					try {
-						Class.forName(service.getDriverClassName()).newInstance();
-					} catch ( ClassNotFoundException e) {
-						logger.error("Could not find the driver class - " + service.getDriverClassName() + 
-								" " + e.toString());
-						throw new Exception(e.getMessage());
-					}
-				}
-				
-				Iterator<XMLServiceitem> iterserviceitem = serviceconfig.getServiceitem().iterator();
-				
-				while (iterserviceitem.hasNext()) {
-					XMLServiceitem serviceitemconfig = iterserviceitem.next();
-					
-					ServiceItem serviceitem = ServiceItemFactory.createServiceItem(
-							serviceitemconfig.getName(),
-							serviceitemconfig.getServiceitemclass().trim());
-
-					serviceitem.setService(service);
-					serviceitem.setDecscription(serviceitemconfig.getDesc());
-					serviceitem.setExecution(serviceitemconfig.getExecstatement());
-					serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
-
-					service.addServiceItem(serviceitem);
-
-				}
-				host.addService(service);	
-			}
-		}
+		setupHost(bischeckconfig);
 		
 		// Create the quartz schedule triggers and store in a List
+		setServiceTriggers(once);
+	}
+
+
+	private void setServiceTriggers(boolean once) throws Exception {
 		for (Map.Entry<String, Host> hostentry: hostsmap.entrySet()) {
 			Host host = hostentry.getValue();
 			for (Map.Entry<String, Service> serviceentry: host.getServices().entrySet()) {
@@ -411,6 +386,89 @@ public class ConfigurationManager {
 				}
 				schedulejobs.add(servicejobconfig);
 			}	
+		}
+	}
+
+
+	private void setupHost(XMLBischeck bischeckconfig)
+			throws Exception, InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException,
+			ClassNotFoundException {
+		Iterator<XMLHost> iterhost = bischeckconfig.getHost().iterator();
+		
+		while (iterhost.hasNext() ) {
+			XMLHost hostconfig = iterhost.next(); 
+
+			Host host= null;
+			if (hostsmap.containsKey(hostconfig.getName())) {
+				host = hostsmap.get(hostconfig.getName());
+			}
+			else {
+				host = new Host(hostconfig.getName());   
+				hostsmap.put(hostconfig.getName(),host);
+			}
+			
+			host.setDecscription(hostconfig.getDesc());
+
+			setupService(hostconfig, host);
+		}
+	}
+
+
+	private void setupService(XMLHost hostconfig, Host host) throws Exception,
+			InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException,
+			ClassNotFoundException {
+		Iterator<XMLService> iterservice = hostconfig.getService().iterator();
+		
+		while (iterservice.hasNext()) {
+			XMLService serviceconfig = iterservice.next();
+			Service service = ServiceFactory.createService(
+					serviceconfig.getName(),
+					serviceconfig.getUrl());
+
+			//Check for null - not supported logger.error
+			service.setHost(host);
+			service.setDecscription(serviceconfig.getDesc());
+			service.setSchedules(serviceconfig.getSchedule());
+			service.setConnectionUrl(serviceconfig.getUrl());
+			service.setDriverClassName(serviceconfig.getDriver());	
+			if (service.getDriverClassName() != null) {
+				try {
+					Class.forName(service.getDriverClassName()).newInstance();
+				} catch ( ClassNotFoundException e) {
+					logger.error("Could not find the driver class - " + service.getDriverClassName() + 
+							" " + e.toString());
+					throw new Exception(e.getMessage());
+				}
+			}
+			
+			setupServiceItem(serviceconfig, service);
+			host.addService(service);	
+		}
+	}
+
+
+	private void setupServiceItem(XMLService serviceconfig, Service service)
+			throws NoSuchMethodException, InstantiationException,
+			IllegalAccessException, InvocationTargetException,
+			ClassNotFoundException {
+		Iterator<XMLServiceitem> iterserviceitem = serviceconfig.getServiceitem().iterator();
+		
+		while (iterserviceitem.hasNext()) {
+			XMLServiceitem serviceitemconfig = iterserviceitem.next();
+			
+			ServiceItem serviceitem = ServiceItemFactory.createServiceItem(
+					serviceitemconfig.getName(),
+					serviceitemconfig.getServiceitemclass().trim());
+
+			serviceitem.setService(service);
+			serviceitem.setDecscription(serviceitemconfig.getDesc());
+			serviceitem.setExecution(serviceitemconfig.getExecstatement());
+			serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
+
+			service.addServiceItem(serviceitem);
+
 		}
 	}
 	
@@ -593,53 +651,61 @@ public class ConfigurationManager {
 
 		xmlobj = xmlcache.get(xmlName);
 		if (xmlobj == null) {
-			File configfile = new File(initConfigDir(),xmlName);
-			JAXBContext jc;
-			try {
-				jc = JAXBContext.newInstance(instanceName);
-			} catch (JAXBException e) {
-				logger.error("Could not get JAXB context from class");
-				throw new Exception(e.getMessage());
-			}
-			SchemaFactory sf = SchemaFactory.newInstance(
-					javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Schema schema = null;
-			
-			
-			URL xsdUrl = Thread.currentThread().getContextClassLoader().getResource(xsdName);
-			if (xsdUrl == null) {
-				logger.error("Could not find xsd file " +
-						xsdName + " in classpath");
-				throw new Exception("Could not find xsd file " +
-						xsdName + " in classpath");
-			}
-			
-			try {
-				schema = sf.newSchema(new File(xsdUrl.getFile()));
-			} catch (Exception e) {
-				logger.error("Could not vaildate xml file " + xmlName + " with xsd file " +
-						xsdName + ": " + e.getMessage());
-				throw new Exception(e.getMessage());
-			} 
-
-			Unmarshaller u = null;
-			try {
-				u = jc.createUnmarshaller();
-			} catch (JAXBException e) {
-				logger.error("Could not create an unmarshaller for for context");
-				throw new Exception(e);
-			}
-			u.setSchema(schema);
-
-			try {
-				xmlobj =  u.unmarshal(configfile);
-			} catch (JAXBException e) {
-				logger.error("Could not unmarshall the file " + xmlName +":" + e);
-				throw new Exception(e);
-			}
-			xmlcache.put(xmlName, xmlobj);
-			logger.debug("Create new object for xml file " + xmlName + " and store in cache");
+			xmlobj = createXMLConfig(xmlName, xsdName, instanceName, xmlobj);
 		}
+		return xmlobj;
+	}
+
+
+	private Object createXMLConfig(String xmlName, String xsdName,
+			String instanceName, Object xmlobj) throws Exception {
+		File configfile = new File(initConfigDir(),xmlName);
+		JAXBContext jc;
+		
+		try {
+			jc = JAXBContext.newInstance(instanceName);
+		} catch (JAXBException e) {
+			logger.error("Could not get JAXB context from class");
+			throw new Exception(e.getMessage());
+		}
+		SchemaFactory sf = SchemaFactory.newInstance(
+				javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		Schema schema = null;
+		
+		
+		URL xsdUrl = Thread.currentThread().getContextClassLoader().getResource(xsdName);
+		if (xsdUrl == null) {
+			logger.error("Could not find xsd file " +
+					xsdName + " in classpath");
+			throw new Exception("Could not find xsd file " +
+					xsdName + " in classpath");
+		}
+		
+		try {
+			schema = sf.newSchema(new File(xsdUrl.getFile()));
+		} catch (Exception e) {
+			logger.error("Could not vaildate xml file " + xmlName + " with xsd file " +
+					xsdName + ": " + e.getMessage());
+			throw new Exception(e.getMessage());
+		} 
+
+		Unmarshaller u = null;
+		try {
+			u = jc.createUnmarshaller();
+		} catch (JAXBException e) {
+			logger.error("Could not create an unmarshaller for for context");
+			throw new Exception(e);
+		}
+		u.setSchema(schema);
+
+		try {
+			xmlobj =  u.unmarshal(configfile);
+		} catch (JAXBException e) {
+			logger.error("Could not unmarshall the file " + xmlName +":" + e);
+			throw new Exception(e);
+		}
+		xmlcache.put(xmlName, xmlobj);
+		logger.debug("Create new object for xml file " + xmlName + " and store in cache");
 		return xmlobj;
 	}
 
@@ -764,15 +830,6 @@ public class ConfigurationManager {
 	}
 
 	public Map<String,Class<?>> getServerClassMap() throws ClassNotFoundException {
-		/*
-		Map<String,Class<?>> serversclass = new HashMap<String,Class<?>>();
-		Iterator<String> iter = servermap.keySet().iterator();
-		while (iter.hasNext()) {
-			String key = iter.next();
-			Class<?> clazz = Class.forName(servermap.get(key).getProperty("class"));
-			serversclass.put(key, clazz);
-		}
-		*/
 		return serversclass;
 	}
 	
