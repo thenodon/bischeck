@@ -19,7 +19,8 @@
     <property name="docs.home" value="${basedir}/doc" />
     <property name="src.home" value="${basedir}/src" />
 	<property name="javasrc.home" value="${basedir}/src/main/java" />
-    <property name="javagensrc.home" value="${basedir}/src/main/generated" />
+	<property name="javasrcng.home" value="${basedir}/src/main/test/java" />
+	<property name="javagensrc.home" value="${basedir}/src/main/generated" />
 	<property name="scriptsrc.home" value="${basedir}/src/main/scripts" />
 	<property name="migscriptsrc.home" value="${basedir}/src/main/migscripts" />
 	<property name="javac_target" value="6" />
@@ -65,7 +66,44 @@
         
     </target>
     
+	<target name="compileng" depends="compile" description="Compile Java Test-NG sources">
+	        <!-- Compile Java classes as necessary -->
+	                
+	        <javac destdir="${build.home}/classes"
+	               debug="${compile.debug}" deprecation="${compile.deprecation}"
+	               optimize="${compile.optimize}" target="${javac_target}"
+	               excludes="*.java"
+	               source="${javac_src}"
+	               includeantruntime="false">
+	        	
+	        	<src path="${javasrcng.home}" />            
+	            <classpath refid="compile.classpath" />
+	        </javac>
+	        
+	</target>
 	
+	<taskdef name="testng" classname="org.testng.TestNGAntTask">
+		<classpath refid="compile.classpath"/>	
+    </taskdef>
+
+	<target name="test" depends="dist, compileng">
+	   <testng>
+	    <sysproperty key="bishome" value="${basedir}"/>
+	   	
+		<classpath>
+	   	    <pathelement path="${build.home}/classes"/>
+			<pathelement path="${build.home}/resources"/>
+			<fileset dir="${build.home}/lib/">
+        		<include name="*.jar" />
+    		</fileset>
+			<fileset dir="${basedir}/customlib/">
+			        		<include name="*.jar" />
+			</fileset>
+	   	 </classpath>
+	     <classfileset dir="${build.home}/classes" includes="testng/**/*.class"/>
+	   </testng>
+	 </target>
+
     <target name="dist" depends="clean, genjaxb, compile, javadoc, svninfo " description="Create binary distribution">
         
         <jar index="true" destfile="${build.home}/lib/${app.name}-${app.version}.jar" basedir="${build.home}/classes" >
