@@ -218,7 +218,11 @@
 	<target name="svninfo" description="svn info">
 	   <exec executable="svn" output="svninfo.txt" outputproperty="svnrev">      
 	        <arg value="log"/>
-	       	<arg value="-rHEAD"/>
+	        <arg value="--username"/>
+	   	    <arg value="anonymous"/>
+	        <arg value="--password"/>
+	   	    <arg value="no"/>
+	   	   	<arg value="-rHEAD"/>
 	        <arg value="-q"/>
 	   </exec>
 	   <echo>${svnrev}</echo>	
