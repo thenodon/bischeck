@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck;
 
@@ -36,24 +36,28 @@ public class JobListenerLogger implements JobListener {
 
 	@Override
 	public void jobExecutionVetoed(JobExecutionContext arg0) {
-		Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-		logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed vetoed");
-
+		if (arg0 instanceof Service) {	
+			Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
+			logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed vetoed");
+		}
 	}
 
 	@Override
 	public void jobToBeExecuted(JobExecutionContext arg0) {
-		Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-		logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed");
-		
+		if (arg0 instanceof Service) {
+			Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
+			logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed");
+		}
 
 	}
 
 	@Override
 	public void jobWasExecuted(JobExecutionContext arg0,
 			JobExecutionException arg1) {
-		Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-		logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " execution completed");
+		if (arg0 instanceof Service) {
+			Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
+			logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " execution completed");
+		}	
 	}
 
 }
