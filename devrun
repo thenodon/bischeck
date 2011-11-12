@@ -26,7 +26,7 @@ jmxssl=-Dcom.sun.management.jmxremote.ssl=false
 jmxauth=-Dcom.sun.management.jmxremote.authenticate=false 
 #jmx="$jmxport $jmxssl $jmxauth"
 #debug="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
-java $debug $jmx -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=test \
+java $debug $jmx -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=etc \
  -classpath $bishome/target/resources:$bishome/target/classes:$bishome/target/lib/*:$bishome/customlib/*:/usr/lib/javasqlite/sqlite.jar \
  com.ingby.socbox.bischeck.$program $arg 
 
