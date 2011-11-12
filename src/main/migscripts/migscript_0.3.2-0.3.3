@@ -1,3 +1,5 @@
 #!/bin/sh
 rm -f $1/etc/*.xml 
 cp $2/etc/*.xml $1/etc/
+user_grp=`stat --printf %U:%G $2/etc`
+chown $user_grp $1/etc/*.xml
