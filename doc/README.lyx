@@ -85,7 +85,7 @@ A business activity check command server for Nagios
 \end_layout
 
 \begin_layout Date
-Version 0.3.3 
+Version 0.4.0 
 \begin_inset Newline newline
 \end_inset
 
@@ -3099,7 +3099,47 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.3.3 - 2011-
+Release 0.4.0 - 201
+\end_layout
+
+\begin_layout Section
+Release 0.3.3 - 2011-11-14
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Standard
+No new features exists for this version.
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+TR-207 
+\begin_inset Quotes eld
+\end_inset
+
+sudo in bischeckd script cause problem at boot
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+TR-214 
+\begin_inset Quotes eld
+\end_inset
+
+Threshold object cache is no cleared
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
