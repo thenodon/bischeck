@@ -618,7 +618,7 @@ public class ConfigurationManager {
 	}
 
 
-	private File initConfigDir() throws Exception {
+	static public File initConfigDir() throws Exception {
 		String path = "";
 		String xmldir;
 		
