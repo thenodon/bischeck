@@ -79,86 +79,8 @@ import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlservices;
  *
  */
 
-public class ConfigurationManager {
-
-	/*
-	 * Enum definition of all xml file configuration including xml and xsd name, and JAXB class
-	 * name.
-	 */
-	public enum XMLCONFIG  { 
-		BISCHECK { 
-			public String toString() {
-				return "BISCHECK";
-			}
-			public String xml() {
-				return "bischeck.xml";
-			}
-			public String xsd() {
-				return "bischeck.xsd";
-			}
-			public String instance() {
-				return "com.ingby.socbox.bischeck.xsd.bischeck";
-			}
-		}, PROPERTIES { 
-			public String toString() {
-				return "PROPERTIES";
-			}
-			public String xml() {
-				return "properties.xml";
-			}
-			public String xsd() {
-				return "properties.xsd";
-			}
-			public String instance() {
-				return "com.ingby.socbox.bischeck.xsd.properties";
-			}
-		}, URL2SERVICES { 
-			public String toString() {
-				return "URL2SERVICES";
-			}
-			public String xml() {
-				return "urlservices.xml";
-			}
-			public String xsd() {
-				return "urlservices.xsd";
-			}
-			public String instance() {
-				return "com.ingby.socbox.bischeck.xsd.urlservices";
-			}
-		}, TWENTY4HOURTHRESHOLD { 
-			public String toString() {
-				return "TWENTY4HOURTHRESHOLD";
-			}
-			public String xml() {
-				return "24thresholds.xml";
-			}
-			public String xsd() {
-				return "twenty4threshold.xsd";
-			}
-			public String instance() {
-				return "com.ingby.socbox.bischeck.xsd.twenty4threshold";
-			}
-		}, SERVERS { 
-			public String toString() {
-				return "SERVERS";
-			}
-			public String xml() {
-				return "servers.xml";
-			}
-			public String xsd() {
-				return "servers.xsd";
-			}
-			public String instance() {
-				return "com.ingby.socbox.bischeck.xsd.servers";
-			}
-		};
-
-		public abstract String xml();
-		public abstract String xsd();
-		public abstract String instance();
-
-	}
-
+public class ConfigurationManager implements ConfigXMLInf {
+	
 	static Logger  logger = Logger.getLogger(ConfigurationManager.class);
 
 	/*
@@ -480,8 +402,7 @@ public class ConfigurationManager {
 
 		while (iter.hasNext()) {
 			XMLServer serverconfig = iter.next(); 
-			setServers(serverconfig);
-			
+			setServers(serverconfig);		
 		}
 	}
 
@@ -710,35 +631,14 @@ public class ConfigurationManager {
 	}
 
 	
-	public Object getXMLConfiguration(XMLCONFIG config) throws Exception {
+	public Object getXMLConfiguration(XMLCONFIG xmlconf) throws Exception {
 		Object obj = null;
-		if (config == XMLCONFIG.TWENTY4HOURTHRESHOLD) {
-			obj = getXMLConfig(XMLCONFIG.TWENTY4HOURTHRESHOLD.xml(),
-					XMLCONFIG.TWENTY4HOURTHRESHOLD.xsd(),
-					XMLCONFIG.TWENTY4HOURTHRESHOLD.instance());
-		}
-		else if (config == XMLCONFIG.BISCHECK) {
-			obj = getXMLConfig(XMLCONFIG.BISCHECK.xml(),
-					XMLCONFIG.BISCHECK.xsd(),
-					XMLCONFIG.BISCHECK.instance());
-		}
-		else if (config == XMLCONFIG.PROPERTIES) {
-			obj = getXMLConfig(XMLCONFIG.PROPERTIES.xml(),
-					XMLCONFIG.PROPERTIES.xsd(),
-					XMLCONFIG.PROPERTIES.instance());
-		}
-		else if (config == XMLCONFIG.URL2SERVICES) {
-			obj = getXMLConfig(XMLCONFIG.URL2SERVICES.xml(),
-					XMLCONFIG.URL2SERVICES.xsd(),
-					XMLCONFIG.URL2SERVICES.instance());
-		}
-		else if (config == XMLCONFIG.SERVERS) {
-			obj = getXMLConfig(XMLCONFIG.SERVERS.xml(),
-					XMLCONFIG.SERVERS.xsd(),
-					XMLCONFIG.SERVERS.instance());
-		}
-		
-		return obj;
+	
+		obj = getXMLConfig(xmlconf.xml(),
+				xmlconf.xsd(),
+				xmlconf.instance());
+	
+				return obj;
 	}
 	
 
@@ -753,49 +653,15 @@ public class ConfigurationManager {
 			return 1;
 		}
 
-		try {
-			configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.BISCHECK);
-		} catch (Exception e) {
-			System.out.println("Errors was found validating the configuration file " + 
-					ConfigurationManager.XMLCONFIG.BISCHECK.xml());
-			e.printStackTrace();
-			return 1;
-		}
-
-		try {
-			configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.PROPERTIES);
-		} catch (Exception e) {
-			System.out.println("Errors was found validating the configuration file " + 
-					ConfigurationManager.XMLCONFIG.PROPERTIES.xml());
-			e.printStackTrace();
-			return 1;
-		}
-
-		try {
-			configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.URL2SERVICES);
-		} catch (Exception e) {
-			System.out.println("Errors was found validating the configuration file " + 
-					ConfigurationManager.XMLCONFIG.URL2SERVICES.xml());
-			e.printStackTrace();
-			return 1;
-		}
-
-		try {
-			configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
-		} catch (Exception e) {
-			System.out.println("Errors was found validating the configuration file " + 
-					ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml());
-			e.printStackTrace();
-			return 1;
-		}
-		
-		try {
-			configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.SERVERS);
-		} catch (Exception e) {
-			System.out.println("Errors was found validating the configuration file " + 
-					ConfigurationManager.XMLCONFIG.SERVERS.xml());
-			e.printStackTrace();
-			return 1;
+		for (XMLCONFIG xmlconf : XMLCONFIG.values()) {
+			try {
+				configMgr.getXMLConfiguration(xmlconf);
+			} catch (Exception e) {
+				System.out.println("Errors was found validating the configuration file " + 
+						xmlconf.xml());
+				e.printStackTrace();
+				return 1;
+			}	
 		}
 		return 0;
 	}
