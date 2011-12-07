@@ -20,10 +20,12 @@ package com.ingby.socbox.bischeck;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -31,12 +33,14 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
+import com.ingby.socbox.bischeck.ConfigXMLInf.XMLCONFIG;
+
 
 /**
  * @author andersh
  *
  */
-public class DocManager {
+public class DocManager implements ConfigXMLInf {
 
 	/**
 	 * @param args
@@ -47,7 +51,7 @@ public class DocManager {
 		// create the Options
 		Options options = new Options();
 		options.addOption( "u", "usage", false, "show usage." );
-		options.addOption( "f", "file", true, "output file name" );
+		options.addOption( "d", "directory", true, "output directory" );
 		options.addOption( "t", "type", true, "type of out put - html or csv" );
 
 		try {
@@ -67,21 +71,73 @@ public class DocManager {
 
 		DocManager dmgmt = new DocManager();
 
-		File outputfile = null;
-		if (line.hasOption("file")) {
-			String filename = line.getOptionValue("file"); 
-			outputfile = new File(filename);
+		File outputdir = null;
+		if (line.hasOption("directory")) {
+			String dirname = line.getOptionValue("directory");
+			try {
+			outputdir = dmgmt.checkDir(dirname);
+			} catch (IOException ioe) {
+				System.out.println(ioe.getMessage());
+				System.exit(1);
+			}
 		}
-
-		dmgmt.GenHtml(outputfile);
+		
+		if (line.hasOption("type")) {
+			String type = line.getOptionValue("type");
+			if ( type.equalsIgnoreCase("html")) {
+				dmgmt.genHtml(outputdir);
+			} else if (type.equalsIgnoreCase("text")) {
+				dmgmt.genText(outputdir);
+			}
+		} else {
+			dmgmt.genHtml(outputdir);
+		}
+		
 	}
 
-	private void GenHtml(File outputfile) {
+	
+	private void genHtml(File outputdir) {
+		genIndex(outputdir);
+		for (XMLCONFIG xmlconf : XMLCONFIG.values()) {
+			genHtmlFile(xmlconf,outputdir);			
+		}
+		
+	}
+	
+	
+
+	private void genText(File outputdir) {
+		for (XMLCONFIG xmlconf : XMLCONFIG.values()) {
+			genHtmlText(xmlconf,outputdir);			
+		}
+	}
+
+	private void genHtmlFile(XMLCONFIG xmlconf, File outputdir) {
+		System.out.println(xmlconf.xml() + " " + xmlconf.xsd());
+		genFile(xmlconf, outputdir, "html");
+	}
+
+	private void genHtmlText(XMLCONFIG xmlconf, File outputdir) {
+		System.out.println(xmlconf.xml() + " " + xmlconf.xsd());
+		genFile(xmlconf, outputdir, "text");
+	}
+
+
+	private void genIndex(File outputdir) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	private void genFile(XMLCONFIG xmlconf, File outputdir, String type)
+			throws TransformerFactoryConfigurationError {
 		try {
-
+			URL xslUrl = Thread.currentThread().getContextClassLoader().getResource(xmlconf.nametag()+"2"+type+".xsl");
+			if (xslUrl == null) {
+				throw new IOException("File " + xmlconf.nametag()+"2"+type+".xsl does not exists");
+			}
+			
 			TransformerFactory tFactory = TransformerFactory.newInstance();
-
-			URL xslUrl = Thread.currentThread().getContextClassLoader().getResource("bischeckhtml.xsl");
 
 			Transformer transformer =
 				tFactory.newTransformer
@@ -90,14 +146,42 @@ public class DocManager {
 
 			transformer.transform
 			(new javax.xml.transform.stream.StreamSource
-					(new File(ConfigurationManager.initConfigDir(),"bischeck.xml")),
+					(new File(ConfigurationManager.initConfigDir(),xmlconf.xml())),
 					new javax.xml.transform.stream.StreamResult
-					( new FileOutputStream(outputfile)));
+					( new FileOutputStream(outputdir+File.separator+xmlconf.nametag()+"."+type)));
 		}
 		catch (Exception e) {
 			e.printStackTrace( );
 		}
-
-
 	}
+
+	private File checkDir(String dirname) throws IOException {
+
+		File outputdir = new File(dirname);
+			
+		if (outputdir.isDirectory()) {
+			if (outputdir.canWrite() && outputdir.canExecute()) {
+				return outputdir;
+			} else {
+				throw new IOException("Directory "+ dirname + " is not writable.");
+			}
+		}
+		else {
+			File parent = outputdir.getParentFile();
+			
+			if (parent == null) {
+				// absolute name from .
+				parent = new File(".");
+			}
+			
+			if (parent.isDirectory() && parent.canWrite()) {
+				outputdir.mkdir(); 
+				return outputdir;
+			} else {
+				throw new IOException("Parent directory "+ parent.getPath() + " does not exist or is not writable.");
+			}
+		} 
+		
+	}
+
 }
