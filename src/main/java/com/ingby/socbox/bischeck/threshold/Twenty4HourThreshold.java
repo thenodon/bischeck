@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.nfunk.jep.JEP;
 
 import com.ingby.socbox.bischeck.BisCalendar;
+import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.LastStatusCache;
 import com.ingby.socbox.bischeck.Util;
@@ -49,7 +50,7 @@ import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLServicedef;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLTwenty4Threshold;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLWeeks;
 
-public class Twenty4HourThreshold implements Threshold {
+public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
 	static Logger  logger = Logger.getLogger(Twenty4HourThreshold.class);
 
@@ -706,7 +707,7 @@ public class Twenty4HourThreshold implements Threshold {
 	private void dumpConfig() throws Exception {
 		
 		ConfigurationManager configMgr = ConfigurationManager.getInstance();
-		XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
+		XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(XMLCONFIG.TWENTY4HOURTHRESHOLD);
 		
 		Iterator<XMLServicedef> serviceIter = twenty4hourconfig.getServicedef().iterator();
 		
