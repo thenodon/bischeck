@@ -86,31 +86,31 @@
             </xsl:otherwise>
         </xsl:choose>
         </div>
-        <!--
-        <p><span class="keyof">hoursIDREF:&#160;</span> <span class="valueof"><xsl:value-of select="hoursIDREF" /></span></p>
-        -->
+        
+
         <xsl:variable name="myid" select="hoursIDREF" />
         <xsl:variable name="cur" select="0" />
         <table class="hours">
+            
             <CAPTION class="hours">
             hoursIDREF:&#160; <xsl:value-of select="hoursIDREF" />
             </CAPTION>
-
-                <thead>
+            
+            <thead>
                 <tr>
                     <th>Hour</th>
                     <th>Value</th>
                 </tr>
-                </thead>
-
-                <xsl:for-each select="//twenty4threshold/hours[@hoursID=$myid]" >
-                    <xsl:apply-templates select="hour"/> 
-                </xsl:for-each>    
-                </table>
+            </thead>
+            
+            <xsl:for-each select="//twenty4threshold/hours[@hoursID=$myid]" >
+                <xsl:apply-templates select="hour"/> 
+            </xsl:for-each>
+                
+        </table>
         
     </xsl:for-each>
     </div>
-    
 </xsl:for-each>
 </div>
 
