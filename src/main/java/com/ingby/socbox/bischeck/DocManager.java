@@ -18,9 +18,14 @@
  */
 package com.ingby.socbox.bischeck;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.xml.transform.Transformer;
@@ -41,6 +46,9 @@ import com.ingby.socbox.bischeck.ConfigXMLInf.XMLCONFIG;
  *
  */
 public class DocManager implements ConfigXMLInf {
+
+	private static final String CSSFILE = "bischeck.css";
+
 
 	/**
 	 * @param args
@@ -85,50 +93,135 @@ public class DocManager implements ConfigXMLInf {
 		if (line.hasOption("type")) {
 			String type = line.getOptionValue("type");
 			if ( type.equalsIgnoreCase("html")) {
-				dmgmt.genHtml(outputdir);
+				try {
+					dmgmt.genHtml(outputdir);
+				} catch (IOException ioe) {
+					System.out.println(ioe.getMessage());
+					System.exit(1);
+				}
 			} else if (type.equalsIgnoreCase("text")) {
 				dmgmt.genText(outputdir);
 			}
 		} else {
-			dmgmt.genHtml(outputdir);
+			try {
+				dmgmt.genHtml(outputdir);
+			} catch (IOException ioe) {
+				System.out.println(ioe.getMessage());
+				System.exit(1);
+			}
 		}
-		
 	}
 
 	
-	private void genHtml(File outputdir) {
+	/**
+	 * Generate html output of configuration files
+	 * @param outputdir
+	 * @throws IOException
+	 */
+	private void genHtml(File outputdir) throws IOException {
+		URL cssfile = Thread.currentThread().getContextClassLoader().getResource(CSSFILE);
+		System.out.println(cssfile.toString());
+		System.out.println(outputdir.getAbsolutePath()+File.separator+CSSFILE);
+		copy(cssfile.getPath(), outputdir.getAbsolutePath()+File.separator+CSSFILE);
 		genIndex(outputdir);
+		
 		for (XMLCONFIG xmlconf : XMLCONFIG.values()) {
 			genHtmlFile(xmlconf,outputdir);			
 		}
-		
 	}
 	
 	
-
+	/**
+	 * Generate text output of configuration files
+	 * @param outputdir
+	 */
 	private void genText(File outputdir) {
 		for (XMLCONFIG xmlconf : XMLCONFIG.values()) {
-			genHtmlText(xmlconf,outputdir);			
+			genTextFile(xmlconf,outputdir);			
 		}
 	}
 
+	
+	/**
+	 * Generate html file
+	 * @param xmlconf the enum entry of configuration file
+	 * @param outputdir the directory where to put the generated file
+	 */
 	private void genHtmlFile(XMLCONFIG xmlconf, File outputdir) {
-		System.out.println(xmlconf.xml() + " " + xmlconf.xsd());
+		System.out.println("Generating html file for " + xmlconf.xml());
 		genFile(xmlconf, outputdir, "html");
 	}
 
-	private void genHtmlText(XMLCONFIG xmlconf, File outputdir) {
-		System.out.println(xmlconf.xml() + " " + xmlconf.xsd());
+	
+	/**
+	 * Generate text file 
+	 * @param xmlconf the enum entry of configuration file
+	 * @param outputdir the directory where to put the generated file
+	 */
+	private void genTextFile(XMLCONFIG xmlconf, File outputdir) {
+		System.out.println("Generating text file for " + xmlconf.xml());
 		genFile(xmlconf, outputdir, "text");
 	}
 
 
+	/**
+	 * Generate an index file for html
+	 * @param outputdir
+	 */
 	private void genIndex(File outputdir) {
-		// TODO Auto-generated method stub
+		String nl = System.getProperty("line.separator");
+		
+		StringBuffer indexbuf = new StringBuffer();
+		
+		indexbuf.append("<html>").append(nl).
+		append("<link rel=\"stylesheet\" type=\"text/css\" href=\"bischeck.css\">").append(nl).
+		append("<head>").append(nl).
+		append("<META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">").append(nl).
+		append("<title>bischeck system configuration</title>").append(nl).
+		append("</head>").append(nl).
+		append("<body>").append(nl).
+		append("<div class=\"toc\">").append(nl);
+				
+		for (XMLCONFIG xmlconf : XMLCONFIG.values()) {
+			indexbuf.append("<h1>").append(nl).
+			append("<a href=\"").
+			append(xmlconf.nametag()).
+			append(".html").
+			append("\">").
+			append(xmlconf.nametag()).
+			append("</a>").
+			append(nl).
+			append("</h1>").append(nl);
+		}
+		
+		indexbuf.append("</div>").append(nl).
+		append("</body>").append(nl).
+		append("</html>").append(nl);
+
+				
+		try {
+			BufferedWriter out = new BufferedWriter(
+					new FileWriter(new File(outputdir, "index.html")));
+			out.write(indexbuf.toString());
+			out.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
 		
 	}
 
-
+	/**
+	 * Generate the display file of configuration file 
+	 * @param xmlconf the enum entry of the configuration file
+	 * @param outputdir the output directory where the generated files should
+	 * be generated
+	 * @param type the type of file to be generated, like html and text. This
+	 * controll the xslt file to be used for the generation.
+	 * @throws TransformerFactoryConfigurationError
+	 */
 	private void genFile(XMLCONFIG xmlconf, File outputdir, String type)
 			throws TransformerFactoryConfigurationError {
 		try {
@@ -155,6 +248,15 @@ public class DocManager implements ConfigXMLInf {
 		}
 	}
 
+	
+	/**
+	 * Check if the output directory is valid to create output in. If it does 
+	 * not exists it will be created.
+	 * @param dirname
+	 * @return the File to the directory
+	 * @throws IOException if the directory can not be written to, if it can
+	 * not be created.
+	 */
 	private File checkDir(String dirname) throws IOException {
 
 		File outputdir = new File(dirname);
@@ -181,7 +283,54 @@ public class DocManager implements ConfigXMLInf {
 				throw new IOException("Parent directory "+ parent.getPath() + " does not exist or is not writable.");
 			}
 		} 
-		
 	}
 
+	
+	/**
+	 * Copy a file 
+	 * @param fromFileName
+	 * @param toFileName
+	 * @throws IOException
+	 */
+	private void copy(String fromFileName, String toFileName)
+	throws IOException {
+		File fromFile = new File(fromFileName);
+		File toFile = new File(toFileName);
+
+		if (!fromFile.exists())
+			throw new IOException("FileCopy: " + "no such source file: "
+					+ fromFileName);
+		if (!fromFile.isFile())
+			throw new IOException("FileCopy: " + "can't copy directory: "
+					+ fromFileName);
+		if (!fromFile.canRead())
+			throw new IOException("FileCopy: " + "source file is unreadable: "
+					+ fromFileName);
+
+		
+		FileInputStream from = null;
+		FileOutputStream to = null;
+		try {
+			from = new FileInputStream(fromFile);
+			to = new FileOutputStream(toFile);
+			byte[] buffer = new byte[4096];
+			int bytesRead;
+
+			while ((bytesRead = from.read(buffer)) != -1)
+				to.write(buffer, 0, bytesRead); // write
+		} finally {
+			if (from != null)
+				try {
+					from.close();
+				} catch (IOException e) {
+					;
+				}
+				if (to != null)
+					try {
+						to.close();
+					} catch (IOException e) {
+						;
+					}
+		}
+	}
 }
