@@ -48,6 +48,7 @@ import com.ingby.socbox.bischeck.ConfigXMLInf.XMLCONFIG;
 public class DocManager implements ConfigXMLInf {
 
 	private static final String CSSFILE = "bischeck.css";
+	private static final String DEFAULTDIR = "bischeckdoc";
 
 
 	/**
@@ -83,7 +84,14 @@ public class DocManager implements ConfigXMLInf {
 		if (line.hasOption("directory")) {
 			String dirname = line.getOptionValue("directory");
 			try {
-			outputdir = dmgmt.checkDir(dirname);
+				outputdir = dmgmt.checkDir(dirname);
+			} catch (IOException ioe) {
+				System.out.println(ioe.getMessage());
+				System.exit(1);
+			}
+		} else {
+			try {
+				outputdir = dmgmt.checkDir(DEFAULTDIR);
 			} catch (IOException ioe) {
 				System.out.println(ioe.getMessage());
 				System.exit(1);
