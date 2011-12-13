@@ -109,10 +109,11 @@ public class ConfigurationManager implements ConfigXMLInf {
 		options.addOption( "u", "usage", false, "show usage." );
 		options.addOption( "v", "verify", false, "verify all xml configuration with their xsd" );
 		options.addOption( "p", "pidfile", false, "Show bischeck pid file path" );
+		/*
 		options.addOption( "l", "list", false, "list the bischeck host configuration" );
 		options.addOption( "S", "serverproperties", false, "Show server properties" );
 		options.addOption( "U", "urlserviceproperties", false, "Show url to service properties" );
-
+		*/
 		try {
 			// parse the command line arguments
 			line = parser.parse( options, args );
@@ -137,7 +138,7 @@ public class ConfigurationManager implements ConfigXMLInf {
 			System.exit(confMgmr.verify());
 		}
 
-		
+/*		
 		if (line.hasOption("serverproperties")) {
 			System.out.println(confMgmr.getProperties().toString());
 		}
@@ -151,7 +152,7 @@ public class ConfigurationManager implements ConfigXMLInf {
 			System.out.println(confMgmr.printHostConfig());
 	
 		}
-	
+*/
 		if (line.hasOption("pidfile")) {
 			System.out.println("PidFile:"+confMgmr.getPidFile().getPath());	
 		}
@@ -704,7 +705,10 @@ public class ConfigurationManager implements ConfigXMLInf {
 		return prop.getProperty("thresholdCacheClear","10 0 00 * * ? *");
 	}
  
-	
+	/**
+	 * @deprecated Moved to DocManager
+	 * @return
+	 */
 	public String printHostConfig() {
 		StringBuffer str = new StringBuffer();
 		for (Map.Entry<String, Host> hostentry: hostsmap.entrySet()) {
