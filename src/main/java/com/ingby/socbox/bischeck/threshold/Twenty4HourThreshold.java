@@ -73,7 +73,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 		// create the Options
 		Options options = new Options();
 		options.addOption( "u", "usage", false, "show usage." );
-		options.addOption( "l", "list", false, "list the threshold configuration" );
+		//options.addOption( "l", "list", false, "list the threshold configuration" );
 		options.addOption( "d", "date", true, "date to test, e.g. 20100811" );
 		options.addOption( "h", "host", true, "host to test");
 		options.addOption( "s", "service", true, "service to test");
@@ -96,12 +96,13 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
 		ConfigurationManager.init();
 		
+		/*
 		if (line.hasOption("list")) {
 			Twenty4HourThreshold current = new Twenty4HourThreshold();
 			current.dumpConfig();
 			System.exit(0);
 		}
-
+		*/
 
 		if (line.hasOption("host") && 
 				line.hasOption("service") &&
@@ -703,7 +704,11 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 		this.serviceName = name;
 	}
 
-
+	
+	/**
+	 * @deprecated Moved to DocManager
+	 * @throws Exception
+	 */
 	private void dumpConfig() throws Exception {
 		
 		ConfigurationManager configMgr = ConfigurationManager.getInstance();
