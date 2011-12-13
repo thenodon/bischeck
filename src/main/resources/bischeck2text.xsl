@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
 <xsl:template name="Newline">
@@ -16,8 +17,10 @@
 <xsl:template match="/">
 
     <xsl:call-template name="Newline" />
-    <xsl:text>bischeck configuration</xsl:text><xsl:call-template name="Newline" />
-    <xsl:text>======================</xsl:text><xsl:call-template name="Newline" />
+    <xsl:text>bischeck configuration</xsl:text>
+    <xsl:call-template name="Newline" />
+    <xsl:text>======================</xsl:text>
+    <xsl:call-template name="Newline" />
     <!-- Loop through each section -->
     
     <xsl:for-each select="bischeck/host">    
