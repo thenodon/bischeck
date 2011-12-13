@@ -4,7 +4,7 @@
 <html>
 <link rel="stylesheet" type="text/css" href="bischeck.css" />   
 
-<head><title>bischeck property configuration</title></head>
+<head><title>bischeck url property configuration</title></head>
 <body>
 <table class="property">
     <CAPTION CLASS="property">

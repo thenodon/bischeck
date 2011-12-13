@@ -45,43 +45,47 @@
             <xsl:otherwise>
                 <!-- Check for months -->
                 <xsl:for-each select="months">
+                    <p>
                     <xsl:choose>
-                        <xsl:when test="not(week)">
-                            <p><span class="periodkeyof">Month:&#160;</span> <span class="periodvalueof">*</span></p>
+                        <xsl:when test="not(month)">
+                            <span class="periodkeyof">Month:&#160;</span> <span class="periodvalueof">*</span>
                         </xsl:when>
                         <xsl:otherwise>
-                            <p><span class="periodkeyof">Month:&#160;</span> <span class="periodvalueof"><xsl:value-of select="month" /></span></p>
+                            <span class="periodkeyof">Month:&#160;</span> <span class="periodvalueof"><xsl:value-of select="month" /></span>
                         </xsl:otherwise>
                     </xsl:choose>    
                     <xsl:choose>
                         <xsl:when test="not(dayofmonth)">
-                            <p><span class="periodkeyof">Day of month:&#160;</span> <span class="periodvalueof">*</span></p>
+                            <span class="periodkeyof"> - Day of month:&#160;</span> <span class="periodvalueof">*</span>
                         </xsl:when>
                         <xsl:otherwise>    
-                            <p><span class="periodkeyof">Day of month:&#160;</span> <span class="periodvalueof"><xsl:value-of select="dayofmonth" /></span></p>
+                            <span class="periodkeyof"> - Day of month:&#160;</span> <span class="periodvalueof"><xsl:value-of select="dayofmonth" /></span>
                         </xsl:otherwise>
-                    </xsl:choose> 
+                    </xsl:choose>
+                    </p> 
                 </xsl:for-each>
         
         
                 <!-- Check for weeks -->
                 <xsl:for-each select="weeks">
+                    <p>
                     <xsl:choose>
                         <xsl:when test="not(week)">
-                            <p><span class="periodkeyof">Week:&#160;</span> <span class="periodvalueof">*</span></p>
+                            <span class="periodkeyof">Week:&#160;</span> <span class="periodvalueof">*</span>
                         </xsl:when>
                         <xsl:otherwise>
-                            <p><span class="periodkeyof">Week:&#160;</span> <span class="periodvalueof"><xsl:value-of select="week" /></span></p>
+                            <span class="periodkeyof">Week:&#160;</span> <span class="periodvalueof"><xsl:value-of select="week" /></span>
                         </xsl:otherwise>
                     </xsl:choose>    
                     <xsl:choose>
                         <xsl:when test="not(dayofweek)">
-                            <p><span class="periodkeyof">Day of week:&#160;</span> <span class="periodvalueof">*</span></p>
+                            <span class="periodkeyof"> - Day of week:&#160;</span> <span class="periodvalueof">*</span>
                         </xsl:when>
                         <xsl:otherwise>    
-                            <p><span class="periodkeyof">Day of week:&#160;</span> <span class="periodvalueof"><xsl:value-of select="dayofweek" /></span></p>
+                            <span class="periodkeyof"> - Day of week:&#160;</span> <span class="periodvalueof"><xsl:value-of select="dayofweek" /></span>
                         </xsl:otherwise>
-                    </xsl:choose> 
+                    </xsl:choose>
+                    </p> 
                 </xsl:for-each>
             </xsl:otherwise>
         </xsl:choose>
@@ -123,7 +127,20 @@
 <xsl:template match="hour">
 <xsl:variable name="cur" select="$cur + position() - 1" />
 <tr>
-    <td><xsl:value-of select="$cur" /> </td>
+    <xsl:choose>
+        <xsl:when test="$cur &lt; '10'">
+            <td>
+            <xsl:text>0</xsl:text>
+            <xsl:text><xsl:value-of select="$cur" /></xsl:text>
+            </td>
+        </xsl:when>
+        <xsl:otherwise>
+            <td>
+            <xsl:text><xsl:value-of select="$cur" /></xsl:text>
+            </td>
+        </xsl:otherwise>
+    </xsl:choose>    
+    
     <td><xsl:value-of select="." /> </td>
 </tr>
 </xsl:template>
