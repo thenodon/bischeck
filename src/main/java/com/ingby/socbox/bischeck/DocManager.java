@@ -18,19 +18,20 @@
  */
 package com.ingby.socbox.bischeck;
 
-import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -38,7 +39,7 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
-import com.ingby.socbox.bischeck.ConfigXMLInf.XMLCONFIG;
+
 
 
 /**
@@ -218,9 +219,9 @@ public class DocManager implements ConfigXMLInf {
 			e.printStackTrace();
 		}
 
-		
 	}
 
+	
 	/**
 	 * Generate the display file of configuration file 
 	 * @param xmlconf the enum entry of the configuration file
@@ -242,11 +243,14 @@ public class DocManager implements ConfigXMLInf {
 
 			Transformer transformer =
 				tFactory.newTransformer
-				(new javax.xml.transform.stream.StreamSource
+				(new StreamSource
 						(xslUrl.getFile()));
-
+			
+			if (type.equalsIgnoreCase("text"))
+				transformer.setOutputProperty(OutputKeys.METHOD, "text");
+			
 			transformer.transform
-			(new javax.xml.transform.stream.StreamSource
+			(new StreamSource
 					(new File(ConfigurationManager.initConfigDir(),xmlconf.xml())),
 					new javax.xml.transform.stream.StreamResult
 					( new FileOutputStream(outputdir+File.separator+xmlconf.nametag()+"."+type)));
