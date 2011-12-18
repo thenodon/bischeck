@@ -247,6 +247,7 @@ public class Execute implements ExecuteMBean {
 			if (getNumberOfTriggers() == 0) {
 				shutdown();
 			}
+			
 			if (logger.getEffectiveLevel() == Level.DEBUG) {
 				// Show next fire time for all triggers
 				String[] list = getTriggers();
@@ -353,8 +354,7 @@ public class Execute implements ExecuteMBean {
 			List<String> triggerGroups = sched.getTriggerGroupNames();
 			for (String triggergroup: triggerGroups) {
 				Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.groupEquals(triggergroup));
-
-				numberoftriggers =+ keys.size();
+				numberoftriggers += keys.size();
 			}
 		
 		} catch (SchedulerException se) {
