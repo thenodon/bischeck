@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 
 
 public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
-	static Logger  logger = Logger.getLogger(ServiceItem.class);
+	static Logger  logger = Logger.getLogger(SQLServiceItem.class);
 
 	
 	public SQLServiceItem(String name) {
