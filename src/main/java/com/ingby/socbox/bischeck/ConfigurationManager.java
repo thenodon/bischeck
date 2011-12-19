@@ -50,7 +50,6 @@ import org.apache.commons.cli.Options;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.quartz.CronExpression;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
@@ -81,6 +80,8 @@ import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlservices;
 
 public class ConfigurationManager implements ConfigXMLInf {
 	
+	private static final String DEFAULT_TRESHOLD = "DummyThreshold";
+
 	static Logger  logger = Logger.getLogger(ConfigurationManager.class);
 
 	/*
@@ -388,8 +389,16 @@ public class ConfigurationManager implements ConfigXMLInf {
 			serviceitem.setService(service);
 			serviceitem.setDecscription(serviceitemconfig.getDesc());
 			serviceitem.setExecution(serviceitemconfig.getExecstatement());
-			serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
-
+			
+			/*
+			 * Set default threshold class if not set in bischeck.xml
+			 */
+			if (serviceitemconfig.getThresholdclass() != null) {
+				serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
+			} else {
+				serviceitem.setThresholdClassName(DEFAULT_TRESHOLD);
+			}
+			
 			service.addServiceItem(serviceitem);
 
 		}
