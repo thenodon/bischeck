@@ -160,8 +160,9 @@ Support for custom threshold classes to enable any way to define threshold
 \end_layout
 
 \begin_layout Itemize
-Integrates with multiple monitoring and surveillance tools like Nagios and
- OpenTSDB.
+Integrates with multiple monitoring and surveillance tools, like Nagios
+ and OpenTSDB.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -2933,7 +2934,13 @@ List bischeck configuration
 \end_layout
 
 \begin_layout Standard
-To list the current bischeck.xml configuration.
+Formatting listing of all configuration files is managed by the DocManager
+ class.
+ 
+\end_layout
+
+\begin_layout Standard
+To generate the configuration files in html format:
 \end_layout
 
 \begin_layout Standard
@@ -2944,7 +2951,7 @@ status open
 
 \begin_layout Plain Layout
 
-$ bischeck ConfigurationManager -l
+$ bischeck DocManager -d <directory name> -t html
 \end_layout
 
 \end_inset
@@ -2953,7 +2960,13 @@ $ bischeck ConfigurationManager -l
 \end_layout
 
 \begin_layout Standard
-To list all properties in the properties.xml.
+The files are generated to the directory set with -d.
+ Point your browser to the index.html file in the directory to get links
+ to each configuration file.
+\end_layout
+
+\begin_layout Standard
+To get the same but in plain text:
 \end_layout
 
 \begin_layout Standard
@@ -2964,7 +2977,7 @@ status open
 
 \begin_layout Plain Layout
 
-$ bischeck ConfigurationManager -S
+$ bischeck DocManager -d <directory name> -t text
 \end_layout
 
 \end_inset
@@ -2973,23 +2986,8 @@ $ bischeck ConfigurationManager -S
 \end_layout
 
 \begin_layout Standard
-To list the url to service mapping in urlproperties.xml.
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ bischeck ConfigurationManager -U
-\end_layout
-
-\end_inset
-
-
+If -d is ommited the files file be created in the default directory bisheckdoc.
+ The default value for -t is html.
 \end_layout
 
 \begin_layout Standard
@@ -3032,6 +3030,11 @@ $ bischeck ConfigurationManager -p
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+This command is used in the init script bischeckd to retrive the current
+ pid.
 \end_layout
 
 \begin_layout Section
@@ -3099,7 +3102,60 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.4.0 - 201
+Release 0.4.0 - 201X-xx-xx
+\end_layout
+
+\begin_layout Subsection
+New feature
+\end_layout
+
+\begin_layout Itemize
+[FR-197] Support for different and multiple survaliance engines.
+ With version 0.4.0 bischeck is not limited to send data to Nagios.
+ It can now send the data to multiple Nagios servers and to other servers
+ like OpenTSB.
+ This is done by moving server formatting and protocol to server integration
+ classes that implements the interface com.ingby.socbox.bischeck.servers.Server.
+ What servers to use are described in the xml configuration file servers.xml.
+ This also means that that some Nagios NSCA specific properties previous
+ configured in properties.xml has been moved to the servers.xml file NSCA
+ section.
+ The OpenTSDB server class should be regarded as beta.
+\end_layout
+
+\begin_layout Itemize
+Configuration listing.
+ The conifguration listning has been moved from the ConfigurationManager
+ to the DocManager class.
+ Currently html and text listing is supported.
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+TR-216 
+\begin_inset Quotes eld
+\end_inset
+
+Shutdown is automatic triggered
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+TR-217 
+\begin_inset Quotes eld
+\end_inset
+
+Configuration Manager initzialization failed with java.lang.NullPointerException
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
