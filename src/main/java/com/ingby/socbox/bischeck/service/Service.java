@@ -24,6 +24,7 @@ import java.util.Map;
 
 import com.ingby.socbox.bischeck.Host;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
  * The interface describe all methods need to create a Service compatible 
@@ -168,14 +169,6 @@ public interface Service {
 	public ServiceItem getServiceItemByName(String name);
 	
 	
-	/**
-	 * Get the message the will be sent with NSCA to the Nagios server. For more 
-	 * info about the message format please see the standard Nagios
-	 * documentation.
-	 * @return the NSCA message
-	 */
-	//public String getNSCAMessage();
-
 	
 	/**
 	 * Called by the framework to map the Service to a specific Host object. 
@@ -189,4 +182,32 @@ public interface Service {
 	 * @return Host that the Service is related to
 	 */
 	public Host getHost();
+	
+	
+	/**
+	 * Return the current nagios level of the service
+	 * @return current nagios level of the service
+	 */
+	public NAGIOSSTAT getLevel();
+	
+	
+	/**
+	 * Set the current status level of the service
+	 * @param level
+	 */
+	public void setLevel(NAGIOSSTAT level);
+	
+	
+	/**
+	 * Check if the service has a valid connection
+	 * @return true if connection is established
+	 */
+	public boolean isConnectionEstablished();
+	
+	
+	/**
+	 * Set the connection status
+	 * @param connected
+	 */
+	public void setConnectionEstablished(boolean connected);
 }
