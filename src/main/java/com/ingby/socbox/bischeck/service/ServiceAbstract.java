@@ -26,11 +26,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.Host;
-import com.ingby.socbox.bischeck.LastStatusCache;
-import com.ingby.socbox.bischeck.TimeMeasure;
-import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
-import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
@@ -133,112 +129,24 @@ public abstract class ServiceAbstract {
 		return null;
 	}
 
-	/*
-	public final NAGIOSSTAT getLevel() {
-		return level;
-	}
-	
-	public final boolean statusConnection() {
-		return connectionEstablished;
-	}
-	*/
 	
 	public NAGIOSSTAT getLevel(){
 		return level;
 	}
+
 	
 	public void setLevel(NAGIOSSTAT level) {
 		this.level = level;
 	}
 	
+	
 	public boolean isConnectionEstablished() {
 		return connectionEstablished;
 	}
+	
 	
 	public void setConnectionEstablished(boolean connected){
 		connectionEstablished = connected;
 	}
 
-	/*
-	public final void executeService(Service service) {
-
-		level = NAGIOSSTAT.OK;
-
-		try {
-			service.openConnection();
-			connectionEstablished = true;
-		} catch (Exception e) {
-			logger.error("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed with error " + e);
-			connectionEstablished = false;
-			level=NAGIOSSTAT.CRITICAL;
-			return;
-		}
-
-
-
-		if (connectionEstablished) {
-			try {
-				level = checkServiceItem(service);
-			} catch (Exception e) {
-				level=NAGIOSSTAT.CRITICAL;
-			}
-			finally {
-				try {
-					service.closeConnection();
-				} catch (Exception ignore) {}
-			}
-		} 
-		
-	}
-	
-	
-	private NAGIOSSTAT checkServiceItem(Service service) throws Exception {
-		
-		level = NAGIOSSTAT.OK;
-		
-		for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
-			ServiceItem serviceitem = serviceitementry.getValue();
-			logger.debug("Executing ServiceItem: "+ serviceitem.getServiceItemName());
-			
-			try {
-				long start = TimeMeasure.start();
-				serviceitem.execute();
-				serviceitem.setExecutionTime(
-						Long.valueOf(TimeMeasure.stop(start)));
-				logger.debug("Time to execute " + 
-						serviceitem.getExecution() + 
-						" : " + serviceitem.getExecutionTime() +
-				" ms");
-			} catch (Exception e) {
-				logger.error("Execution prepare and/or query \""+ serviceitem.getExecution() 
-						+ "\" failed with " + e);
-				throw new Exception("Execution prepare and/or query \""+ serviceitem.getExecution() 
-						+ "\" failed. See bischeck log for more info.");
-			}
-
-			try {
-				serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
-				// Always report the state for the worst service item 
-				logger.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
-				NAGIOSSTAT newstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
-				// New cache handling
-				
-				LastStatusCache.getInstance().add(service,serviceitem);
-				
-				if (newstate.val() > level.val() ) { 
-					level = newstate;
-				}
-			} catch (ClassNotFoundException e) {
-				logger.error("Threshold class not found - " + e);
-				throw new Exception("Threshold class not found, see bischeck log for more info.");
-			} catch (Exception e) {
-				logger.error("Threshold excution error - " + e);
-				throw new Exception("Threshold excution error, see bischeck log for more info");
-			}
-
-
-		} // for serviceitem
-		return level;
-	}
-	*/
 }
