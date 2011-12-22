@@ -133,6 +133,7 @@ public abstract class ServiceAbstract {
 		return null;
 	}
 
+	/*
 	public final NAGIOSSTAT getLevel() {
 		return level;
 	}
@@ -140,7 +141,25 @@ public abstract class ServiceAbstract {
 	public final boolean statusConnection() {
 		return connectionEstablished;
 	}
+	*/
 	
+	public NAGIOSSTAT getLevel(){
+		return level;
+	}
+	
+	public void setLevel(NAGIOSSTAT level) {
+		this.level = level;
+	}
+	
+	public boolean isConnectionEstablished() {
+		return connectionEstablished;
+	}
+	
+	public void setConnectionEstablished(boolean connected){
+		connectionEstablished = connected;
+	}
+
+	/*
 	public final void executeService(Service service) {
 
 		level = NAGIOSSTAT.OK;
@@ -221,5 +240,5 @@ public abstract class ServiceAbstract {
 		} // for serviceitem
 		return level;
 	}
-
+	*/
 }
