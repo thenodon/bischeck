@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.TimeMeasure;
 import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.service.ServiceAbstract;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class OpenTSDBServer implements Server {
@@ -53,7 +52,7 @@ public class OpenTSDBServer implements Server {
 		PrintWriter out = null;
 
 		String message;	
-		if ( ((ServiceAbstract) service).statusConnection() ) {
+		if ( service.isConnectionEstablished()) {
 			message = getMessage(service);
 		} else {
 			message = null;

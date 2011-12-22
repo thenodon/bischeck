@@ -18,7 +18,6 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.TimeMeasure;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.service.ServiceAbstract;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 /**
@@ -91,9 +90,9 @@ public class NSCAServer implements Server {
 		/*
 		 * Check the last connection status for the Service
 		 */
-		if ( ((ServiceAbstract) service).statusConnection() ) {
+		if ( service.isConnectionEstablished() ) {
 			try {
-				level = ((ServiceAbstract) service).getLevel();
+				level = service.getLevel();
 				payload.setMessage(level + getMessage(service));
 			} catch (Exception e) {
 				level=NAGIOSSTAT.CRITICAL;
