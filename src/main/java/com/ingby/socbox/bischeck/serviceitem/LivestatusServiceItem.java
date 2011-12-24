@@ -100,7 +100,6 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
 		if (jsonStatement.getString("query").equalsIgnoreCase("perfdata")){
 			
 		}
-		
 		strbuf.append("OutputFormat: json").append("\n").
 		append("\n");
 
