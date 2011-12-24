@@ -59,6 +59,7 @@ public class JDBCService extends ServiceAbstract implements Service {
 	@Override
 	public void openConnection() throws SQLException {
 		this.connection = DriverManager.getConnection(this.getConnectionUrl());
+		setConnectionEstablished(true);
 	}
 
 	

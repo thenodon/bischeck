@@ -66,6 +66,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
 	    // Create socket that is connected to server on specified port
 	    clientSocket = new Socket(url.getHost(), url.getPort());
 	    clientSocket.setSoTimeout(querytimeout);
+	    setConnectionEstablished(true);
 	    logger.debug("Connected");
 	}
 
@@ -74,6 +75,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
 	public void closeConnection() {
 		try {
 			clientSocket.close();
+			logger.debug("Closed");
 		} catch (IOException ignore) {}
 	}
 
