@@ -39,39 +39,22 @@ public class ServiceJob implements Job {
 	}
 
 	
+	
 	private void executeService(Service service) {
 
 		service.setLevel(NAGIOSSTAT.OK);
-
 		try {
-			service.openConnection();
-			service.setConnectionEstablished(true);
+			service.setLevel(checkServiceItem(service));
 		} catch (Exception e) {
-			logger.error("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed with error " + e);
-			service.setConnectionEstablished(false);
 			service.setLevel(NAGIOSSTAT.CRITICAL);
-			return;
 		}
-
-		if (service.isConnectionEstablished()) {
-			try {
-				service.setLevel(checkServiceItem(service));
-			} catch (Exception e) {
-				service.setLevel(NAGIOSSTAT.CRITICAL);
-			}
-			finally {
-				try {
-					service.closeConnection();
-				} catch (Exception ignore) {}
-			}
-		} 
-		
 	}
 	
-	
+
 	private NAGIOSSTAT checkServiceItem(Service service) throws Exception {
 		
-		service.setLevel(NAGIOSSTAT.OK);
+		NAGIOSSTAT servicestate= NAGIOSSTAT.OK;
+		
 		
 		for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
 			ServiceItem serviceitem = serviceitementry.getValue();
@@ -79,7 +62,23 @@ public class ServiceJob implements Job {
 			
 			try {
 				long start = TimeMeasure.start();
+				try {
+					service.openConnection();
+					//service.setConnectionEstablished(true);
+				} catch (Exception e) {
+					logger.error("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed with error " + e);
+					service.setConnectionEstablished(false);
+					return NAGIOSSTAT.CRITICAL;
+				}
+
 				serviceitem.execute();
+				
+				if (service.isConnectionEstablished()) {
+					try {
+						service.closeConnection();
+					} catch (Exception ignore) {}
+				}
+					
 				serviceitem.setExecutionTime(
 						Long.valueOf(TimeMeasure.stop(start)));
 				logger.debug("Time to execute " + 
@@ -97,13 +96,13 @@ public class ServiceJob implements Job {
 				serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
 				// Always report the state for the worst service item 
 				logger.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
-				NAGIOSSTAT newstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
+				NAGIOSSTAT curstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
 				// New cache handling
 				
 				LastStatusCache.getInstance().add(service,serviceitem);
 				
-				if (newstate.val() > service.getLevel().val() ) { 
-					service.setLevel(newstate);
+				if (curstate.val() > servicestate.val() ) { 
+					servicestate = curstate;
 				}
 			} catch (ClassNotFoundException e) {
 				logger.error("Threshold class not found - " + e);
@@ -115,7 +114,7 @@ public class ServiceJob implements Job {
 
 
 		} // for serviceitem
-		return service.getLevel();
+		return servicestate;
 	}
 
 	
