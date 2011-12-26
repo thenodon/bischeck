@@ -153,7 +153,7 @@ echo "===================================="
 echo "Copyright Anders Håål, Ingenjörsbyn AB 2011"
 echo "Licensed under GPL version 2"
 
-while getopts U:I:J:uR:X name
+while getopts U:I:J:uRX name
 do
   case $name in
     U)  USERINIT="$OPTARG";;
@@ -168,7 +168,12 @@ done
 shift $(($OPTIND - 1))
 
 if [ "x$uninstall" = "xtrue" ] ; then
-  echo uninstall
+  echo "Uninstall bischeck"
+  echo "Remove $BISHOME"
+  rm -rf $BISHOME
+  echo "Remove bischeckd from /etc/init.d"
+  chkconfig --del bischeckd
+  rm -f /etc/init.d/bischeckd
   exit 0
 fi
 
@@ -176,10 +181,10 @@ headline "Pre-installation verification"
 
 echo "Checking software dependencies"
 
-if [ "x$upgrade" = "xtrue" ] ; then
-  checkpackage sqlite
-  checkpackage javasqlite
-fi
+#if [ "x$upgrade" = "xtrue" ] ; then
+#  checkpackage sqlite
+#  checkpackage javasqlite
+#fi
 
 echo "All software installed"
 
