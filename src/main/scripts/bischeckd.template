@@ -17,12 +17,23 @@
 #
 # chkconfig: 3 99 10
 # description: bischeckd init script
+#
+#
+### BEGIN INIT INFO
+# Provides:          bischeckd
+# Required-Start:    $syslog $network
+# Required-Stop:     $syslog $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start bischeck daemon at boot time
+### END INIT INFO
 
 JAVA_HOME=%JAVA_HOME%
 PATH=$JAVA_HOME/bin:$PATH
 
 bishome=%BISHOME%
 user=%USERINIT%
+DISTRO=%DISTRO%
 
 processName=com.ingby.socbox.bischeck.Execute
 
@@ -37,14 +48,39 @@ if [ -f /etc/init.d/functions ] ; then
     . /etc/init.d/functions
 elif [ -f /etc/rc.d/init.d/functions ] ; then
     . /etc/rc.d/init.d/functions
+elif [ -f /lib/lsb/init-functions ] ; then
+    . /lib/lsb/init-functions
 else
     exit 0
 fi
+
 # Avoid using root's TMPDIR
 unset TMPDIR
 RETVAL=0
 
 
+retstatus() {
+     RETVAL=$1
+     if [ $RETVAL -eq 0 ] ; then
+        if [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+          log_end_msg $RETVAL
+        elif [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+          echo_success
+          echo
+        else 
+          echo $RETVAL 
+        fi
+    else
+        if [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+          log_end_msg $RETVAL
+        elif [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+          echo_failure
+          echo
+        else 
+          echo $RETVAL 
+        fi
+    fi
+}
 
 start() {
     echo -n "bischeckd startup"
@@ -69,12 +105,8 @@ start() {
     else
        RETVAL=2
     fi
-    if [ $RETVAL -eq 0 ] ; then
-        echo_success
-    else
-        echo_failure
-    fi
-    echo
+    
+    retstatus $RETVAL
 }
 
 stop() {
@@ -93,12 +125,7 @@ stop() {
         RETVAL=2
     fi
 
-    if [ $RETVAL -eq 0 ] ; then
-        echo_success
-    else 
-        echo_failure
-    fi 
-    echo
+    retstatus $RETVAL
 
 }
 
@@ -111,12 +138,7 @@ status() {
         echo -n "$scriptName is not running"
         RETVAL=1
     fi
-    if [ $RETVAL -eq 0 ] ; then
-        echo_success
-    else
-        echo_failure
-    fi
-    echo
+    retstatus $RETVAL
 }
 
 case "$1" in

@@ -113,6 +113,16 @@ function checkpackage() {
   fi 
 }
 
+function distrocheck() {
+DISTRIBUTION=$(lsb_release -i | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
+if [ "$DISTRIBUTION" != "unknown" ] ; then 
+    VERSION=$(lsb_release -r | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
+    echo ${DISTRIBUTION}:${VERSION}
+fi
+
+}
+
+
 function usage {
   echo "Usage: $0: -U user -I directory -J java_home "
   echo "-u show usage"
@@ -144,6 +154,8 @@ BISHOME="/opt/socbox/addons/bischeck"
 JAVA_HOME=""
 unistall=false
 upgrade=false
+DISTRO=""
+DISTROVERS=""
 
 VERSION=$(basename `pwd` | sed -e "s/^.*-//")
 
@@ -152,8 +164,9 @@ echo "Welcome to bischeck $VERSION installer"
 echo "===================================="
 echo "Copyright Anders Håål, Ingenjörsbyn AB 2011"
 echo "Licensed under GPL version 2"
+echo 
 
-while getopts U:I:J:uRX name
+while getopts U:I:J:uRXd: name
 do
   case $name in
     U)  USERINIT="$OPTARG";;
@@ -161,18 +174,56 @@ do
     J)  JAVA_HOME="$OPTARG";;
     X)  upgrade=true;;
     R)  uninstall=true;;
+    d)  DISTRO="$OPTARG";;
     u)  usage; exit 0;;
   esac
 done
 
 shift $(($OPTIND - 1))
 
+
+#########################
+## Check distribution
+#########################
+# Need to find a way to determine and pass on.
+if [ "x$DISTRO" = "x" ] ; then
+  DISTRO=$(distrocheck | cut -f1 -d:)
+  DISTROVERS=$(distrocheck | cut -f2 -d:)
+  if [ "x$DISTRO" = "x" ] ; then
+    echo "Can not determine distribution - please try set distribution name with -d"
+    exit 1
+  fi 
+else
+  DISTRO=$(echo $DISTRO | tr A-Z a-z)
+fi
+
+case ${DISTRO} in
+  rh|rhel|centos|debian|ubuntu)
+      echo "Supported distribution - $DISTRO $DISTROVERS" 
+      ;;
+  *)
+      echo "Linux distribution $DISTRO is not supported"
+      echo "Supported distributions are rh, rhel, centos and debian" 
+      exit 1
+      ;;
+esac;
+
+
+
+
+#########################
+## Uninstall
+#########################
 if [ "x$uninstall" = "xtrue" ] ; then
   echo "Uninstall bischeck"
   echo "Remove $BISHOME"
   rm -rf $BISHOME
   echo "Remove bischeckd from /etc/init.d"
-  chkconfig --del bischeckd
+  if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+    chkconfig --del bischeckd
+  elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+    update-rc.d bischeckd remove
+  fi
   rm -f /etc/init.d/bischeckd
   exit 0
 fi
@@ -186,7 +237,7 @@ echo "Checking software dependencies"
 #  checkpackage javasqlite
 #fi
 
-echo "All software installed"
+echo "All requiered software installed"
 
 
 id $USERINIT > /dev/null 2>&1
@@ -197,6 +248,9 @@ else
   echo User "$USERINIT exists"
 fi
 
+#########################
+## Pre install 
+#########################
 if [ "$upgrade" = "false" ] ; then
   if [ -d $BISHOME ] ; then
     errormsg "Directory $BISHOME already exists"
@@ -220,6 +274,9 @@ else
 fi
   
 
+#########################
+## Upgrade check
+#########################
 if [ "$upgrade" = "true" ] ; then
 
   #Check if the current version can be upgraded
@@ -231,13 +288,10 @@ if [ "$upgrade" = "true" ] ; then
     errormsg "Copy directory $upgradedir exists, must be removed to upgrade bischeck"
     initerror=true
   fi
-
     
   migline=$(grep $oldversion:$newversion: migrationpath.txt 2>&1)
   migoldver=$(echo $migline | cut -d":" -f1)
   mignewver=$(echo $migline | cut -d":" -f2)
-
-  
 
   if [ "x$migoldver" = "x$oldversion" -a "x$mignewver" = "x$newversion" ] ; then
     echo "Upgrading bischeck from $oldversion to $newversion"
@@ -248,6 +302,10 @@ if [ "$upgrade" = "true" ] ; then
   migscript=$(echo $migline | cut -d":" -f3)
 fi
 
+
+#########################
+## Exit if any error was detected
+#########################
 if [ "$initerror" = "true" ] ; then
   getout
 else 
@@ -255,7 +313,9 @@ else
 fi
 
 
-
+#########################
+## Backup old install 
+#########################
 # Create a backup directory of old bischeck installation
 if [ "$upgrade" = "true" ] ; then
   service bischeckd stop
@@ -264,6 +324,9 @@ if [ "$upgrade" = "true" ] ; then
 fi
 
 
+#########################
+## Install
+#########################
 headline "Do installation of bischeck $newversion"
 if [ ! -d $BISHOME ] ; then
     echo "Create installation directory $BISHOME"
@@ -288,14 +351,20 @@ if [ ! -d $BISHOME ] ; then
       cat  $i| sed -e "s#%BISHOME%#$BISHOME#g" \
         -e "s#%VERSION%#$VERSION#g" \
         -e "s#%USERINIT%#$USERINIT#g" \
-        -e "s#%JAVA_HOME%#$JAVA_HOME#g" > $BISHOME/bin/`basename ${i%\.template}`
+        -e "s#%JAVA_HOME%#$JAVA_HOME#g" \
+        -e "s#%DISTRO%#$DISTRO#g" > $BISHOME/bin/`basename ${i%\.template}`
     done
     chmod 750 $BISHOME/bin/* 
 
     echo "Install init.d script bischeckd in /etc/init.d"
     cp $BISHOME/bin/bischeckd /etc/init.d
     chmod 755 /etc/init.d/bischeckd
-    chkconfig --add bischeckd
+  
+    if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+        chkconfig --add bischeckd
+    elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+        update-rc.d bischeckd defaults
+    fi
     
     echo "Change ownership and permissions to install user $USERINIT"
     chown -R $USERINIT:`id -gn $USERINIT` $BISHOME
@@ -306,6 +375,10 @@ else
    getout
 fi
 
+
+#########################
+## Upgrade
+#########################
 if [ "$upgrade" = "true" ] ; then
   headline "Upgrade of bischeck $newversion with $oldversion"
   echo "Copy customlib jars"
@@ -314,6 +387,10 @@ if [ "$upgrade" = "true" ] ; then
   sh ./migscripts/$migscript $BISHOME $upgradedir
 fi
 
+
+#########################
+## Always set permission
+#########################
 if [ ! -d $BISHOME ] ; then
   echo "Set permission of the installation"
   chmod -R o-rwx $BISHOME/etc
