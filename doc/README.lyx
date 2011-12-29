@@ -89,7 +89,7 @@ Version 0.4.0
 \begin_inset Newline newline
 \end_inset
 
-2011-
+2012-
 \end_layout
 
 \begin_layout Standard
@@ -506,8 +506,8 @@ m1[0] - host1-service1-item1[1])
 
 \begin_layout Standard
 The above example check is the result of "host1-service1-item1[0] - host1-servic
-e1-item1[1]" is less then 0, if yes return 0 else return the result of "host1-se
-rvice1-item1[0] - host1-service1-item1[1]".
+e1-item1[1]" is less then 0, if true return 0 and if false return the result
+ of "host1-service1-item1[0] - host1-service1-item1[1]".
  The value to use from the cache is defined by an index [X], where 0 is
  the latest value retrieved for the specific host-service-item.
 \end_layout
@@ -3102,7 +3102,7 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.4.0 - 201X-xx-xx
+Release 0.4.0 - 2012-xx-xx
 \end_layout
 
 \begin_layout Subsection
@@ -3124,6 +3124,19 @@ New feature
 \end_layout
 
 \begin_layout Itemize
+[FR-202] The implementation of running bischeck once, none daemon mode,
+ is changed so the same code is used as running in daemon mode.
+ The only difference is that the initialization of triggers are different
+ so all service items are just ran directly and once.
+\end_layout
+
+\begin_layout Itemize
+Added support for other Linux distributions then Redhat based.
+ bischeck should now install on Debian 6 or and Ubuntu 10/11.
+ 
+\end_layout
+
+\begin_layout Itemize
 Configuration listing.
  The conifguration listning has been moved from the ConfigurationManager
  to the DocManager class.
@@ -3135,7 +3148,69 @@ Bugs fixed and important issues
 \end_layout
 
 \begin_layout Itemize
-TR-216 
+The Service interface has a number of new methods that should been there
+ from the beginning.
+ If you developed any service class you need to add these, but if you just
+ inherited ServiceAbstract its fixed for you.
+ The new methods are:
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Itemize
+
+public NAGIOSSTAT getLevel(); 
+\end_layout
+
+\begin_layout Itemize
+
+public void setLevel(NAGIOSSTAT level); 
+\end_layout
+
+\begin_layout Itemize
+
+public boolean isConnectionEstablished(); 
+\end_layout
+
+\begin_layout Itemize
+
+public void setConnectionEstablished(boolean connected); 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Property 
+\emph on
+cacheclear
+\emph default
+ is renamed to 
+\emph on
+thresholdCacheClear
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+All the nsca related properties has been moved from properties.xml to servers.xml
+ when used for the NSCAServer class.
+ The new property names has also gone through some minor changes.
+ When upgrading a manual update is needed of the servers.xml file with the
+ current setting of nsca related properties in properties.xml.
+ Recommended that these are later removed.
+\end_layout
+
+\begin_layout Itemize
+[TR-216] 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3147,15 +3222,19 @@ Shutdown is automatic triggered
 \end_layout
 
 \begin_layout Itemize
-TR-217 
+[TR-217] 
 \begin_inset Quotes eld
 \end_inset
 
-Configuration Manager initzialization failed with java.lang.NullPointerException
+Configuration Manager initialization failed with java.lang.NullPointerException
 \begin_inset Quotes erd
 \end_inset
 
 
+\end_layout
+
+\begin_layout Itemize
+[TR-207] sudo in bischeckd script cause problem at boot
 \end_layout
 
 \begin_layout Section
@@ -3175,7 +3254,7 @@ Bugs fixed and important issues
 \end_layout
 
 \begin_layout Itemize
-TR-207 
+[TR-207] 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3187,7 +3266,7 @@ sudo in bischeckd script cause problem at boot
 \end_layout
 
 \begin_layout Itemize
-TR-214 
+[TR-214] 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3215,40 +3294,8 @@ bischeck are no longer limited to just be integrated with a single Nagios
  integration.
 \end_layout
 
-\begin_layout Itemize
-[FR-202] The implementation of running bischeck once, none daemon mode,
- is changed so the same code is used as running in daemon mode.
- The only difference is that the initialization of triggers are different
- so all service items are just ran directly and once.
-\end_layout
-
 \begin_layout Subsection
 Bugs fixed and important issues
-\end_layout
-
-\begin_layout Itemize
-All the nsca related properties has been moved from properties.xml to servers.xml
- when used for the NSCAServer class.
- The new property names has also gone through some minor changes.
- When upgrading a manual update is needed of the servers.xml file with the
- current setting of nsca related properties in properties.xml.
- Recommended that these are later removed.
-\end_layout
-
-\begin_layout Itemize
-Property 
-\emph on
-cacheclear
-\emph default
- is renamed to 
-\emph on
-thresholdCacheClear
-\emph default
-.
-\end_layout
-
-\begin_layout Itemize
-[TR-207] sudo in bischeckd script cause problem at boot
 \end_layout
 
 \begin_layout Section
@@ -3701,7 +3748,7 @@ http://code.google.com/p/jsendnsca/
 \begin_deeper
 \begin_layout Itemize
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -3799,6 +3846,130 @@ status collapsed
 \begin_layout Plain Layout
 
 http://www.gnu.org/licenses/gpl-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+json-lib-2.4 - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://json-lib.sourceforge.net/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+ezmorph-1.0.6.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ezmorph.sourceforge.net/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-beanutils-1.8.3.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/beanutils/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-collections-3.2.1.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/collections/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
 \end_layout
 
 \end_inset
