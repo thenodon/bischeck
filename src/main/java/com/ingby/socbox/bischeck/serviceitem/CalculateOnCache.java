@@ -88,6 +88,26 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	
+
+		bis = new LastCacheService("serviceName");
+		coc = new CalculateOnCache("serviceItemName");
+		coc.setService(bis);
+		
+		try {
+			
+			LastStatusCache.getInstance().add("host1", "web", "state", "1",null);
+			LastStatusCache.getInstance().add("host2", "web", "state", "1",null);
+			LastStatusCache.getInstance().add("host3", "web", "state", "0",null);
+			
+			coc.setExecution("if ((host1-web-state[0] == 0) &&  (host2-web-state[0] == 0) , 0, 1)");
+			coc.setExecution("if ((host1-web-state[0] + host2-web-state[0] + host3-web-state[0]) > 2 ,1 , 0)");
+			coc.execute();
+			System.out.println("test boolean " + coc.getLatestExecuted());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+	
 	}
 
 	
