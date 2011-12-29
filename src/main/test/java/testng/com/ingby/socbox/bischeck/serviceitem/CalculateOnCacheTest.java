@@ -43,12 +43,12 @@ public class CalculateOnCacheTest {
 			LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "10.0",null);
 			
 			LastStatusCache.getInstance().add("host2", "service2", "serviceitem2", "100.0",null);
-			LastStatusCache.getInstance().listLru("host1", "service1", "serviceitem1");
 			LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "11.0",null);
 			LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "12.0",null);
 			
 			Assert.assertEquals(LastStatusCache.getInstance().size(),2);
 			Assert.assertEquals(LastStatusCache.getInstance().sizeLru("host1", "service1", "serviceitem1"),12);
+			Assert.assertEquals(LastStatusCache.getInstance().sizeLru("host1", "service1", "serviceitem1"),1);
 			
 			coc.setExecution("if ((host1-service1-serviceitem1[1] - host1-service1-serviceitem1[0]) < 0, host1-service1-serviceitem1[1] - host1-service1-serviceitem1[0], 0)");
 			coc.execute();
