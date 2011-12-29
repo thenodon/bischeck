@@ -32,6 +32,8 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
+import net.sf.json.JSONObject;
+
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.service.Service;
@@ -78,11 +80,19 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	}
 
 	
+	/**
+	 * Return the cache reference
+	 * @return
+	 */
 	public static LastStatusCache getInstance(){
 		return lsc;
 	}
 	
-	
+	/**
+	 * Add an entry to the cache
+	 * @param service
+	 * @param serviceitem
+	 */
 	public  void add(Service service, ServiceItem serviceitem) {
 		synchronized (cache) {
 			
@@ -111,6 +121,14 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	}
 	
 	
+	/**
+	 * Add a entry to the cache
+	 * @param hostname
+	 * @param serviceName
+	 * @param serviceItemName
+	 * @param measuredValue
+	 * @param thresholdValue
+	 */
 	public  void add(String hostname, String serviceName,
 			String serviceItemName, String measuredValue,
 			Float thresholdValue) {
@@ -230,12 +248,19 @@ public class LastStatusCache implements LastStatusCacheMBean {
 			System.out.println(i +" : "+cache.get(key).get(i).getValue());
 	}
 
-	
+	/**
+	 * Takes a list of ; separated host-service-serviceitems[x] and return the 
+	 * a string with each of the corresponding values from the cache with , as
+	 * separator.
+	 * @param parameters
+	 * @return 
+	 */
+	// TODO - replace with json 
 	public String getParametersByString(String parameters) {
 		String resultStr="";
 		StringTokenizer st = new StringTokenizer(parameters,";");
 		StringBuffer strbuf = new StringBuffer();
-
+		logger.debug("Parameter string: " + parameters);
 		strbuf.append(resultStr);
 
 		while (st.hasMoreTokens()){
@@ -258,12 +283,11 @@ public class LastStatusCache implements LastStatusCacheMBean {
 					serviceitem + "[" +
 					index+"]");
 
+			
 			// Check the format of the index
-			//
 			if (index.contains(",")) {
 				StringTokenizer ind = new StringTokenizer(index,",");
 				while (ind.hasMoreTokens()) {
-					//resultStr=resultStr +
 					strbuf.append(
 					this.getIndex( 
 							host,
@@ -277,7 +301,6 @@ public class LastStatusCache implements LastStatusCacheMBean {
 				int indend = Integer.parseInt((String) ind.nextToken());
 
 				for (int i = indstart; i<indend+1; i++) {
-					//resultStr=resultStr +
 					strbuf.append(
 							this.getIndex( 
 							host,
@@ -286,7 +309,6 @@ public class LastStatusCache implements LastStatusCacheMBean {
 							i) + ",");
 				}
 			} else { 
-				//resultStr=resultStr +
 				strbuf.append(
 						this.getIndex( 
 						host,
@@ -301,9 +323,17 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		if (resultStr.lastIndexOf(',') == resultStr.length()-1) {
 			resultStr = resultStr.substring(0, resultStr.length()-1);
 		}
-
+		logger.debug("Result string: "+ resultStr);
 		return resultStr;
 	}
+	
+	
+	/*
+	public JSONObject getParametersByJson(JSONObject parameters) {
+		
+		return null;
+	}
+	*/
 	
 	
 	public String getHostServiceItemFormat(){
@@ -311,12 +341,20 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	}
 	
 	
+	/*
+	 * (non-Javadoc)
+	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getLastStatusCacheCount()
+	 */
 	@Override
 	public int getLastStatusCacheCount() {
 		return this.size();
 	}
 	
 	
+	/*
+	 * (non-Javadoc)
+	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getCacheKeys()
+	 */
 	@Override
 	public String[] getCacheKeys() {
 		String[] key = new String[cache.size()];
