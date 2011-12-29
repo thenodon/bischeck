@@ -47,92 +47,16 @@ public class LastCacheService extends ServiceAbstract implements Service {
 	
 	@Override
 	public void openConnection() throws Exception {
-	    // The us of LastStatusCache do not need a connection
+		// The use of LastStatusCache do not need a connection
 	}
 
-	
+
 	@Override
 	public void closeConnection() throws Exception {
-	 // The us of LastStatusCache do not need a connection
+		// The use of LastStatusCache do not need a connection
 	}
 
-	/*
-	@Override
-	public String getNSCAMessage() {
-		String message = "";
-		String perfmessage = "";
-		int count = 0;
-		long totalexectime = 0;
-			
-		for (Map.Entry<String, ServiceItem> serviceItementry: servicesItems.entrySet()) {
-			ServiceItem serviceItem = serviceItementry.getValue();
-		
-			Float warnValue = new Float(0);//null;
-			Float critValue = new Float(0);//null;
-			String method = "NA";//null;
-			
-			Float currentThreshold = Util.roundOneDecimals(serviceItem.getThreshold().getThreshold());
-			
-			if (currentThreshold != null) {
-				
-				method = serviceItem.getThreshold().getCalcMethod();
-				
-				if (method.equalsIgnoreCase("=")) {
-					warnValue = Util.roundOneDecimals(new Float ((1-serviceItem.getThreshold().getWarning())*currentThreshold));
-					critValue = Util.roundOneDecimals(new Float ((1-serviceItem.getThreshold().getCritical())*currentThreshold));
-					message = message + serviceItem.getServiceItemName() +
-					" = " + 
-					serviceItem.getLatestExecuted() +
-					" ("+ 
-					currentThreshold + " " + method + " " +
-					(warnValue) + " " + method + " +-W " + method + " " +
-					(critValue) + " " + method + " +-C " + method + " " +
-					") ";
-					
-				} else {
-					warnValue = Util.roundOneDecimals(new Float (serviceItem.getThreshold().getWarning()*currentThreshold));
-					critValue = Util.roundOneDecimals(new Float (serviceItem.getThreshold().getCritical()*currentThreshold));
-					message = message + serviceItem.getServiceItemName() +
-					" = " + 
-					serviceItem.getLatestExecuted() +
-					" ("+ 
-					currentThreshold + " " + method + " " +
-					(warnValue) + " " + method + " W " + method + " " +
-					(critValue) + " " + method + " C " + method + " " +
-					") ";
-				}
-				
-			} else {
-				message = message + serviceItem.getServiceItemName() +
-				" = " + 
-				serviceItem.getLatestExecuted() +
-				" (NA) ";
-				currentThreshold=new Float(0); //This is so the perfdata will be correct.
-			}
-			
-			
-			
-			perfmessage = perfmessage + serviceItem.getServiceItemName() +
-			"=" + 
-			serviceItem.getLatestExecuted() + ";" +
-			(warnValue) +";" +
-			(critValue) +";0; " + //;
-			
-			"threshold=" +
-			currentThreshold +";0;0;0;";
-			
-			totalexectime = (totalexectime + serviceItem.getExecutionTime());
-			count++;
-		}
 
-		return " " + message + " | " + 
-			perfmessage +
-			" avg-exec-time=" + ((totalexectime/count)+"ms");
-
-	}
-
-	*/
-	
 	@Override
 	/**
 	 * The exec string is a list of arrays as
