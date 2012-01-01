@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#
-# 
 # 
 ###########################################################
 
@@ -270,7 +268,13 @@ elif [ ! -f $JAVA_HOME/bin/java ] ; then
   errormsg "Java do not exists in $JAVA_HOME/bin"
   initerror=true
 else 
-  echo "Java runtime exists"
+  jver=$(java -version 2>&1 | awk '/version/ {print $3}' | awk -F . '{print $2}')
+  if [ $jver -qe 6 ] ; then 
+    echo "Java runtime exists"
+  else
+    errormsg "Java version is must be 6 or higher."
+    initerror=true
+  fi
 fi
   
 
