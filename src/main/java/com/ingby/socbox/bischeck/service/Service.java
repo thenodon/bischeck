@@ -210,4 +210,20 @@ public interface Service {
 	 * @param connected
 	 */
 	public void setConnectionEstablished(boolean connected);
+
+	
+	/**
+	 * Determine if the data retrieved by the service should be sent to the 
+	 * different configured monitoring servers. 
+	 * @return true if the data should be sent - true should be the default
+	 */
+	public Boolean isSendServiceData();
+	
+	
+	/**
+	 * Set to true if the data should be sent to monitoring servers
+	 * @param sendServiceData true to send and false not to send.
+	 */
+	public void setSendServiceData(Boolean sendServiceData);
+
 }

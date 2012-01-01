@@ -54,6 +54,7 @@ public abstract class ServiceAbstract {
 	protected List<String> schedulelist;
 	private NAGIOSSTAT level = NAGIOSSTAT.UNKNOWN;
 	private boolean connectionEstablished = false;
+	private Boolean sendServiceData = true;
 	
 	public String getServiceName() {
 		return serviceName;
@@ -147,6 +148,16 @@ public abstract class ServiceAbstract {
 	
 	public void setConnectionEstablished(boolean connected){
 		connectionEstablished = connected;
+	}
+
+
+	public boolean isSendServiceData(){
+		return sendServiceData;
+	}
+	
+	
+	public void setSendServiceData(Boolean sendServiceData){
+		this.sendServiceData = sendServiceData;
 	}
 
 }

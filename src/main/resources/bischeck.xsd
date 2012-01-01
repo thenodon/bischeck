@@ -22,6 +22,7 @@
 				<xsd:element ref="name"/>
 				<xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
                 <xsd:element ref="schedule" minOccurs="1" maxOccurs="unbounded"/>
+				<xsd:element ref="sendserver" minOccurs="0" maxOccurs="1"/>
 				<xsd:element ref="url"/>
 				<xsd:element ref="driver" minOccurs="0" maxOccurs="1"/>
 				<xsd:element ref="serviceitem" minOccurs="1" maxOccurs="unbounded"/>
@@ -48,5 +49,6 @@
 	<xsd:element name="execstatement" type="xsd:normalizedString"/>
 	<xsd:element name="thresholdclass" type="xsd:normalizedString"/>
 	<xsd:element name="serviceitemclass" type="xsd:normalizedString"/>
+	<xsd:element name="sendserver" type="xsd:boolean" default="true"/>
 
 </xsd:schema>

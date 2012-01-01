@@ -356,7 +356,13 @@ public class ConfigurationManager implements ConfigXMLInf {
 			service.setDecscription(serviceconfig.getDesc());
 			service.setSchedules(serviceconfig.getSchedule());
 			service.setConnectionUrl(serviceconfig.getUrl());
-			service.setDriverClassName(serviceconfig.getDriver());	
+			service.setDriverClassName(serviceconfig.getDriver());
+			if (serviceconfig.isSendserver() != null) {
+				service.setSendServiceData(serviceconfig.isSendserver());
+			} else {
+				service.setSendServiceData(true);
+			}
+				
 			if (service.getDriverClassName() != null) {
 				try {
 					Class.forName(service.getDriverClassName()).newInstance();

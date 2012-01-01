@@ -23,23 +23,29 @@ public class ServiceJob implements Job {
 	private Service service;
 		
 	@Override
+	/**
+	 * The method is called every time the service is define to run by the 
+	 * scheduler
+	 */
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 
-		
 		JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-
+		
+		// Get the Service object passed by the context
 		service = (Service) dataMap.get("service");
 
-		//((ServiceAbstract) service).executeService(service);
 		executeService(service);
-		
-		ServerExecutor serverexecutor = ServerExecutor.getInstance();
-		
-		serverexecutor.execute(service);		
+	
+		if (service.isSendServiceData()) {
+			ServerExecutor.getInstance().execute(service);
+		}
 	}
 
 	
-	
+	/**
+	 * 
+	 * @param service
+	 */
 	private void executeService(Service service) {
 
 		service.setLevel(NAGIOSSTAT.OK);
@@ -51,10 +57,15 @@ public class ServiceJob implements Job {
 	}
 	
 
+	/**
+	 * 
+	 * @param service
+	 * @return
+	 * @throws Exception
+	 */
 	private NAGIOSSTAT checkServiceItem(Service service) throws Exception {
 		
 		NAGIOSSTAT servicestate= NAGIOSSTAT.OK;
-		
 		
 		for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
 			ServiceItem serviceitem = serviceitementry.getValue();
@@ -97,7 +108,6 @@ public class ServiceJob implements Job {
 				// Always report the state for the worst service item 
 				logger.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
 				NAGIOSSTAT curstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
-				// New cache handling
 				
 				LastStatusCache.getInstance().add(service,serviceitem);
 				
