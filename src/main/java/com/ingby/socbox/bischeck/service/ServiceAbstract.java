@@ -151,7 +151,7 @@ public abstract class ServiceAbstract {
 	}
 
 
-	public boolean isSendServiceData(){
+	public Boolean isSendServiceData(){
 		return sendServiceData;
 	}
 	
