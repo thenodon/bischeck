@@ -167,7 +167,7 @@ Support date macros in execution statements of measured entities, typical
 \end_layout
 
 \begin_layout Itemize
-Support a multitude of ways to connected to a the entity to measure by allowing
+Support a multitude of ways to connected to the source to monitor by allowing
  custom service connection methods.
 \end_layout
 
@@ -465,14 +465,43 @@ Service classes
 The following Service classes is provided in the standard bischeck distribution:
 \end_layout
 
-\begin_layout Itemize
-JDBCService - Manage services connecting to databases over JDBC.
+\begin_layout Subsection
+JDBC
+\end_layout
+
+\begin_layout Standard
+JDBCService manage services connecting to databases over JDBC.
  JDBC jars should be put in the directory customlib in the bischeck install
  directory to automatically be found at start-up.
 \end_layout
 
-\begin_layout Itemize
-LastCacheService - Make a connection to bischeck's internal last measured
+\begin_layout Subsection
+Livestatus
+\end_layout
+
+\begin_layout Standard
+LivestatusService enable connectivity to any Nagios server using MK Livestatus.
+ With the service state and performance data can be retrived from a Nagios
+ server.
+ 
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.0]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Bischeck cache
+\end_layout
+
+\begin_layout Standard
+LastCacheService enable connection to bischeck's internal last measured
  value cache.
 \end_layout
 
@@ -491,10 +520,26 @@ The following ServiceItem classes is provided in the standard bischeck distribut
 ion:
 \end_layout
 
+\begin_layout Subsection
+SQL
+\end_layout
+
 \begin_layout Itemize
 SQLServiceItem - enable execution of a SQL statement.
  Its important that the SQL statement only return on value, like a "select
  count(*) ....".
+\end_layout
+
+\begin_layout Subsection
+Livestatus 
+\end_layout
+
+\begin_layout Standard
+f
+\end_layout
+
+\begin_layout Subsection
+Cache calculations
 \end_layout
 
 \begin_layout Itemize
