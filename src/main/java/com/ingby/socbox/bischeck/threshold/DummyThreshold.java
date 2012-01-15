@@ -23,86 +23,86 @@ import org.apache.log4j.Logger;
 
 public class DummyThreshold implements Threshold {
 
-	static Logger  logger = Logger.getLogger(DummyThreshold.class);
+    static Logger  logger = Logger.getLogger(DummyThreshold.class);
 
-	
-	private String serviceName;
-	private String serviceItemName;
-	private NAGIOSSTAT state;
-	
-	Float warning;
-	Float critical;
-	String calcMethod = null;
+    
+    private String serviceName;
+    private String serviceItemName;
+    private NAGIOSSTAT state;
+    
+    Float warning;
+    Float critical;
+    String calcMethod = null;
 
-	
-	public DummyThreshold() {
-		this.state = NAGIOSSTAT.OK;
-	}
+    
+    public DummyThreshold() {
+        this.state = NAGIOSSTAT.OK;
+    }
 
-	
-	@Override
-	public Float getWarning() {
-	    return null;
-	}
-
-
-	@Override
-	public Float getCritical() {
-	    return null;
-	}
-
-	
-	@Override
-	public void init() {
-	
-	}
-
-	
-	@Override
-	public NAGIOSSTAT getState(String value) {		
-		return this.state;
-	}
-
-	
-	@Override
-	public String getServiceName() {
-		return serviceName;
-	}
-
-	
-	@Override
-	public String getServiceItemName() {
-		return serviceItemName;
-	}
-	
-
-	@Override
-	public String getCalcMethod() {
-		return calcMethod;
-	}
-		
-
-	@Override
-	public Float getThreshold() {
-			return null;
-	}
-	
-
-	@Override
-	public void setHostName(String name) {
-
-	}
+    
+    @Override
+    public Float getWarning() {
+        return null;
+    }
 
 
-	@Override
-	public void setServiceItemName(String name) {
-		this.serviceItemName = name;
+    @Override
+    public Float getCritical() {
+        return null;
+    }
 
-	}
+    
+    @Override
+    public void init() {
+    
+    }
+
+    
+    @Override
+    public NAGIOSSTAT getState(String value) {        
+        return this.state;
+    }
+
+    
+    @Override
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    
+    @Override
+    public String getServiceItemName() {
+        return serviceItemName;
+    }
+    
+
+    @Override
+    public String getCalcMethod() {
+        return calcMethod;
+    }
+        
+
+    @Override
+    public Float getThreshold() {
+            return null;
+    }
+    
+
+    @Override
+    public void setHostName(String name) {
+
+    }
 
 
-	@Override
-	public void setServiceName(String name) {
-		this.serviceName = name;
-	}
+    @Override
+    public void setServiceItemName(String name) {
+        this.serviceItemName = name;
+
+    }
+
+
+    @Override
+    public void setServiceName(String name) {
+        this.serviceName = name;
+    }
 }

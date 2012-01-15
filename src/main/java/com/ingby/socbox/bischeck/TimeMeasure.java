@@ -21,13 +21,13 @@ package com.ingby.socbox.bischeck;
 
 public class TimeMeasure {
 
-	public static long start() {
-		return System.currentTimeMillis();
-	}
+    public static long start() {
+        return System.currentTimeMillis();
+    }
 
-	
-	public static long stop(long start) {
-		return (System.currentTimeMillis() - start);
-	}
+    
+    public static long stop(long start) {
+        return (System.currentTimeMillis() - start);
+    }
 
 }

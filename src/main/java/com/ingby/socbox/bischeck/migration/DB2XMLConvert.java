@@ -60,452 +60,452 @@ import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlservices;
 
 public class DB2XMLConvert {
 
-	//private static final String DEFAULTSCHEDULE = "0 0/5 * * * ?";
+    //private static final String DEFAULTSCHEDULE = "0 0/5 * * * ?";
 
-	public static void main(String[] args) throws Exception {
-		CommandLineParser parser = new GnuParser();
-		CommandLine line = null;
-		// create the Options
-		Options options = new Options();
-		options.addOption( "u", "usage", false, "show usage." );
-		options.addOption( "v", "verbose", false, "verbose - do not write to files" );
-		options.addOption( "s", "source", true, "directory where databases is located" );
-		options.addOption( "d", "destination", true, "directory where the xml files while be stored" );
-		
+    public static void main(String[] args) throws Exception {
+        CommandLineParser parser = new GnuParser();
+        CommandLine line = null;
+        // create the Options
+        Options options = new Options();
+        options.addOption( "u", "usage", false, "show usage." );
+        options.addOption( "v", "verbose", false, "verbose - do not write to files" );
+        options.addOption( "s", "source", true, "directory where databases is located" );
+        options.addOption( "d", "destination", true, "directory where the xml files while be stored" );
+        
 
-		try {
-			// parse the command line arguments
-			line = parser.parse( options, args );
+        try {
+            // parse the command line arguments
+            line = parser.parse( options, args );
 
-		} catch (org.apache.commons.cli.ParseException e) {
-			System.out.println( "Command parse error:" + e.getMessage() );
-			System.exit(1);
-		}
+        } catch (org.apache.commons.cli.ParseException e) {
+            System.out.println( "Command parse error:" + e.getMessage() );
+            System.exit(1);
+        }
 
-		if (line.hasOption("usage")) {
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp( "DB2XMLConvert", options );
-			System.exit(0);
-		}
+        if (line.hasOption("usage")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp( "DB2XMLConvert", options );
+            System.exit(0);
+        }
 
-		
-		DB2XMLConvert converter = new DB2XMLConvert();
-		if (line.hasOption("source")) {
-			String destdir=".";
-			if (line.hasOption("destination"))
-				destdir=line.getOptionValue("destination");
-			
-			StringWriter xmlstr = converter.createXMLProperties(line.getOptionValue("source") + File.separator + "bischeck.conf");
-			if (!line.hasOption("verbose")) 
-				converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.PROPERTIES.xml(),xmlstr);
-			else { 
-				System.out.println("############## " + 
-						ConfigurationManager.XMLCONFIG.PROPERTIES.xml() + 
-						" ##############");
-				System.out.println(xmlstr);
-			}
-			
-			xmlstr = converter.createXMLURL2Services(line.getOptionValue("source") + File.separator + "bischeck.conf");
-			if (!line.hasOption("verbose")) 
-				converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.URL2SERVICES.xml(),xmlstr);
-			else {
-				System.out.println("############## " + 
-						ConfigurationManager.XMLCONFIG.URL2SERVICES.xml() + 
-						" ##############");
-				System.out.println(xmlstr);
-			}
-			
-			xmlstr = converter.createXMLBischeck(line.getOptionValue("source") + File.separator + "bischeck.conf");
-			if (!line.hasOption("verbose")) 
-				converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.BISCHECK.xml(),xmlstr);
-			else {
-				System.out.println("############## " + ConfigurationManager.XMLCONFIG.BISCHECK.xml() +
-						" ##############");
-				System.out.println(xmlstr);
-			}
+        
+        DB2XMLConvert converter = new DB2XMLConvert();
+        if (line.hasOption("source")) {
+            String destdir=".";
+            if (line.hasOption("destination"))
+                destdir=line.getOptionValue("destination");
+            
+            StringWriter xmlstr = converter.createXMLProperties(line.getOptionValue("source") + File.separator + "bischeck.conf");
+            if (!line.hasOption("verbose")) 
+                converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.PROPERTIES.xml(),xmlstr);
+            else { 
+                System.out.println("############## " + 
+                        ConfigurationManager.XMLCONFIG.PROPERTIES.xml() + 
+                        " ##############");
+                System.out.println(xmlstr);
+            }
+            
+            xmlstr = converter.createXMLURL2Services(line.getOptionValue("source") + File.separator + "bischeck.conf");
+            if (!line.hasOption("verbose")) 
+                converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.URL2SERVICES.xml(),xmlstr);
+            else {
+                System.out.println("############## " + 
+                        ConfigurationManager.XMLCONFIG.URL2SERVICES.xml() + 
+                        " ##############");
+                System.out.println(xmlstr);
+            }
+            
+            xmlstr = converter.createXMLBischeck(line.getOptionValue("source") + File.separator + "bischeck.conf");
+            if (!line.hasOption("verbose")) 
+                converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.BISCHECK.xml(),xmlstr);
+            else {
+                System.out.println("############## " + ConfigurationManager.XMLCONFIG.BISCHECK.xml() +
+                        " ##############");
+                System.out.println(xmlstr);
+            }
 
-			xmlstr = converter.createXMLTwenty4HourThreshold(line.getOptionValue("source") + File.separator + "24threshold.conf");
-			if (!line.hasOption("verbose")) 
-				converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml(),xmlstr);
-			else { 
-				System.out.println("############## " +
-						ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml() +
-						" ##############");
-				System.out.println(xmlstr);
-			}
-		}
-	}
+            xmlstr = converter.createXMLTwenty4HourThreshold(line.getOptionValue("source") + File.separator + "24threshold.conf");
+            if (!line.hasOption("verbose")) 
+                converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml(),xmlstr);
+            else { 
+                System.out.println("############## " +
+                        ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml() +
+                        " ##############");
+                System.out.println(xmlstr);
+            }
+        }
+    }
 
-	
-	
-	private StringWriter createXMLProperties(String dbname) throws Exception {
-		Connection conn = null;
-		Statement stat = null;
-		ResultSet rs = null;
+    
+    
+    private StringWriter createXMLProperties(String dbname) throws Exception {
+        Connection conn = null;
+        Statement stat = null;
+        ResultSet rs = null;
 
-		try {
-			conn = initConfigConnection(dbname);
-			com.ingby.socbox.bischeck.xsd.properties.ObjectFactory objfact = new com.ingby.socbox.bischeck.xsd.properties.ObjectFactory();
+        try {
+            conn = initConfigConnection(dbname);
+            com.ingby.socbox.bischeck.xsd.properties.ObjectFactory objfact = new com.ingby.socbox.bischeck.xsd.properties.ObjectFactory();
 
-			XMLProperties properties = objfact.createXMLProperties();
-			List<XMLProperty> propertiesList = properties.getProperty();
-
-
-			rs = null;
-			stat = conn.createStatement();
-
-			rs = stat.executeQuery("SELECT * FROM properties");
-
-			while (rs.next()) {
-				XMLProperty prop = objfact.createXMLProperty();
-				prop.setKey(rs.getString(1));
-				prop.setValue(rs.getString(2));
-				propertiesList.add(prop);
-			}
+            XMLProperties properties = objfact.createXMLProperties();
+            List<XMLProperty> propertiesList = properties.getProperty();
 
 
-			return createXMLString(properties,XMLProperties.class);
-			
-			
-		} finally {
-			try {
-				rs.close();
-			} catch (Exception ignore) {}
-			try {
-				stat.close();
-			} catch (Exception ignore) {}
-			try {
-				conn.close();
-			} catch (Exception ignore) {}
-		}
-	}
+            rs = null;
+            stat = conn.createStatement();
 
-	
-	private StringWriter createXMLURL2Services(String dbname) throws Exception {
-		Connection conn = null;
-		Statement stat = null;
-		ResultSet rs = null;
+            rs = stat.executeQuery("SELECT * FROM properties");
 
-		try {
-			conn = initConfigConnection(dbname);
-			com.ingby.socbox.bischeck.xsd.urlservices.ObjectFactory objfact = new com.ingby.socbox.bischeck.xsd.urlservices.ObjectFactory();
-
-			XMLUrlservices url2services = objfact.createXMLUrlservices();
-			List<XMLUrlproperty> url2servicesList = url2services.getUrlproperty();
+            while (rs.next()) {
+                XMLProperty prop = objfact.createXMLProperty();
+                prop.setKey(rs.getString(1));
+                prop.setValue(rs.getString(2));
+                propertiesList.add(prop);
+            }
 
 
-			rs = null;
-			stat = conn.createStatement();
+            return createXMLString(properties,XMLProperties.class);
+            
+            
+        } finally {
+            try {
+                rs.close();
+            } catch (Exception ignore) {}
+            try {
+                stat.close();
+            } catch (Exception ignore) {}
+            try {
+                conn.close();
+            } catch (Exception ignore) {}
+        }
+    }
 
-			rs = stat.executeQuery("SELECT * FROM urlservice");
+    
+    private StringWriter createXMLURL2Services(String dbname) throws Exception {
+        Connection conn = null;
+        Statement stat = null;
+        ResultSet rs = null;
 
-			while (rs.next()) {
-				XMLUrlproperty prop = objfact.createXMLUrlproperty();
-				prop.setKey(rs.getString(1));
-				prop.setValue(rs.getString(2));
-				url2servicesList.add(prop);
-			}
+        try {
+            conn = initConfigConnection(dbname);
+            com.ingby.socbox.bischeck.xsd.urlservices.ObjectFactory objfact = new com.ingby.socbox.bischeck.xsd.urlservices.ObjectFactory();
 
-
-			return createXMLString(url2services,XMLUrlservices.class);
-			
-			
-		} finally {
-			try {
-				rs.close();
-			} catch (Exception ignore) {}
-			try {
-				stat.close();
-			} catch (Exception ignore) {}
-			try {
-				conn.close();
-			} catch (Exception ignore) {}
-		}
-	}
-
-
-	private StringWriter createXMLBischeck(String dbname) throws Exception {
-		Connection conn = null;
-		
-		PreparedStatement hostStmt = null;
-		PreparedStatement serviceStmt = null;
-		PreparedStatement serviceItemStmt = null;
-		PreparedStatement scheduleStmt = null;
-		ResultSet hostset = null;
-		ResultSet serviceset = null;
-		ResultSet serviceitemset = null;
-		ResultSet propertiesset = null;
-		
-		
-		try {
-			conn = initConfigConnection(dbname);
-			com.ingby.socbox.bischeck.xsd.bischeck.ObjectFactory objfact = new com.ingby.socbox.bischeck.xsd.bischeck.ObjectFactory();
-
-			XMLBischeck bischeck = objfact.createXMLBischeck();
-		
-			hostStmt = conn.prepareStatement ("SELECT * FROM hosts");
-			serviceStmt = conn.prepareStatement ("SELECT * FROM services WHERE hostid=?");
-			serviceItemStmt = conn.prepareStatement("SELECT * FROM items WHERE serviceid=?");
-			scheduleStmt = conn.prepareStatement("SELECT value FROM properties WHERE key='checkinterval'");
-			
-			propertiesset = scheduleStmt.executeQuery();
-			int checkinterval=0;
-			while (propertiesset.next()) {
-				checkinterval = propertiesset.getInt(1);
-			}
-			
-			hostset = hostStmt.executeQuery();
-			
-			List<XMLHost> hostList = bischeck.getHost();
-			
-			while (hostset.next()) {
-				if (Integer.parseInt(hostset.getString("active")) == 1) {
-					XMLHost host = new XMLHost();
-					host.setName(hostset.getString("name"));
-					host.setDesc(hostset.getString("desc"));
-					
-					serviceStmt.setInt(1,hostset.getInt("id"));
-					serviceset = serviceStmt.executeQuery();
-				
-					
-					
-					List<XMLService> serviceList = host.getService();
-
-					while (serviceset.next()) {						
-						if (Integer.parseInt(serviceset.getString("active")) == 1) {
-							XMLService service = new XMLService();
-
-							service.setName(serviceset.getString("name"));
-							service.setDesc(serviceset.getString("desc"));
-							service.setUrl(serviceset.getString("url"));
-							service.setDriver(serviceset.getString("driver"));
-							
-							// Add default schedule based on current check interval
-							List<String> scheduleList = service.getSchedule();
-							scheduleList.add(checkinterval+"S");
-							
-							serviceItemStmt.setInt(1,serviceset.getInt("id"));
-							serviceitemset = serviceItemStmt.executeQuery();
-
-							List<XMLServiceitem> serviceitemList = service.getServiceitem();
-
-							while (serviceitemset.next()) {
-								if (Integer.parseInt(serviceitemset.getString("active")) == 1) {
-									XMLServiceitem serviceitem = new XMLServiceitem();
-									serviceitem.setName(serviceitemset.getString("name"));
-									serviceitem.setServiceitemclass(serviceitemset.getString("serviceitemclass"));
-									serviceitem.setDesc(serviceitemset.getString("desc"));
-									serviceitem.setExecstatement(serviceitemset.getString("execstatement"));
-									serviceitem.setThresholdclass(serviceitemset.getString("thresholdclass"));
-
-									serviceitemList.add(serviceitem);
-								} // if service item
-							} // while service item
-							serviceList.add(service);
-						} //if service
-					} // while service
-					hostList.add(host);
-				} //if host
-			} // while host
-			
-			return createXMLString(bischeck,XMLBischeck.class);
-			
-		} finally {
-			try {
-				propertiesset.close();
-			} catch (Exception ignore) {}
-			try {
-				hostset.close();
-			} catch (Exception ignore) {}
-			try {
-				serviceset.close();
-			} catch (Exception ignore) {}
-			try {
-				serviceitemset.close();
-			} catch (Exception ignore) {}
-			try {
-				scheduleStmt.close();
-			} catch (Exception ignore) {}
-			try {
-				hostStmt.close();
-			} catch (Exception ignore) {}
-			try {
-				serviceStmt.close();
-			} catch (Exception ignore) {}
-			try {
-				serviceStmt.close();
-			} catch (Exception ignore) {}
-			try {
-				conn.close();
-			} catch (Exception ignore) {}
-		}
-	}
-
-	
-	private StringWriter createXMLTwenty4HourThreshold(String dbname) throws Exception {
-		Connection conn = null;
-		try {
-			conn = initConfigConnection(dbname);
-			com.ingby.socbox.bischeck.xsd.twenty4threshold.ObjectFactory objfact = new com.ingby.socbox.bischeck.xsd.twenty4threshold.ObjectFactory();
-
-			XMLTwenty4Threshold twenty = objfact.createXMLTwenty4Threshold();
-
-			
-			
-			PreparedStatement servicedefstmt = null;
-			PreparedStatement periodstmt = null;
-			PreparedStatement hourstmt = null;
-			PreparedStatement holidaystmt = null;
+            XMLUrlservices url2services = objfact.createXMLUrlservices();
+            List<XMLUrlproperty> url2servicesList = url2services.getUrlproperty();
 
 
-			servicedefstmt = conn.prepareStatement("SELECT * FROM servicedef");
-			periodstmt = conn.prepareStatement ("SELECT * FROM period WHERE servicedefid = ?");
-			hourstmt = conn.prepareStatement ("SELECT * FROM hour");
-			holidaystmt = conn.prepareStatement ("SELECT * FROM holiday");
+            rs = null;
+            stat = conn.createStatement();
+
+            rs = stat.executeQuery("SELECT * FROM urlservice");
+
+            while (rs.next()) {
+                XMLUrlproperty prop = objfact.createXMLUrlproperty();
+                prop.setKey(rs.getString(1));
+                prop.setValue(rs.getString(2));
+                url2servicesList.add(prop);
+            }
 
 
-			ResultSet rsservice = servicedefstmt.executeQuery();
-			
-			List<XMLServicedef> servicedefList = twenty.getServicedef();
-			
-			while (rsservice.next()) {
-				XMLServicedef servicedef = new XMLServicedef();
-				servicedef.setHostname(rsservice.getString("hostname")); 
-				servicedef.setServicename(rsservice.getString("servicename"));
-				servicedef.setServiceitemname(rsservice.getString("serviceitemname"));
+            return createXMLString(url2services,XMLUrlservices.class);
+            
+            
+        } finally {
+            try {
+                rs.close();
+            } catch (Exception ignore) {}
+            try {
+                stat.close();
+            } catch (Exception ignore) {}
+            try {
+                conn.close();
+            } catch (Exception ignore) {}
+        }
+    }
 
-				periodstmt.setInt(1,rsservice.getInt("id"));
-				ResultSet rsperiod = periodstmt.executeQuery();
 
-				List<XMLPeriod> periodList = servicedef.getPeriod();
+    private StringWriter createXMLBischeck(String dbname) throws Exception {
+        Connection conn = null;
+        
+        PreparedStatement hostStmt = null;
+        PreparedStatement serviceStmt = null;
+        PreparedStatement serviceItemStmt = null;
+        PreparedStatement scheduleStmt = null;
+        ResultSet hostset = null;
+        ResultSet serviceset = null;
+        ResultSet serviceitemset = null;
+        ResultSet propertiesset = null;
+        
+        
+        try {
+            conn = initConfigConnection(dbname);
+            com.ingby.socbox.bischeck.xsd.bischeck.ObjectFactory objfact = new com.ingby.socbox.bischeck.xsd.bischeck.ObjectFactory();
 
-				while (rsperiod.next()) {
-					XMLPeriod period = new XMLPeriod();
-					
-					if (rsperiod.getString("type") != null) {
-						if (rsperiod.getString("type").equalsIgnoreCase("M")) {
-							XMLMonths months = new XMLMonths();
-							if (rsperiod.getString("interval") != null)
-								months.setMonth(new Integer(rsperiod.getString("interval")));
-							if (rsperiod.getString("day") != null)
-								months.setDayofmonth(new Integer(rsperiod.getString("day")));
-							period.getMonths().add(months);
-						} else if (rsperiod.getString("type").equalsIgnoreCase("W")) {
-							XMLWeeks weeks = new XMLWeeks();
-							if (rsperiod.getString("interval") != null)
-								weeks.setWeek(new Integer(rsperiod.getString("interval")));
-							if (rsperiod.getString("day") != null)
-								weeks.setDayofweek(new Integer(rsperiod.getString("day")));
-							period.getWeeks().add(weeks);
-						}
-						
-					}
-					
-					period.setHoursIDREF(rsperiod.getInt("hourid"));
-					period.setCalcmethod(rsperiod.getString("calcmethod"));
-					period.setWarning(rsperiod.getInt("warning"));
-					period.setCritical(rsperiod.getInt("critical"));
-					periodList.add(period);
-				}
-				servicedefList.add(servicedef);
-			}
+            XMLBischeck bischeck = objfact.createXMLBischeck();
+        
+            hostStmt = conn.prepareStatement ("SELECT * FROM hosts");
+            serviceStmt = conn.prepareStatement ("SELECT * FROM services WHERE hostid=?");
+            serviceItemStmt = conn.prepareStatement("SELECT * FROM items WHERE serviceid=?");
+            scheduleStmt = conn.prepareStatement("SELECT value FROM properties WHERE key='checkinterval'");
+            
+            propertiesset = scheduleStmt.executeQuery();
+            int checkinterval=0;
+            while (propertiesset.next()) {
+                checkinterval = propertiesset.getInt(1);
+            }
+            
+            hostset = hostStmt.executeQuery();
+            
+            List<XMLHost> hostList = bischeck.getHost();
+            
+            while (hostset.next()) {
+                if (Integer.parseInt(hostset.getString("active")) == 1) {
+                    XMLHost host = new XMLHost();
+                    host.setName(hostset.getString("name"));
+                    host.setDesc(hostset.getString("desc"));
+                    
+                    serviceStmt.setInt(1,hostset.getInt("id"));
+                    serviceset = serviceStmt.executeQuery();
+                
+                    
+                    
+                    List<XMLService> serviceList = host.getService();
 
-		
-			ResultSet rshour = hourstmt.executeQuery();
-			List<XMLHours> hoursList = twenty.getHours();
-			
-			while (rshour.next()) {
-				XMLHours hours = new XMLHours();
-				hours.setHoursID(rshour.getInt("id"));
-				List<String> hour = hours.getHour();
-				for (int i=0;i<24;i++) { 
-					
-					if (i < 10){
-						rshour.getString("H0"+i);
-						if (rshour.wasNull())
-							hour.add("null");
-						else
-							hour.add(rshour.getString("H0"+i));
-					} else {
-						rshour.getString("H"+i);
-						if (rshour.wasNull())
-							hour.add("null");
-						else
-							hour.add(rshour.getString("H"+i));	
-					}
-				}
-				hoursList.add(hours);
-			}
-		
-			ResultSet rsholiday = null;
-		
-			rsholiday = holidaystmt.executeQuery();
-			List<XMLHoliday> holidayList = twenty.getHoliday();
-			
-			while (rsholiday.next()) {
-				
-				XMLHoliday holiday = new XMLHoliday();
-				holiday.setYear(rsholiday.getInt("year"));
-				
-				List<String> dayofyearList = holiday.getDayofyear();
-				
-				String[] holidays = rsholiday.getString("holidays").split("[|]+");
-				for (int i=0; i<holidays.length;i++){
-					dayofyearList.add(holidays[i]);	
-				}
-				holidayList.add(holiday);
-			}
-			
-			return createXMLString(twenty,XMLTwenty4Threshold.class);
-		} finally {
-			
-		}
-	}
-	
-	
-	private void writeToFile(String destdir, String filename, StringWriter xmlstr) throws IOException {
-			
-		BufferedWriter bufferedWriter = null;
-		try {
+                    while (serviceset.next()) {                        
+                        if (Integer.parseInt(serviceset.getString("active")) == 1) {
+                            XMLService service = new XMLService();
 
-			//Construct the BufferedWriter object
-			bufferedWriter = new BufferedWriter(new FileWriter(destdir+File.separator+filename));
+                            service.setName(serviceset.getString("name"));
+                            service.setDesc(serviceset.getString("desc"));
+                            service.setUrl(serviceset.getString("url"));
+                            service.setDriver(serviceset.getString("driver"));
+                            
+                            // Add default schedule based on current check interval
+                            List<String> scheduleList = service.getSchedule();
+                            scheduleList.add(checkinterval+"S");
+                            
+                            serviceItemStmt.setInt(1,serviceset.getInt("id"));
+                            serviceitemset = serviceItemStmt.executeQuery();
 
-			//Start writing to the output stream
-			bufferedWriter.write(xmlstr.toString());
-		} finally {
-			bufferedWriter.flush();
-			try {
-				bufferedWriter.close();
-			} catch (Exception ignore) {}
-		}
-	}
+                            List<XMLServiceitem> serviceitemList = service.getServiceitem();
 
-	
-	private static Connection initConfigConnection(String dbname) throws Exception {
+                            while (serviceitemset.next()) {
+                                if (Integer.parseInt(serviceitemset.getString("active")) == 1) {
+                                    XMLServiceitem serviceitem = new XMLServiceitem();
+                                    serviceitem.setName(serviceitemset.getString("name"));
+                                    serviceitem.setServiceitemclass(serviceitemset.getString("serviceitemclass"));
+                                    serviceitem.setDesc(serviceitemset.getString("desc"));
+                                    serviceitem.setExecstatement(serviceitemset.getString("execstatement"));
+                                    serviceitem.setThresholdclass(serviceitemset.getString("thresholdclass"));
 
-		return createDBConn("jdbc:sqlite:/" + dbname);    
-	}
+                                    serviceitemList.add(serviceitem);
+                                } // if service item
+                            } // while service item
+                            serviceList.add(service);
+                        } //if service
+                    } // while service
+                    hostList.add(host);
+                } //if host
+            } // while host
+            
+            return createXMLString(bischeck,XMLBischeck.class);
+            
+        } finally {
+            try {
+                propertiesset.close();
+            } catch (Exception ignore) {}
+            try {
+                hostset.close();
+            } catch (Exception ignore) {}
+            try {
+                serviceset.close();
+            } catch (Exception ignore) {}
+            try {
+                serviceitemset.close();
+            } catch (Exception ignore) {}
+            try {
+                scheduleStmt.close();
+            } catch (Exception ignore) {}
+            try {
+                hostStmt.close();
+            } catch (Exception ignore) {}
+            try {
+                serviceStmt.close();
+            } catch (Exception ignore) {}
+            try {
+                serviceStmt.close();
+            } catch (Exception ignore) {}
+            try {
+                conn.close();
+            } catch (Exception ignore) {}
+        }
+    }
 
-	
-	private static Connection createDBConn(String connName) throws Exception {
+    
+    private StringWriter createXMLTwenty4HourThreshold(String dbname) throws Exception {
+        Connection conn = null;
+        try {
+            conn = initConfigConnection(dbname);
+            com.ingby.socbox.bischeck.xsd.twenty4threshold.ObjectFactory objfact = new com.ingby.socbox.bischeck.xsd.twenty4threshold.ObjectFactory();
 
-		Connection conn = null;
-		Class.forName("SQLite.JDBCDriver").newInstance();
-		conn = DriverManager.getConnection(connName);
-		return conn;
-	}
+            XMLTwenty4Threshold twenty = objfact.createXMLTwenty4Threshold();
 
-	
-	private StringWriter createXMLString (Object xmlobj, Class<?> clazz) throws Exception {
-		StringWriter writer = new StringWriter();
-		JAXBContext context = JAXBContext.newInstance(clazz);
-		Marshaller m = context.createMarshaller();
-		m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            
+            
+            PreparedStatement servicedefstmt = null;
+            PreparedStatement periodstmt = null;
+            PreparedStatement hourstmt = null;
+            PreparedStatement holidaystmt = null;
 
-		m.marshal(xmlobj, writer);
 
-		return writer;
-	}
+            servicedefstmt = conn.prepareStatement("SELECT * FROM servicedef");
+            periodstmt = conn.prepareStatement ("SELECT * FROM period WHERE servicedefid = ?");
+            hourstmt = conn.prepareStatement ("SELECT * FROM hour");
+            holidaystmt = conn.prepareStatement ("SELECT * FROM holiday");
+
+
+            ResultSet rsservice = servicedefstmt.executeQuery();
+            
+            List<XMLServicedef> servicedefList = twenty.getServicedef();
+            
+            while (rsservice.next()) {
+                XMLServicedef servicedef = new XMLServicedef();
+                servicedef.setHostname(rsservice.getString("hostname")); 
+                servicedef.setServicename(rsservice.getString("servicename"));
+                servicedef.setServiceitemname(rsservice.getString("serviceitemname"));
+
+                periodstmt.setInt(1,rsservice.getInt("id"));
+                ResultSet rsperiod = periodstmt.executeQuery();
+
+                List<XMLPeriod> periodList = servicedef.getPeriod();
+
+                while (rsperiod.next()) {
+                    XMLPeriod period = new XMLPeriod();
+                    
+                    if (rsperiod.getString("type") != null) {
+                        if (rsperiod.getString("type").equalsIgnoreCase("M")) {
+                            XMLMonths months = new XMLMonths();
+                            if (rsperiod.getString("interval") != null)
+                                months.setMonth(new Integer(rsperiod.getString("interval")));
+                            if (rsperiod.getString("day") != null)
+                                months.setDayofmonth(new Integer(rsperiod.getString("day")));
+                            period.getMonths().add(months);
+                        } else if (rsperiod.getString("type").equalsIgnoreCase("W")) {
+                            XMLWeeks weeks = new XMLWeeks();
+                            if (rsperiod.getString("interval") != null)
+                                weeks.setWeek(new Integer(rsperiod.getString("interval")));
+                            if (rsperiod.getString("day") != null)
+                                weeks.setDayofweek(new Integer(rsperiod.getString("day")));
+                            period.getWeeks().add(weeks);
+                        }
+                        
+                    }
+                    
+                    period.setHoursIDREF(rsperiod.getInt("hourid"));
+                    period.setCalcmethod(rsperiod.getString("calcmethod"));
+                    period.setWarning(rsperiod.getInt("warning"));
+                    period.setCritical(rsperiod.getInt("critical"));
+                    periodList.add(period);
+                }
+                servicedefList.add(servicedef);
+            }
+
+        
+            ResultSet rshour = hourstmt.executeQuery();
+            List<XMLHours> hoursList = twenty.getHours();
+            
+            while (rshour.next()) {
+                XMLHours hours = new XMLHours();
+                hours.setHoursID(rshour.getInt("id"));
+                List<String> hour = hours.getHour();
+                for (int i=0;i<24;i++) { 
+                    
+                    if (i < 10){
+                        rshour.getString("H0"+i);
+                        if (rshour.wasNull())
+                            hour.add("null");
+                        else
+                            hour.add(rshour.getString("H0"+i));
+                    } else {
+                        rshour.getString("H"+i);
+                        if (rshour.wasNull())
+                            hour.add("null");
+                        else
+                            hour.add(rshour.getString("H"+i));    
+                    }
+                }
+                hoursList.add(hours);
+            }
+        
+            ResultSet rsholiday = null;
+        
+            rsholiday = holidaystmt.executeQuery();
+            List<XMLHoliday> holidayList = twenty.getHoliday();
+            
+            while (rsholiday.next()) {
+                
+                XMLHoliday holiday = new XMLHoliday();
+                holiday.setYear(rsholiday.getInt("year"));
+                
+                List<String> dayofyearList = holiday.getDayofyear();
+                
+                String[] holidays = rsholiday.getString("holidays").split("[|]+");
+                for (int i=0; i<holidays.length;i++){
+                    dayofyearList.add(holidays[i]);    
+                }
+                holidayList.add(holiday);
+            }
+            
+            return createXMLString(twenty,XMLTwenty4Threshold.class);
+        } finally {
+            
+        }
+    }
+    
+    
+    private void writeToFile(String destdir, String filename, StringWriter xmlstr) throws IOException {
+            
+        BufferedWriter bufferedWriter = null;
+        try {
+
+            //Construct the BufferedWriter object
+            bufferedWriter = new BufferedWriter(new FileWriter(destdir+File.separator+filename));
+
+            //Start writing to the output stream
+            bufferedWriter.write(xmlstr.toString());
+        } finally {
+            bufferedWriter.flush();
+            try {
+                bufferedWriter.close();
+            } catch (Exception ignore) {}
+        }
+    }
+
+    
+    private static Connection initConfigConnection(String dbname) throws Exception {
+
+        return createDBConn("jdbc:sqlite:/" + dbname);    
+    }
+
+    
+    private static Connection createDBConn(String connName) throws Exception {
+
+        Connection conn = null;
+        Class.forName("SQLite.JDBCDriver").newInstance();
+        conn = DriverManager.getConnection(connName);
+        return conn;
+    }
+
+    
+    private StringWriter createXMLString (Object xmlobj, Class<?> clazz) throws Exception {
+        StringWriter writer = new StringWriter();
+        JAXBContext context = JAXBContext.newInstance(clazz);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+        m.marshal(xmlobj, writer);
+
+        return writer;
+    }
 }

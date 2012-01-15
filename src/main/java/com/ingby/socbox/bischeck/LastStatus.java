@@ -23,43 +23,43 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class LastStatus {
 
-	private String value = null;
-	private Long timestamp = null;
-	private Float threshold = null;
-	private String calcmethod = null;
-	
-	
-	public LastStatus(String measuredValue, Float thresholdValue) {
-		this.timestamp = System.currentTimeMillis();
-		this.value = measuredValue;
-		this.threshold = thresholdValue;
-	}
-	
-	
-	public LastStatus(ServiceItem serviceitem) {
-		this.timestamp = System.currentTimeMillis();
-		this.value = serviceitem.getLatestExecuted();
-		this.threshold = serviceitem.getThreshold().getThreshold();
-		this.calcmethod  = serviceitem.getThreshold().getCalcMethod();
-	}
+    private String value = null;
+    private Long timestamp = null;
+    private Float threshold = null;
+    private String calcmethod = null;
+    
+    
+    public LastStatus(String measuredValue, Float thresholdValue) {
+        this.timestamp = System.currentTimeMillis();
+        this.value = measuredValue;
+        this.threshold = thresholdValue;
+    }
+    
+    
+    public LastStatus(ServiceItem serviceitem) {
+        this.timestamp = System.currentTimeMillis();
+        this.value = serviceitem.getLatestExecuted();
+        this.threshold = serviceitem.getThreshold().getThreshold();
+        this.calcmethod  = serviceitem.getThreshold().getCalcMethod();
+    }
 
 
-	public String getValue() {	
-		return this.value;
-	}
-	
-	
-	public Float getThreshold() {
-		return threshold;
-	}
-	
-	
-	public String getCalcmetod() {
-		return calcmethod;
-	}
-	
-	
-	public Long getTimestamp() { 
-		return timestamp;
-	}
+    public String getValue() {    
+        return this.value;
+    }
+    
+    
+    public Float getThreshold() {
+        return threshold;
+    }
+    
+    
+    public String getCalcmetod() {
+        return calcmethod;
+    }
+    
+    
+    public Long getTimestamp() { 
+        return timestamp;
+    }
 }

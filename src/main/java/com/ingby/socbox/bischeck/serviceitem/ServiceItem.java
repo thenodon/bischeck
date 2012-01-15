@@ -44,15 +44,15 @@ import com.ingby.socbox.bischeck.threshold.Threshold;
  *
  */
 public interface ServiceItem {
-	
+    
     /**
      * Get the service item name for the ServiceItem
      * @return service item name
      */
-	public String getServiceItemName();
+    public String getServiceItemName();
 
-	
-	/**
+    
+    /**
      * Get the description text of the ServiceItem
      * @return description test
      */
@@ -93,67 +93,67 @@ public interface ServiceItem {
      * @return the threshold class name
      */
     public String getThresholdClassName();
-	
+    
     
     /**
      * Set the class name for the threshold class used for the ServiceItem. 
      * @param thresholdclassname Name of the Threshold class 
      */
     public void setThresholdClassName(String thresholdclassname);
-	
     
-	/**
-	 * Set the time for executing the ServiceItem's execution statement. 
-	 * @param exectime The time to execute the ServiceItem statement
-	 */
-	public void setExecutionTime(Long exectime);
-	
-	
-	/**
-	 * Return the time it took to execute the execution statement. 
-	 * @return the execution time
-	 */
-	public Long getExecutionTime();
-	
-	
-	/**
-	 * Set a reference to the currently used threshold object.
-	 * @param threshold Threshold object to use for threshold calculation
-	 */
-	public void setThreshold(Threshold threshold);
-	
-	
-	/**
-	 * Get the threshold object used for the ServiceItem object.
-	 * @return Threshold for the ServiceItem
-	 */
-	public Threshold getThreshold();
-	
-	
-	/**
-	 * Set the execution statement for the ServiceItem.
-	 * @throws Exception
-	 */
-	public void execute() throws Exception;
-	
-	
-	/**
-	 * Return the last return value from the execution.
-	 * @return last execution value
-	 */
-	public String getLatestExecuted();
-	
-	
-	/**
-	 * Set the last executed value form the execution.
-	 * @param value
-	 */
-	public void setLatestExecuted(String value);
-	
-	
-	/**
-	 * Set the Service object the the ServiceItem is configured for. 
-	 * @param service Service object that the ServiceItem belongs to
-	 */
-	public void setService(Service service);
+    
+    /**
+     * Set the time for executing the ServiceItem's execution statement. 
+     * @param exectime The time to execute the ServiceItem statement
+     */
+    public void setExecutionTime(Long exectime);
+    
+    
+    /**
+     * Return the time it took to execute the execution statement. 
+     * @return the execution time
+     */
+    public Long getExecutionTime();
+    
+    
+    /**
+     * Set a reference to the currently used threshold object.
+     * @param threshold Threshold object to use for threshold calculation
+     */
+    public void setThreshold(Threshold threshold);
+    
+    
+    /**
+     * Get the threshold object used for the ServiceItem object.
+     * @return Threshold for the ServiceItem
+     */
+    public Threshold getThreshold();
+    
+    
+    /**
+     * Set the execution statement for the ServiceItem.
+     * @throws Exception
+     */
+    public void execute() throws Exception;
+    
+    
+    /**
+     * Return the last return value from the execution.
+     * @return last execution value
+     */
+    public String getLatestExecuted();
+    
+    
+    /**
+     * Set the last executed value form the execution.
+     * @param value
+     */
+    public void setLatestExecuted(String value);
+    
+    
+    /**
+     * Set the Service object the the ServiceItem is configured for. 
+     * @param service Service object that the ServiceItem belongs to
+     */
+    public void setService(Service service);
 }

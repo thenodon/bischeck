@@ -23,16 +23,16 @@ import org.apache.log4j.Logger;
 
 
 public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
-	static Logger  logger = Logger.getLogger(SQLServiceItem.class);
+    static Logger  logger = Logger.getLogger(SQLServiceItem.class);
 
-	
-	public SQLServiceItem(String name) {
-		this.serviceItemName = name;		
-	}
+    
+    public SQLServiceItem(String name) {
+        this.serviceItemName = name;        
+    }
 
-	
-	@Override
-	public void execute() throws Exception {
-		setLatestExecuted(service.executeStmt(this.getExecution()));	
-	}
+    
+    @Override
+    public void execute() throws Exception {
+        setLatestExecuted(service.executeStmt(this.getExecution()));    
+    }
 }

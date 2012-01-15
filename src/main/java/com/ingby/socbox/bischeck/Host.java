@@ -26,49 +26,49 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class Host {
 
-	static Logger  logger = Logger.getLogger(Host.class);
-	
-	private String hostname;
-	private HashMap<String,Service> services = new HashMap<String,Service>();
-	private String description;
+    static Logger  logger = Logger.getLogger(Host.class);
+    
+    private String hostname;
+    private HashMap<String,Service> services = new HashMap<String,Service>();
+    private String description;
 
-	public Host (String hostname) {
-		this.hostname = hostname;
-	}
+    public Host (String hostname) {
+        this.hostname = hostname;
+    }
 
-	
-	public void addService(Service service) {
-		services.put(service.getServiceName(), service);
-	}
+    
+    public void addService(Service service) {
+        services.put(service.getServiceName(), service);
+    }
 
-	
-	public HashMap<String,Service> getServices() {
-		return services;
-	}
+    
+    public HashMap<String,Service> getServices() {
+        return services;
+    }
 
-	
-	public Service getServiceByName(String name) {
-		for (Map.Entry<String, Service> serviceentry: services.entrySet()) {
-			Service service = serviceentry.getValue();
-			if (service.getServiceName().compareTo(name) == 0) {
-				return service;
-			}
-		}
-		return null;
-	}
+    
+    public Service getServiceByName(String name) {
+        for (Map.Entry<String, Service> serviceentry: services.entrySet()) {
+            Service service = serviceentry.getValue();
+            if (service.getServiceName().compareTo(name) == 0) {
+                return service;
+            }
+        }
+        return null;
+    }
 
-	
-	public String getHostname() {
-		return hostname;
-	}
+    
+    public String getHostname() {
+        return hostname;
+    }
 
-	
-	public String getDecscription() {
-		return description;
-	}
-	
-	
-	public void setDecscription(String decscription) {
-		this.description = decscription;
-	}
+    
+    public String getDecscription() {
+        return description;
+    }
+    
+    
+    public void setDecscription(String decscription) {
+        this.description = decscription;
+    }
 }

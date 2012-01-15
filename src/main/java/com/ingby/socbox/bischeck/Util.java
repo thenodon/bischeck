@@ -29,91 +29,91 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.log4j.Logger;
 
 public class Util {
-	static Logger  logger = Logger.getLogger(Util.class);
+    static Logger  logger = Logger.getLogger(Util.class);
 
-	private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
-	private static final String SEP =";";
+    private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
+    private static final String SEP =";";
 
-	/**
-	 * Obfuscate a string including password= until none character or number. 
-	 * @param url typical a url string
-	 * @return Obfuscated string
-	 */
-	public static String obfuscatePassword(String url) {
-		return url.replaceAll("password=[0-9A-Za-z]*","password=xxxxx");
-	}
+    /**
+     * Obfuscate a string including password= until none character or number. 
+     * @param url typical a url string
+     * @return Obfuscated string
+     */
+    public static String obfuscatePassword(String url) {
+        return url.replaceAll("password=[0-9A-Za-z]*","password=xxxxx");
+    }
 
 
-	/**
-	 * Return the current date according to format "yyyy-MM-dd HH:mm:ss"
-	 * @return current date as "yyyy-MM-dd HH:mm:ss"
-	 */
-	public static String now() {
-		Calendar cal = BisCalendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
-		return sdf.format(cal.getTime());
-	}
+    /**
+     * Return the current date according to format "yyyy-MM-dd HH:mm:ss"
+     * @return current date as "yyyy-MM-dd HH:mm:ss"
+     */
+    public static String now() {
+        Calendar cal = BisCalendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+        return sdf.format(cal.getTime());
+    }
 
-	
-	/**
-	 * Return the date with the offset of offset according to format "yyyy-MM-dd HH:mm:ss"
-	 * @return current date +- offset as "yyyy-MM-dd HH:mm:ss"
-	 */
-	public static String fromNowInSeconds(int offset) {
-		Calendar cal = BisCalendar.getInstance();
-		cal.add(Calendar.SECOND, offset);
-		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
-		return sdf.format(cal.getTime());
-	}
-	
-	
-	/**
-	 * Round a float to one decimal
-	 * @param d  
-	 * @return rounded to one decimal
-	 */
-	public static Float roundOneDecimals(Float d) {
-		if (d != null) {
-			DecimalFormat oneDForm = new DecimalFormat("#");
-			return Float.valueOf(oneDForm.format(d));
-		}
-		return null;
-	}
+    
+    /**
+     * Return the date with the offset of offset according to format "yyyy-MM-dd HH:mm:ss"
+     * @return current date +- offset as "yyyy-MM-dd HH:mm:ss"
+     */
+    public static String fromNowInSeconds(int offset) {
+        Calendar cal = BisCalendar.getInstance();
+        cal.add(Calendar.SECOND, offset);
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+        return sdf.format(cal.getTime());
+    }
+    
+    
+    /**
+     * Round a float to one decimal
+     * @param d  
+     * @return rounded to one decimal
+     */
+    public static Float roundOneDecimals(Float d) {
+        if (d != null) {
+            DecimalFormat oneDForm = new DecimalFormat("#");
+            return Float.valueOf(oneDForm.format(d));
+        }
+        return null;
+    }
 
-	
-	/**
-	* Parse out all host-service-item parameters from the calculation string
-	* @param execute expression string
-	* @return a comma separated string of the found host-service-item parameters from the 
-	* input parameter
-	*/
-	public static String parseParameters(String execute) throws PatternSyntaxException {
-		Pattern pat = null;
-		
-		try {
-			pat = Pattern.compile (LastStatusCache.getInstance().getHostServiceItemFormat());		
-		} catch (PatternSyntaxException e) {
-			logger.warn("Regex syntax exception, " + e);
-			throw e;
-		}
-		
-		Matcher mat = pat.matcher (execute);
+    
+    /**
+    * Parse out all host-service-item parameters from the calculation string
+    * @param execute expression string
+    * @return a comma separated string of the found host-service-item parameters from the 
+    * input parameter
+    */
+    public static String parseParameters(String execute) throws PatternSyntaxException {
+        Pattern pat = null;
+        
+        try {
+            pat = Pattern.compile (LastStatusCache.getInstance().getHostServiceItemFormat());        
+        } catch (PatternSyntaxException e) {
+            logger.warn("Regex syntax exception, " + e);
+            throw e;
+        }
+        
+        Matcher mat = pat.matcher (execute);
 
-		// empty array to be filled with the cache fields to find
-		String arraystr="";
-		StringBuffer strbuf = new StringBuffer();
-		strbuf.append(arraystr);
-		while (mat.find ()) {
-			String param = mat.group();
-			strbuf.append(param+SEP);	
-		}
-		
-		arraystr=strbuf.toString();
-		
-		if (arraystr.lastIndexOf(SEP) == arraystr.length()-1) {
-			arraystr = arraystr.substring(0, arraystr.length()-1);
-		}
-		
-		return arraystr;
-	}
+        // empty array to be filled with the cache fields to find
+        String arraystr="";
+        StringBuffer strbuf = new StringBuffer();
+        strbuf.append(arraystr);
+        while (mat.find ()) {
+            String param = mat.group();
+            strbuf.append(param+SEP);    
+        }
+        
+        arraystr=strbuf.toString();
+        
+        if (arraystr.lastIndexOf(SEP) == arraystr.length()-1) {
+            arraystr = arraystr.substring(0, arraystr.length()-1);
+        }
+        
+        return arraystr;
+    }
 }

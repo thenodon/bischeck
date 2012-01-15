@@ -30,116 +30,116 @@ package com.ingby.socbox.bischeck.threshold;
 
 public interface Threshold {
 
-	public enum NAGIOSSTAT  { 
-		OK { 
-			public String toString() {
-				return "OK";
-			}
-			public Integer val() {
-				return Integer.valueOf(0);
-			}
-		}, WARNING { 
-			public String toString() {
-				return "WARNING";
-			}
-			public Integer val() {
-				return Integer.valueOf(1);
-			}
-		}, CRITICAL { 
-			public String toString() {
-				return "CRITICAL";
-			}
-			public Integer val() {
-				return Integer.valueOf(2);
-			}
-		}, UNKNOWN { 
-			public String toString() {
-				return "UNKNOWN";
-			}
-			public Integer val() {
-				return Integer.valueOf(3);
-			}
-		};
+    public enum NAGIOSSTAT  { 
+        OK { 
+            public String toString() {
+                return "OK";
+            }
+            public Integer val() {
+                return Integer.valueOf(0);
+            }
+        }, WARNING { 
+            public String toString() {
+                return "WARNING";
+            }
+            public Integer val() {
+                return Integer.valueOf(1);
+            }
+        }, CRITICAL { 
+            public String toString() {
+                return "CRITICAL";
+            }
+            public Integer val() {
+                return Integer.valueOf(2);
+            }
+        }, UNKNOWN { 
+            public String toString() {
+                return "UNKNOWN";
+            }
+            public Integer val() {
+                return Integer.valueOf(3);
+            }
+        };
 
-		public abstract Integer val();
-	}
+        public abstract Integer val();
+    }
 
-	
-	/**
-	 * The init method is called by the ThresholdFactory if the Threshold object
-	 * do not exists in the Threshold cache for the combination of 
-	 * host->service->serviceitem.
-	 */
-	public void init() throws Exception;
-	
-	
-	/**
-	 * Get the current warning value calculated for the Threshold.
-	 * @return calculated warning value
-	 */
-	public Float getWarning();
-	
-	
-	/**
+    
+    /**
+     * The init method is called by the ThresholdFactory if the Threshold object
+     * do not exists in the Threshold cache for the combination of 
+     * host->service->serviceitem.
+     */
+    public void init() throws Exception;
+    
+    
+    /**
+     * Get the current warning value calculated for the Threshold.
+     * @return calculated warning value
+     */
+    public Float getWarning();
+    
+    
+    /**
      * Get the current critical value calculated for the Threshold.
      * @return calculated critical value
      */
-	public Float getCritical();
-	
-	
-	/**
-	 * Return the NAGIOSSTAT based on the measured value as the parameter
-	 * @param value Measured value to compare the threshold against
-	 * @return the state
-	 */
-	public NAGIOSSTAT getState(String value);
-	
-	
-	/**
-	 * Get the service name for the Threshold.
-	 * @return service name
-	 */
-	public String getServiceName();
-	
-	
-	/**
-	 * Get the service item name for the Threshold.
-	 * @return service item name
-	 */
-	public String getServiceItemName();
+    public Float getCritical();
+    
+    
+    /**
+     * Return the NAGIOSSTAT based on the measured value as the parameter
+     * @param value Measured value to compare the threshold against
+     * @return the state
+     */
+    public NAGIOSSTAT getState(String value);
+    
+    
+    /**
+     * Get the service name for the Threshold.
+     * @return service name
+     */
+    public String getServiceName();
+    
+    
+    /**
+     * Get the service item name for the Threshold.
+     * @return service item name
+     */
+    public String getServiceItemName();
 
-	
-	/**
-	 * Get the current threshold value.
-	 * @return the value of the threshold
-	 */
-	public Float getThreshold();
-	
-	
-	/**
-	 * Return the method used for the threshold calculation. Like <, > or =.
-	 * @return method for the calculated threshold
-	 */
-	public String getCalcMethod();
+    
+    /**
+     * Get the current threshold value.
+     * @return the value of the threshold
+     */
+    public Float getThreshold();
+    
+    
+    /**
+     * Return the method used for the threshold calculation. Like <, > or =.
+     * @return method for the calculated threshold
+     */
+    public String getCalcMethod();
 
-	
-	/**
-	 * Set the service name for the threshold.
-	 * @param name Service name
-	 */
-	public void setServiceName(String name);
-	
-	
-	/**
-	 * Set the service item name for the threshold.
-	 * @param name ServiceItem name
-	 */
-	public void setServiceItemName(String name);
-	
-	
-	/**
-	 * Set the host name for the threshold.
-	 * @param name Host name
-	 */
-	public void setHostName(String name);
+    
+    /**
+     * Set the service name for the threshold.
+     * @param name Service name
+     */
+    public void setServiceName(String name);
+    
+    
+    /**
+     * Set the service item name for the threshold.
+     * @param name ServiceItem name
+     */
+    public void setServiceItemName(String name);
+    
+    
+    /**
+     * Set the host name for the threshold.
+     * @param name Host name
+     */
+    public void setHostName(String name);
 }

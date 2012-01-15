@@ -27,47 +27,47 @@ import com.ingby.socbox.bischeck.LastStatusCache;
 
 public class LastCacheService extends ServiceAbstract implements Service {
 
-	static Logger  logger = Logger.getLogger(LastStatusCache.class);
+    static Logger  logger = Logger.getLogger(LastStatusCache.class);
 
-	public static void main(String[] args) {
-		LastCacheService bis = new LastCacheService("serviceName");
-		try {
-			System.out.println("<"+bis.executeStmt(args[0])+">");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    public static void main(String[] args) {
+        LastCacheService bis = new LastCacheService("serviceName");
+        try {
+            System.out.println("<"+bis.executeStmt(args[0])+">");
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
-	
-	public LastCacheService (String serviceName) {
-		this.serviceName = serviceName;
-	}
+    
+    public LastCacheService (String serviceName) {
+        this.serviceName = serviceName;
+    }
 
-	
-	@Override
-	public void openConnection() throws Exception {
-		// The use of LastStatusCache do not need a connection
-	}
-
-
-	@Override
-	public void closeConnection() throws Exception {
-		// The use of LastStatusCache do not need a connection
-	}
+    
+    @Override
+    public void openConnection() throws Exception {
+        // The use of LastStatusCache do not need a connection
+    }
 
 
-	@Override
-	/**
-	 * The exec string is a list of arrays as
-	 * host-service-serviceitem[X];host-service-serviceitem[Y];....
-	 * x can be of the format:
-	 * x - single value
-	 * x,y - the index x and y
-	 * x:y - the indexes from x to y  
-	 * return is the value of each separated by ,
-	 */
-	public String executeStmt(String exec) throws Exception {
-		return LastStatusCache.getInstance().getParametersByString(exec);		
-	}
+    @Override
+    public void closeConnection() throws Exception {
+        // The use of LastStatusCache do not need a connection
+    }
+
+
+    @Override
+    /**
+     * The exec string is a list of arrays as
+     * host-service-serviceitem[X];host-service-serviceitem[Y];....
+     * x can be of the format:
+     * x - single value
+     * x,y - the index x and y
+     * x:y - the indexes from x to y  
+     * return is the value of each separated by ,
+     */
+    public String executeStmt(String exec) throws Exception {
+        return LastStatusCache.getInstance().getParametersByString(exec);        
+    }
 }

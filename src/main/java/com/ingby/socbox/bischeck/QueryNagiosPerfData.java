@@ -36,70 +36,70 @@ import org.apache.log4j.Logger;
  */
 public class QueryNagiosPerfData {
 
-	public static void main(String[] args) {
-		System.out.println(QueryNagiosPerfData.parse("load5","load1=0.160;15.000;30.000;0; load5=0.090;10.000;25.000;0; load15=0.020;5.000;20.000;0;"));
-		System.out.println(QueryNagiosPerfData.parse("rta","'rta'=0.251ms;100.000;500.000;0; 'pl'=0%;20;60;;"));
-		System.out.println(QueryNagiosPerfData.parse("size","time=0.009737s;;;0.000000 size=481B;;;0"));
-		System.out.println(QueryNagiosPerfData.parse("dns","'dns'=10ms 'pl'=0%;20;60;;"));
-		
-	}
-	
-	static Logger  logger = Logger.getLogger(QueryNagiosPerfData.class);
+    public static void main(String[] args) {
+        System.out.println(QueryNagiosPerfData.parse("load5","load1=0.160;15.000;30.000;0; load5=0.090;10.000;25.000;0; load15=0.020;5.000;20.000;0;"));
+        System.out.println(QueryNagiosPerfData.parse("rta","'rta'=0.251ms;100.000;500.000;0; 'pl'=0%;20;60;;"));
+        System.out.println(QueryNagiosPerfData.parse("size","time=0.009737s;;;0.000000 size=481B;;;0"));
+        System.out.println(QueryNagiosPerfData.parse("dns","'dns'=10ms 'pl'=0%;20;60;;"));
+        
+    }
+    
+    static Logger  logger = Logger.getLogger(QueryNagiosPerfData.class);
 
-	//Find label entry from start of line or space until =
-	static Pattern labelMatch = Pattern.compile("(^| )(.*?)=");
-	//Find data from = to ; or space or end of line
-	static Pattern dataMatch = Pattern.compile("=(.*?)(;|$)");
-	
-	
-	public static String parse(String label, String strtoparse) {
-		logger.debug("Perf data to parse - " + strtoparse);
-		
+    //Find label entry from start of line or space until =
+    static Pattern labelMatch = Pattern.compile("(^| )(.*?)=");
+    //Find data from = to ; or space or end of line
+    static Pattern dataMatch = Pattern.compile("=(.*?)(;|$)");
+    
+    
+    public static String parse(String label, String strtoparse) {
+        logger.debug("Perf data to parse - " + strtoparse);
+        
 
-		Matcher mat = labelMatch.matcher(strtoparse);
+        Matcher mat = labelMatch.matcher(strtoparse);
 
-		String perflabel = null;
-		boolean labelfound = false;
-		while (mat.find()) {			
-			perflabel = mat.group().trim();
-			logger.debug("<"+perflabel+">");
-			if (perflabel.equals(label+"=") || perflabel.equals("'"+label+"'"+"=")) {
-				labelfound=true; 
-				break;
-			}
-		}//while
-		
-		// Not hits
-		if (!labelfound) return null;
-		
-		Pattern perfMatch = Pattern.compile(perflabel+"(.*?)( |$)");
-		
-		mat = perfMatch.matcher(strtoparse);
+        String perflabel = null;
+        boolean labelfound = false;
+        while (mat.find()) {            
+            perflabel = mat.group().trim();
+            logger.debug("<"+perflabel+">");
+            if (perflabel.equals(label+"=") || perflabel.equals("'"+label+"'"+"=")) {
+                labelfound=true; 
+                break;
+            }
+        }//while
+        
+        // Not hits
+        if (!labelfound) return null;
+        
+        Pattern perfMatch = Pattern.compile(perflabel+"(.*?)( |$)");
+        
+        mat = perfMatch.matcher(strtoparse);
 
-		String perfdata = null;
-		while (mat.find()) {
-			perfdata = mat.group();
-			logger.debug(">"+perfdata+"<");		
-		}
-		
-		mat = dataMatch.matcher(perfdata);
-		String data = null;
-		while (mat.find()) {
-			data = removeUOM(mat.group().replaceAll("=","").replaceAll(";", ""));
-			logger.debug("<>"+data+"<>");		
-		}
-		
-		return data;
-	}
-	
-	private static String removeUOM(String s) {
-		StringBuilder sb = new StringBuilder();
-		for(int i = 0; i < s.length(); i++) {
-		   char ch = s.charAt(i);
-		   if (Character.isDigit(ch) || ch == ',' || ch == '.') {
-		     sb.append(ch);
-		   }
-		}
-		return sb.toString();
-	}
+        String perfdata = null;
+        while (mat.find()) {
+            perfdata = mat.group();
+            logger.debug(">"+perfdata+"<");        
+        }
+        
+        mat = dataMatch.matcher(perfdata);
+        String data = null;
+        while (mat.find()) {
+            data = removeUOM(mat.group().replaceAll("=","").replaceAll(";", ""));
+            logger.debug("<>"+data+"<>");        
+        }
+        
+        return data;
+    }
+    
+    private static String removeUOM(String s) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < s.length(); i++) {
+           char ch = s.charAt(i);
+           if (Character.isDigit(ch) || ch == ',' || ch == '.') {
+             sb.append(ch);
+           }
+        }
+        return sb.toString();
+    }
 }

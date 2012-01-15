@@ -43,121 +43,121 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 public abstract class ServiceAbstract {
 
-	static Logger  logger = Logger.getLogger(ServiceAbstract.class);
-	
-	protected HashMap<String,ServiceItem> servicesItems = new HashMap<String,ServiceItem>();
-	protected String serviceName;
-	protected String decscription;
-	protected String connectionUrl;
-	protected String driverClassName;
-	protected Host host;
-	protected List<String> schedulelist;
-	private NAGIOSSTAT level = NAGIOSSTAT.UNKNOWN;
-	private boolean connectionEstablished = false;
-	private Boolean sendServiceData = true;
-	
-	public String getServiceName() {
-		return serviceName;
-	}
+    static Logger  logger = Logger.getLogger(ServiceAbstract.class);
+    
+    protected HashMap<String,ServiceItem> servicesItems = new HashMap<String,ServiceItem>();
+    protected String serviceName;
+    protected String decscription;
+    protected String connectionUrl;
+    protected String driverClassName;
+    protected Host host;
+    protected List<String> schedulelist;
+    private NAGIOSSTAT level = NAGIOSSTAT.UNKNOWN;
+    private boolean connectionEstablished = false;
+    private Boolean sendServiceData = true;
+    
+    public String getServiceName() {
+        return serviceName;
+    }
 
-	
-	public String getConnectionUrl() {
-		return connectionUrl;
-	}
+    
+    public String getConnectionUrl() {
+        return connectionUrl;
+    }
 
-	
-	public void setConnectionUrl(String connectionUrl) {
-		this.connectionUrl = connectionUrl;
-	}
+    
+    public void setConnectionUrl(String connectionUrl) {
+        this.connectionUrl = connectionUrl;
+    }
 
-	
-	public String getDecscription() {
-		return decscription;
-	}
+    
+    public String getDecscription() {
+        return decscription;
+    }
 
-	
-	public void setDecscription(String decscription) {
-		this.decscription = decscription;
-	}
+    
+    public void setDecscription(String decscription) {
+        this.decscription = decscription;
+    }
 
-	
-	public String getDriverClassName() {
-		return driverClassName;
-	}
+    
+    public String getDriverClassName() {
+        return driverClassName;
+    }
 
-	
-	public void setDriverClassName(String driverClassName) {
-		this.driverClassName = driverClassName;
-	}
+    
+    public void setDriverClassName(String driverClassName) {
+        this.driverClassName = driverClassName;
+    }
 
-	
-	public void setHost(Host host) {
-		this.host = host;
-	}
+    
+    public void setHost(Host host) {
+        this.host = host;
+    }
 
-	
-	public Host getHost() {
-		return this.host;
-	}
-	
-	
-	public void setSchedules(List<String> schedulelist) {
-		this.schedulelist = schedulelist;
-	}
+    
+    public Host getHost() {
+        return this.host;
+    }
+    
+    
+    public void setSchedules(List<String> schedulelist) {
+        this.schedulelist = schedulelist;
+    }
 
-	
-	public List<String> getSchedules() {
-		return this.schedulelist;
-	}	
-	
-	public void addServiceItem(ServiceItem serviceItem) {
-		servicesItems.put(serviceItem.getServiceItemName(), serviceItem);
-	}
+    
+    public List<String> getSchedules() {
+        return this.schedulelist;
+    }    
+    
+    public void addServiceItem(ServiceItem serviceItem) {
+        servicesItems.put(serviceItem.getServiceItemName(), serviceItem);
+    }
 
-	
-	public HashMap<String,ServiceItem> getServicesItems() {
-		return servicesItems;
-	}
+    
+    public HashMap<String,ServiceItem> getServicesItems() {
+        return servicesItems;
+    }
 
-	
-	public ServiceItem getServiceItemByName(String name) {
-		for (Map.Entry<String, ServiceItem> serviceItementry: servicesItems.entrySet()) {
-			ServiceItem serviceItem = serviceItementry.getValue();
-			if (serviceItem.getServiceItemName().compareTo(name) == 0) {
-				return serviceItem;
-			}
-		}
-		return null;
-	}
+    
+    public ServiceItem getServiceItemByName(String name) {
+        for (Map.Entry<String, ServiceItem> serviceItementry: servicesItems.entrySet()) {
+            ServiceItem serviceItem = serviceItementry.getValue();
+            if (serviceItem.getServiceItemName().compareTo(name) == 0) {
+                return serviceItem;
+            }
+        }
+        return null;
+    }
 
-	
-	public NAGIOSSTAT getLevel(){
-		return level;
-	}
+    
+    public NAGIOSSTAT getLevel(){
+        return level;
+    }
 
-	
-	public void setLevel(NAGIOSSTAT level) {
-		this.level = level;
-	}
-	
-	
-	public boolean isConnectionEstablished() {
-		return connectionEstablished;
-	}
-	
-	
-	public void setConnectionEstablished(boolean connected){
-		connectionEstablished = connected;
-	}
+    
+    public void setLevel(NAGIOSSTAT level) {
+        this.level = level;
+    }
+    
+    
+    public boolean isConnectionEstablished() {
+        return connectionEstablished;
+    }
+    
+    
+    public void setConnectionEstablished(boolean connected){
+        connectionEstablished = connected;
+    }
 
 
-	public Boolean isSendServiceData(){
-		return sendServiceData;
-	}
-	
-	
-	public void setSendServiceData(Boolean sendServiceData){
-		this.sendServiceData = sendServiceData;
-	}
+    public Boolean isSendServiceData(){
+        return sendServiceData;
+    }
+    
+    
+    public void setSendServiceData(Boolean sendServiceData){
+        this.sendServiceData = sendServiceData;
+    }
 
 }

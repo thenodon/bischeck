@@ -20,6 +20,6 @@
 package com.ingby.socbox.bischeck;
 
 public interface LastStatusCacheMBean {
-	public int getLastStatusCacheCount();
-	public String[] getCacheKeys();
+    public int getLastStatusCacheCount();
+    public String[] getCacheKeys();
 }

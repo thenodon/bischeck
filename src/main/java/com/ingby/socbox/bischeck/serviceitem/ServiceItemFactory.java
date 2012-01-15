@@ -27,39 +27,39 @@ import org.apache.log4j.Logger;
 
 public class ServiceItemFactory {
 
-	static Logger  logger = Logger.getLogger(ServiceItemFactory.class);
+    static Logger  logger = Logger.getLogger(ServiceItemFactory.class);
 
-	@SuppressWarnings("unchecked")
-	public static ServiceItem createServiceItem(String name, String clazzname) 
-	throws SecurityException, NoSuchMethodException, 
-	IllegalArgumentException, InstantiationException, 
-	IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+    @SuppressWarnings("unchecked")
+    public static ServiceItem createServiceItem(String name, String clazzname) 
+    throws SecurityException, NoSuchMethodException, 
+    IllegalArgumentException, InstantiationException, 
+    IllegalAccessException, InvocationTargetException, ClassNotFoundException {
 
-		Class<ServiceItem> clazz = null;
+        Class<ServiceItem> clazz = null;
 
-		try {
-			clazz = (Class<ServiceItem>) Thread.currentThread().
-			getContextClassLoader().
-			loadClass("com.ingby.socbox.bischeck.serviceitem." +clazzname);
-		} catch (ClassNotFoundException e) {
-			try {
-				clazz = (Class<ServiceItem>) Thread.currentThread().
-				getContextClassLoader().
-				loadClass(clazzname);
-			}catch (ClassNotFoundException ee) {
-				logger.fatal("ServiceItem class " + clazzname + " not found.");
-				throw ee;
-			}
-		}
+        try {
+            clazz = (Class<ServiceItem>) Thread.currentThread().
+            getContextClassLoader().
+            loadClass("com.ingby.socbox.bischeck.serviceitem." +clazzname);
+        } catch (ClassNotFoundException e) {
+            try {
+                clazz = (Class<ServiceItem>) Thread.currentThread().
+                getContextClassLoader().
+                loadClass(clazzname);
+            }catch (ClassNotFoundException ee) {
+                logger.fatal("ServiceItem class " + clazzname + " not found.");
+                throw ee;
+            }
+        }
 
-		Class param[] = (Class[]) Array.newInstance(Class.class, 1);
-		param[0] = String.class;
+        Class param[] = (Class[]) Array.newInstance(Class.class, 1);
+        param[0] = String.class;
 
-		Constructor cons = null;
-		cons = clazz.getConstructor(param);
+        Constructor cons = null;
+        cons = clazz.getConstructor(param);
 
-		ServiceItem serviceItem = null;
-		serviceItem = (ServiceItem) cons.newInstance(name);
-		return serviceItem;
-	}
+        ServiceItem serviceItem = null;
+        serviceItem = (ServiceItem) cons.newInstance(name);
+        return serviceItem;
+    }
 }

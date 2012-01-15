@@ -29,26 +29,26 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 
 public class ServiceFactory {
 
-	static Logger  logger = Logger.getLogger(ServiceFactory.class);
-	
-	@SuppressWarnings("unchecked")
-	public static Service createService(String name, String url) throws Exception 
-	{
-		
-	    URI uri = null;
-		try {
-			uri= new URI(url);
-			logger.debug("uri - " + uri.toString());
-		} catch (URISyntaxException e) {
-			logger.warn("URL malformed - " + url + " - " + e.getMessage());
-			throw new Exception(e.getMessage());
-		}
-		
-		String clazzname = ConfigurationManager.getInstance().getURL2Service().getProperty(uri.getScheme());
-		
-		Class<Service> clazz = null;
+    static Logger  logger = Logger.getLogger(ServiceFactory.class);
+    
+    @SuppressWarnings("unchecked")
+    public static Service createService(String name, String url) throws Exception 
+    {
         
-		try {
+        URI uri = null;
+        try {
+            uri= new URI(url);
+            logger.debug("uri - " + uri.toString());
+        } catch (URISyntaxException e) {
+            logger.warn("URL malformed - " + url + " - " + e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+        
+        String clazzname = ConfigurationManager.getInstance().getURL2Service().getProperty(uri.getScheme());
+        
+        Class<Service> clazz = null;
+        
+        try {
             clazz = (Class<Service>) Thread.currentThread().getContextClassLoader().loadClass("com.ingby.socbox.bischeck.service."+clazzname);
         } catch (ClassNotFoundException e) {
             try { 
@@ -59,25 +59,25 @@ public class ServiceFactory {
             }
         }
          
-		Class param[] = (Class[]) Array.newInstance(Class.class, 1);
-		param[0] = String.class;
-		
-		
-		Constructor cons = null;
-		try {
-			cons = clazz.getConstructor(param);
-		} catch (Exception e) {
-			logger.error("Error getting class constructor for "+ clazz.getName());
-			throw new Exception(e.getMessage());
-		}
+        Class param[] = (Class[]) Array.newInstance(Class.class, 1);
+        param[0] = String.class;
+        
+        
+        Constructor cons = null;
+        try {
+            cons = clazz.getConstructor(param);
+        } catch (Exception e) {
+            logger.error("Error getting class constructor for "+ clazz.getName());
+            throw new Exception(e.getMessage());
+        }
         
         Service service = null;
         try {
-			service = (Service) cons.newInstance(name);
-		} catch (Exception e) {
-			logger.error("Error creating an instance of " + clazz.getName());
-			throw new Exception(e.getMessage());
-		}
+            service = (Service) cons.newInstance(name);
+        } catch (Exception e) {
+            logger.error("Error creating an instance of " + clazz.getName());
+            throw new Exception(e.getMessage());
+        }
         return service;
-	}
+    }
 }

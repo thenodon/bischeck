@@ -28,36 +28,36 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class JobListenerLogger implements JobListener {
 
-	static Logger  logger = Logger.getLogger(JobListenerLogger.class);
-	@Override
-	public String getName() {
-		return JobListenerLogger.class.getName();
-	}
+    static Logger  logger = Logger.getLogger(JobListenerLogger.class);
+    @Override
+    public String getName() {
+        return JobListenerLogger.class.getName();
+    }
 
-	@Override
-	public void jobExecutionVetoed(JobExecutionContext arg0) {
-		if (arg0 instanceof Service) {	
-			Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-			logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed vetoed");
-		}
-	}
+    @Override
+    public void jobExecutionVetoed(JobExecutionContext arg0) {
+        if (arg0 instanceof Service) {    
+            Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
+            logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed vetoed");
+        }
+    }
 
-	@Override
-	public void jobToBeExecuted(JobExecutionContext arg0) {
-		if (arg0 instanceof Service) {
-			Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-			logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed");
-		}
+    @Override
+    public void jobToBeExecuted(JobExecutionContext arg0) {
+        if (arg0 instanceof Service) {
+            Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
+            logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed");
+        }
 
-	}
+    }
 
-	@Override
-	public void jobWasExecuted(JobExecutionContext arg0,
-			JobExecutionException arg1) {
-		if (arg0 instanceof Service) {
-			Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-			logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " execution completed");
-		}	
-	}
+    @Override
+    public void jobWasExecuted(JobExecutionContext arg0,
+            JobExecutionException arg1) {
+        if (arg0 instanceof Service) {
+            Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
+            logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " execution completed");
+        }    
+    }
 
 }

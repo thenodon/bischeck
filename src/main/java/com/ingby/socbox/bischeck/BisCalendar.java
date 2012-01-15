@@ -14,21 +14,21 @@ import org.apache.log4j.Logger;
  *
  */
 public class BisCalendar {
-	
-	static Logger  logger = Logger.getLogger(BisCalendar.class);
-	
-	public static Calendar getInstance() {
-		Calendar now = GregorianCalendar.getInstance();
-		now.setFirstDayOfWeek(Integer.parseInt
-				(ConfigurationManager.getInstance().getProperties().
-						getProperty("firstdayofweek", 
-								String.valueOf(Calendar.MONDAY))));
-		
-		now.setMinimalDaysInFirstWeek(Integer.parseInt
-				(ConfigurationManager.getInstance().getProperties().
-						getProperty("mindaysinfirstweek", 
-								String.valueOf(4))));
-		
-		return now;
-	}
+    
+    static Logger  logger = Logger.getLogger(BisCalendar.class);
+    
+    public static Calendar getInstance() {
+        Calendar now = GregorianCalendar.getInstance();
+        now.setFirstDayOfWeek(Integer.parseInt
+                (ConfigurationManager.getInstance().getProperties().
+                        getProperty("firstdayofweek", 
+                                String.valueOf(Calendar.MONDAY))));
+        
+        now.setMinimalDaysInFirstWeek(Integer.parseInt
+                (ConfigurationManager.getInstance().getProperties().
+                        getProperty("mindaysinfirstweek", 
+                                String.valueOf(4))));
+        
+        return now;
+    }
 }

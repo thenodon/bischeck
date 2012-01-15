@@ -39,32 +39,32 @@ import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 
 public class ThresholdTimer implements Job {
 
-	static Logger  logger = Logger.getLogger(ThresholdTimer.class);
+    static Logger  logger = Logger.getLogger(ThresholdTimer.class);
 
-	static SchedulerFactory sf;
-	static Scheduler sched;
+    static SchedulerFactory sf;
+    static Scheduler sched;
 
-	public static void init(ConfigurationManager configMgr) throws SchedulerException, ParseException {
-		//DirectSchedulerFactory.getInstance().createVolatileScheduler(10);
-		//sched = DirectSchedulerFactory.getInstance().getScheduler();
-		//sf = new StdSchedulerFactory();
-		sched = StdSchedulerFactory.getDefaultScheduler();
-		sched.start();
-		
-		JobDetail job = newJob(ThresholdTimer.class).
-			withIdentity("DepleteThresholdCache", "DailyMaintenance").
-			withDescription("DepleteThresholdCache").    
-			build();
-				
+    public static void init(ConfigurationManager configMgr) throws SchedulerException, ParseException {
+        //DirectSchedulerFactory.getInstance().createVolatileScheduler(10);
+        //sched = DirectSchedulerFactory.getInstance().getScheduler();
+        //sf = new StdSchedulerFactory();
+        sched = StdSchedulerFactory.getDefaultScheduler();
+        sched.start();
+        
+        JobDetail job = newJob(ThresholdTimer.class).
+            withIdentity("DepleteThresholdCache", "DailyMaintenance").
+            withDescription("DepleteThresholdCache").    
+            build();
+                
         // Every day at 10 sec past midnight
-		CronTrigger trigger = newTrigger()
-	    .withIdentity("DepleteThresholdCacheTrigger", "DailyMaintenance")
-	    .withSchedule(cronSchedule(configMgr.getCacheClearCron()))
-	    .forJob("DepleteThresholdCache", "DailyMaintenance")
-	    .build();
-			
-		
-		Date ft = sched.scheduleJob(job, trigger);
+        CronTrigger trigger = newTrigger()
+        .withIdentity("DepleteThresholdCacheTrigger", "DailyMaintenance")
+        .withSchedule(cronSchedule(configMgr.getCacheClearCron()))
+        .forJob("DepleteThresholdCache", "DailyMaintenance")
+        .build();
+            
+        
+        Date ft = sched.scheduleJob(job, trigger);
         sched.addJob(job, true);
         //Date ft = null; // If you do not want to run
         //Date ft = sched.scheduleJob(trigger);
@@ -73,19 +73,19 @@ public class ThresholdTimer implements Job {
                 + " and repeat based on expression: "
                 + trigger.getCronExpression());
 
-	}
-	
-	/*
-	public static void stop() throws SchedulerException {
-		
-		sched.shutdown(true);
-		 SchedulerMetaData metaData = sched.getMetaData();
-		 logger.info("Executed " + metaData.getNumberOfJobsExecuted() + " jobs.");
-	}
+    }
+    
+    /*
+    public static void stop() throws SchedulerException {
+        
+        sched.shutdown(true);
+         SchedulerMetaData metaData = sched.getMetaData();
+         logger.info("Executed " + metaData.getNumberOfJobsExecuted() + " jobs.");
+    }
 */
-	
-	@Override
-	public void execute(JobExecutionContext arg0) throws JobExecutionException {
-		ThresholdFactory.clearCache();	
-	}
+    
+    @Override
+    public void execute(JobExecutionContext arg0) throws JobExecutionException {
+        ThresholdFactory.clearCache();    
+    }
 }

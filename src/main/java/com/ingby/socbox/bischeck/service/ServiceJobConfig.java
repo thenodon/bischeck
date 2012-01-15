@@ -26,26 +26,26 @@ import org.quartz.Trigger;
 
 public class ServiceJobConfig {
 
-	private Service service;
-	private List<Trigger> triggerList = new ArrayList<Trigger>();
+    private Service service;
+    private List<Trigger> triggerList = new ArrayList<Trigger>();
 
-	
-	public ServiceJobConfig(Service service) {
-		this.service = service;
-	}
+    
+    public ServiceJobConfig(Service service) {
+        this.service = service;
+    }
 
-	
-	public Service getService()	{
-		return service;
-	}
-	
-	
-	public void addSchedule(Trigger trigger) {
-		triggerList.add(trigger);		
-	}
+    
+    public Service getService()    {
+        return service;
+    }
+    
+    
+    public void addSchedule(Trigger trigger) {
+        triggerList.add(trigger);        
+    }
 
-	
-	public List<Trigger> getSchedules(){
-		return triggerList;
-	}
+    
+    public List<Trigger> getSchedules(){
+        return triggerList;
+    }
 }

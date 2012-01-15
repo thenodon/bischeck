@@ -35,98 +35,98 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 
 public class LivestatusService extends ServiceAbstract implements Service {
 
-	static Logger  logger = Logger.getLogger(LivestatusService.class);
-	
-	static private int querytimeout = 10000; //millisec
-	private Socket clientSocket = null;
-	
-	
-	
-	static {
-		try {
-			querytimeout = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
-					getProperty("LiveStatusService.querytimeout","10")) * 1000;
-		} catch (NumberFormatException ne) {
-			logger.error("Property LiveStatusService.querytimeout is not " + 
-					"set correct to an integer: " +
-					ConfigurationManager.getInstance().getProperties().getProperty(
-					"LiveStatusService.querytimeout"));
-		}
-	}
+    static Logger  logger = Logger.getLogger(LivestatusService.class);
+    
+    static private int querytimeout = 10000; //millisec
+    private Socket clientSocket = null;
+    
+    
+    
+    static {
+        try {
+            querytimeout = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
+                    getProperty("LiveStatusService.querytimeout","10")) * 1000;
+        } catch (NumberFormatException ne) {
+            logger.error("Property LiveStatusService.querytimeout is not " + 
+                    "set correct to an integer: " +
+                    ConfigurationManager.getInstance().getProperties().getProperty(
+                    "LiveStatusService.querytimeout"));
+        }
+    }
 
-	
-	public LivestatusService (String serviceName) {
-		this.serviceName = serviceName;
-	}
+    
+    public LivestatusService (String serviceName) {
+        this.serviceName = serviceName;
+    }
 
-	
-	@Override
-	public void openConnection() throws Exception {
-		URI url = new URI(this.getConnectionUrl());
-	    // Create socket that is connected to server on specified port
-	    clientSocket = new Socket(url.getHost(), url.getPort());
-	    clientSocket.setSoTimeout(querytimeout);
-	    setConnectionEstablished(true);
-	    logger.debug("Connected");
-	}
+    
+    @Override
+    public void openConnection() throws Exception {
+        URI url = new URI(this.getConnectionUrl());
+        // Create socket that is connected to server on specified port
+        clientSocket = new Socket(url.getHost(), url.getPort());
+        clientSocket.setSoTimeout(querytimeout);
+        setConnectionEstablished(true);
+        logger.debug("Connected");
+    }
 
-	
-	@Override
-	public void closeConnection() {
-		try {
-			clientSocket.close();
-			logger.debug("Closed");
-		} catch (IOException ignore) {}
-	}
+    
+    @Override
+    public void closeConnection() {
+        try {
+            clientSocket.close();
+            logger.debug("Closed");
+        } catch (IOException ignore) {}
+    }
 
-	
-	@Override 
-	public String executeStmt(String exec) throws Exception {
-		
-		/*
-		 * Replace all \n occurance with real newlines 
-		 */
-		String message = exec.replaceAll("\\\\n", "\n");
-		
-		DataOutputStream dataOut = null;
-		BufferedReader bufIn = null;
-		
-		StringBuffer responseBuffer = new StringBuffer();
-		
-		logger.debug("Execute request: " + message);
-		
-		dataOut = new DataOutputStream(clientSocket.getOutputStream());
-	    dataOut.writeBytes(message);
-	    dataOut.flush();
-	    
-	    bufIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-	    String responseLine = null;
-	    try {
-	    	while ((responseLine = bufIn.readLine()) != null) {  
-	    		responseBuffer.append(responseLine);    
-	    	}  
-	    } catch (SocketTimeoutException exptime) {
-	    	logger.error("Livestatus connection timed-out after " + querytimeout + " ms");
-	    	return null;
-	    } finally {	
-	    	try {
-				dataOut.close();
-			} catch (IOException ignore) {}  
-	        dataOut = null;  
-
-	        try {
-				bufIn.close();
-			} catch (IOException ignore) {}  
-	        bufIn = null; 
-	    }
-                
-	    String responseMsg = new String(responseBuffer);
+    
+    @Override 
+    public String executeStmt(String exec) throws Exception {
         
-		logger.debug("Received response: " + responseMsg);
-	    
-		return responseMsg;
-	}
+        /*
+         * Replace all \n occurance with real newlines 
+         */
+        String message = exec.replaceAll("\\\\n", "\n");
+        
+        DataOutputStream dataOut = null;
+        BufferedReader bufIn = null;
+        
+        StringBuffer responseBuffer = new StringBuffer();
+        
+        logger.debug("Execute request: " + message);
+        
+        dataOut = new DataOutputStream(clientSocket.getOutputStream());
+        dataOut.writeBytes(message);
+        dataOut.flush();
+        
+        bufIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+        String responseLine = null;
+        try {
+            while ((responseLine = bufIn.readLine()) != null) {  
+                responseBuffer.append(responseLine);    
+            }  
+        } catch (SocketTimeoutException exptime) {
+            logger.error("Livestatus connection timed-out after " + querytimeout + " ms");
+            return null;
+        } finally {    
+            try {
+                dataOut.close();
+            } catch (IOException ignore) {}  
+            dataOut = null;  
+
+            try {
+                bufIn.close();
+            } catch (IOException ignore) {}  
+            bufIn = null; 
+        }
+                
+        String responseMsg = new String(responseBuffer);
+        
+        logger.debug("Received response: " + responseMsg);
+        
+        return responseMsg;
+    }
 }
 
 

@@ -20,36 +20,36 @@
 package com.ingby.socbox.bischeck.threshold;
 
 public class ThresholdContainer {
-	private Float floatThreshold = null;
-	private String expThreshold = null;
-	private boolean expInd = false;
-	
-	public Float getFloatThreshold() {
-		return floatThreshold;
-	}
+    private Float floatThreshold = null;
+    private String expThreshold = null;
+    private boolean expInd = false;
+    
+    public Float getFloatThreshold() {
+        return floatThreshold;
+    }
 
-	
-	public void setFloatThreshold(Float floatThreshold) {
-		this.floatThreshold = floatThreshold;
-	}
-	
-	
-	public String getExpThreshold() {
-		return expThreshold;
-	}
-	
-	
-	public void setExpThreshold(String expThreshold) {
-		this.expThreshold = expThreshold;
-	}
-	
-	
-	public boolean isExpInd() {
-		return expInd;
-	}
-	
-	
-	public void setExpInd(boolean expInd) {
-		this.expInd = expInd;
-	}
+    
+    public void setFloatThreshold(Float floatThreshold) {
+        this.floatThreshold = floatThreshold;
+    }
+    
+    
+    public String getExpThreshold() {
+        return expThreshold;
+    }
+    
+    
+    public void setExpThreshold(String expThreshold) {
+        this.expThreshold = expThreshold;
+    }
+    
+    
+    public boolean isExpInd() {
+        return expInd;
+    }
+    
+    
+    public void setExpInd(boolean expInd) {
+        this.expInd = expInd;
+    }
 }

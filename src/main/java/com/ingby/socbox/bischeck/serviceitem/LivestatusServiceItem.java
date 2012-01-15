@@ -54,80 +54,80 @@ import com.ingby.socbox.bischeck.QueryNagiosPerfData;
  *
  */
 public class LivestatusServiceItem extends ServiceItemAbstract implements ServiceItem {
-	static Logger  logger = Logger.getLogger(LivestatusServiceItem.class);
+    static Logger  logger = Logger.getLogger(LivestatusServiceItem.class);
 
-	
-	public LivestatusServiceItem(String name) {
-		this.serviceItemName = name;		
-	}
+    
+    public LivestatusServiceItem(String name) {
+        this.serviceItemName = name;        
+    }
 
-	
-	@Override
-	public void execute() throws Exception {
-		/*
-		 * Check the operation type - status
-		 *  
-		 */
-		JSONObject jsonStatement = JSONObject.fromObject(this.getExecution());
-		StringBuffer strbuf = new StringBuffer();
-		if (!validateExecStatement(jsonStatement)) {
-			throw new Exception("Not a valid livestatus operation " + jsonStatement.toString());
-		}
+    
+    @Override
+    public void execute() throws Exception {
+        /*
+         * Check the operation type - status
+         *  
+         */
+        JSONObject jsonStatement = JSONObject.fromObject(this.getExecution());
+        StringBuffer strbuf = new StringBuffer();
+        if (!validateExecStatement(jsonStatement)) {
+            throw new Exception("Not a valid livestatus operation " + jsonStatement.toString());
+        }
 
-		// Check if a host or service request
-		if (jsonStatement.containsKey("service")) {
-			strbuf.append("GET services").append("\n");
-		} else {
-			strbuf.append("GET hosts").append("\n");
-		}
-		
-		// Set the host name - mandatory
-		strbuf.append("Filter: host_name = ").append(jsonStatement.getString("host")).append("\n");
-		
-		// If a service check get service name
-		if (jsonStatement.containsKey("service")) {
-			strbuf.append("Filter: display_name = ").append(jsonStatement.getString("service")).append("\n");
-		}
-		
-		// Get the type of query - state or perfdata
-		if (jsonStatement.getString("query").equalsIgnoreCase("state")) {
-			strbuf.append("Columns: state").append("\n");
-		} else if (jsonStatement.getString("query").equalsIgnoreCase("perfdata")){
-			strbuf.append("Columns: perf_data").append("\n");
-		} 
-		
-		// If the query is perfdata retrieve label and measured data 
-		if (jsonStatement.getString("query").equalsIgnoreCase("perfdata")){
-			
-		}
-		strbuf.append("OutputFormat: json").append("\n").
-		append("\n");
+        // Check if a host or service request
+        if (jsonStatement.containsKey("service")) {
+            strbuf.append("GET services").append("\n");
+        } else {
+            strbuf.append("GET hosts").append("\n");
+        }
+        
+        // Set the host name - mandatory
+        strbuf.append("Filter: host_name = ").append(jsonStatement.getString("host")).append("\n");
+        
+        // If a service check get service name
+        if (jsonStatement.containsKey("service")) {
+            strbuf.append("Filter: display_name = ").append(jsonStatement.getString("service")).append("\n");
+        }
+        
+        // Get the type of query - state or perfdata
+        if (jsonStatement.getString("query").equalsIgnoreCase("state")) {
+            strbuf.append("Columns: state").append("\n");
+        } else if (jsonStatement.getString("query").equalsIgnoreCase("perfdata")){
+            strbuf.append("Columns: perf_data").append("\n");
+        } 
+        
+        // If the query is perfdata retrieve label and measured data 
+        if (jsonStatement.getString("query").equalsIgnoreCase("perfdata")){
+            
+        }
+        strbuf.append("OutputFormat: json").append("\n").
+        append("\n");
 
-		
-		JSONArray jsonReplyArray =  (JSONArray) JSONSerializer.toJSON(service.executeStmt(strbuf.toString()));
-		String firstValue = ((JSONArray) JSONSerializer.toJSON(jsonReplyArray.getString(0))).getString(0);
-		if (jsonStatement.containsKey("label")) {
-			firstValue = QueryNagiosPerfData.parse(jsonStatement.getString("label"),firstValue) ;
-		}
-		
-		
-		setLatestExecuted(firstValue);	
-	}
-
-
-	private boolean validateExecStatement(JSONObject jsonStatement) {
-		if (!jsonStatement.containsKey("host"))  return false;
-		
-		if (!jsonStatement.containsKey("query")) return false; 
-		else if(!validateQuery(jsonStatement.getString("query"))) return false;	
-		
-		return true;
-	}
+        
+        JSONArray jsonReplyArray =  (JSONArray) JSONSerializer.toJSON(service.executeStmt(strbuf.toString()));
+        String firstValue = ((JSONArray) JSONSerializer.toJSON(jsonReplyArray.getString(0))).getString(0);
+        if (jsonStatement.containsKey("label")) {
+            firstValue = QueryNagiosPerfData.parse(jsonStatement.getString("label"),firstValue) ;
+        }
+        
+        
+        setLatestExecuted(firstValue);    
+    }
 
 
-	private boolean validateQuery(String ops) {
-		if (ops.equalsIgnoreCase("state") || 
-				(ops.equalsIgnoreCase("perfdata")) ) return true;
-		return false;
-	}
+    private boolean validateExecStatement(JSONObject jsonStatement) {
+        if (!jsonStatement.containsKey("host"))  return false;
+        
+        if (!jsonStatement.containsKey("query")) return false; 
+        else if(!validateQuery(jsonStatement.getString("query"))) return false;    
+        
+        return true;
+    }
+
+
+    private boolean validateQuery(String ops) {
+        if (ops.equalsIgnoreCase("state") || 
+                (ops.equalsIgnoreCase("perfdata")) ) return true;
+        return false;
+    }
 }

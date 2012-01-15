@@ -20,20 +20,20 @@
 package com.ingby.socbox.bischeck;
 
 public interface ExecuteMBean {
-	/**
-	 * Get the last status of the sending the nsca message to the Nagios server.
-	 * @return status information
-	 */
-	public String getLastStatus();
-	
-	/**
-	 * List the triggers to schedule
-	 * @return all triggers to execute
-	 */
-	public String[] getTriggers();
-	/**
-	 * Shutdown the execution
-	 */
-	public void shutdown();
+    /**
+     * Get the last status of the sending the nsca message to the Nagios server.
+     * @return status information
+     */
+    public String getLastStatus();
+    
+    /**
+     * List the triggers to schedule
+     * @return all triggers to execute
+     */
+    public String[] getTriggers();
+    /**
+     * Shutdown the execution
+     */
+    public void shutdown();
 
 }

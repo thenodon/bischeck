@@ -36,93 +36,93 @@ import com.ingby.socbox.bischeck.threshold.Threshold;
 
 public abstract class ServiceItemAbstract {
 
-	protected String 	serviceItemName;
-	protected String 	decscription;
-	protected String 	execution;
-	protected Service 	service;
-	protected String 	thresholdclassname;
-	protected String 	latestValue = null;
-	protected Long 		exectime;
-	protected Threshold threshold;
+    protected String     serviceItemName;
+    protected String     decscription;
+    protected String     execution;
+    protected Service     service;
+    protected String     thresholdclassname;
+    protected String     latestValue = null;
+    protected Long         exectime;
+    protected Threshold threshold;
 
-	
-	public void setService(Service service) {
-		this.service = service;
-	}
+    
+    public void setService(Service service) {
+        this.service = service;
+    }
 
-	
-	public String getServiceItemName() {
-		return this.serviceItemName;
-	}
+    
+    public String getServiceItemName() {
+        return this.serviceItemName;
+    }
 
-	
-	public String getDecscription() {
-		return decscription;
-	}
+    
+    public String getDecscription() {
+        return decscription;
+    }
 
-	
-	public void setDecscription(String decscription) {
-		this.decscription = decscription;
-	}
-	
-	
-	public String getExecution() {
-		return QueryDate.parse(execution);	
-	}
+    
+    public void setDecscription(String decscription) {
+        this.decscription = decscription;
+    }
+    
+    
+    public String getExecution() {
+        return QueryDate.parse(execution);    
+    }
 
-	
-	public String getExecutionStat() {
-		return execution;	
-	}
-	
-	
-	public void setExecution(String execution) {
-		this.execution = execution;
-	}
+    
+    public String getExecutionStat() {
+        return execution;    
+    }
+    
+    
+    public void setExecution(String execution) {
+        this.execution = execution;
+    }
 
-	
-	public void execute() throws Exception {				
-		latestValue = service.executeStmt(this.getExecution());	
-	}
+    
+    public void execute() throws Exception {                
+        latestValue = service.executeStmt(this.getExecution());    
+    }
 
-	
-	public String getThresholdClassName() {
-		return this.thresholdclassname;
-		
-	}
+    
+    public String getThresholdClassName() {
+        return this.thresholdclassname;
+        
+    }
 
-	
-	public void setThresholdClassName(String thresholdclassname) {
-		this.thresholdclassname = thresholdclassname;
-	}
+    
+    public void setThresholdClassName(String thresholdclassname) {
+        this.thresholdclassname = thresholdclassname;
+    }
 
-	
-	public void setLatestExecuted(String value) {
-		latestValue = value;
-	}
+    
+    public void setLatestExecuted(String value) {
+        latestValue = value;
+    }
 
-	
-	public String getLatestExecuted() {
-		return latestValue;
-	}
+    
+    public String getLatestExecuted() {
+        return latestValue;
+    }
 
-	
-	public void setExecutionTime(Long exectime) {
-		this.exectime = exectime;
-	}
+    
+    public void setExecutionTime(Long exectime) {
+        this.exectime = exectime;
+    }
 
-	
-	public Long getExecutionTime() {
-		return exectime;
-	}
+    
+    public Long getExecutionTime() {
+        return exectime;
+    }
 
-	
-	public Threshold getThreshold() {
-		return this.threshold;
-	}
+    
+    public Threshold getThreshold() {
+        return this.threshold;
+    }
 
-	
-	public void setThreshold(Threshold threshold) {
-		this.threshold = threshold;
-	}
+    
+    public void setThreshold(Threshold threshold) {
+        this.threshold = threshold;
+    }
 }
