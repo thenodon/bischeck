@@ -16,7 +16,7 @@ public class ConfigurationManagerTest {
     		
     }
     
-    @Test
+    @Test (groups = { "ConfigurationManager" })
     public void verify_basicxml_return0() {
             Assert.assertEquals(confMgmr.verify(), 0);
     }
