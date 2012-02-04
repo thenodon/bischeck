@@ -106,9 +106,7 @@ public class NSCAServer implements Server {
         }
         
         payload.setLevel(level.toString());
-        // Store the value in the LastStatusCache
-        // moved to checkServiceItem addServiceItemToCache(service);
-
+        
         logger.info("******************** "+ instanceName +" *******************");
         logger.info("*");
         logger.info("*    Host: " + service.getHost().getHostname());
@@ -131,7 +129,7 @@ public class NSCAServer implements Server {
         } catch (IOException e) {
             logger.error("Network error - check nsca server and that service is started - " + e);
         }
-    }// for service
+    }
     
     
     /**

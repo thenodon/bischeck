@@ -113,8 +113,6 @@ public class Execute implements ExecuteMBean {
         Options options = new Options();
         options.addOption( "u", "usage", false, "show usage." );
         options.addOption( "d", "deamon", false, "start as a deamon" );
-//        options.addOption( "h", "host", true, "host to run" );
-//        options.addOption( "s", "service", true, "service to run" );
         
         try {
             // parse the command line arguments
@@ -130,9 +128,7 @@ public class Execute implements ExecuteMBean {
             formatter.printHelp( "Bischeck", options );
             System.exit(0);
         }
-        
-        //ConfigurationManager confmgr = null;
-        
+                
         try {
             if (line.hasOption("deamon"))
                 ConfigurationManager.init();
