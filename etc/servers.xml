@@ -4,9 +4,8 @@
 
   <server name="NSCA">
     <class>
-       com.ingby.socbox.bischeck.servers.NSCAServer
+       NSCAServer
     </class>
-    
     
     <property>
       <key>hostAddress</key>
@@ -34,45 +33,5 @@
     </property>
 
   </server>
-
-  <server name="OpenTSDB">
-    <class>com.ingby.socbox.bischeck.servers.OpenTSDBServer</class>
-    
-    <property>
-      <key>hostAddress</key>
-      <value>localhost</value>
-    </property>
-
-    <property>
-      <key>port</key>
-      <value>4242</value>
-    </property>
-
-    <property>
-      <key>connectionTimeout</key>
-      <value>5000</value>
-    </property>
-
-  </server>  
-
- <server name="XYZ">
-    <class>com.ingby.socbox.bischeck.servers.OpenTSDBServer</class>
-    
-    <property>
-      <key>hostAddress</key>
-      <value>localhost</value>
-    </property>
-
-    <property>
-      <key>port</key>
-      <value>4242</value>
-    </property>
-
-    <property>
-      <key>connectionTimeout</key>
-      <value>5000</value>
-    </property>
-
-  </server>  
 
 </servers>
