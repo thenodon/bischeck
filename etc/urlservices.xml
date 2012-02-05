@@ -12,4 +12,10 @@
     <value>LastCacheService</value>
   </urlproperty>
 
+  <urlproperty>
+    <key>livestatus</key>
+    <value>LivestatusService</value>
+  </urlproperty>
+
+  
 </urlservices>
