@@ -9,7 +9,7 @@
     <!-- ==== File and Directory Names =================================== -->
     <property name="app.name" value="bischeck" />
     <property name="app.path" value="/${app.name}" />
-    <property name="app.version" value="0.3.3A1" />
+    <property name="app.version" value="0.4.0" />
     <property name="build.home" value="${basedir}/target" />
     <property name="dist.home" value="${basedir}/dist" />
     <property name="bin.home" value="${basedir}/bin" />
@@ -104,6 +104,26 @@
 	   </testng>
 	 </target>
 
+	
+	   <target name="testng" depends="compileng">
+	       <testng>
+	        <sysproperty key="bishome" value="${basedir}"/>
+	        
+	        <classpath>
+	            <pathelement path="${build.home}/classes"/>
+	            <pathelement path="${build.home}/resources"/>
+	            <fileset dir="${build.home}/lib/">
+	                <include name="*.jar" />
+	            </fileset>
+	            <fileset dir="${basedir}/customlib/">
+	                            <include name="*.jar" />
+	            </fileset>
+	         </classpath>
+	         <classfileset dir="${build.home}/classes" includes="testng/**/*.class"/>
+	       </testng>
+	     </target>
+
+	
     <target name="dist" depends="clean, genjaxb, compile, javadoc, svninfo " description="Create binary distribution">
         
         <jar index="true" destfile="${build.home}/lib/${app.name}-${app.version}.jar" basedir="${build.home}/classes" >
