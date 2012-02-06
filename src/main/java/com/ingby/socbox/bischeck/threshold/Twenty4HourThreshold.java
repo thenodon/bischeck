@@ -73,7 +73,6 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         // create the Options
         Options options = new Options();
         options.addOption( "u", "usage", false, "show usage." );
-        //options.addOption( "l", "list", false, "list the threshold configuration" );
         options.addOption( "d", "date", true, "date to test, e.g. 20100811" );
         options.addOption( "h", "host", true, "host to test");
         options.addOption( "s", "service", true, "service to test");
@@ -96,19 +95,10 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
         ConfigurationManager.init();
         
-        /*
-        if (line.hasOption("list")) {
-            Twenty4HourThreshold current = new Twenty4HourThreshold();
-            current.dumpConfig();
-            System.exit(0);
-        }
-        */
-
         if (line.hasOption("host") && 
                 line.hasOption("service") &&
                 line.hasOption("item")) {
 
-            //ConfigurationManager.getInstance().initServerConfiguration();
             Twenty4HourThreshold current = new Twenty4HourThreshold();
             current.setHostName(line.getOptionValue("host"));    
             current.setServiceName(line.getOptionValue("service"));
@@ -168,7 +158,6 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     @Override
     public void init() throws Exception {
         Calendar now = BisCalendar.getInstance();
-        //now.setFirstDayOfWeek(Calendar.SUNDAY);
         this.init(now);
     }
     
@@ -432,7 +421,6 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         ConfigurationManager configMgr = ConfigurationManager.getInstance();
         XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
         
-        //now.setFirstDayOfWeek(Calendar.SUNDAY);
         
         int year=now.get(Calendar.YEAR);
         int month=now.get(Calendar.MONTH) + 1;
@@ -705,97 +693,4 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     }
 
     
-    /**
-     * @deprecated Moved to DocManager
-     * @throws Exception
-     */
-    private void dumpConfig() throws Exception {
-        
-        ConfigurationManager configMgr = ConfigurationManager.getInstance();
-        XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(XMLCONFIG.TWENTY4HOURTHRESHOLD);
-        
-        Iterator<XMLServicedef> serviceIter = twenty4hourconfig.getServicedef().iterator();
-        
-        
-        while (serviceIter.hasNext()) {
-            XMLServicedef servicedef = serviceIter.next();
-            System.out.println("##############################");
-            System.out.println("Host - " +    servicedef.getHostname()); 
-            System.out.println("Service - " + servicedef.getServicename());
-            System.out.println("ServiceItem - " +servicedef.getServiceitemname());
-            System.out.println("##############################");
-                    
-            Iterator<XMLPeriod> periodIter = servicedef.getPeriod().iterator();
-            while (periodIter.hasNext()) {
-                XMLPeriod period = periodIter.next();
-                
-                StringBuffer strbuf = new StringBuffer();
-    
-                Iterator<XMLMonths> monthsIter= period.getMonths().iterator();
-
-                while (monthsIter.hasNext()) {
-                    XMLMonths months = monthsIter.next();
-                
-                    if (!isContentNull(months.getMonth())) {
-                        strbuf.append("   Month: ").append(months.getMonth());
-                    }
-                    if (!isContentNull(months.getDayofmonth())) {
-                        strbuf.append("   DayofMonth: ").append(months.getDayofmonth());
-                    }
-                    strbuf.append("\n");
-                }
-                
-                Iterator<XMLWeeks> weeksIter= period.getWeeks().iterator();
-
-                while (weeksIter.hasNext()) {
-                    XMLWeeks weeks = weeksIter.next();
-
-                        if (!isContentNull(weeks.getWeek())) {
-                            strbuf.append("   Week: ").append(weeks.getWeek());
-                        }
-                        if (!isContentNull(weeks.getDayofweek())) {
-                            strbuf.append("   DayofWeek: ").append(weeks.getDayofweek());    
-                    }
-                    strbuf.append("\n");
-                }
-                
-                if (strbuf.length()>0)
-                    System.out.print("  Period include(s):\n" + strbuf.toString());
-                else
-                    System.out.println("  Period - Default");
-                System.out.println("  Calculation - " + period.getCalcmethod());
-                System.out.println("  Warning - " + period.getWarning());
-                System.out.println("  Critical - " + period.getCritical());
-                System.out.println("  Hours id - " + period.getHoursIDREF());
-
-                int hoursid = period.getHoursIDREF();
-                Iterator<XMLHours> hoursIter = twenty4hourconfig.getHours().iterator();
-                while (hoursIter.hasNext()) {
-                    XMLHours hours = hoursIter.next();
-                
-                    if (hours.getHoursID() == hoursid) {
-                
-                        for (int i=0;i<24;i++) { 
-                            if (i < 10){
-                                System.out.print("    0"+(i)+":00 ");
-                                
-                                if (isContentNull(hours.getHour().get(i)))
-                                    System.out.print("null");
-                                else
-                                    System.out.print(hours.getHour().get(i));
-                            } else {
-                                System.out.print("    "+ (i)+":00 ");
-                                if (isContentNull(hours.getHour().get(i)))
-                                    System.out.print("null");
-                                else
-                                    System.out.print(hours.getHour().get(i));    
-                            }
-                            System.out.println("");
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    }
 }
