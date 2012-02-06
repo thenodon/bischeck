@@ -111,11 +111,7 @@ public class ConfigurationManager implements ConfigXMLInf {
         options.addOption( "u", "usage", false, "show usage." );
         options.addOption( "v", "verify", false, "verify all xml configuration with their xsd" );
         options.addOption( "p", "pidfile", false, "Show bischeck pid file path" );
-        /*
-        options.addOption( "l", "list", false, "list the bischeck host configuration" );
-        options.addOption( "S", "serverproperties", false, "Show server properties" );
-        options.addOption( "U", "urlserviceproperties", false, "Show url to service properties" );
-        */
+        
         try {
             // parse the command line arguments
             line = parser.parse( options, args );
@@ -140,21 +136,6 @@ public class ConfigurationManager implements ConfigXMLInf {
             System.exit(confMgmr.verify());
         }
 
-/*        
-        if (line.hasOption("serverproperties")) {
-            System.out.println(confMgmr.getProperties().toString());
-        }
-
-        if (line.hasOption("urlserviceproperties")) {
-            
-            System.out.println(confMgmr.getURL2Service().toString());
-        }
-    
-        if (line.hasOption("list")) {
-            System.out.println(confMgmr.printHostConfig());
-    
-        }
-*/
         if (line.hasOption("pidfile")) {
             System.out.println("PidFile:"+confMgmr.getPidFile().getPath());    
         }
@@ -761,42 +742,5 @@ public class ConfigurationManager implements ConfigXMLInf {
         return prop.getProperty("thresholdCacheClear","10 0 00 * * ? *");
     }
  
-    /**
-     * @deprecated Moved to DocManager
-     * @return
-     */
-    public String printHostConfig() {
-        StringBuffer str = new StringBuffer();
-        for (Map.Entry<String, Host> hostentry: hostsmap.entrySet()) {
-            Host host = hostentry.getValue();
-            str.append("Host: ").append(host.getHostname()).append("\n");
-            str.append("  Desc: ").append(host.getDecscription()).append("\n");
-            
-            for (Map.Entry<String, Service> serviceentry: host.getServices().entrySet()) {
-                Service service = serviceentry.getValue();
-
-                str.append("  Service: ").append(service.getServiceName()).append("\n");
-                str.append("      Desc: ").append(service.getDecscription()).append("\n");
-                str.append("      URL: ").append(Util.obfuscatePassword(service.getConnectionUrl())).append("\n");
-                str.append("      Driver: ").append(service.getDriverClassName()).append("\n");
-                Iterator<String> iter = service.getSchedules().iterator();
-                str.append("      Schedules: \n");
-                while(iter.hasNext()) {
-                    str.append("          Schedule: ").append(iter.next()).append("\n");
-                }
-                for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
-                    ServiceItem serviceitem = serviceitementry.getValue();
-
-                    str.append("      ServiceItem: ").append(serviceitem.getServiceItemName()).append("\n");
-                    str.append("          Desc: ").append(serviceitem.getDecscription()).append("\n");
-                    str.append("          ExecStat: ").append(serviceitem.getExecutionStat()).append("\n");
-                    str.append("          ExecStat with current date parsing: ").append(serviceitem.getExecution()).append("\n");
-                    str.append("          Serviceitem class: ").append(serviceitem.getClass().getName()).append("\n");
-                    str.append("          Threshold class: ").append(serviceitem.getThresholdClassName()).append("\n");
-                }
-            }
-        }
-        return str.toString();
-    }
 
 }
