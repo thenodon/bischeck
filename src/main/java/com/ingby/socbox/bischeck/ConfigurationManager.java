@@ -54,6 +54,7 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
+import com.ingby.socbox.bischeck.servers.Server;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
@@ -178,8 +179,8 @@ public class ConfigurationManager implements ConfigXMLInf {
                 configMgr.initBischeckServices(true);
                 configMgr.initScheduler();
 
-                // Verify all structures
-                if (configMgr.getPidFile().canWrite()) {
+                // Verify if the pid file is writable
+                if (!configMgr.checkPidFile()) {
                     throw new Exception("Can not write to pid file " + configMgr.getPidFile());
                 }
                 configMgr.getServerClassMap();
@@ -208,8 +209,8 @@ public class ConfigurationManager implements ConfigXMLInf {
                 configMgr.initBischeckServices(false);
                 configMgr.initScheduler();
 
-                // Verify all structures
-                if (configMgr.getPidFile().canWrite()) {
+                // Verify if the pid file is writable
+                if (!configMgr.checkPidFile()) {
                     throw new Exception("Can not write to pid file " + configMgr.getPidFile());
                 }
                 configMgr.getServerClassMap();
@@ -432,7 +433,31 @@ public class ConfigurationManager implements ConfigXMLInf {
         
         servermap.put(serverconfig.getName(), prop);            
         
-        serversclass.put(serverconfig.getName(), Class.forName(serverconfig.getClazz().trim()));
+                
+        //serversclass.put(serverconfig.getName(), Class.forName(serverconfig.getClazz().trim()));
+        serversclass.put(serverconfig.getName(), getServerClass(serverconfig.getClazz().trim()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<?> getServerClass(String clazzname) throws ClassNotFoundException { 
+
+    	Class<Server> clazz = null;
+
+    	try {
+    		clazz = (Class<Server>) Thread.currentThread().
+    		getContextClassLoader().
+    		loadClass("com.ingby.socbox.bischeck.servers." +clazzname);
+    	} catch (ClassNotFoundException e) {
+    		try {
+    			clazz = (Class<Server>) Thread.currentThread().
+    			getContextClassLoader().
+    			loadClass(clazzname);
+    		}catch (ClassNotFoundException ee) {
+    			logger.fatal("Server class " + clazzname + " not found.");
+    			throw ee;
+    		}
+    	}
+    	return clazz;
     }
 
 
@@ -707,6 +732,22 @@ public class ConfigurationManager implements ConfigXMLInf {
         return new File(prop.getProperty("pidfile","/var/tmp/bischeck.pid"));
     }
 
+    public  boolean checkPidFile() {
+        File pidfile = getPidFile();
+        if (pidfile.exists()) {
+        	if (pidfile.canWrite())
+        		return true;
+        	else
+        		return false;
+        }
+        else {
+        	if(new File(pidfile.getParent()).canWrite())
+        		return true;
+        	else
+        		return false;
+        }
+    }
+    
     public Properties getServerProperiesByName(String name) {
         return servermap.get(name);
     }
