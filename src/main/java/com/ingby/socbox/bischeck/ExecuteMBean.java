@@ -31,9 +31,15 @@ public interface ExecuteMBean {
      * @return all triggers to execute
      */
     public String[] getTriggers();
+    
     /**
      * Shutdown the execution
      */
     public void shutdown();
+
+    /**
+     * Restart 
+     */
+    public void reload();
 
 }
