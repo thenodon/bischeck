@@ -75,7 +75,7 @@ import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlservices;
  * The ConfigurationManager class is responsible for all core configuration of bischeck.
  * The ConfigurationManager is shared and only instantiated once through the class factory.
  *
- * @author andersh
+ * @author Anders Haal
  *
  */
 
@@ -90,19 +90,15 @@ public class ConfigurationManager implements ConfigXMLInf {
      */
     private static ConfigurationManager configMgr = null;
     
-    /*
-     * Cache to hold all unmarshalled xml configuration files. 
-     */
-    private Map<String,Object> xmlcache = new HashMap<String,Object>();    
-
+    private Properties prop = null;    
+    private Properties url2service = null;
+    private Map<String,Host> hostsmap = null;
+    private List<ServiceJobConfig> schedulejobs = null;
+    private Map<String,Properties> servermap = null;
+    private Map<String,Class<?>> serversclass = null;
+    private ConfigFileManager xmlfilemgr = null;
     
-    private Properties prop = new Properties();    
-    private Properties url2service = new Properties();
-    private Map<String,Host> hostsmap = new HashMap<String,Host>();
-    private List<ServiceJobConfig> schedulejobs = new ArrayList<ServiceJobConfig>();
-    private Map<String,Properties> servermap = new HashMap<String,Properties>();
-    private Map<String,Class<?>> serversclass = new HashMap<String,Class<?>>();
-    
+	
     public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
         CommandLine line = null;
@@ -149,26 +145,41 @@ public class ConfigurationManager implements ConfigXMLInf {
     
     private ConfigurationManager() {}    
     
+    
+    private void allocateDataStructs() {
+    	xmlfilemgr  = new ConfigFileManager();
+    	prop = new Properties();    
+    	url2service = new Properties();
+    	hostsmap = new HashMap<String,Host>();
+    	schedulejobs = new ArrayList<ServiceJobConfig>();
+    	servermap = new HashMap<String,Properties>();
+    	serversclass = new HashMap<String,Class<?>>();
+    }
+    
+    
     synchronized public static void initonce() throws Exception{
-        if (configMgr == null ) {
+        if (configMgr == null ) 
             configMgr = new ConfigurationManager();
-            try {
-                // Init all data structures. 
-                configMgr.initProperties();
-                configMgr.initURL2Service();
-                configMgr.initServers();
-                configMgr.initBischeckServices(true);
-                configMgr.initScheduler();
+        
+        configMgr.allocateDataStructs();
+        
+        logger.debug("Init");
+        try {
+        	// Initialize all data structures. 
+        	configMgr.initProperties();
+        	configMgr.initURL2Service();
+        	configMgr.initServers();
+        	configMgr.initBischeckServices(true);
+        	configMgr.initScheduler();
 
-                // Verify if the pid file is writable
-                if (!configMgr.checkPidFile()) {
-                    throw new Exception("Can not write to pid file " + configMgr.getPidFile());
-                }
-                configMgr.getServerClassMap();
-            } catch (Exception e) {
-                logger.error("Configuration Manager initzialization failed with " + e);
-                throw e;
-            }
+        	// Verify if the pid file is writable
+        	if (!configMgr.checkPidFile()) {
+        		throw new Exception("Can not write to pid file " + configMgr.getPidFile());
+        	}
+        	configMgr.getServerClassMap();
+        } catch (Exception e) {
+        	logger.error("Configuration Manager initzialization failed with " + e);
+        	throw e;
         }
     }
     
@@ -180,26 +191,30 @@ public class ConfigurationManager implements ConfigXMLInf {
      * @throws Exception
      */
     synchronized public static void init() throws Exception{
-        if (configMgr == null ) {
+        if (configMgr == null ) 
             configMgr = new ConfigurationManager();
-            try {
-                // Init all data structures. 
-                configMgr.initProperties();
-                configMgr.initURL2Service();
-                configMgr.initServers();
-                configMgr.initBischeckServices(false);
-                configMgr.initScheduler();
+        
+        configMgr.allocateDataStructs();
+        
+        logger.debug("Init");
+        try {
+        	// Init all data structures. 
+        	configMgr.initProperties();
+        	configMgr.initURL2Service();
+        	configMgr.initServers();
+        	configMgr.initBischeckServices(false);
+        	configMgr.initScheduler();
 
-                // Verify if the pid file is writable
-                if (!configMgr.checkPidFile()) {
-                    throw new Exception("Can not write to pid file " + configMgr.getPidFile());
-                }
-                configMgr.getServerClassMap();
-            } catch (Exception e) {
-                logger.error("Configuration Manager initzialization failed with " + e);
-                throw e;
-            }
+        	// Verify if the pid file is writable
+        	if (!configMgr.checkPidFile()) {
+        		throw new Exception("Can not write to pid file " + configMgr.getPidFile());
+        	}
+        	configMgr.getServerClassMap();
+        } catch (Exception e) {
+        	logger.error("Configuration Manager initzialization failed with " + e);
+        	throw e;
         }
+
     }
 
     
@@ -219,7 +234,7 @@ public class ConfigurationManager implements ConfigXMLInf {
     
     private void initProperties() throws Exception {
         XMLProperties propertiesconfig = 
-            (XMLProperties) getXMLConfiguration(ConfigurationManager.XMLCONFIG.PROPERTIES);
+            (XMLProperties) xmlfilemgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.PROPERTIES);
 
         Iterator<XMLProperty> iter = propertiesconfig.getProperty().iterator();
 
@@ -233,7 +248,7 @@ public class ConfigurationManager implements ConfigXMLInf {
     private void initURL2Service() throws Exception {     
 
         XMLUrlservices urlservicesconfig  = 
-            (XMLUrlservices) getXMLConfiguration(ConfigurationManager.XMLCONFIG.URL2SERVICES);
+            (XMLUrlservices) xmlfilemgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.URL2SERVICES);
 
         Iterator<XMLUrlproperty> iter = urlservicesconfig.getUrlproperty().iterator();
         while (iter.hasNext() ) {
@@ -258,7 +273,7 @@ public class ConfigurationManager implements ConfigXMLInf {
     
     private void initBischeckServices(boolean once) throws Exception {
         XMLBischeck bischeckconfig  =
-                (XMLBischeck) getXMLConfiguration(ConfigurationManager.XMLCONFIG.BISCHECK);
+                (XMLBischeck) xmlfilemgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.BISCHECK);
 
         setupHost(bischeckconfig);
         
@@ -394,7 +409,7 @@ public class ConfigurationManager implements ConfigXMLInf {
     
 
     private void initServers() throws Exception {
-        XMLServers serversconfig = (XMLServers) getXMLConfiguration(ConfigurationManager.XMLCONFIG.SERVERS);
+        XMLServers serversconfig = (XMLServers) xmlfilemgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.SERVERS);
 
         Iterator<XMLServer> iter = serversconfig.getServer().iterator();
 
@@ -414,8 +429,6 @@ public class ConfigurationManager implements ConfigXMLInf {
         
         servermap.put(serverconfig.getName(), prop);            
         
-                
-        //serversclass.put(serverconfig.getName(), Class.forName(serverconfig.getClazz().trim()));
         serversclass.put(serverconfig.getName(), getServerClass(serverconfig.getClazz().trim()));
     }
 
@@ -425,14 +438,16 @@ public class ConfigurationManager implements ConfigXMLInf {
     	Class<Server> clazz = null;
 
     	try {
-    		clazz = (Class<Server>) Thread.currentThread().
-    		getContextClassLoader().
-    		loadClass("com.ingby.socbox.bischeck.servers." +clazzname);
+    		//clazz = (Class<Server>) Thread.currentThread().
+    		//getContextClassLoader().
+    		//loadClass("com.ingby.socbox.bischeck.servers." +clazzname);
+    		clazz=(Class<Server>) Class.forName("com.ingby.socbox.bischeck.servers." +clazzname);
     	} catch (ClassNotFoundException e) {
     		try {
-    			clazz = (Class<Server>) Thread.currentThread().
-    			getContextClassLoader().
-    			loadClass(clazzname);
+    			//clazz = (Class<Server>) Thread.currentThread().
+    			//getContextClassLoader().
+    			//loadClass(clazzname);
+    			clazz=(Class<Server>) Class.forName(clazzname);
     		}catch (ClassNotFoundException ee) {
     			logger.fatal("Server class " + clazzname + " not found.");
     			throw ee;
@@ -559,111 +574,8 @@ public class ConfigurationManager implements ConfigXMLInf {
     private boolean isCronTrigger(String schedule) { 
         return CronExpression.isValidExpression(schedule);    
     }
-
-
-    static public File initConfigDir() throws Exception {
-        String path = "";
-        String xmldir;
-        
-        if (System.getProperty("bishome") != null)
-            path=System.getProperty("bishome");
-        else {
-
-            logger.warn("System property bishome must be set");
-            throw new Exception("System property bishome must be set");
-        }
-        
-        if (System.getProperty("xmlconfigdir") != null) {
-            xmldir=System.getProperty("xmlconfigdir");
-        }else {
-            xmldir="etc";
-        }
-        
-        File configDir = new File(path+File.separator+xmldir);
-        if (configDir.isDirectory() && configDir.canRead()) 
-            return configDir;    
-        else {
-            logger.warn("Configuration directory " + configDir.getPath() + " does not exist or is not readable.");
-            throw new Exception("Configuration directory " + configDir.getPath() + " does not exist or is not readable.");
-        }
-    }
-
-
-    synchronized private Object getXMLConfig(String xmlName, String xsdName, String instanceName) throws Exception {
-        Object xmlobj = null;
-
-        xmlobj = xmlcache.get(xmlName);
-        if (xmlobj == null) {
-            xmlobj = createXMLConfig(xmlName, xsdName, instanceName, xmlobj);
-        }
-        return xmlobj;
-    }
-
-
-    private Object createXMLConfig(String xmlName, String xsdName,
-            String instanceName, Object xmlobj) throws Exception {
-        File configfile = new File(initConfigDir(),xmlName);
-        JAXBContext jc;
-        
-        try {
-            jc = JAXBContext.newInstance(instanceName);
-        } catch (JAXBException e) {
-            logger.error("Could not get JAXB context from class");
-            throw new Exception(e.getMessage());
-        }
-        SchemaFactory sf = SchemaFactory.newInstance(
-                javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = null;
-        
-        
-        URL xsdUrl = Thread.currentThread().getContextClassLoader().getResource(xsdName);
-        if (xsdUrl == null) {
-            logger.error("Could not find xsd file " +
-                    xsdName + " in classpath");
-            throw new Exception("Could not find xsd file " +
-                    xsdName + " in classpath");
-        }
-        
-        try {
-            schema = sf.newSchema(new File(xsdUrl.getFile()));
-        } catch (Exception e) {
-            logger.error("Could not vaildate xml file " + xmlName + " with xsd file " +
-                    xsdName + ": " + e.getMessage());
-            throw new Exception(e.getMessage());
-        } 
-
-        Unmarshaller u = null;
-        try {
-            u = jc.createUnmarshaller();
-        } catch (JAXBException e) {
-            logger.error("Could not create an unmarshaller for for context");
-            throw new Exception(e);
-        }
-        u.setSchema(schema);
-
-        try {
-            xmlobj =  u.unmarshal(configfile);
-        } catch (JAXBException e) {
-            logger.error("Could not unmarshall the file " + xmlName +":" + e);
-            throw new Exception(e);
-        }
-        xmlcache.put(xmlName, xmlobj);
-        logger.debug("Create new object for xml file " + xmlName + " and store in cache");
-        return xmlobj;
-    }
-
     
-    public Object getXMLConfiguration(XMLCONFIG xmlconf) throws Exception {
-        Object obj = null;
     
-        obj = getXMLConfig(xmlconf.xml(),
-                xmlconf.xsd(),
-                xmlconf.instance());
-    
-                return obj;
-    }
-    
-
     public int verify() {
         ConfigurationManager configMgr = null;
 
@@ -677,7 +589,7 @@ public class ConfigurationManager implements ConfigXMLInf {
 
         for (XMLCONFIG xmlconf : XMLCONFIG.values()) {
             try {
-                configMgr.getXMLConfiguration(xmlconf);
+                configMgr.xmlfilemgr.getXMLConfiguration(xmlconf);
             } catch (Exception e) {
                 System.out.println("Errors was found validating the configuration file " + 
                         xmlconf.xml());
@@ -697,7 +609,6 @@ public class ConfigurationManager implements ConfigXMLInf {
     public Properties getProperties() {
         return prop;
     }
-    
     
     public Map<String, Host> getHostConfig() {
         return hostsmap;
@@ -741,6 +652,5 @@ public class ConfigurationManager implements ConfigXMLInf {
     public  String getCacheClearCron() {
         return prop.getProperty("thresholdCacheClear","10 0 00 * * ? *");
     }
- 
 
 }

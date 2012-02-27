@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.nfunk.jep.JEP;
 
 import com.ingby.socbox.bischeck.BisCalendar;
+import com.ingby.socbox.bischeck.ConfigFileManager;
 import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.LastStatusCache;
@@ -49,6 +50,7 @@ import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLPeriod;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLServicedef;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLTwenty4Threshold;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLWeeks;
+
 
 public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
@@ -418,8 +420,10 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     
     private void init(Calendar now) throws Exception  {
         
-        ConfigurationManager configMgr = ConfigurationManager.getInstance();
-        XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
+        //ConfigurationManager configMgr = ConfigurationManager.getInstance();
+    	ConfigFileManager xmlfilemgr = new ConfigFileManager();
+        //XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
+        XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
         
         
         int year=now.get(Calendar.YEAR);

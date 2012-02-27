@@ -117,9 +117,11 @@ public class DocManager implements ConfigXMLInf {
         }
     }
 
+    
     public DocManager() throws IOException {
     	this(DEFAULTDIR);
     }
+    
     
     public DocManager(String dirname) throws IOException {
     	outputdir = checkDir(dirname);
@@ -134,7 +136,9 @@ public class DocManager implements ConfigXMLInf {
      */
     public void genHtml() 
     throws TransformerFactoryConfigurationError, TransformerException, Exception {
-        URL cssfile = Thread.currentThread().getContextClassLoader().getResource(CSSFILE);
+        //URL cssfile = Thread.currentThread().getContextClassLoader().getResource(CSSFILE);
+        //System.out.println(cssfile.toString());
+        URL cssfile = DocManager.class.getClassLoader().getResource(CSSFILE);
         System.out.println(cssfile.toString());
         System.out.println(outputdir.getAbsolutePath()+File.separator+CSSFILE);
         copy(cssfile.getPath(), outputdir.getAbsolutePath()+File.separator+CSSFILE);
@@ -250,7 +254,8 @@ public class DocManager implements ConfigXMLInf {
     private void genFile(XMLCONFIG xmlconf, File outputdir, String type)
     throws TransformerFactoryConfigurationError, TransformerException, IOException, Exception {
 
-    	URL xslUrl = Thread.currentThread().getContextClassLoader().getResource(xmlconf.nametag()+"2"+type+".xsl");
+    	//URL xslUrl = Thread.currentThread().getContextClassLoader().getResource(xmlconf.nametag()+"2"+type+".xsl");
+    	URL xslUrl = DocManager.class.getClassLoader().getResource(xmlconf.nametag()+"2"+type+".xsl");
     	if (xslUrl == null) {
     		throw new IOException("File " + xmlconf.nametag()+"2"+type+".xsl does not exists");
     	}
@@ -267,7 +272,7 @@ public class DocManager implements ConfigXMLInf {
 
     	transformer.transform
     	(new StreamSource
-    			(new File(ConfigurationManager.initConfigDir(),xmlconf.xml())),
+    			(new File(ConfigFileManager.initConfigDir(),xmlconf.xml())),
     			new javax.xml.transform.stream.StreamResult
     			( new FileOutputStream(outputdir+File.separator+xmlconf.nametag()+"."+type)));
     }
