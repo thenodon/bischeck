@@ -5,10 +5,10 @@
   >
 
     <jxb:bindings schemaLocation="bischeck.xsd" node="/xsd:schema">
-      <!--
-      <jxb:globalBindings
-         generateIsSetMethod="false"/>
-      -->
+        <jxb:globalBindings>
+            <jxb:serializable uid="1" />
+        </jxb:globalBindings>
+     
         <jxb:schemaBindings>
             <jxb:nameXmlTransform>
               <!--  <jxb:typeName prefix="XML"/> -->
