@@ -79,7 +79,7 @@ import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlservices;
  *
  */
 
-public class ConfigurationManager implements ConfigXMLInf {
+public class ConfigurationManager  {
     
     private static final String DEFAULT_TRESHOLD = "DummyThreshold";
 
@@ -234,7 +234,7 @@ public class ConfigurationManager implements ConfigXMLInf {
     
     private void initProperties() throws Exception {
         XMLProperties propertiesconfig = 
-            (XMLProperties) xmlfilemgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.PROPERTIES);
+            (XMLProperties) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.PROPERTIES);
 
         Iterator<XMLProperty> iter = propertiesconfig.getProperty().iterator();
 
@@ -248,7 +248,7 @@ public class ConfigurationManager implements ConfigXMLInf {
     private void initURL2Service() throws Exception {     
 
         XMLUrlservices urlservicesconfig  = 
-            (XMLUrlservices) xmlfilemgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.URL2SERVICES);
+            (XMLUrlservices) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.URL2SERVICES);
 
         Iterator<XMLUrlproperty> iter = urlservicesconfig.getUrlproperty().iterator();
         while (iter.hasNext() ) {
@@ -273,7 +273,7 @@ public class ConfigurationManager implements ConfigXMLInf {
     
     private void initBischeckServices(boolean once) throws Exception {
         XMLBischeck bischeckconfig  =
-                (XMLBischeck) xmlfilemgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.BISCHECK);
+                (XMLBischeck) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.BISCHECK);
 
         setupHost(bischeckconfig);
         
@@ -409,7 +409,7 @@ public class ConfigurationManager implements ConfigXMLInf {
     
 
     private void initServers() throws Exception {
-        XMLServers serversconfig = (XMLServers) xmlfilemgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.SERVERS);
+        XMLServers serversconfig = (XMLServers) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.SERVERS);
 
         Iterator<XMLServer> iter = serversconfig.getServer().iterator();
 
@@ -587,7 +587,7 @@ public class ConfigurationManager implements ConfigXMLInf {
             return 1;
         }
 
-        for (XMLCONFIG xmlconf : XMLCONFIG.values()) {
+        for (ConfigXMLInf.XMLCONFIG xmlconf :ConfigXMLInf.XMLCONFIG.values()) {
             try {
                 configMgr.xmlfilemgr.getXMLConfiguration(xmlconf);
             } catch (Exception e) {
