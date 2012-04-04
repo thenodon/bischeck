@@ -40,6 +40,7 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
+import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLBischeck;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLHost;
@@ -97,39 +98,39 @@ public class DB2XMLConvert {
             
             StringWriter xmlstr = converter.createXMLProperties(line.getOptionValue("source") + File.separator + "bischeck.conf");
             if (!line.hasOption("verbose")) 
-                converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.PROPERTIES.xml(),xmlstr);
+                converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.PROPERTIES.xml(),xmlstr);
             else { 
                 System.out.println("############## " + 
-                        ConfigurationManager.XMLCONFIG.PROPERTIES.xml() + 
+                		ConfigXMLInf.XMLCONFIG.PROPERTIES.xml() + 
                         " ##############");
                 System.out.println(xmlstr);
             }
             
             xmlstr = converter.createXMLURL2Services(line.getOptionValue("source") + File.separator + "bischeck.conf");
             if (!line.hasOption("verbose")) 
-                converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.URL2SERVICES.xml(),xmlstr);
+                converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.URL2SERVICES.xml(),xmlstr);
             else {
                 System.out.println("############## " + 
-                        ConfigurationManager.XMLCONFIG.URL2SERVICES.xml() + 
+                		ConfigXMLInf.XMLCONFIG.URL2SERVICES.xml() + 
                         " ##############");
                 System.out.println(xmlstr);
             }
             
             xmlstr = converter.createXMLBischeck(line.getOptionValue("source") + File.separator + "bischeck.conf");
             if (!line.hasOption("verbose")) 
-                converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.BISCHECK.xml(),xmlstr);
+                converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.BISCHECK.xml(),xmlstr);
             else {
-                System.out.println("############## " + ConfigurationManager.XMLCONFIG.BISCHECK.xml() +
+                System.out.println("############## " + ConfigXMLInf.XMLCONFIG.BISCHECK.xml() +
                         " ##############");
                 System.out.println(xmlstr);
             }
 
             xmlstr = converter.createXMLTwenty4HourThreshold(line.getOptionValue("source") + File.separator + "24threshold.conf");
             if (!line.hasOption("verbose")) 
-                converter.writeToFile(destdir,ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml(),xmlstr);
+                converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml(),xmlstr);
             else { 
                 System.out.println("############## " +
-                        ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml() +
+                		ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml() +
                         " ##############");
                 System.out.println(xmlstr);
             }
