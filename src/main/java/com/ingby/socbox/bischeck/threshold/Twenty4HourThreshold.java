@@ -423,7 +423,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         //ConfigurationManager configMgr = ConfigurationManager.getInstance();
     	ConfigFileManager xmlfilemgr = new ConfigFileManager();
         //XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
-        XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
+        XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD);
         
         
         int year=now.get(Calendar.YEAR);
