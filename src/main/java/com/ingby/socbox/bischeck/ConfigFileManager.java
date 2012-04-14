@@ -1,10 +1,8 @@
 package com.ingby.socbox.bischeck;
 
 import java.io.File;
-import java.io.StringWriter;
+import java.io.FileWriter;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -28,12 +26,8 @@ public class ConfigFileManager {
 	static Logger  logger = Logger.getLogger(ConfigFileManager.class);
 
 	
-    private Map<String,Object> xmlcache = null;
-    
 
-    public ConfigFileManager() {
-    	xmlcache = new HashMap<String,Object>();
-    }
+    public ConfigFileManager() {}
     
 	
     /**
@@ -86,19 +80,38 @@ public class ConfigFileManager {
 	 */
 	synchronized public Object getXMLConfiguration(XMLCONFIG xmlconf)  throws Exception {
         Object xmlobj = null;
-        /*
-        xmlobj = xmlcache.get(xmlconf.xml());
-        if (xmlobj == null) {
-            xmlobj = createXMLConfig(xmlconf);
-        }
-        */
-        xmlobj = createXMLConfig(xmlconf);
+        
+        xmlobj = createXMLConfig(xmlconf,ConfigFileManager.initConfigDir().getPath());
         return xmlobj;
     }
-
-	private Object createXMLConfig(XMLCONFIG xmlconf) throws Exception {
+	
+	
+	/**
+	 * Retrieve the xml object for a specific configuration file. 
+	 * @param xmlconf member of the enum {@link ConfigXMLInf.XMLCONFIG}
+	 * @param directory the directory location where to find the config file
+	 * @return return the object to the JAXB generated class based on the
+	 * configuration files xsd schema files.
+	 * @throws Exception
+	 */
+	synchronized public Object getXMLConfiguration(XMLCONFIG xmlconf,String directory)  throws Exception {
+        Object xmlobj = null;
+        
+        xmlobj = createXMLConfig(xmlconf,directory);
+        return xmlobj;
+    }
+	
+	
+	/**
+	 * Method manage the process to read xml config file and manage it into a XMLxxx objects.
+	 * @param xmlconf
+	 * @param directory
+	 * @return
+	 * @throws Exception
+	 */
+	private Object createXMLConfig(XMLCONFIG xmlconf, String directory) throws Exception {
     	Object xmlobj = null;
-    	File configfile = new File(ConfigFileManager.initConfigDir(),xmlconf.xml());
+    	File configfile = new File(directory,xmlconf.xml());
         JAXBContext jc;
         
         try {
@@ -111,8 +124,6 @@ public class ConfigFileManager {
                 javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = null;
         
-        
-        //URL xsdUrl = Thread.currentThread().getContextClassLoader().getResource(xsdName);
         URL xsdUrl = ConfigurationManager.class.getClassLoader().getResource(xmlconf.xsd());
         if (xsdUrl == null) {
             logger.error("Could not find xsd file " +
@@ -144,16 +155,21 @@ public class ConfigFileManager {
             logger.error("Could not unmarshall the file " + xmlconf.xml() +":" + e);
             throw new Exception(e);
         }
-        xmlcache.put(xmlconf.xml(), xmlobj);
-        logger.debug("Create new object for xml file " + xmlconf.xml() + " and store in cache");
+        logger.debug("Create new object for xml file " + xmlconf.xml());
         return xmlobj;
     }
 
 	
-	public void createXMLFile(Object xmlobj, XMLCONFIG xmlconf) throws Exception {
+	/**
+	 * The method is used when storing the xml data to a file. 
+	 * @param xmlobj The xmlobject to marshal 
+	 * @param xmlconf This control file naming
+	 * @param directory The directory where to store the file
+	 * @throws Exception
+	 */
+	public void createXMLFile(Object xmlobj, XMLCONFIG xmlconf, String directory) throws Exception {
     	
-    	//File configfile = new File(ConfigFileManager.initConfigDir(),xmlconf.xml());
-        JAXBContext jc;
+    	JAXBContext jc;
         
         try {
             jc = JAXBContext.newInstance(xmlconf.instance());
@@ -166,7 +182,6 @@ public class ConfigFileManager {
         Schema schema = null;
         
         
-        //URL xsdUrl = Thread.currentThread().getContextClassLoader().getResource(xsdName);
         URL xsdUrl = ConfigFileManager.class.getClassLoader().getResource(xmlconf.xsd());
         if (xsdUrl == null) {
             logger.error("Could not find xsd file " +
@@ -183,26 +198,29 @@ public class ConfigFileManager {
             throw new Exception(e.getMessage());
         } 
 
-        Marshaller u = null;
+        Marshaller m = null;
         try {
-            u = jc.createMarshaller();
+            m = jc.createMarshaller();
+            m.setProperty("jaxb.formatted.output",Boolean.TRUE);
         } catch (JAXBException e) {
             logger.error("Could not create an marshaller for for context");
             throw new Exception(e);
         }
-        u.setSchema(schema);
+        m.setSchema(schema);
         
-        StringWriter writer = new StringWriter();
+        FileWriter writer = new FileWriter(new File (directory + File.separator + xmlconf.xml()));
         try {
         	
-            u.marshal(xmlobj, writer);
+            m.marshal(xmlobj, writer);
+            
         } catch (JAXBException e) {
             logger.error("Could not unmarshall the file " + xmlconf.xml() +":" + e);
             throw new Exception(e);
+        } finally {
+        	writer.flush();
+        	writer.close();
+        	
         }
-        //xmlcache.put(xmlconf.xml(), xmlobj);
-        logger.debug("Create new object for xml file " + xmlconf.xml() + " and store in cache");
-        System.out.println(writer);
+        logger.debug("Create new file in directory "+ directory + "for xml object " + xmlconf.nametag());
     }
-
 }
