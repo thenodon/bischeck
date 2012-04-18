@@ -26,6 +26,7 @@ import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +45,8 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -67,6 +70,9 @@ public class Execute implements ExecuteMBean {
     static Object syncObj = new Object();
     private Boolean shutdownRequested = false;
     private Boolean reloadRequested = false;
+    private Integer reloadcount = 0;
+    private Long reloadtime = null;
+    
     
     private static Execute exec = new Execute();
     
@@ -113,7 +119,8 @@ public class Execute implements ExecuteMBean {
     }
     
     
-    public static void main(String[] args) {
+    
+	public static void main(String[] args) {
 
         // create the command line parser
         CommandLineParser parser = new GnuParser();
@@ -171,7 +178,7 @@ public class Execute implements ExecuteMBean {
 	private Execute() {}
     
     private static Execute getInstance() {
-        return exec;
+    	return exec;
     }
     
     
@@ -264,6 +271,7 @@ public class Execute implements ExecuteMBean {
      * each quartz trigger scheduled is printed every LOOPTIMEOUT ms. 
      */
 	private void deamonLoop() {
+		
 		do {
             try {
                 synchronized(syncObj) {
@@ -286,6 +294,7 @@ public class Execute implements ExecuteMBean {
                 }
                 logger.debug("*******************************");                
             } 
+        
         } while (!isShutdownRequested());
 	}
 
@@ -417,10 +426,27 @@ public class Execute implements ExecuteMBean {
     @Override
     public void reload() {
     	logger.info("Reload request");
+    	reloadcount++;
+    	reloadtime = System.currentTimeMillis();
         reloadRequested = true;
         shutdown();
     }
     
+    
+    
+    
+    @Override
+    public Long getReloadTime() {
+    	return reloadtime;
+    }
+
+    
+    @Override
+    public Integer getReloadCount() {
+    	return reloadcount;
+    }
+
+   
     
     @SuppressWarnings("unchecked")
     @Override

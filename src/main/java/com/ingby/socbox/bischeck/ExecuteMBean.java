@@ -19,6 +19,7 @@
 
 package com.ingby.socbox.bischeck;
 
+
 public interface ExecuteMBean {
     /**
      * Get the last status of the sending the nsca message to the Nagios server.
@@ -38,8 +39,23 @@ public interface ExecuteMBean {
     public void shutdown();
 
     /**
-     * Restart 
+     * Reload/restart bischeck with the configuration in the etc directory 
      */
     public void reload();
 
+    
+    /**
+     * The time in milliseconds when a reload occurred
+     * @return the time when last reload occurred in milliseconds
+     */
+    public Long getReloadTime();
+    
+    /**
+     * The number of times reload has been done since bischeck was started
+     * @return number of reloads done
+     */
+    public Integer getReloadCount();
+    
+    
+    
 }
