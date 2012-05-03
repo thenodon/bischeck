@@ -26,7 +26,6 @@ import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -45,8 +44,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -79,8 +76,7 @@ public class Execute implements ExecuteMBean {
     private static MBeanServer mbs = null;
     private static ObjectName   mbeanname = null;
     
-    private static final String BEANNAME = "com.ingby.socbox.bischeck:name=Execute";
-	private static final int RESTART = 1000;
+    private static final int RESTART = 1000;
 	private static final int OKAY = 0;
 	private static final int FAILED = 1;
 	private static final long LOOPTIMEOUT = 60000;
@@ -100,7 +96,7 @@ public class Execute implements ExecuteMBean {
         mbs = ManagementFactory.getPlatformMBeanServer();
 
         try {
-            mbeanname = new ObjectName(BEANNAME);
+            mbeanname = new ObjectName(ExecuteMBean.BEANNAME);
         } catch (MalformedObjectNameException e) {
             logger.error("MBean object name failed, " + e);
         } catch (NullPointerException e) {
@@ -182,7 +178,6 @@ public class Execute implements ExecuteMBean {
     }
     
     
-    @SuppressWarnings("unchecked")
     private int daemon() {
     	
     	logger.info("******************** Startup *******************");
@@ -348,6 +343,7 @@ public class Execute implements ExecuteMBean {
 	 * @throws SchedulerException if the scheduler can not be created or it can
 	 * not be started
 	 */
+	@SuppressWarnings("unchecked")
 	private Scheduler initScheduler(Scheduler sched) throws SchedulerException {
 		try {
             logger.info("Create scheduler");
@@ -485,7 +481,8 @@ public class Execute implements ExecuteMBean {
      * subtracted with the number of admin jobs ADMINJOBS. 
      * @return number of service jobs
      */
-    public int getNumberOfTriggers() {
+    @SuppressWarnings("unchecked")
+	public int getNumberOfTriggers() {
         int numberoftriggers = 0;
         
         try {

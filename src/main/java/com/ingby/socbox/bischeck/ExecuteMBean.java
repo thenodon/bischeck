@@ -20,8 +20,12 @@
 package com.ingby.socbox.bischeck;
 
 
+
 public interface ExecuteMBean {
-    /**
+	
+	public static final String BEANNAME = "com.ingby.socbox.bischeck:name=Execute";
+	
+	/**
      * Get the last status of the sending the nsca message to the Nagios server.
      * @return status information
      */
