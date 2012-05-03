@@ -37,6 +37,7 @@ public class NSCAServer implements Server {
     private NagiosPassiveCheckSender sender = null;
     private String instanceName;
     
+    
     /**
      * Retrieve the Server object. The method is invoked from class ServerExecutor
      * execute method. The created Server object is placed in the class internal 
@@ -68,13 +69,19 @@ public class NSCAServer implements Server {
     }
     
     private NagiosSettings getNSCAConnection(String name)  {
-        Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+    	Properties defaultproperties = getServerProperties();
+    	Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
         return new NagiosSettingsBuilder()
-        .withNagiosHost(prop.getProperty("hostAddress","localhost"))
-        .withPort(Integer.parseInt(prop.getProperty("port","5667")))
-        .withEncryption(Encryption.valueOf(prop.getProperty("encryptionMode","XOR")))
-        .withPassword(prop.getProperty("password",""))
-        .withConnectionTimeout(Integer.parseInt(prop.getProperty("connectionTimeout","5000")))
+        .withNagiosHost(prop.getProperty("hostAddress",
+        		defaultproperties.getProperty("hostAddress")))
+        .withPort(Integer.parseInt(prop.getProperty("port", 
+        		defaultproperties.getProperty("port"))))
+        .withEncryption(Encryption.valueOf(prop.getProperty("encryptionMode", 
+        		defaultproperties.getProperty("encryptionMode"))))
+        .withPassword(prop.getProperty("password",
+        		defaultproperties.getProperty("password")))
+        .withConnectionTimeout(Integer.parseInt(prop.getProperty("connectionTimeout",
+        		defaultproperties.getProperty("connectionTimeout"))))
         .create();
     }
     
@@ -209,5 +216,17 @@ public class NSCAServer implements Server {
             perfmessage +
             " avg-exec-time=" + ((totalexectime/count)+"ms");
     }
+
+	public static Properties getServerProperties() {
+		Properties defaultproperties = new Properties();
+	    
+		defaultproperties.setProperty("hostAddress","localhost");
+    	defaultproperties.setProperty("port","5667");
+    	defaultproperties.setProperty("encryptionMode","XOR");
+    	defaultproperties.setProperty("password","");
+    	defaultproperties.setProperty("connectionTimeout","5000");
+		
+		return defaultproperties;
+	}
 
 }

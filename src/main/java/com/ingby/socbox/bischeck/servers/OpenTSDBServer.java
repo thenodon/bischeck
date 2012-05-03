@@ -30,10 +30,14 @@ public class OpenTSDBServer implements Server {
     private int connectionTimeout;
     
     private OpenTSDBServer (String name) {
+    	Properties defaultproperties = getServerProperties();
         Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
-        hostAddress = prop.getProperty("hostAddress","localhost");
-        port = Integer.parseInt(prop.getProperty("port","4242"));
-        connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout","5000"));
+        hostAddress = prop.getProperty("hostAddress",
+        		defaultproperties.getProperty("hostAddress"));
+        port = Integer.parseInt(prop.getProperty("port",
+        		defaultproperties.getProperty("port")));
+        connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
+        		defaultproperties.getProperty("connectionTimeout")));
         instanceName = name;
     }
     
@@ -195,5 +199,14 @@ public class OpenTSDBServer implements Server {
         
         return strbuf;
     }
-
+    
+    public static Properties getServerProperties() {
+		Properties defaultproperties = new Properties();
+	    
+		defaultproperties.setProperty("hostAddress","localhost");
+    	defaultproperties.setProperty("port","5667");
+    	defaultproperties.setProperty("connectionTimeout","5000");
+	
+		return defaultproperties;
+	}
 }
