@@ -24,9 +24,13 @@ ant compile
 jmxport=-Dcom.sun.management.jmxremote.port=3333 
 jmxssl=-Dcom.sun.management.jmxremote.ssl=false 
 jmxauth=-Dcom.sun.management.jmxremote.authenticate=false 
-#jmx="$jmxport $jmxssl $jmxauth"
+jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
+jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+
+jmx="$jmxport $jmxssl $jmxauth $jmxpasswd $jmxaccess"
+#jmem="-XX:+TraceClassloading -Xmx30m"
 #debug="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
-java $debug $jmx -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=etc \
+java $debug $jmx $jmem -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=etc \
  -classpath $bishome/src/main/resources:$bishome/target/classes:$bishome/lib/*:$bishome/customlib/* \
  com.ingby.socbox.bischeck.$program $arg 
 

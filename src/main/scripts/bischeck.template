@@ -31,12 +31,14 @@ sqlite=/usr/lib/javasqlite/sqlite.jar
 jmxport=-Dcom.sun.management.jmxremote.port=3333 
 jmxssl=-Dcom.sun.management.jmxremote.ssl=false 
 jmxauth=-Dcom.sun.management.jmxremote.authenticate=false 
+jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
+jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
 
 # resources must be before the bischeck-x.x.x.jar in the classpath
 classpath=$bishome/resources:$bishome:$bishome/lib/*:$bishome/customlib/*:$sqlite
 
 if [ "x$program" = "xExecute" -a "x$arg" = "x-d" ] ; then
-  java $jmxport $jmxssl $jmxauth -Dbishome=$bishome -classpath $classpath com.ingby.socbox.bischeck.$program $arg
+  java $jmxport $jmxssl $jmxauth $jmxpasswd $jmxaccess -Dbishome=$bishome -classpath $classpath com.ingby.socbox.bischeck.$program $arg
 else
   java -Dbishome=$bishome -classpath $classpath com.ingby.socbox.bischeck.$program $arg
 fi

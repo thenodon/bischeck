@@ -154,8 +154,10 @@
         
         <copy todir="${build.home}/etc">
             <fileset dir="${etc.home}">
-                <include name="**/*.xml"/>
-            	<exclude name="**/repos/**"/>
+            	<exclude name="meta.xml"/>
+                <exclude name="**/repos/**"/>    
+            	<include name="*.xml"/>
+            	<include name="jmxremote.*"/>
             </fileset>
         </copy>
         
