@@ -36,6 +36,7 @@ import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.xsd.properties.XMLProperties;
 import com.ingby.socbox.bischeck.xsd.properties.XMLProperty;
 import com.ingby.socbox.bischeck.xsd.servers.XMLServer;
+import com.ingby.socbox.bischeck.xsd.servers.XMLServers;
 
 
 public class Properties2ServerProperties {
@@ -130,8 +131,10 @@ public class Properties2ServerProperties {
     	}
     	
     	propertiesconfig.getProperty().removeAll(deletelist);
-    
-    	xmlfilemgr.createXMLFile(server,ConfigXMLInf.XMLCONFIG.SERVERS,destdir);  
+    	
+    	XMLServers servers = new XMLServers();
+    	servers.getServer().add(server);
+    	xmlfilemgr.createXMLFile(servers,ConfigXMLInf.XMLCONFIG.SERVERS,destdir);  
     	xmlfilemgr.createXMLFile(propertiesconfig,ConfigXMLInf.XMLCONFIG.PROPERTIES,destdir);  
     	
     }
