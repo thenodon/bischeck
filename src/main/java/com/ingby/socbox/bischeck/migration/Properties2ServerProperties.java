@@ -90,19 +90,13 @@ public class Properties2ServerProperties {
     	XMLProperties propertiesconfig = 
     		(XMLProperties) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.PROPERTIES,destdir);
 
-    	Iterator<XMLProperty> iter = propertiesconfig.getProperty().iterator();
-
-    	while (iter.hasNext()) {
-    		XMLProperty propertyconfig = iter.next(); 
-    		System.out.println("key "+propertyconfig.getKey() + " value: " + propertyconfig.getValue());      
-    	}
 
     	XMLServer server = new XMLServer();
     	server.setName("NagiosServer");
     	server.setClazz("NSCAServer");
     	List<com.ingby.socbox.bischeck.xsd.servers.XMLProperty> serverproplist = server.getProperty();
 
-    	iter = propertiesconfig.getProperty().iterator();
+    	Iterator<XMLProperty> iter = propertiesconfig.getProperty().iterator();
 
     	List<XMLProperty> deletelist = new ArrayList<XMLProperty>();
     	
@@ -113,28 +107,24 @@ public class Properties2ServerProperties {
     			newprop.setKey("hostAddress");
     			newprop.setValue(property.getValue());
     			serverproplist.add(newprop);
-    			//propertiesconfig.getProperty().remove(property);
     			deletelist.add(property);
     		} else if (property.getKey().equals("nscaencryption")) {
     			com.ingby.socbox.bischeck.xsd.servers.XMLProperty newprop = new com.ingby.socbox.bischeck.xsd.servers.XMLProperty();
     			newprop.setKey("encryptionMode");
     			newprop.setValue(property.getValue());
     			serverproplist.add(newprop);
-    			//propertiesconfig.getProperty().remove(property);
     			deletelist.add(property);
     		} else if  (property.getKey().equals("nscapassword")) {
     			com.ingby.socbox.bischeck.xsd.servers.XMLProperty newprop = new com.ingby.socbox.bischeck.xsd.servers.XMLProperty();
     			newprop.setKey("password");
     			newprop.setValue(property.getValue());
     			serverproplist.add(newprop);
-    			//propertiesconfig.getProperty().remove(property);
     			deletelist.add(property);
     		} else if  (property.getKey().equals("nscaport")) {
     			com.ingby.socbox.bischeck.xsd.servers.XMLProperty newprop = new com.ingby.socbox.bischeck.xsd.servers.XMLProperty();
     			newprop.setKey("port");
     			newprop.setValue(property.getValue());
     			serverproplist.add(newprop);
-    			//propertiesconfig.getProperty().remove(property);
     			deletelist.add(property);
     		}
     	}
