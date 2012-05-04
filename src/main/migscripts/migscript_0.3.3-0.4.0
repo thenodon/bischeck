@@ -1,25 +1,6 @@
 #!/bin/sh
-# Todo 
-# 1 - Adding servers.xml template
-#   - Move properties from NSCA properties.xml to servers.xml and create a standard entry
-#
-#    <key>nscaserver</key> -> hostAddress
-#    <value>localhost</value>
-#
-#    <key>nscaencryption</key> -> encryptionMode
-#    <value>XOR</value>
-#
-#    <key>nscapassword</key> -> password
-#    <value>change this</value>
-#
-#    <key>nscaport</key> -> port
-#    <value>5667</value>
-#   - Remove redudant entries from properties.xml
-#
-# 2 - Change the name of 24thresholds.xml to twenty4threshold.xml align with xsd name.
 
-
-# Todo move all xml specs to interface. Do a iteration over all enum enties to verify.
 
 cp $2/etc/*.xml $1/etc
-cp etc/servers.xml $1/etc
+$1/bin/bischeck migration.Properties2ServerProperties -s $1/etc -d $1/etc
+
