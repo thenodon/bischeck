@@ -103,11 +103,11 @@ A Business Activity Monitoring Server
 \end_layout
 
 \begin_layout Date
-Version 0.4.0 
+Version 0.4.0 RC1 (alpha)
 \begin_inset Newline newline
 \end_inset
 
-2012-
+2012-05-06
 \end_layout
 
 \begin_layout Standard
@@ -206,12 +206,13 @@ Support for custom threshold classes to enable any way to define threshold
 
 \begin_layout Itemize
 Integrates with multiple monitoring and surveillance tools, like any Nagios
- like systems supporting NSCA
+ like systems that supports the NSCA protocol
 \begin_inset Foot
 status open
 
 \begin_layout Plain Layout
-Nagios Core, Nagios XI, Icinga, OP5 Monitor, Opsview, Centreon, etc.
+Nagios Core, Nagios XI, Icinga, OP5 Monitor, Shinken, Opsview, Centreon,
+ etc.
 \end_layout
 
 \end_inset
@@ -450,7 +451,11 @@ All host, service and service items are described in xml configuration files
 \emph on
 etc
 \emph default
- directory of the installation.
+ directory of the installation,
+\emph on
+ $BISHOME
+\emph default
+.
  For more information about services and service items classes please section
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1370,15 +1375,14 @@ bischeck configuration files
 \begin_layout Standard
 The basic configuration file are xml based and located in the 
 \emph on
-etc
+$BISHOME/etc
 \emph default
- directory of the bischeck installation.
+ directory.
  The distribution package also include all xml schema, xsd, files used for
  validation.
- For detail information please review the xsd files located in the installation
- directory 
+ For detail information please review the xsd files located in the directory
 \emph on
-resources
+ $BISHOME/resources
 \emph default
 .
  Remember that all xml configuration files should use HTML encoded characters.
@@ -2817,16 +2821,13 @@ bischeck internal surveillance
 
 \begin_layout Standard
 bischeck use Java JMX standard for internal monitoring.
- Please read the javadoc for the following classes to review methods available
- in: 
-\end_layout
-
-\begin_layout Itemize
-ExecuteMBean
-\end_layout
-
-\begin_layout Itemize
-LastStatusCacheMBean
+ Please read the javadoc for the classes ExecuteMBean and LastStatusCacheMBean
+ to to understand the methods available or just start 
+\emph on
+jconsole
+\emph default
+ or equivalent tool.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -2836,10 +2837,9 @@ bischeck
 \emph default
  script located in the 
 \emph on
-bin
+$BISHOME/bin
 \emph default
- directory of the bischeck installation directory.
- 
+ directory.
 \end_layout
 
 \begin_layout Standard
@@ -2863,9 +2863,25 @@ jmxssl=-Dcom.sun.management.jmxremote.ssl=false
 jmxauth=-Dcom.sun.management.jmxremote.authenticate=false
 \end_layout
 
+\begin_layout Plain Layout
+
+jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
+ jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+\end_layout
+
 \end_inset
 
- 
+ If authentication should be used please change the property com.sun.management.jmx
+remote.authenticate to true and configure the roles and password in the files
+ jmxremote.access and jmxremote.password.
+ For more information how to configure JMX please visit 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -2877,7 +2893,11 @@ bischeck
 \emph on
 Execute -d
 \emph default
-", which is the way bischeckd init script call the script 
+", which is the way 
+\emph on
+bischeckd
+\emph default
+ init script call the script 
 \emph on
 bischeck
 \emph default
@@ -3074,9 +3094,17 @@ status open
 
 \begin_layout Standard
 To get full list of available options to the install script use -u.
- By default the install script will install bischeck in directory 
+ By default the 
+\emph on
+install
+\emph default
+ script will install bischeck in directory 
 \emph on
 /opt/socbox/addons/bischeck
+\emph default
+, referred to as 
+\emph on
+$BISHOME,
 \emph default
  and with the ownership of the user id 
 \emph on
@@ -3088,14 +3116,18 @@ nagios
 
 \begin_layout Standard
 The last commands start the bischeck daemon with the effective user id of
- the user id set during install, default nagios.
+ the user id set during install, default user 
+\emph on
+nagios
+\emph default
+.
  The installation will configure bischeckd to start automatically in run
  level 3, 4 and 5.
 \end_layout
 
 \begin_layout Standard
 The process id of the java process running bischeck in daemon mode is located
- by default in 
+ in a file, default in 
 \emph on
 /var/tmp/bischeck.pid
 \emph default
@@ -3151,8 +3183,12 @@ The file
 \emph on
 migrationpath.txt
 \emph default
- describe the supported upgrade paths and what migration scripts to run
- by the install script.
+ describe the supported upgrade paths and what migration scripts that will
+ be run by the 
+\emph on
+install
+\emph default
+ script when running in upgrade mode, -X.
 \end_layout
 
 \begin_layout Standard
@@ -3189,13 +3225,12 @@ Getting started
 \begin_layout Standard
 In the 
 \emph on
-etc
+$BISHOME/etc
 \emph default
  directory there are examples of all the configuration files.
  These works as an examples to get started with a simple bischeck setup
- of monitoring a database table.
- Scripts to create the test database is found in the examples directory
- and requires Mysql.
+ of monitoring a Mysql database table.
+ Scripts to create the test database is found in the examples directory.
  You do not need a nagios server setup to run the test, just monitor the
  bischeck log file located by default in 
 \emph on
@@ -3209,7 +3244,7 @@ mysql-connector-java.jar
 \emph default
  should be copied to the 
 \emph on
-customlib
+$BISHOME/customlib
 \emph default
  directory to automatically be part of bischecks classpath.
 \end_layout
@@ -3222,7 +3257,7 @@ status open
 
 \begin_layout Plain Layout
 
-$ cd <bischeck install directory>
+$ cd $BISHOME
 \end_layout
 
 \begin_layout Plain Layout
@@ -3346,10 +3381,26 @@ bischeck
 \emph default
 script located in the 
 \emph on
-bin
+$BISHOME/bin
 \emph default
  directory.
- 
+ To use the bischeck script add it to your PATH variable.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ PATH=$BISHOME/bin:$PATH
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -3357,8 +3408,11 @@ Run bischeck
 \end_layout
 
 \begin_layout Standard
-The normal way to run bischeck is as a daemon using the init.d script bischeckd.
- It is also possible to start bischeck in continues running mode by executing:
+The normal way to run bischeck is as a daemon using the init.d script 
+\emph on
+bischeckd
+\emph default
+, but is also possible to start bischeck in continues running mode by executing:
 \end_layout
 
 \begin_layout Standard
@@ -3657,6 +3711,17 @@ reload
 \end_layout
 
 \begin_layout Itemize
+[FR-219] Bischeck can now retrieve state and performance data from a Nagios
+ server supporting livestatus.
+ With the service class LivestatusService a connection is set up over livestatus
+ and with the and serviceitem class LivestatusServiceItem state and/or performan
+ce data can be retrieved from the a Nagios service.
+ This can be useful when when creating virtual services in bischeck or used
+ in complex thresholds.
+ 
+\end_layout
+
+\begin_layout Itemize
 Added support for other Linux distributions then Redhat based.
  bischeck should now install on Debian 6 and Ubuntu 10/11.
  
@@ -3678,9 +3743,33 @@ bischeckdoc
 \begin_layout Itemize
 A configured service can be configured not to send its data to a the configured
  monitoring servers like Nagios.
- This can be useful if the Service is just to be used to construct virtual
+ This can be useful if the service is just to be used to create virtual
  services or just to be used as thresholds.
  
+\end_layout
+
+\begin_layout Itemize
+The bischeck script now support JMX authentication.
+ The authentication files are located in the etc directory and named jmxremote.pa
+ssword and jmxremote.access.
+ Default is to that authentication is disabled by the system property 
+\begin_inset Quotes eld
+\end_inset
+
+-Dcom.sun.management.jmxremote.authenticate=false
+\begin_inset Quotes erd
+\end_inset
+
+.
+ To enable authentication set the property to true.
+ For more info about JMX see 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -3792,6 +3881,14 @@ Configuration Manager initialization failed with java.lang.NullPointerException
 [TR-207] sudo in bischeckd script cause problem at boot
 \end_layout
 
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.3.3 is supported for upgrade to 0.4.0.
+\end_layout
+
 \begin_layout Section
 Release 0.3.3 - 2011-11-14
 \end_layout
@@ -3800,8 +3897,17 @@ Release 0.3.3 - 2011-11-14
 New features
 \end_layout
 
-\begin_layout Standard
-No new features exists for this version.
+\begin_layout Itemize
+bischeck are no longer limited to just be integrated with a single Nagios
+ server over the NSCA protocol.
+ Now is it possible to integrate with multiple monitoring servers over different
+ protocols.
+ Currently Nagios/NSCA and OpenTSDB is support.
+ To enable this a new class component called Server has been introduced.
+ The class is responsible for communication and formatting for the specific
+ monitoring server it integrate against.
+ A new configuration file, server.xml is used for configuration of server
+ integration.
 \end_layout
 
 \begin_layout Subsection
@@ -3830,27 +3936,6 @@ Threshold object cache is no cleared
 \end_inset
 
 
-\end_layout
-
-\begin_layout Subsection
-New features
-\end_layout
-
-\begin_layout Itemize
-bischeck are no longer limited to just be integrated with a single Nagios
- server over the NSCA protocol.
- Now is it possible to integrate with multiple monitoring servers over different
- protocols.
- Currently Nagios/NSCA and OpenTSDB is support.
- To enable this a new class component called Server has been introduced.
- The class is responsible for communication and formatting for the specific
- monitoring server it integrate against.
- A new configuration file, server.xml is used for configuration of server
- integration.
-\end_layout
-
-\begin_layout Subsection
-Bugs fixed and important issues
 \end_layout
 
 \begin_layout Section
