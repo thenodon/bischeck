@@ -147,7 +147,7 @@ Monitoring and surveillance is today common in any IT operation.
 \begin_inset Quotes eld
 \end_inset
 
-why number of orders have dropped under current threshold
+why number of orders have dropped under the current threshold
 \begin_inset Quotes erd
 \end_inset
 
@@ -159,8 +159,8 @@ why number of orders have dropped under current threshold
 \begin_layout Standard
 So what is the difference between business activity monitoring, BAM, and
  traditional IT infrastructure monitoring? Basically its the same, some
- entity to measure and for that entity define thresholds levels for warning
- and critical alarms.
+ entity to measure and for that entity define thresholds levels that will
+ generate warning or critical alarms.
  The demands we have seen in addition to the basic functionality are the
  following features provided by bischeck:
 \end_layout
@@ -172,7 +172,8 @@ Enable a dynamic configuration of threshold values depending of time of
 
 \begin_layout Itemize
 Support threshold based on fixed values and thresholds based on the measured
- value from other monitored entities.
+ value from other services.
+ This it typical in process driven businesses.
  
 \end_layout
 
@@ -183,19 +184,23 @@ Support multiple scheduling schema per service.
 \end_layout
 
 \begin_layout Itemize
-Configure monitored entity that are based on multiple measured entities,
+Configure services that are based on multiple measured values of other services,
  what could be described as "virtual" entities.
  
 \end_layout
 
 \begin_layout Itemize
-Support date macros in execution statements of measured entities, typical
- used in a where clause when selecting from databases.
+Support date macros in the execution statements of a service, typical used
+ in a 
+\emph on
+where
+\emph default
+ clause when selecting from databases.
 \end_layout
 
 \begin_layout Itemize
-Support a multitude of ways to connected to the source to monitor by allowing
- custom service connection methods.
+Support a multitude of ways to connected to the source system by allowing
+ custom developed service connection methods.
 \end_layout
 
 \begin_layout Itemize
@@ -255,8 +260,7 @@ The order management application receive orders 24 hours a day during Monday
  are according to a linear equation between the defined hour rates.
  This means that the threshold at 13:20 is (2300-1500)*20/60+1500 = 1767.
  The warning alarm level should be between 90% and 70% of the threshold
- and the critical alarm if the measured value should be below 70% of the
- threshold.
+ and critical alarm if the measured value is below 70% of the threshold.
 \begin_inset Newline newline
 \end_inset
 
@@ -1953,7 +1957,7 @@ status open
 
 \begin_layout Plain Layout
 
-	       com.ingby.socbox.bischeck.servers.NSCAServer     
+	    	com.ingby.socbox.bischeck.servers.NSCAServer     
 \end_layout
 
 \begin_layout Plain Layout
@@ -1968,32 +1972,12 @@ status open
 
 \begin_layout Plain Layout
 
-	      <key>hostAddress</key>
+			<key>hostAddress</key>
 \end_layout
 
 \begin_layout Plain Layout
 
-	      <value>localhost</value>
-\end_layout
-
-\begin_layout Plain Layout
-
-	    </property>
-\end_layout
-
-\begin_layout Plain Layout
-
-    	<property>       
-\end_layout
-
-\begin_layout Plain Layout
-
-			<key>encryptionMode</key>
-\end_layout
-
-\begin_layout Plain Layout
-
-		    <value>XOR</value>     
+			<value>localhost</value>
 \end_layout
 
 \begin_layout Plain Layout
@@ -2003,7 +1987,27 @@ status open
 
 \begin_layout Plain Layout
 
-    	<property>
+		<property>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<key>encryptionMode</key>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<value>XOR</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<property>
 \end_layout
 
 \begin_layout Plain Layout
@@ -2023,7 +2027,7 @@ status open
 
 \begin_layout Plain Layout
 
-    	<property>       
+		<property>       
 \end_layout
 
 \begin_layout Plain Layout
@@ -2043,7 +2047,7 @@ status open
 
 \begin_layout Plain Layout
 
-    	<property>       
+		<property>       
 \end_layout
 
 \begin_layout Plain Layout
@@ -2077,7 +2081,7 @@ status open
 
 \begin_layout Plain Layout
 
-	......
+		......
 \end_layout
 
 \begin_layout Plain Layout
@@ -2820,7 +2824,7 @@ bischeck internal surveillance
 \end_layout
 
 \begin_layout Standard
-bischeck use Java JMX standard for internal monitoring.
+bischeck use the Java JMX standard for internal monitoring.
  Please read the javadoc for the classes ExecuteMBean and LastStatusCacheMBean
  to to understand the methods available or just start 
 \emph on
@@ -2866,13 +2870,21 @@ jmxauth=-Dcom.sun.management.jmxremote.authenticate=false
 \begin_layout Plain Layout
 
 jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
- jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
 \end_layout
 
 \end_inset
 
- If authentication should be used please change the property com.sun.management.jmx
-remote.authenticate to true and configure the roles and password in the files
+
+\end_layout
+
+\begin_layout Standard
+If authentication should be used please change the property com.sun.management.jmxr
+emote.authenticate to true and configure the roles and password in the files
  jmxremote.access and jmxremote.password.
  For more information how to configure JMX please visit 
 \begin_inset CommandInset href
@@ -2964,11 +2976,7 @@ This will create a compressed tar file in the
 target
 \shape default
  directory, named bischeck-x.y.z.tgz where x.y.z is the version number.
- 
-\end_layout
-
-\begin_layout Standard
-Different versions of bischeck can be checked out from the tags directory
+ Different versions of bischeck can be checked out from the tags directory
  located in 
 \begin_inset Flex URL
 status collapsed
