@@ -21,10 +21,55 @@ package com.ingby.socbox.bischeck.serviceitem;
 
 import org.apache.log4j.Logger;
 
+import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.LastStatusCache;
+import com.ingby.socbox.bischeck.LastStatusCacheParse;
+import com.ingby.socbox.bischeck.service.JDBCService;
+import com.ingby.socbox.bischeck.service.Service;
+
 
 public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     static Logger  logger = Logger.getLogger(SQLServiceItem.class);
 
+    public static void main(String[] args) {
+    	try {
+			ConfigurationManager.init();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    	Service jdbc = new JDBCService("serviceName");
+        jdbc.setConnectionUrl("jdbc:mysql://localhost/bischecktest?user=bischeck&password=bischeck");
+        jdbc.setDriverClassName("com.mysql.jdbc.Driver");
+        
+        ServiceItem sql = new SQLServiceItem("serviceItemName");
+        sql.setService(jdbc);
+        
+        
+        try {
+            
+            LastStatusCache.getInstance().add("host1", "web", "state", "4",null);
+            LastStatusCache.getInstance().add("host2", "web", "state", "1",null);
+            LastStatusCache.getInstance().add("host3", "web", "state", "1",null);
+            
+            sql.setExecution("select value from test where id = host1-web-state[0] and createdate = '%%yyyy-MM-dd mm-hh-ss%%'");
+            try {
+    			jdbc.openConnection();
+    		} catch (Exception e1) {
+    			// TODO Auto-generated catch block
+    			e1.printStackTrace();
+    		}
+            sql.execute();
+            jdbc.closeConnection();
+            
+            System.out.println("Return value:" + sql.getLatestExecuted());
+            
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }    
+    
+    }
     
     public SQLServiceItem(String name) {
         this.serviceItemName = name;        
@@ -33,6 +78,12 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     
     @Override
     public void execute() throws Exception {
-        setLatestExecuted(service.executeStmt(this.getExecution()));    
+    	String cacheparsedstr = LastStatusCacheParse.parse(getExecution());
+    	if (cacheparsedstr == null) {
+    		setLatestExecuted(null);
+    	}
+    	else {
+    		setLatestExecuted(service.executeStmt(cacheparsedstr));
+    	}
     }
 }
