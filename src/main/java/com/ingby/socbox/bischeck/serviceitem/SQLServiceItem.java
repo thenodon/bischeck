@@ -48,21 +48,29 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
         
         try {
             
-            LastStatusCache.getInstance().add("host1", "web", "state", "4",null);
-            LastStatusCache.getInstance().add("host2", "web", "state", "1",null);
+            LastStatusCache.getInstance().add("host1", "web", "state", "5",null);
+            LastStatusCache.getInstance().add("host2", "web", "state", "6",null);
             LastStatusCache.getInstance().add("host3", "web", "state", "1",null);
             
-            sql.setExecution("select value from test where id = host1-web-state[0] and createdate = '%%yyyy-MM-dd mm-hh-ss%%'");
             try {
     			jdbc.openConnection();
     		} catch (Exception e1) {
     			// TODO Auto-generated catch block
     			e1.printStackTrace();
     		}
+    		sql.setExecution("select sum(value) from test");
+    		sql.execute();
+    		System.out.println("Return value:" + sql.getLatestExecuted());
+            sql.setExecution("select value from test where createdate = '%%yyyy-MM-dd%%'");
             sql.execute();
-            jdbc.closeConnection();
-            
+    		System.out.println("Return value:" + sql.getLatestExecuted());
+            sql.setExecution("select sum(value) from test where (id = host1-web-state[0] or id = host2-web-state[0]) and createdate = '%%yyyy-MM-dd%%'");
+            sql.execute();
             System.out.println("Return value:" + sql.getLatestExecuted());
+            
+    		jdbc.closeConnection();
+            
+            //System.out.println("Return value:" + sql.getLatestExecuted());
             
             
         } catch (Exception e) {
