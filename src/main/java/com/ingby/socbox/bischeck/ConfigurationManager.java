@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ThreadFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +61,7 @@ import com.ingby.socbox.bischeck.service.ServiceFactory;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
+import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLBischeck;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLHost;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLService;
@@ -172,6 +174,8 @@ public class ConfigurationManager  {
         	configMgr.initBischeckServices(true);
         	configMgr.initScheduler();
 
+        	ThresholdFactory.clearCache();
+        	
         	// Verify if the pid file is writable
         	if (!configMgr.checkPidFile()) {
         		throw new Exception("Can not write to pid file " + configMgr.getPidFile());
@@ -205,6 +209,8 @@ public class ConfigurationManager  {
         	configMgr.initBischeckServices(false);
         	configMgr.initScheduler();
 
+        	ThresholdFactory.clearCache();
+        	
         	// Verify if the pid file is writable
         	if (!configMgr.checkPidFile()) {
         		throw new Exception("Can not write to pid file " + configMgr.getPidFile());
