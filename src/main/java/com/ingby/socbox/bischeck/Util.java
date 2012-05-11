@@ -110,7 +110,7 @@ public class Util {
         
         arraystr=strbuf.toString();
         
-        if (arraystr.lastIndexOf(SEP) == arraystr.length()-1) {
+        if (arraystr.length() != 0 && arraystr.lastIndexOf(SEP) == arraystr.length()-1 ) {
             arraystr = arraystr.substring(0, arraystr.length()-1);
         }
         
