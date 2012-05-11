@@ -30,6 +30,7 @@ import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
 
 import com.ingby.socbox.bischeck.LastStatusCache;
+import com.ingby.socbox.bischeck.LastStatusCacheParse;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
@@ -97,9 +98,12 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
             
             LastStatusCache.getInstance().add("host1", "web", "state", "1",null);
             LastStatusCache.getInstance().add("host2", "web", "state", "1",null);
-            LastStatusCache.getInstance().add("host3", "web", "state", "0",null);
+            LastStatusCache.getInstance().add("host3", "web", "state", "1",null);
             
-            coc.setExecution("if ((host1-web-state[0] == 0) &&  (host2-web-state[0] == 0) , 0, 1)");
+            coc.setExecution("if ((host1-web-state[0] == 1) &&  (host2-web-state[0] == 0) , 0, 1)");
+            coc.execute();
+            System.out.println("test boolean " + coc.getLatestExecuted());
+            
             coc.setExecution("if ((host1-web-state[0] + host2-web-state[0] + host3-web-state[0]) > 2 ,1 , 0)");
             coc.execute();
             System.out.println("test boolean " + coc.getLatestExecuted());
@@ -125,64 +129,26 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     @Override
     public void execute() throws Exception {                
         
-        Pattern pat = null;
-        
-        try {
-            pat = Pattern.compile (LastStatusCache.getInstance().getHostServiceItemFormat());
-            
-        } catch (PatternSyntaxException e) {
-            logger.warn("Regex syntax exception, " + e);
-            throw e;
-        }
-        
-        Matcher mat = pat.matcher (this.getExecution());
+    	String cacheparsedstr = LastStatusCacheParse.parse(getExecution());
+    	
+    	if (cacheparsedstr == null) {
+    		setLatestExecuted(null);
+    	}
+    	else {
+    		this.jep.parseExpression(cacheparsedstr);
 
-        String arraystr="";
-        arraystr = Util.parseParameters(this.getExecution());
-        
-        StringTokenizer st = new StringTokenizer(this.service.executeStmt(arraystr),",");
-        
-        // Indicator to see if any parameters are null since then no calc will be done
-        boolean notANumber = false;
-        ArrayList<String> paramOut = new ArrayList<String>();
-        
-        while (st.hasMoreTokens()) {
-            String retvalue = st.nextToken(); 
-            
-            if (retvalue.equalsIgnoreCase("null")) { 
-                notANumber= true;
-            }
-            
-            paramOut.add(retvalue);
-        }
-        
-        if (notANumber) { 
-            logger.debug("One or more of the parameters are null");
-            setLatestExecuted(null);
-        } else  {
-            StringBuffer sb = new StringBuffer ();
-            mat = pat.matcher (this.getExecution());
+    		if (jep.hasError()) {
+    			throw new ParseException(jep.getErrorInfo());
+    		}
 
-            int i=0;
-            while (mat.find ()) {
-                mat.appendReplacement (sb, paramOut.get(i++));
-            }
-            mat.appendTail (sb);
-
-            
-            this.jep.parseExpression(sb.toString());
-
-            if (jep.hasError()) {
-                throw new ParseException(jep.getErrorInfo());
-            }
-
-            float value = (float) jep.getValue();
-            logger.debug("Calculated value = " + value);
-            if (Float.isNaN(value)) {
-                setLatestExecuted(null);
-            } else {
-                setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
-            }
-        }
+    		float value = (float) jep.getValue();
+    		logger.debug("Calculated value = " + value);
+    		if (Float.isNaN(value)) {
+    			setLatestExecuted(null);
+    		} else {
+    			setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
+    		}
+    	}
     }
 }
+
