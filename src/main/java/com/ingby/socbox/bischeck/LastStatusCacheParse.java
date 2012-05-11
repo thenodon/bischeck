@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 
 public class LastStatusCacheParse {
 
+	private static final String SEP = ";";
 	static Logger  logger = Logger.getLogger(LastStatusCacheParse.class);
 
 	public static String parse(String str) {
@@ -55,9 +56,15 @@ public class LastStatusCacheParse {
 
 		String arraystr="";
 		arraystr = Util.parseParameters(str);
-
-		StringTokenizer st = new StringTokenizer(LastStatusCache.getInstance().getParametersByString(arraystr),",");
-
+		
+		
+		// If no cache definition present return the orignal string
+		if (arraystr.length() == 0) 
+			return str;
+		
+		// If cache entries in the string parse and replace
+		StringTokenizer st = new StringTokenizer(LastStatusCache.getInstance().getParametersByString(arraystr),SEP);
+		
 		// Indicator to see if any parameters are null since then no calc will be done
 		boolean notANumber = false;
 		ArrayList<String> paramOut = new ArrayList<String>();
