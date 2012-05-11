@@ -49,6 +49,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
     private static LastStatusCache lsc = new LastStatusCache();
     private static MBeanServer mbs = null;
     private final static String BEANNAME = "com.ingby.socbox.bischeck:name=Cache";
+
+	private static final String SEP = ";";
     private static ObjectName   mbeanname = null;
 
     private String hostServiceItemFormat = "[a-zA-Z1-9]*?.[a-zA-Z1-9]*?.[a-zA-Z1-9]*?\\[.*?\\]";
@@ -285,15 +287,15 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
             
             // Check the format of the index
-            if (index.contains(",")) {
-                StringTokenizer ind = new StringTokenizer(index,",");
+            if (index.contains(SEP)) {
+                StringTokenizer ind = new StringTokenizer(index,SEP);
                 while (ind.hasMoreTokens()) {
                     strbuf.append(
                     this.getIndex( 
                             host,
                             service, 
                             serviceitem,
-                            Integer.parseInt((String)ind.nextToken())) + ",");
+                            Integer.parseInt((String)ind.nextToken())) + SEP);
                 }
             } else if (index.contains(":")) {
                 StringTokenizer ind = new StringTokenizer(index,":");
@@ -306,7 +308,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
                             host,
                             service, 
                             serviceitem,
-                            i) + ",");
+                            i) + SEP);
                 }
             } else { 
                 strbuf.append(
@@ -314,7 +316,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
                         host,
                         service, 
                         serviceitem,
-                        Integer.parseInt(index)) + ",");
+                        Integer.parseInt(index)) + SEP);
             }
         }    
 
