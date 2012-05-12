@@ -224,9 +224,6 @@ public class Execute implements ExecuteMBean {
         
         logger.info("******************* Shutdown ********************");
         
-        
-        ConfigurationManager.getInstance().getPidFile().delete();
-        
         if (reloadRequested) 
         	return RESTART;
         else
