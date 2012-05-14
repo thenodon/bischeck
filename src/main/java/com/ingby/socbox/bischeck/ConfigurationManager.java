@@ -367,13 +367,16 @@ public class ConfigurationManager  {
             }
                 
             if (service.getDriverClassName() != null) {
-                try {
-                    Class.forName(service.getDriverClassName()).newInstance();
-                } catch ( ClassNotFoundException e) {
-                    logger.error("Could not find the driver class - " + service.getDriverClassName() + 
-                            " " + e.toString());
-                    throw new Exception(e.getMessage());
-                }
+            	if (service.getDriverClassName().trim().length() != 0) {
+            		logger.debug("Driver name: " + service.getDriverClassName().trim());
+            		try {
+            			Class.forName(service.getDriverClassName()).newInstance();
+            		} catch ( ClassNotFoundException e) {
+            			logger.error("Could not find the driver class - " + service.getDriverClassName() + 
+            					" " + e.toString());
+            			throw new Exception(e.getMessage());
+            		}
+            	}
             }
             
             setupServiceItem(serviceconfig, service);
@@ -402,10 +405,11 @@ public class ConfigurationManager  {
             /*
              * Set default threshold class if not set in bischeck.xml
              */
-            if (serviceitemconfig.getThresholdclass() != null) {
-                serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
+            if (serviceitemconfig.getThresholdclass() == null || 
+            		serviceitemconfig.getThresholdclass().trim().length() == 0 ) {
+            	serviceitem.setThresholdClassName(DEFAULT_TRESHOLD);
             } else {
-                serviceitem.setThresholdClassName(DEFAULT_TRESHOLD);
+            	serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
             }
             
             service.addServiceItem(serviceitem);
