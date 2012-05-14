@@ -56,6 +56,10 @@ public class LastCacheService extends ServiceAbstract implements Service {
         // The use of LastStatusCache do not need a connection
     }
 
+    @Override
+    public boolean isConnectionEstablished() {
+        return true;
+    }
 
     @Override
     /**
