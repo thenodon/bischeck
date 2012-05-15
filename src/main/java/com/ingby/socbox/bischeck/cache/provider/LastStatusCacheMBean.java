@@ -17,7 +17,7 @@
 #
 */
 
-package com.ingby.socbox.bischeck;
+package com.ingby.socbox.bischeck.cache.provider;
 
 public interface LastStatusCacheMBean {
     public int getLastStatusCacheCount();

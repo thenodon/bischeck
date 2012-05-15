@@ -28,6 +28,8 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.log4j.Logger;
 
+import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
+
 public class Util {
     static Logger  logger = Logger.getLogger(Util.class);
 

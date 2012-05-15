@@ -17,7 +17,7 @@
 #
 */
 
-package com.ingby.socbox.bischeck;
+package com.ingby.socbox.bischeck.cache;
 
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
@@ -28,6 +28,11 @@ public class LastStatus {
     private Float threshold = null;
     private String calcmethod = null;
     
+    public LastStatus(String measuredValue, Float thresholdValue, Long timestamp) {
+        this.timestamp = timestamp;
+        this.value = measuredValue;
+        this.threshold = thresholdValue;
+    }
     
     public LastStatus(String measuredValue, Float thresholdValue) {
         this.timestamp = System.currentTimeMillis();

@@ -17,7 +17,7 @@
 #
 */
 
-package com.ingby.socbox.bischeck;
+package com.ingby.socbox.bischeck.cache.provider;
 
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
@@ -32,20 +32,20 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
-import net.sf.json.JSONObject;
-
 import org.apache.log4j.Logger;
 
+import com.ingby.socbox.bischeck.cache.CacheInf;
+import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 
-public class LastStatusCache implements LastStatusCacheMBean {
+public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
     static Logger  logger = Logger.getLogger(LastStatusCache.class);
 
     private static HashMap<String,LinkedList<LastStatus>> cache = new HashMap<String,LinkedList<LastStatus>>();
-    private static int lrusize = 100;
+    private static int lrusize = 500;
     private static LastStatusCache lsc = new LastStatusCache();
     private static MBeanServer mbs = null;
     private final static String BEANNAME = "com.ingby.socbox.bischeck:name=Cache";
@@ -90,55 +90,53 @@ public class LastStatusCache implements LastStatusCacheMBean {
         return lsc;
     }
     
-    /**
-     * Add an entry to the cache
-     * @param service
-     * @param serviceitem
-     */
+    
+    @Override
     public  void add(Service service, ServiceItem serviceitem) {
-        synchronized (cache) {
-            
-            String hostname = service.getHost().getHostname();
-            String serviceName = service.getServiceName();
-            String serviceItemName = serviceitem.getServiceItemName();
-            
-            LinkedList<LastStatus> lru = null;
-            String key = hostname+"-"+serviceName+"-"+serviceItemName;
+        
 
-            if (cache.get(key) == null) {
-                lru = new LinkedList<LastStatus>();
-                cache.put(key, lru);
-            } else {
-                lru = cache.get(key);
-            }
+    	String hostname = service.getHost().getHostname();
+    	String serviceName = service.getServiceName();
+    	String serviceItemName = serviceitem.getServiceItemName();
 
-            if (lru.size() >= lrusize) {
-                lru.removeLast();
-            }
+    	String key = hostname+"-"+serviceName+"-"+serviceItemName;
 
-            LastStatus ls = new LastStatus(serviceitem);
+    	add(new LastStatus(serviceitem), key);    
 
-            cache.get(key).addFirst(ls);    
-        }
     }
+
+   
+	private void add(LastStatus ls, String key) {
+		LinkedList<LastStatus> lru;
+		synchronized (cache) {
+			if (cache.get(key) == null) {
+				lru = new LinkedList<LastStatus>();
+				cache.put(key, lru);
+			} else {
+				lru = cache.get(key);
+			}
+
+			if (lru.size() >= lrusize) {
+				lru.removeLast();
+			}
+
+			cache.get(key).addFirst(ls);
+		}
+	}
     
     
-    /**
-     * Add a entry to the cache
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @param measuredValue
-     * @param thresholdValue
-     */
+    
+    @Override
     public  void add(String hostname, String serviceName,
             String serviceItemName, String measuredValue,
             Float thresholdValue) {
-        synchronized (cache) {
+        //synchronized (cache) {
 
-            LinkedList<LastStatus> lru = null;
+            //LinkedList<LastStatus> lru = null;
             String key = hostname+"-"+serviceName+"-"+serviceItemName;
 
+            add(new LastStatus(measuredValue,thresholdValue), key);
+            /*
             if (cache.get(key) == null) {
                 lru = new LinkedList<LastStatus>();
                 cache.put(key, lru);
@@ -154,23 +152,19 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
             cache.get(key).addFirst(ls);    
         }
+        */
     }
 
     
-    /**
-     * Get the last value inserted in the cache for the host, service and 
-     * service item.
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @return last inserted value 
-     */
-    public String get(String hostname, String serviceName,
+    @Override
+    public String getFirst(String hostname, String serviceName,
             String serviceItemName) {
 
-        String key = hostname+"-"+serviceName+"-"+serviceItemName;
-        LastStatus ls = null;
-
+        //String key = hostname+"-"+serviceName+"-"+serviceItemName;
+        //LastStatus ls = null;
+        
+        return getIndex(hostname, serviceName, serviceItemName, 0);
+        /*
         synchronized (cache) {
             try {
                 ls = cache.get(key).getFirst();    
@@ -180,18 +174,11 @@ public class LastStatusCache implements LastStatusCacheMBean {
             }
         }
         return ls.getValue();
+        */
     }
-
+	
     
-    /**
-     * Get the value in the cache for the host, service and service item at 
-     * cache location according to index, where index 0 is the last inserted. 
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @param index
-     * @return the value
-     */
+    @Override
     public String getIndex(String hostname, String serviceName,
             String serviceItemName, int index) {
 
@@ -217,23 +204,64 @@ public class LastStatusCache implements LastStatusCacheMBean {
     }
 
 
-    /**
-     * Get the size of the cache entries, the number of unique host, service 
-     * and service item entries. 
-     * @return size of the cache index
-     */
+    @Override
+    public String getByTime(String hostname, String serviceName,
+            String serviceItemName, long stime) {
+
+        String key = hostname+"-"+serviceName+"-"+serviceItemName;
+        LastStatus ls = null;
+
+        synchronized (cache) {
+        	LinkedList<LastStatus> list = cache.get(key); 
+        	// list has no size
+        	if (list.size() == 0) 
+        		return null;
+        	
+        	ls = FindNearest.nearest(stime, list);
+        }
+        return ls.getValue();
+        
+        /*
+        	// stime is out of bounds
+            if ( stime < list.getFirst().getTimestamp() ||
+            		stime > list.getLast().getTimestamp() ) {
+            	logger.debug("stime is out of list scope");
+            	return null;
+            }
+            
+            // find closest with brute force
+            int count = list.size();
+            Integer foundindex = null;
+            for (int i = 0; i<count;i++) {
+            	if ((i+1)<count) {
+            		if ( list.get(i).getTimestamp() <= stime && stime < list.get(i+1).getTimestamp() ) {
+            			if ( Math.abs(list.get(i).getTimestamp()- stime) < 
+            					Math.abs(list.get(i+1).getTimestamp()- stime) ) {  
+            				foundindex = i;
+            				break;
+            			}
+            			else {
+            				foundindex = i+1;
+            				break;
+            			}           	
+            		}
+            	}
+            }
+            if (foundindex == null) 
+            	return null;
+            else 
+            	return list.get(foundindex).getValue();
+        }
+*/    
+    }
+
+    @Override
     public  int size() {
         return cache.size();
     }
 
 
-    /**
-     * The size for the specific host, service, service item entry.
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @return size of cached values for a specific host-service-serviceitem
-     */
+    @Override
     public int sizeLru(String hostname, String serviceName,
             String serviceItemName) {
         String key = hostname+"-"+serviceName+"-"+serviceItemName;
@@ -241,6 +269,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
     }
 
     
+    @Deprecated
     public void listLru(String hostname, String serviceName,
             String serviceItemName) {
 
@@ -250,14 +279,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
             System.out.println(i +" : "+cache.get(key).get(i).getValue());
     }
 
-    /**
-     * Takes a list of ; separated host-service-serviceitems[x] and return the 
-     * a string with each of the corresponding values from the cache with , as
-     * separator.
-     * @param parameters
-     * @return 
-     */
-    // TODO - replace with json 
+    
+    @Override
     public String getParametersByString(String parameters) {
         String resultStr="";
         StringTokenizer st = new StringTokenizer(parameters,";");
@@ -330,12 +353,6 @@ public class LastStatusCache implements LastStatusCacheMBean {
     }
     
     
-    /*
-    public JSONObject getParametersByJson(JSONObject parameters) {
-        
-        return null;
-    }
-    */
     
     
     public String getHostServiceItemFormat(){

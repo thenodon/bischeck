@@ -22,7 +22,7 @@ package com.ingby.socbox.bischeck.service;
 
 import org.apache.log4j.Logger;
 
-import com.ingby.socbox.bischeck.LastStatusCache;
+import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 
 
 public class LastCacheService extends ServiceAbstract implements Service {

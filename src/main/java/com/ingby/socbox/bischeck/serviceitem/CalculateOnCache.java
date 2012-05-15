@@ -29,9 +29,9 @@ import org.apache.log4j.Logger;
 import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
 
-import com.ingby.socbox.bischeck.LastStatusCache;
-import com.ingby.socbox.bischeck.LastStatusCacheParse;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
+import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
 import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
 

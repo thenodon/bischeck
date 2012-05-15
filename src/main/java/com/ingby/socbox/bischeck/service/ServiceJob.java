@@ -8,9 +8,9 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import com.ingby.socbox.bischeck.LastStatusCache;
 import com.ingby.socbox.bischeck.TimeMeasure;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;

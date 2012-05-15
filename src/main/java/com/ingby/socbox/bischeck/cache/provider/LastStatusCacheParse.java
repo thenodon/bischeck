@@ -17,7 +17,7 @@
 #
  */
 
-package com.ingby.socbox.bischeck;
+package com.ingby.socbox.bischeck.cache.provider;
 
 
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.log4j.Logger;
+
+import com.ingby.socbox.bischeck.Util;
 
 /**
  * This class manage parsing os cached data by replacing a cache entry name
