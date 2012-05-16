@@ -26,7 +26,6 @@ public class RunAfter {
 	
 	@Override
 	public boolean equals(Object obj) {
-		logger.debug("Do equals");
 		if (this.hostname.equals( ((RunAfter) obj).getHostname()) &&  
 				this.servicename.equals( ((RunAfter) obj).getServicename()) )
 			return true;
@@ -36,7 +35,6 @@ public class RunAfter {
 	
 	@Override 
 	public int hashCode() { 
-		logger.debug("Do hash for " + hostname +"-"+servicename + (hostname.hashCode()+servicename.hashCode()));
 		return hostname.hashCode()+servicename.hashCode(); 
 		
 	}
