@@ -1,7 +1,6 @@
 package com.ingby.socbox.bischeck.service;
 
 import static org.quartz.JobBuilder.newJob;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.util.Calendar;
@@ -34,7 +33,22 @@ public class ServiceJob implements Job {
 
     static Logger  logger = Logger.getLogger(ServiceJob.class);
 
-    //private Service service;
+    static private int runAfterDelay = 20; //in seconds
+    
+    
+    static {
+        try {
+            runAfterDelay = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
+                    getProperty("runAfterDelay","20"));
+        } catch (NumberFormatException ne) {
+            logger.error("Property " + 
+            		runAfterDelay + 
+                    " is not set correct to an integer: " +
+                    ConfigurationManager.getInstance().getProperties().getProperty(
+                    "runAfterDelay"));
+        }
+    }
+    
         
     @Override
     /**
@@ -49,33 +63,19 @@ public class ServiceJob implements Job {
         Service service = (Service) dataMap.get("service");
 
         RunAfter runafter = new RunAfter(service.getHost().getHostname(), service.getServiceName());
-        //logger.debug(">>>> RunAfter key " + runafter.getHostname() + "-" + runafter.getServicename());
+        
         executeService(service);
         // Check if there is any run after
        
-        
-        //Map<RunAfter,List<Service>> myrunafter = ConfigurationManager.getInstance().getRunAfterMap();
-        //logger.debug(">> RunAfter map size " + myrunafter.size()); 
-    	/*for (RunAfter ra: myrunafter.keySet()) {
-    		logger.debug(">> RunAfter key " + ra.getHostname() + "-" + ra.getServicename());
-    		logger.debug(">> RunAfter value size " + myrunafter.get(ra).size());
-    		for (Service service1: myrunafter.get(ra)) {
-    			logger.debug(">> Service is " + service1.getHost().getHostname() + "-" + service1.getServiceName());
-    		}
-    	}*/
-        
-        
         logger.debug("Service " + runafter.getHostname() + "-" + runafter.getServicename() + " has runAfter " + 
         		ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter));
-       
-        if (ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter)) {
-        	for (Service servicetorunafter : ConfigurationManager.getInstance().getRunAfterMap().get(runafter)) {
-        		logger.debug("The to run after is " + servicetorunafter.getHost().getHostname() + 
-        				" " + servicetorunafter.getServiceName());
-        	}
-        }
         
         if (ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter)) {
+        	for (Service servicetorunafter : ConfigurationManager.getInstance().getRunAfterMap().get(runafter)) {
+        		logger.debug("The services to run after is: " + servicetorunafter.getHost().getHostname() + 
+        				"-" + servicetorunafter.getServiceName());
+        	}
+        
         	try {
         		runImmediate(ConfigurationManager.getInstance().getRunAfterMap().get(runafter));
         	} catch (SchedulerException e) {
@@ -122,7 +122,7 @@ public class ServiceJob implements Job {
     		Trigger trigger = null;
 
     		Calendar  cal = Calendar.getInstance();
-            cal.add(Calendar.SECOND, 10);
+            cal.add(Calendar.SECOND, runAfterDelay);
             Date future=cal.getTime();
             
     		trigger = newTrigger()

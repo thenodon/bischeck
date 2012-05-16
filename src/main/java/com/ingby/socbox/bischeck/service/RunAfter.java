@@ -2,8 +2,6 @@ package com.ingby.socbox.bischeck.service;
 
 import org.apache.log4j.Logger;
 
-import com.ingby.socbox.bischeck.Execute;
-
 public class RunAfter {
     static Logger  logger = Logger.getLogger(RunAfter.class);
 
