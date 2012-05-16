@@ -314,22 +314,25 @@ public class Execute implements ExecuteMBean {
 			Map<String, Object> map) throws SchedulerException {
 		JobDataMap jobmap = new JobDataMap(map);
       	int jobid = 0;
-		
+      		
+      	
       	for (Trigger trigger: jobentry.getSchedules()) {
-		    try {
-		        JobDetail job = newJob(ServiceJob.class)
-		          .withIdentity(jobentry.getService().getServiceName()+(jobid++), jobentry.getService().getHost().getHostname())
-		          .withDescription(jobentry.getService().getHost().getHostname()+"-"+jobentry.getService().getServiceName())
-		          .usingJobData(jobmap)
-		          .build();
-		
-		        
-		        sched.scheduleJob(job, trigger);
-		        logger.info("Adding trigger to job " + trigger.toString());
-		    } catch (SchedulerException e) {
-		        logger.warn("Scheduled job failed with exception " + e);
-		        throw e;
-		    }
+      		if (trigger != null) {
+      			try {
+      				JobDetail job = newJob(ServiceJob.class)
+      				.withIdentity(jobentry.getService().getServiceName()+(jobid++), jobentry.getService().getHost().getHostname())
+      				.withDescription(jobentry.getService().getHost().getHostname()+"-"+jobentry.getService().getServiceName())
+      				.usingJobData(jobmap)
+      				.build();
+
+
+      				sched.scheduleJob(job, trigger);
+      				logger.info("Adding trigger to job " + trigger.toString());
+      			} catch (SchedulerException e) {
+      				logger.warn("Scheduled job failed with exception " + e);
+      				throw e;
+      			}
+      		}
 		}
 	}
 

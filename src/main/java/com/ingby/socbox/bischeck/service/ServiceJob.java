@@ -1,13 +1,27 @@
 package com.ingby.socbox.bischeck.service;
 
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.impl.StdSchedulerFactory;
 
+import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.TimeMeasure;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
@@ -20,7 +34,7 @@ public class ServiceJob implements Job {
 
     static Logger  logger = Logger.getLogger(ServiceJob.class);
 
-    private Service service;
+    //private Service service;
         
     @Override
     /**
@@ -32,9 +46,46 @@ public class ServiceJob implements Job {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
         
         // Get the Service object passed by the context
-        service = (Service) dataMap.get("service");
+        Service service = (Service) dataMap.get("service");
 
+        RunAfter runafter = new RunAfter(service.getHost().getHostname(), service.getServiceName());
+        //logger.debug(">>>> RunAfter key " + runafter.getHostname() + "-" + runafter.getServicename());
         executeService(service);
+        // Check if there is any run after
+       
+        
+        //Map<RunAfter,List<Service>> myrunafter = ConfigurationManager.getInstance().getRunAfterMap();
+        //logger.debug(">> RunAfter map size " + myrunafter.size()); 
+    	/*for (RunAfter ra: myrunafter.keySet()) {
+    		logger.debug(">> RunAfter key " + ra.getHostname() + "-" + ra.getServicename());
+    		logger.debug(">> RunAfter value size " + myrunafter.get(ra).size());
+    		for (Service service1: myrunafter.get(ra)) {
+    			logger.debug(">> Service is " + service1.getHost().getHostname() + "-" + service1.getServiceName());
+    		}
+    	}*/
+        
+        
+        logger.debug("Service " + runafter.getHostname() + "-" + runafter.getServicename() + " has runAfter " + 
+        		ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter));
+       
+        if (ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter)) {
+        	for (Service servicetorunafter : ConfigurationManager.getInstance().getRunAfterMap().get(runafter)) {
+        		logger.debug("The to run after is " + servicetorunafter.getHost().getHostname() + 
+        				" " + servicetorunafter.getServiceName());
+        	}
+        }
+        
+        if (ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter)) {
+        	try {
+        		runImmediate(ConfigurationManager.getInstance().getRunAfterMap().get(runafter));
+        	} catch (SchedulerException e) {
+        		logger.warn("Scheduled immediate job for host + " +
+        				runafter.getHostname() + 
+        				" and service " +
+        				runafter.getServicename() + 
+        				" failed with exception " + e);
+			}
+        }
     
         if (service.isSendServiceData()) {
             ServerExecutor.getInstance().execute(service);
@@ -43,6 +94,49 @@ public class ServiceJob implements Job {
 
     
     /**
+     * Used to kick of services that has a schedule that depends of the execution
+     * of a different schedule.
+     * @param services
+     * @throws SchedulerException
+     */
+    private void runImmediate(List<Service> services) throws SchedulerException {
+    	int jobid = 10000;
+    	
+    	Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
+    	
+    	for (Service service:services) {
+    		logger.debug("Service to run immiediate run - " + service.getHost().getHostname() + "-" + 
+        			service.getServiceName());
+        	
+    		Map<String,Object> map = new HashMap<String, Object>();
+    		map.put("service", service);
+    		JobDataMap jobmap = new JobDataMap(map);
+          	
+    		
+    		JobDetail job = newJob(ServiceJob.class)
+    		.withIdentity(service.getServiceName()+(jobid++), service.getHost().getHostname())
+    		.withDescription(service.getHost().getHostname()+"-"+service.getServiceName())
+    		.usingJobData(jobmap)
+    		.build();
+
+    		Trigger trigger = null;
+
+    		Calendar  cal = Calendar.getInstance();
+            cal.add(Calendar.SECOND, 10);
+            Date future=cal.getTime();
+            
+    		trigger = newTrigger()
+    		.withIdentity(service.getServiceName()+"Trigger-"+(jobid), service.getHost().getHostname()+"TriggerGroup")
+    		.startAt(future)
+    		.build();
+
+    		sched.scheduleJob(job, trigger);
+
+    	}
+    }
+
+
+	/**
      * 
      * @param service
      */

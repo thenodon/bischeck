@@ -56,6 +56,7 @@ import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.ingby.socbox.bischeck.servers.Server;
+import com.ingby.socbox.bischeck.service.RunAfter;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
@@ -85,6 +86,8 @@ public class ConfigurationManager  {
     
     private static final String DEFAULT_TRESHOLD = "DummyThreshold";
 
+	private static final String INTERVALSCHEDULEPATTERN = "^[0-9]+ *[HMS]{1} *$";
+
     static Logger  logger = Logger.getLogger(ConfigurationManager.class);
 
     /*
@@ -100,6 +103,7 @@ public class ConfigurationManager  {
     private Map<String,Class<?>> serversclass = null;
     private ConfigFileManager xmlfilemgr = null;
     
+    private Map<RunAfter,List<Service>> runafter = null;
 	
     public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
@@ -156,6 +160,7 @@ public class ConfigurationManager  {
     	schedulejobs = new ArrayList<ServiceJobConfig>();
     	servermap = new HashMap<String,Properties>();
     	serversclass = new HashMap<String,Class<?>>();
+    	runafter = new HashMap<RunAfter,List<Service>>();
     }
     
     
@@ -505,7 +510,7 @@ public class ConfigurationManager  {
                 throw new Exception(e.getMessage());
             }
             
-        } else {
+        } else if (isIntervalTrigger(schedule)){
             // Simple schedule
             try {
                 trigger = newTrigger()
@@ -518,7 +523,23 @@ public class ConfigurationManager  {
                         " for schedule " + schedule);
                 throw new Exception(e.getMessage());
             }
+        } else if (isRunAfterTrigger(schedule)) {
+        	int index = schedule.indexOf("-");
+        	String hostname = schedule.substring(0, index);
+        	String servicename = schedule.substring(index+1, schedule.length());
+        	logger.debug("Service will run after " + hostname + " " + servicename);
+        	RunAfter runafterkey = new RunAfter(hostname, servicename);
+        	
+        	if (!runafter.containsKey(runafterkey)) {
+        		logger.debug("Add service to " + hostname + " " + servicename);
+        		runafter.put(runafterkey, new ArrayList<Service>());		
+        	}
+        	
+        	
+        	runafter.get(runafterkey).add(service);
+
         }
+        	
         return trigger;
     }
 
@@ -562,7 +583,7 @@ public class ConfigurationManager  {
      */
     private int calculateInterval(String schedule) throws Exception {
         //"^[0-9]+ *[HMS]{1} *$" - check for a
-        Pattern pattern = Pattern.compile("^[0-9]+ *[HMS]{1} *$");
+        Pattern pattern = Pattern.compile(INTERVALSCHEDULEPATTERN);
 
         // Determine if there is an exact match
         Matcher matcher = pattern.matcher(schedule);
@@ -581,8 +602,53 @@ public class ConfigurationManager  {
     }
 
 
-    private boolean isCronTrigger(String schedule) { 
+    private static boolean isCronTrigger(String schedule) { 
         return CronExpression.isValidExpression(schedule);    
+    }
+    
+    
+    private static boolean isIntervalTrigger(String schedule) {
+    	Pattern pattern = Pattern.compile(INTERVALSCHEDULEPATTERN);
+        Matcher matcher = pattern.matcher(schedule);
+        
+        if (matcher.matches()) {
+        	return true;
+        }
+    	
+        return false;
+    }
+    
+    
+    private static boolean isRunAfterTrigger(String schedule) {
+    	int index = schedule.indexOf("-");
+    	if (index == -1) {
+    		return false;
+    	}
+    	
+    	String hostname = schedule.substring(0, index);
+    	String servicename = schedule.substring(index+1, schedule.length());
+    	
+    	Host hostafter = ConfigurationManager.getInstance().hostsmap.get(hostname);
+    	Service serviceafter = hostafter.getServiceByName(servicename);
+    	
+    	if (hostafter != null && serviceafter != null) {
+    		if (!(hostname.equals(hostafter.getHostname()) && 
+    				servicename.equals(serviceafter.getServiceName()))) { 
+    			logger.warn("RunAfter host and/or service do not exists for host " + 
+    					hostname + 
+    					"-" +
+    					servicename);
+    			return false;
+    		}
+    	} else {
+    		logger.warn("RunAfter host and/or service do not exists for " + 
+					hostname + 
+					"-" +
+					servicename);
+			return false;
+    	}
+    	
+    	return true;
     }
     
     
@@ -658,6 +724,9 @@ public class ConfigurationManager  {
         return serversclass;
     }
     
+    public Map<RunAfter,List<Service>> getRunAfterMap() {
+    	return runafter;
+    }
 
     public  String getCacheClearCron() {
         return prop.getProperty("thresholdCacheClear","10 0 00 * * ? *");
