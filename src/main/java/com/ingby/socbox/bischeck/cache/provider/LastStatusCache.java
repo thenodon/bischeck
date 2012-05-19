@@ -19,6 +19,10 @@
 
 package com.ingby.socbox.bischeck.cache.provider;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,6 +38,7 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 
+import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.service.Service;
@@ -52,6 +57,8 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	private static final String SEP = ";";
     private static ObjectName   mbeanname = null;
+
+	private static String lastStatusCacheDumpDir;
 
     private String hostServiceItemFormat = "[a-zA-Z1-9]*?.[a-zA-Z1-9]*?.[a-zA-Z1-9]*?\\[.*?\\]";
     
@@ -79,6 +86,10 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
+        lastStatusCacheDumpDir = ConfigurationManager.getInstance().getProperties().
+        	getProperty("lastStatusCacheDumpDir","/var/tmp/lastStatusCacheDump");
+        
     }
 
     
@@ -388,4 +399,62 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
         }    
         return key; 
     }
+
+
+	@Override
+	public void dump2file() {
+		File dumpfile = new File(lastStatusCacheDumpDir);
+		FileWriter filewriter = null;
+		BufferedWriter dumpwriter = null;
+		
+		try {
+			filewriter = new FileWriter(dumpfile);
+			dumpwriter = new BufferedWriter(filewriter);
+
+			for (String key:cache.keySet()) {
+				try {
+					dumpwriter.write("<key id="+key+">");
+					dumpwriter.newLine();
+
+					for (LastStatus ls:cache.get(key)) {
+
+						dumpwriter.write("  <entry>");
+						dumpwriter.newLine();
+						
+						dumpwriter.write("    <value>"+ls.getValue()+"</value>");
+						dumpwriter.newLine();
+						dumpwriter.write("    <date>"+new java.util.Date(ls.getTimestamp())+"</date>");
+						dumpwriter.newLine();
+						dumpwriter.write("    <timestamp>"+ls.getTimestamp()+"</timestamp>");
+						dumpwriter.newLine();
+						dumpwriter.write("    <threshold>"+ls.getThreshold()+"</threshold>");
+						dumpwriter.newLine();
+						dumpwriter.write("    <calcmethod>"+ls.getCalcmetod()+"</calcmetod>");
+						dumpwriter.newLine();
+						dumpwriter.write("  </entry>");
+						dumpwriter.newLine();
+						
+					}
+
+					dumpwriter.write("</key");
+					dumpwriter.newLine();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			try {
+				dumpwriter.close();
+			} catch (IOException ignore){}
+			try{
+				filewriter.close();
+			} catch (IOException ignore){}
+		}
+
+	}
 }
