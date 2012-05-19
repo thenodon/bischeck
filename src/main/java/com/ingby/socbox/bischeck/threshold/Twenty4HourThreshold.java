@@ -19,14 +19,10 @@
 
 package com.ingby.socbox.bischeck.threshold;
 
-import java.util.ArrayList;
+
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -42,7 +38,7 @@ import com.ingby.socbox.bischeck.ConfigFileManager;
 import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
+import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHoliday;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHours;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLMonths;
@@ -576,106 +572,64 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         return calcMethod;
     }
 
+    
     @Override
     public Float getThreshold() {
         Calendar c = BisCalendar.getInstance();
         int hourThreshold = c.get(Calendar.HOUR_OF_DAY);
         int minuteThreshold = c.get(Calendar.MINUTE);
 
-        if (thresholdByPeriod[hourThreshold] == null) {
+        
+        if (thresholdByPeriod[hourThreshold] == null || 
+        		thresholdByPeriod[(hourThreshold+1)%24] == null) {
             return null;
         }
 
-        if (thresholdByPeriod[hourThreshold].isExpInd()) {
-
-            Float calculatedValue = null;
-            Pattern pat = null;
-
-            try {
-                pat = Pattern.compile (LastStatusCache.getInstance().getHostServiceItemFormat());
-
-            } catch (PatternSyntaxException e) {
-                logger.warn("Regex syntax exception, " + e);
-                return null;
-            }
-
-            Matcher mat = pat.matcher (thresholdByPeriod[hourThreshold].getExpThreshold());
-
-            // empty array to be filled with the cache fields to find
-            String arraystr="";
-
-            StringBuffer strbuf = new StringBuffer();
-            strbuf.append(arraystr);
-
-            while (mat.find ()) {
-                String param = mat.group();
-                strbuf.append(param+";");    
-            }
-
-            arraystr = strbuf.toString();
-            if (arraystr.lastIndexOf(';') == arraystr.length()-1) {
-                arraystr = arraystr.substring(0, arraystr.length()-1);
-            }
-
-            StringTokenizer st = new StringTokenizer(LastStatusCache.getInstance().getParametersByString(arraystr),",");
-
-            // Indicator to see if any parameters are null since then no calc will be done
-            boolean notANumber = false;
-            ArrayList<String> paramOut = new ArrayList<String>();
-
-            while (st.hasMoreTokens()) {
-                String retvalue = st.nextToken(); 
-
-                if (retvalue.equalsIgnoreCase("null")) { 
-                    notANumber= true;
-                }
-
-                paramOut.add(retvalue);
-            }
-
-            if (notANumber) { 
-                logger.debug("One or more of the parameters are null");
-                calculatedValue = null;
-            } else  {
-                StringBuffer sb = new StringBuffer ();
-                mat = pat.matcher (thresholdByPeriod[hourThreshold].getExpThreshold());
-
-                int i=0;
-                while (mat.find ()) {
-                    mat.appendReplacement (sb, paramOut.get(i++));
-                }
-                mat.appendTail (sb);
-
-
-                this.jep.parseExpression(sb.toString());
-
-                if (jep.hasError()) {
-                    logger.warn("Math jep expression error, " +jep.getErrorInfo());
-                    return null;
-                }
-
-                float value = (float) jep.getValue();
-                logger.debug("Calculated value = " + value);
-                if (Float.isNaN(value)) {
-                    calculatedValue=null;
-                } else {
-                    calculatedValue = Util.roundOneDecimals(value);
-                }
-            }
-            return calculatedValue;
-        } else {
-            // If the threshold is a value
-            if (thresholdByPeriod[(hourThreshold+1)%24] == null )
-                return null;
-            else if (thresholdByPeriod[(hourThreshold+1)%24].isExpInd())
-                return null;
-            else
-                return minuteThreshold*(thresholdByPeriod[(hourThreshold+1)%24].getFloatThreshold() - 
-                        thresholdByPeriod[hourThreshold].getFloatThreshold())/60 + 
-                        thresholdByPeriod[hourThreshold].getFloatThreshold();
-        }
+        Float calculatedfirst = calculateForInterval(thresholdByPeriod[hourThreshold]);
+        Float calculatednext = calculateForInterval(thresholdByPeriod[(hourThreshold+1)%24]);
+        
+        if (calculatedfirst == null || calculatednext == null)
+        	return null;
+        
+        return minuteThreshold*(calculatednext - calculatedfirst)/60 + calculatedfirst;
     }
 
+    
+    private Float calculateForInterval(ThresholdContainer tcont) {
+		
+    	Float calculatedValue = null;
+
+		if (tcont.isExpInd()) {
+
+			String parsedstr = LastStatusCacheParse.parse(tcont.getExpThreshold());
+
+			if (parsedstr == null) {
+				return null;
+			}
+			else {
+				this.jep.parseExpression(parsedstr);
+
+				if (jep.hasError()) {
+					logger.warn("Math jep expression error, " +jep.getErrorInfo());
+					return null;
+				}
+
+				float value = (float) jep.getValue();
+				logger.debug("Calculated value = " + value);
+				if (Float.isNaN(value)) {
+					calculatedValue=null;
+				} else {
+					calculatedValue = Util.roundOneDecimals(value);
+				}
+			}
+		}
+		else {
+			calculatedValue = tcont.getFloatThreshold();
+		}
+		
+		return calculatedValue;
+
+    }
 
     @Override
     public void setHostName(String name) {
