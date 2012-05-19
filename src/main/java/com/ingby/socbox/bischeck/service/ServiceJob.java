@@ -33,13 +33,13 @@ public class ServiceJob implements Job {
 
     static Logger  logger = Logger.getLogger(ServiceJob.class);
 
-    static private int runAfterDelay = 20; //in seconds
+    static private int runAfterDelay = 10; //in seconds
     
     
     static {
         try {
             runAfterDelay = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
-                    getProperty("runAfterDelay","20"));
+                    getProperty("runAfterDelay", Integer.toString(runAfterDelay)));
         } catch (NumberFormatException ne) {
             logger.error("Property " + 
             		runAfterDelay + 
