@@ -42,6 +42,7 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
+import com.ingby.socbox.bischeck.cache.LastStatusCacheMBean;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
