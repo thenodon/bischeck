@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.cache.CacheInf;
+import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
@@ -218,19 +219,23 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
     @Override
     public String getByTime(String hostname, String serviceName,
             String serviceItemName, long stime) {
-
+    	logger.debug("Find cache data for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
         String key = hostname+"-"+serviceName+"-"+serviceItemName;
         LastStatus ls = null;
 
         synchronized (cache) {
         	LinkedList<LastStatus> list = cache.get(key); 
         	// list has no size
-        	if (list.size() == 0) 
+        	if (list == null || list.size() == 0) 
         		return null;
         	
         	ls = FindNearest.nearest(stime, list);
+        
         }
-        return ls.getValue();
+        if (ls == null) 
+        	return null;
+        else
+        	return ls.getValue();
         
         /*
         	// stime is out of bounds
@@ -321,8 +326,8 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
             
             // Check the format of the index
-            if (index.contains(SEP)) {
-                StringTokenizer ind = new StringTokenizer(index,SEP);
+            if (index.contains(",")) {
+                StringTokenizer ind = new StringTokenizer(index,",");
                 while (ind.hasMoreTokens()) {
                     strbuf.append(
                     this.getIndex( 
@@ -343,8 +348,17 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
                             service, 
                             serviceitem,
                             i) + SEP);
-                }
-            } else { 
+                
+                } 
+            } else if (CacheUtil.isByTime(index)){
+            	// This is negative so its a time 
+            	strbuf.append(
+                        this.getByTime( 
+                        host,
+                        service, 
+                        serviceitem,
+                        System.currentTimeMillis() + CacheUtil.calculateByTime(index)*1000) + SEP);
+            } else {
                 strbuf.append(
                         this.getIndex( 
                         host,
