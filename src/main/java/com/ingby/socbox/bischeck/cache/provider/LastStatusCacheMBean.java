@@ -22,4 +22,9 @@ package com.ingby.socbox.bischeck.cache.provider;
 public interface LastStatusCacheMBean {
     public int getLastStatusCacheCount();
     public String[] getCacheKeys();
+    
+    /**
+     * Dump the cache to a simple xml
+     */
+    public void dump2file();
 }
