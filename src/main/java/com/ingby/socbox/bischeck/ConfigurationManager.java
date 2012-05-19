@@ -590,7 +590,7 @@ public class ConfigurationManager  {
             case 'H' : return (Integer.parseInt(value)*60*60);
             }
         }
-        throw new Exception();
+        throw new Exception("String" + schedule + " is not according to regex " + INTERVALSCHEDULEPATTERN );
     }
 
 
