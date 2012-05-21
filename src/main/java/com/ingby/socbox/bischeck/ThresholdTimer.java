@@ -27,6 +27,7 @@ import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
@@ -45,29 +46,32 @@ public class ThresholdTimer implements Job {
     static Scheduler sched;
 
     public static void init(ConfigurationManager configMgr) throws SchedulerException, ParseException {
-        //DirectSchedulerFactory.getInstance().createVolatileScheduler(10);
-        //sched = DirectSchedulerFactory.getInstance().getScheduler();
-        //sf = new StdSchedulerFactory();
-        sched = StdSchedulerFactory.getDefaultScheduler();
-        sched.start();
+    	
+    	
+    	sched = StdSchedulerFactory.getDefaultScheduler();
+        if (!sched.isStarted())
+        	sched.start();
+        
         
         JobDetail job = newJob(ThresholdTimer.class).
             withIdentity("DepleteThresholdCache", "DailyMaintenance").
             withDescription("DepleteThresholdCache").    
             build();
                 
+        
         // Every day at 10 sec past midnight
         CronTrigger trigger = newTrigger()
         .withIdentity("DepleteThresholdCacheTrigger", "DailyMaintenance")
         .withSchedule(cronSchedule(configMgr.getCacheClearCron()))
         .forJob("DepleteThresholdCache", "DailyMaintenance")
         .build();
-            
         
+        // If job exists delete and add
+        if (sched.getJobDetail(job.getKey()) != null)
+        		sched.deleteJob(job.getKey());
         Date ft = sched.scheduleJob(job, trigger);
+        
         sched.addJob(job, true);
-        //Date ft = null; // If you do not want to run
-        //Date ft = sched.scheduleJob(trigger);
         
         logger.info(job.getDescription() + " has been scheduled to run at: " + ft
                 + " and repeat based on expression: "
@@ -75,14 +79,6 @@ public class ThresholdTimer implements Job {
 
     }
     
-    /*
-    public static void stop() throws SchedulerException {
-        
-        sched.shutdown(true);
-         SchedulerMetaData metaData = sched.getMetaData();
-         logger.info("Executed " + metaData.getNumberOfJobsExecuted() + " jobs.");
-    }
-*/
     
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
