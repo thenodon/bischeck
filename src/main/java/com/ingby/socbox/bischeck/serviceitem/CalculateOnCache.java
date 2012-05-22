@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
 
+import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
@@ -43,7 +44,15 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     private JEP jep = null;
     
     public static void main(String[] args) {
-        Service bis = new LastCacheService("serviceName");
+    	try {
+			ConfigurationManager.initonce();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    	
+    	ConfigurationManager.getInstance();
+    	Service bis = new LastCacheService("serviceName");
         ServiceItem coc = new CalculateOnCache("serviceItemName");
         coc.setService(bis);
         
