@@ -45,7 +45,7 @@ public class LastStatusCacheParse {
 
 	public static String parse(String str) {
 		Pattern pat = null;
-
+		logger.debug("String to cache parse: " + str);
 		try {
 			pat = Pattern.compile (LastStatusCache.getInstance().getHostServiceItemFormat());
 
@@ -93,7 +93,7 @@ public class LastStatusCacheParse {
 				mat.appendReplacement (sb, paramOut.get(i++));
 			}
 			mat.appendTail (sb);
-
+			logger.debug("Parsed string with cache data: " + sb.toString());
 			return sb.toString();
 			
 		}

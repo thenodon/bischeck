@@ -5,8 +5,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import com.ingby.socbox.bischeck.cache.provider.FindNearest;
-
 public class CacheUtil {
 
 	static Logger  logger = Logger.getLogger(CacheUtil.class);

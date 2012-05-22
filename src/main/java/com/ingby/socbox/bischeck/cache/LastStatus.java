@@ -19,11 +19,17 @@
 
 package com.ingby.socbox.bischeck.cache;
 
+import java.io.Serializable;
+
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
 
-public class LastStatus {
+public class LastStatus implements Serializable, Cloneable {
 
-    private String value = null;
+
+    private static final long serialVersionUID = 1L;
+
+	private String value = null;
     private Long timestamp = null;
     private Float threshold = null;
     private String calcmethod = null;
@@ -49,7 +55,24 @@ public class LastStatus {
     }
 
 
-    public String getValue() {    
+    public LastStatus(XMLEntry entry) {
+    	this.timestamp = entry.getTimestamp();
+        this.value = entry.getValue();
+        this.threshold = entry.getThreshold();
+        this.calcmethod  = entry.getCalcmethod();
+    
+	}
+
+	
+    public LastStatus(LastStatus ls) {
+		this.value = ls.getValue();
+		this.timestamp = ls.getTimestamp();
+		this.calcmethod = ls.getCalcmetod();
+		this.threshold = ls.getThreshold();
+	}
+
+	
+	public String getValue() {    
         return this.value;
     }
     
@@ -66,5 +89,10 @@ public class LastStatus {
     
     public Long getTimestamp() { 
         return timestamp;
+    }
+
+    public LastStatus copy(){
+    	  LastStatus copy = new LastStatus(this); 
+    	  return copy;
     }
 }

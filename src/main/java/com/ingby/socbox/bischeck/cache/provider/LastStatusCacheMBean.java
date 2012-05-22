@@ -27,4 +27,9 @@ public interface LastStatusCacheMBean {
      * Dump the cache to a simple xml
      */
     public void dump2file();
+    
+    /**
+     * Clear cache content
+     */
+    public void clearCache();
 }
