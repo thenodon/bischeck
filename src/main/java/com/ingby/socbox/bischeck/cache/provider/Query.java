@@ -20,20 +20,19 @@ public class Query {
 			
 			System.out.println(i + "> " + list.get(i).getTimestamp());
 		}
-		LastStatus ls = nearest(80, list);
-		if (ls != null)
-			System.out.println(ls.getValue());
-		else 
-			System.out.println("IS null");
-	
-		LinkedList<LastStatus> tmplist = findByListToFrom(21, 101, list);
-		System.out.println("Size of copy " + tmplist.size());
-		for(LastStatus lst : tmplist) {
-			System.out.println(">>>" + lst.getTimestamp());
-		}
+		System.out.println(nearest(54, list).getValue());
+		System.out.println(nearest(55, list).getValue());
+		System.out.println(nearest(0, list).getValue());
+		
+		
+		System.out.println("Size of copy " + findByListToFrom(0, 101, list).size());
+		System.out.println("Size of copy " + findByListToFrom(31, 56, list).size());
+		System.out.println("Size of copy " + findByListToFrom(11,91 , list).size());
+		
+		
 	}
 	
-	protected static LastStatus nearest(long time, LinkedList<LastStatus> listtosearch) {
+	public static LastStatus nearest(long time, LinkedList<LastStatus> listtosearch) {
 		
 		logger.debug("Find value in cache at " + new java.util.Date(time));
         
