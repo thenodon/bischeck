@@ -5,7 +5,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.LastStatusCache;
+import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.CalculateOnCache;
