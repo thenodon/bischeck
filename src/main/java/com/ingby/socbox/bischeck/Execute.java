@@ -57,6 +57,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 
+import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 
@@ -79,7 +80,7 @@ public class Execute implements ExecuteMBean {
     private static final int RESTART = 1000;
 	private static final int OKAY = 0;
 	private static final int FAILED = 1;
-	private static final long LOOPTIMEOUT = 60000;
+	private static final long LOOPTIMEOUT = 30000;
 	private static final long SHUTDOWNSLEEP = 3000; 
     
 	/*
@@ -150,9 +151,8 @@ public class Execute implements ExecuteMBean {
         			ConfigurationManager.init();
         		else 
         			ConfigurationManager.initonce();
-        	} catch (Exception e1) {
-        		System.out.println("Creating bischeck Configuration Manager failed with:");
-        		e1.printStackTrace();
+        	} catch (Exception e) {
+        		logger.error("Creating bischeck Configuration Manager failed with:" + e.getMessage());
         		System.exit(FAILED);
         	}
 
@@ -188,7 +188,8 @@ public class Execute implements ExecuteMBean {
         if (!reloadRequested) {
         	try {
         		deamonInit();
-        	} catch (Exception e1) {
+        	} catch (Exception e) {
+        		logger.error("Deamon init failed with: " + e.getMessage());
         		return FAILED;
         	}	
         }
@@ -205,22 +206,33 @@ public class Execute implements ExecuteMBean {
         try {
 			sched = initScheduler(sched);
 			initTriggers(sched); 
-        } catch (SchedulerException e1) {
-			return FAILED;
+        } catch (SchedulerException e) {
+        	logger.error("Scheduler init failed with: " + e.getMessage());
+        	return FAILED;
 		}
         
-        
+        /*
+         * Reload cache
+         */
+        try {
+        	LastStatusCache.loaddump();
+        } catch (Exception e) {
+        	logger.warn("Loading cache failed: " + e.getMessage());
+        }
+		
         /* 
          * Enter loop if daemonMode 
          */
         deamonLoop(); 
-
-        
+  
         try {
             sched.shutdown();
+            logger.info("Scheduler shutdown");
         } catch (SchedulerException e) {
             logger.warn("Stopping Quartz scheduler failed with - " + e);
         }
+        
+        LastStatusCache.getInstance().dump2file();
         
         logger.info("******************* Shutdown ********************");
         
@@ -404,7 +416,7 @@ public class Execute implements ExecuteMBean {
 
     @Override
     public void shutdown() {
-        logger.info("Shutdown request");
+        logger.info("Shutdown request");        
         shutdownRequested = true;
         synchronized(syncObj) {
         	syncObj.notify();
