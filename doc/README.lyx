@@ -178,9 +178,15 @@ Support threshold based on fixed values and thresholds based on the measured
 \end_layout
 
 \begin_layout Itemize
+Data cache for all measured service items that can be retrieved based on
+ index or time.
+\end_layout
+
+\begin_layout Itemize
 Support multiple scheduling schema per service.
  This enable a fine grain control of when a service should be run.
- The configuration is based on a similar structure as UNIX cron.
+ bischeck support interval scheduling, cron scheduling and service relation
+ based scheduling.
 \end_layout
 
 \begin_layout Itemize
@@ -217,7 +223,7 @@ status open
 
 \begin_layout Plain Layout
 Nagios Core, Nagios XI, Icinga, OP5 Monitor, Shinken, Opsview, Centreon,
- etc.
+ NetEye, etc.
 \end_layout
 
 \end_inset
@@ -798,10 +804,23 @@ Service item cache - LastStatusCache
 
 \begin_layout Standard
 bischeck keeps a none persistent cache of the measured service items.
- For each service item the last 100 measured values are kept in the cache
+ The cache content can be used in the specification of execute statements
+ of service items and in threshold classes to create dynamic and adaptive
+ thresholds, see section 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "label:Twenty4HourThreshold-class"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+For each service item the last 500 measured values are kept in the cache
  in a LRU list.
- To retrieve a specific service item from the cache the following format
- is used, 
+ To retrieve data from the cache the following format is used, 
 \emph on
 host-service-item[index]
 \emph default
@@ -812,16 +831,25 @@ host-service-item[index]
 erpserver-orders-ediOrders[0]
 \emph default
 .
- The cache content can be used in the specification of execute statements
- of service items and in specification in threshold classes, see section
  
-\begin_inset CommandInset ref
-LatexCommand vref
-reference "label:Twenty4HourThreshold-class"
+\end_layout
 
-\end_inset
-
-.
+\begin_layout Standard
+Data can also be retrieved from the cache by using a time offset, like the
+ cache data of 
+\emph on
+erpserver-orders-ediOrders
+\emph default
+ 30 minutes ago.
+ This is specified by setting the index part to 
+\emph on
+-30M, erpserver-orders-ediOrders[-30M].
+ 
+\emph default
+This is useful since now relation between static index and service schedule
+ needs to be known.
+ The time definition support S for seconds, M for minutes and H for hours.
+ 
 \end_layout
 
 \begin_layout Chapter
@@ -2740,12 +2768,44 @@ Service scheduling
 The service scheduling define when a service is triggered to be executed.
  For each service there can be multiple scheduling configurations, but at
  lest one is mandatory.
- A scheduling can be described in two ways.
- The simple format describe a interval execution that are repeated forever.
+ The scheduling can be described in three ways.
+ 
+\end_layout
+
+\begin_layout Section
+Interval scheduling
+\end_layout
+
+\begin_layout Standard
+The simple format describe a interval execution that are repeated forever.
  The format is just a number and a indicator defining the granularity in
  seconds (S), minutes (M) or hours (H).
  10M specify that the service should be executed every ten minutes.
- The second format is more advanced and follow the cron specification of
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<schedule>10M</schedule>		
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Cron based scheduling
+\end_layout
+
+\begin_layout Standard
+The second format is more advanced and follow the cron specification of
  Quartz, see 
 \begin_inset Flex URL
 status open
@@ -2758,7 +2818,7 @@ http://www.quartz-scheduler.org
 \end_inset
 
 .
- With this format its possible to define This could be like 
+ With this format its possible to define scheduling expression like 
 \emph on
 
 \begin_inset Quotes eld
@@ -2779,6 +2839,72 @@ status open
 \begin_layout Plain Layout
 
 http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<schedule>0 15 10 ? * MON-FRI</schedule>		
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Service relation scheduling
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.0]
+\end_layout
+
+\end_inset
+
+The service relation scheduling trigger a service to execute after another
+ service has been scheduled.
+ This is useful when a service is depending on data for another service
+ for its thresholds or execution statement.
+ The format is 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+host-service
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\emph default
+specifying the host and service that will trigger the execution of the service.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<schedule>erpserver-orders</schedule>		
 \end_layout
 
 \end_inset
@@ -2848,7 +2974,7 @@ $BISHOME/bin
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\sffamily}"
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
 inline false
 status open
 
@@ -2883,10 +3009,17 @@ jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.acce
 \end_layout
 
 \begin_layout Standard
-If authentication should be used please change the property com.sun.management.jmxr
-emote.authenticate to true and configure the roles and password in the files
- jmxremote.access and jmxremote.password.
+If authentication should be used please change the property 
+\begin_inset Newline newline
+\end_inset
+
+com.sun.management.jmxremote.authenticate to true and configure the roles and
+ password in the files jmxremote.access and jmxremote.password.
  For more information how to configure JMX please visit 
+\begin_inset Newline newline
+\end_inset
+
+
 \begin_inset CommandInset href
 LatexCommand href
 target "http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html"
@@ -3730,6 +3863,42 @@ ce data can be retrieved from the a Nagios service.
 \end_layout
 
 \begin_layout Itemize
+[FR-220] Bischeck now support one additional scheduling method where scheduling
+ can be defined to run a service after a different service has executed.
+ This can be useful when a service is depending on data for another service
+ for its thresholds or execution statement.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-221] Cache retrieval is now support by using a time offset to find the
+ nearest cache element to the time offset.
+ 
+\end_layout
+
+\begin_layout Itemize
+Bischeck can now support the usage of cached data in an execution statement
+ of a serviceitem.
+ This is typical useful when a serviceitem execute statement is depending
+ on other service data.
+ For example in a SQL query string:
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+select value from table1 where id = host1-web-state[0] and createdate =
+ '%%yyyy-MM-dd%%'");
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
 Added support for other Linux distributions then Redhat based.
  bischeck should now install on Debian 6 and Ubuntu 10/11.
  
@@ -3760,7 +3929,11 @@ A configured service can be configured not to send its data to a the configured
 The bischeck script now support JMX authentication.
  The authentication files are located in the etc directory and named jmxremote.pa
 ssword and jmxremote.access.
- Default is to that authentication is disabled by the system property 
+ Default is to that authentication is disabled by the system property
+\begin_inset Newline newline
+\end_inset
+
+
 \begin_inset Quotes eld
 \end_inset
 
@@ -3771,6 +3944,10 @@ ssword and jmxremote.access.
 .
  To enable authentication set the property to true.
  For more info about JMX see 
+\begin_inset Newline newline
+\end_inset
+
+
 \begin_inset CommandInset href
 LatexCommand href
 target "http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html"
@@ -3784,6 +3961,120 @@ target "http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525
 Bugs fixed and important issues
 \end_layout
 
+\begin_layout Itemize
+The Twenty4Thresholds class was previous version not doing a correct linear
+ equation calculation if a expression based threshold was defined.
+ Lets illustrate the errors with this example from the 24thresholds.xml configura
+tion file having a mix with static and expression based thresholds.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+....
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 12:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>7000</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 13:00 -->     
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>testhost-testservice-testitem[1] / 3</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 14:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>testhost-testservice-testitem[1] / 2</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 15:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>testhost-testservice-testitem[1] + 1000 </hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 16:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>12000</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+....
+\end_layout
+
+\end_inset
+
+In the previous version the threshold value between 12:00 and 13:00 would
+ be null since it was a mix of static and expression based thresholds.
+ And between 15:00 and 16:00 the threshold would have been calculated as
+ 
+\begin_inset Quotes eld
+\end_inset
+
+testhost-testservice-testitem[1] + 1000
+\begin_inset Quotes erd
+\end_inset
+
+ independent of the time between 15:00 and 16:00.
+\end_layout
+
+\begin_layout Standard
+Now the linear equation will correctly be calculated with any mix of static
+ and expression based definitions.
+ In the above example the calculated threshold for 12:20 will now be:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+20*((testhost-testservice-testitem[1]/3) - 7000)/60 + 7000
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 The Service interface has a number of new methods that should been there
  from the beginning.
