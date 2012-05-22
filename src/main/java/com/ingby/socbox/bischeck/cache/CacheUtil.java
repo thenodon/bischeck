@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 public class CacheUtil {
 
 	static Logger  logger = Logger.getLogger(CacheUtil.class);
-	private static final String INTERVALSCHEDULEPATTERN = "^-[0-9]+ *[HMS]{1} *$";
+	private static final String FINDINTIMEPATTERN = "^-[0-9]+ *[HMS]{1} *$";
     
 	/**
      * The method calculate the interval for continues scheduling if the format
@@ -20,7 +20,7 @@ public class CacheUtil {
      */
     public static int calculateByTime(String schedule) {
         //"^[0-9]+ *[HMS]{1} *$" - check for a
-        Pattern pattern = Pattern.compile(INTERVALSCHEDULEPATTERN);
+        Pattern pattern = Pattern.compile(FINDINTIMEPATTERN);
 
         // Determine if there is an exact match
         Matcher matcher = pattern.matcher(schedule);
@@ -41,7 +41,7 @@ public class CacheUtil {
     
     
     public static boolean isByTime(String schedule) {
-    	Pattern pattern = Pattern.compile(INTERVALSCHEDULEPATTERN);
+    	Pattern pattern = Pattern.compile(FINDINTIMEPATTERN);
 
     	// Determine if there is an exact match
     	Matcher matcher = pattern.matcher(schedule);
