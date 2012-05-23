@@ -32,6 +32,7 @@ import org.apache.commons.cli.Options;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.nfunk.jep.JEP;
+import org.nfunk.jep.ParseException;
 
 import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.ConfigFileManager;
@@ -39,6 +40,7 @@ import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
+import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHoliday;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHours;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLMonths;
@@ -52,7 +54,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     static Logger  logger = Logger.getLogger(Twenty4HourThreshold.class);
 
-    private JEP jep = null;
+    private ExecuteJEP jep = null;
 
     private String serviceName;
     private String serviceItemName;
@@ -124,7 +126,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     
     public Twenty4HourThreshold() {
-        this.jep = new JEP();
+        this.jep = new ExecuteJEP();
         this.state = NAGIOSSTAT.OK;
     }
 
@@ -597,7 +599,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     
     private Float calculateForInterval(ThresholdContainer tcont) {
 		
-    	Float calculatedValue = null;
+    	//Float calculatedValue = null;
 
 		if (tcont.isExpInd()) {
 
@@ -607,13 +609,31 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 				return null;
 			}
 			else {
-				this.jep.parseExpression(parsedstr);
+			
+				Float value;
+				try {
+					value = jep.execute(parsedstr);
+				} catch (ParseException e) { 
+					return null;
+				}
+				
+	    		if (value == null) 
+	    			return null;
+	    		
+	    		logger.debug("Calculated value = " + value);
+	    		return Util.roundOneDecimals(value);
+				
+	    			
+				
+				//this.jep.parseExpression(parsedstr);
 
+	    		/*	
 				if (jep.hasError()) {
 					logger.warn("Math jep expression error, " +jep.getErrorInfo());
 					return null;
 				}
-
+				
+	    			
 				float value = (float) jep.getValue();
 				logger.debug("Calculated value = " + value);
 				if (Float.isNaN(value)) {
@@ -621,13 +641,14 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 				} else {
 					calculatedValue = Util.roundOneDecimals(value);
 				}
+				*/
 			}
 		}
 		else {
-			calculatedValue = tcont.getFloatThreshold();
+			return tcont.getFloatThreshold();
 		}
 		
-		return calculatedValue;
+		//return calculatedValue;
 
     }
 

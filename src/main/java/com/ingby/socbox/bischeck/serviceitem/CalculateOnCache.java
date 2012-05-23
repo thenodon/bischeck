@@ -19,20 +19,13 @@
 
 package com.ingby.socbox.bischeck.serviceitem;
 
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import org.apache.log4j.Logger;
-import org.nfunk.jep.JEP;
-import org.nfunk.jep.ParseException;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
+import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
 
@@ -41,9 +34,10 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     
     static Logger  logger = Logger.getLogger(CalculateOnCache.class);
 
-    private JEP jep = null;
+    private ExecuteJEP jep = null;
     
-    public static void main(String[] args) {
+    @SuppressWarnings("deprecation")
+	public static void main(String[] args) {
     	try {
 			ConfigurationManager.initonce();
 		} catch (Exception e1) {
@@ -126,9 +120,9 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     
     public CalculateOnCache(String name) {
         this.serviceItemName = name;    
-        this.jep = new JEP();
-        this.jep.addStandardFunctions();
-        this.jep.addStandardConstants();
+        this.jep = new ExecuteJEP();
+        //this.jep.addStandardFunctions();
+        //this.jep.addStandardConstants();
                  
     }
     
@@ -144,6 +138,14 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     		setLatestExecuted(null);
     	}
     	else {
+    		
+    		Float value = jep.execute(cacheparsedstr);
+    		if (value == null) {
+    			setLatestExecuted(null);
+    		} else {
+    			setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
+    		}
+    		/*
     		this.jep.parseExpression(cacheparsedstr);
 
     		if (jep.hasError()) {
@@ -157,6 +159,7 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     		} else {
     			setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
     		}
+    		 */
     	}
     }
 }
