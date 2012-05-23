@@ -4,7 +4,6 @@ package com.ingby.socbox.bischeck.jepext;
 import java.util.*;
 import org.nfunk.jep.*;
 import org.nfunk.jep.function.Add;
-import org.nfunk.jep.function.Divide;
 import org.nfunk.jep.function.PostfixMathCommand;
 
 public class Average extends PostfixMathCommand {
