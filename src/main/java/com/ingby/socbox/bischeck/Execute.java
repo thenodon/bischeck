@@ -200,7 +200,16 @@ public class Execute implements ExecuteMBean {
     	shutdownRequested = false;
     	reloadRequested = false;
         
-        
+    	/*
+         * Reload cache
+         */
+        try {
+        	LastStatusCache.loaddump();
+        } catch (Exception e) {
+        	logger.warn("Loading cache failed: " + e.getMessage());
+        }
+		
+                
         Scheduler sched = null;     
         
         try {
@@ -211,15 +220,7 @@ public class Execute implements ExecuteMBean {
         	return FAILED;
 		}
         
-        /*
-         * Reload cache
-         */
-        try {
-        	LastStatusCache.loaddump();
-        } catch (Exception e) {
-        	logger.warn("Loading cache failed: " + e.getMessage());
-        }
-		
+        
         /* 
          * Enter loop if daemonMode 
          */
