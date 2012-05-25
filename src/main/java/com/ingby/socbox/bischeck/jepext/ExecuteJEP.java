@@ -3,7 +3,6 @@ package com.ingby.socbox.bischeck.jepext;
 import org.apache.log4j.Logger;
 import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
-import org.nfunk.jep.function.PostfixMathCommandI;
 
 
 public class ExecuteJEP {
@@ -11,7 +10,6 @@ public class ExecuteJEP {
 
 	private JEP parser = null;
 	
-	@SuppressWarnings("unchecked")
 	public ExecuteJEP() {
 		logger.debug("Create");
 		parser = new JEP();
