@@ -97,6 +97,7 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private final static String BEANNAME = "com.ingby.socbox.bischeck:name=Cache";
 
 	private static final String SEP = ";";
+	private static final String JEPLISTSEP = ",";
 	private static ObjectName   mbeanname = null;
 
 	private static String lastStatusCacheDumpDir;
@@ -282,8 +283,8 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		for (int i = 0; i < size;i++)
 			System.out.println(i +" : "+cache.get(key).get(i).getValue());
 	}
-
-
+	
+	
 	@Override
 	public String getParametersByString(String parameters) {
 		String resultStr="";
@@ -314,6 +315,10 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 
 			// Check the format of the index
+			/*
+			 * Format x[Y,Z,--]
+			 * A list of elements 
+			 */
 			if (index.contains(",")) {
 				StringTokenizer ind = new StringTokenizer(index,",");
 				while (ind.hasMoreTokens()) {
@@ -322,9 +327,15 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 									host,
 									service, 
 									serviceitem,
-									Integer.parseInt((String)ind.nextToken())) + SEP);
+									Integer.parseInt((String)ind.nextToken())) + JEPLISTSEP);
 				}
+				strbuf.append(SEP);
+				
 			} else if (index.contains(":")) {
+				/*
+				 * Format x[Y:Z]
+				 * Elements from index to index
+				 */
 				StringTokenizer ind = new StringTokenizer(index,":");
 				int indstart = Integer.parseInt((String) ind.nextToken());
 				int indend = Integer.parseInt((String) ind.nextToken());
@@ -335,11 +346,17 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 									host,
 									service, 
 									serviceitem,
-									i) + SEP);
+									i) + JEPLISTSEP);
 
-				} 
+				}
+				strbuf.append(SEP);
+				
 			} else if (CacheUtil.isByTime(index)){
-				// This is negative so its a time 
+				/*
+				 * Format x[-Tc]
+				 * The element closest to time T at time granularity based on c 
+				 * that is S, M or H. 
+				 */ 
 				strbuf.append(
 						this.getByTime( 
 								host,
@@ -357,15 +374,24 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		}    
 
 		resultStr=strbuf.toString();
-		// Remove ending ,
-		if (resultStr.lastIndexOf(',') == resultStr.length()-1) {
-			resultStr = resultStr.substring(0, resultStr.length()-1);
-		}
+		
+		resultStr = cleanUp(resultStr, SEP);
 		logger.debug("Result string: "+ resultStr);
 		return resultStr;
 	}
 
+	
+	private String cleanUp(String str, String sep) {
+		// This line replace all lists that will end with ,;
+		str = str.replaceAll(",;", ";");
+		// remove the last sep character
+		if (str.lastIndexOf(sep) == str.length()-1) {
+			str = str.substring(0, str.length()-1);
+		}
+		return str;
+	}
 
+	
 	public String getHostServiceItemFormat(){
 		return hostServiceItemFormat;
 	}
