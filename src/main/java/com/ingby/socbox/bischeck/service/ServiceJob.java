@@ -164,39 +164,42 @@ public class ServiceJob implements Job {
         for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
             ServiceItem serviceitem = serviceitementry.getValue();
             logger.debug("Executing ServiceItem: "+ serviceitem.getServiceItemName());
-            
-            try {
-                long start = TimeMeasure.start();
-                try {
-                    service.openConnection();
-                    //service.setConnectionEstablished(true);
+            synchronized (service) {
+
+            	try {
+            		long start = TimeMeasure.start();
+
+
+                	try {
+                		service.openConnection();
+                		//service.setConnectionEstablished(true);
+                	} catch (Exception e) {
+                		logger.error("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed with error " + e);
+                		service.setConnectionEstablished(false);
+                		return NAGIOSSTAT.CRITICAL;
+                	}
+
+                	serviceitem.execute();
+
+                	if (service.isConnectionEstablished()) {
+                		try {
+                			service.closeConnection();
+                		} catch (Exception ignore) {}
+                	}
+
+                	serviceitem.setExecutionTime(
+                			Long.valueOf(TimeMeasure.stop(start)));
+                	logger.debug("Time to execute " + 
+                			serviceitem.getExecution() + 
+                			" : " + serviceitem.getExecutionTime() +
+                	" ms");
                 } catch (Exception e) {
-                    logger.error("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed with error " + e);
-                    service.setConnectionEstablished(false);
-                    return NAGIOSSTAT.CRITICAL;
+                	logger.error("Execution prepare and/or query \""+ serviceitem.getExecution() 
+                			+ "\" failed with " + e);
+                	throw new Exception("Execution prepare and/or query \""+ serviceitem.getExecution() 
+                			+ "\" failed. See bischeck log for more info.");
                 }
-
-                serviceitem.execute();
-                
-                if (service.isConnectionEstablished()) {
-                    try {
-                        service.closeConnection();
-                    } catch (Exception ignore) {}
-                }
-                    
-                serviceitem.setExecutionTime(
-                        Long.valueOf(TimeMeasure.stop(start)));
-                logger.debug("Time to execute " + 
-                        serviceitem.getExecution() + 
-                        " : " + serviceitem.getExecutionTime() +
-                " ms");
-            } catch (Exception e) {
-                logger.error("Execution prepare and/or query \""+ serviceitem.getExecution() 
-                        + "\" failed with " + e);
-                throw new Exception("Execution prepare and/or query \""+ serviceitem.getExecution() 
-                        + "\" failed. See bischeck log for more info.");
             }
-
             try {
                 serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
                 // Always report the state for the worst service item 
