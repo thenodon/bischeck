@@ -38,7 +38,6 @@ import javax.xml.bind.JAXBContext;
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.service.Service;
@@ -74,7 +73,7 @@ import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
  * @author andersh
  *
  */
-public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
+public class LastStatusCache implements LastStatusCacheMBean {
 
 	static Logger  logger = Logger.getLogger(LastStatusCache.class);
 
@@ -138,9 +137,12 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
-	@Override
+	/**
+	 * Add value form the serviceitem
+	 * @param service
+	 * @param serviceitem
+	 */
 	public  void add(Service service, ServiceItem serviceitem) {
-
 
 		String hostname = service.getHost().getHostname();
 		String serviceName = service.getServiceName();
@@ -153,7 +155,14 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
-	@Override
+	/**
+     * Add a entry to the cache
+     * @param hostname
+     * @param serviceName
+     * @param serviceItemName
+     * @param measuredValue
+     * @param thresholdValue
+     */
 	public  void add(String hostname, String serviceName,
 			String serviceItemName, String measuredValue,
 			Float thresholdValue) {
@@ -163,6 +172,11 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
+	/**
+	 * Add cache element
+	 * @param ls
+	 * @param key
+	 */
 	private void add(LastStatus ls, String key) {
 		LinkedList<LastStatus> fifo;
 		synchronized (cache) {
@@ -181,6 +195,12 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		}
 	}
 
+	
+	/**
+	 * Add cache element in the end of the list
+	 * @param ls
+	 * @param key
+	 */
 	private void addLast(LastStatus ls, String key) {
 		LinkedList<LastStatus> fifo;
 		synchronized (cache) {
@@ -200,7 +220,14 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
-	@Override
+	/**
+     * Get the last value inserted in the cache for the host, service and 
+     * service item.
+     * @param hostname
+     * @param serviceName
+     * @param serviceItemName
+     * @return last inserted value 
+     */
 	public String getFirst(String hostname, String serviceName,
 			String serviceItemName) {
 
@@ -208,7 +235,15 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
-	@Override
+	/**
+	 * Get the value in the cache for the host, service and service item at 
+	 * cache location according to index, where index 0 is the last inserted. 
+	 * @param hostname
+	 * @param serviceName
+	 * @param serviceItemName
+	 * @param index
+	 * @return the value
+	 */
 	public String getIndex(String hostname, String serviceName,
 			String serviceItemName, int index) {
 
@@ -234,7 +269,16 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
-	@Override
+	/**
+     * Get the value in the cache for the host, service and service item that  
+     * is closed in time to a cache data. 
+     * The method do the search by a number splitting and then search.
+     * @param hostname
+     * @param serviceName
+     * @param serviceItemName
+     * @param time
+     * @return the value
+     */
 	public String getByTime(String hostname, String serviceName,
 			String serviceItemName, long stime) {
 		logger.debug("Find cache data for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
@@ -257,6 +301,15 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
+	/**
+	 * Get cache index for element closest to the stime, where stime is the time
+	 * in milliseconds "back" in time.
+	 * @param hostname
+	 * @param serviceName
+	 * @param serviceItemName
+	 * @param stime
+	 * @return
+	 */
 	public Integer getByTimeIndex(String hostname, String serviceName,
 			String serviceItemName, long stime) {
 		logger.debug("Find cache index for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
@@ -281,14 +334,24 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 	
 	
-	@Override
+	/**
+     * Get the size of the cache entries, the number of unique host, service 
+     * and service item entries. 
+     * @return size of the cache index
+     */
 	public  int size() {
 		return cache.size();
 	}
 
 
-	@Override
-	public int sizeLru(String hostname, String serviceName,
+	/**
+     * The size for the specific host, service, service item entry.
+     * @param hostname
+     * @param serviceName
+     * @param serviceItemName
+     * @return size of cached values for a specific host-service-serviceitem
+     */
+    public int sizeLru(String hostname, String serviceName,
 			String serviceItemName) {
 		String key = hostname+"-"+serviceName+"-"+serviceItemName;
 		return cache.get(key).size();
@@ -306,8 +369,14 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 	
 	
-	@Override
-	public String getParametersByString(String parameters) {
+	/**
+     * Takes a list of ; separated host-service-serviceitems[x] and return the 
+     * a string with each of the corresponding values from the cache with , as
+     * separator.
+     * @param parameters
+     * @return 
+     */
+    public String getParametersByString(String parameters) {
 		String resultStr="";
 		StringTokenizer st = new StringTokenizer(parameters,SEP);
 		StringBuffer strbuf = new StringBuffer();
@@ -346,6 +415,15 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
+    /**
+     * Parse the indexstr that contain the index expression and find the 
+     * right way to retrieve the cache elements. 
+     * @param strbuf
+     * @param indexstr
+     * @param host
+     * @param service
+     * @param serviceitem
+     */
 	private void parseIndexString(StringBuffer strbuf, String indexstr,
 			String host, String service, String serviceitem) {
 		
@@ -450,6 +528,10 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	
+	/**
+	 * Return the regex for the host-service-serviceitem format
+	 * @return
+	 */
 	public String getHostServiceItemFormat(){
 		return hostServiceItemFormat;
 	}
@@ -485,7 +567,10 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	
-	
+	/**
+	 * Load the cache data from the persistent storage
+	 * @throws Exception
+	 */
 	public static void loaddump() throws Exception{
 		Object xmlobj = null;
 		File configfile = new File(lastStatusCacheDumpFile);
@@ -517,149 +602,11 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				countEntries + " entries in " + (end-start) + " ms");
 	}
 
-/*
-	private static Object getXMLFromBackend(Object xmlobj, File configfile, JAXBContext jc)
-			throws Exception {
-		try {
-			jc = JAXBContext.newInstance("com.ingby.socbox.bischeck.xsd.laststatuscache");
-		} catch (JAXBException e) {
-			logger.error("Could not get JAXB context from class");
-			throw new Exception(e.getMessage());
-		}
-		SchemaFactory sf = SchemaFactory.newInstance(
-				javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		Schema schema = null;
-
-		URL xsdUrl = ConfigurationManager.class.getClassLoader().getResource("laststatuscache.xsd");
-		if (xsdUrl == null) {
-			logger.error("Could not find xsd file " +
-					"laststatuscache.xsd"+ " in classpath");
-			throw new Exception("Could not find xsd file " +
-					"laststatuscache.xsd" + " in classpath");
-		}
-
-		try {
-			schema = sf.newSchema(new File(xsdUrl.getFile()));
-		} catch (Exception e) {
-			logger.error("Could not vaildate xml file " + 
-					configfile.getAbsolutePath() + 
-					" with xsd file " +
-					"laststatuscache.xsd" + ": " + 
-					e.getMessage());
-			throw new Exception(e.getMessage());
-		} 
-
-		Unmarshaller u = null;
-		try {
-			u = jc.createUnmarshaller();
-		} catch (JAXBException e) {
-			logger.error("Could not create an unmarshaller for for context");
-			throw new Exception(e);
-		}
-		u.setSchema(schema);
-
-		try {
-			xmlobj =  u.unmarshal(configfile);
-		} catch (JAXBException e) {
-			logger.error("Could not unmarshall the file " +  configfile.getAbsolutePath() +":" + e);
-			throw new Exception(e);
-		}
-		logger.debug("Create new object for xml file " +  configfile.getAbsolutePath());
-		return xmlobj;
-	}
-
-*/
 	
 	@Override
 	public void dump2file() {
 		BackendStorage.dump2file(cache,lastStatusCacheDumpFile);
-		/*
-		long start = System.currentTimeMillis();
-		long countEntries = 0;
-		long countKeys = 0;
-		File dumpfile = new File(lastStatusCacheDumpFile);
-		copyFile(dumpfile,new File(lastStatusCacheDumpFile+".bak"));
-		FileWriter filewriter = null;
-		BufferedWriter dumpwriter = null;
-		logger.debug("Start dump cache");
-		
-		try {
-			filewriter = new FileWriter(dumpfile);
-			dumpwriter = new BufferedWriter(filewriter);
-
-			dumpwriter.write("<laststatuscache>");
-			dumpwriter.newLine();
-			
-			for (String key:cache.keySet()) {
-				dumpwriter.write("  <!-- ################################ -->");
-				dumpwriter.newLine();
-				
-				dumpwriter.write("  <!-- "+key+" -->");
-				dumpwriter.newLine();
-				
-				dumpwriter.write("  <!-- ################################ -->");
-				dumpwriter.newLine();
-				
-				dumpwriter.write("  <key id=\""+key+"\">");
-				dumpwriter.newLine();
-				
-				for (LastStatus ls:cache.get(key)) {
-				try {
-					dumpwriter.write("    <entry>");
-					dumpwriter.newLine();
-
- 					dumpwriter.write("      <value>"+ls.getValue()+"</value>");
-					dumpwriter.newLine();
-					dumpwriter.write("      <date>"+new java.util.Date(ls.getTimestamp())+"</date>");
-					dumpwriter.newLine();
-					dumpwriter.write("      <timestamp>"+ls.getTimestamp()+"</timestamp>");
-					dumpwriter.newLine();
-					if (ls.getThreshold() != null) {
-						dumpwriter.write("      <threshold>"+ls.getThreshold()+"</threshold>");
-						dumpwriter.newLine();
-					}
-					dumpwriter.write("      <calcmethod>"+encode(ls.getCalcmetod())+"</calcmethod>");
-					dumpwriter.newLine();
- 					dumpwriter.write("    </entry>");
-					dumpwriter.newLine();
-					countEntries++;
-				} catch (NullPointerException ne) {
-					StringWriter sw = new StringWriter();
-					PrintWriter pw = new PrintWriter(sw);
-					ne.printStackTrace(pw);
-					sw.toString();
-					logger.warn("Dump entry failed: "+ sw.toString());
-				}
-				}
-
-				dumpwriter.write("  </key>");
-				dumpwriter.newLine();
-				dumpwriter.newLine();
-				countKeys++;
-			}
-
-			dumpwriter.write("</laststatuscache>");
-			dumpwriter.newLine();
-			dumpwriter.flush();
-			filewriter.flush();
-		} catch (IOException e) {
-			logger.warn("Failed to write to cache dump with exception: " + e.getMessage());
-		}finally {
-			try {
-				dumpwriter.close();
-			} catch (IOException ignore){}
-			try{
-				filewriter.close();
-			} catch (IOException ignore){}
-		}
-
-		long end = System.currentTimeMillis();
-	
-		logger.info("Cache dumped " + countKeys + " keys and " +
-				countEntries + " entries in " + (end-start) + " ms");
-	*/
 	}
-
 
 
 	@Override
