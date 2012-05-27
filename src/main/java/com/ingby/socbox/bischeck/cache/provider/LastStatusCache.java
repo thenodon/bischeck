@@ -19,17 +19,9 @@
 
 package com.ingby.socbox.bischeck.cache.provider;
 
-import java.io.BufferedWriter;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.management.ManagementFactory;
-import java.net.URL;
-import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -42,10 +34,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 
@@ -100,7 +88,7 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private static final String JEPLISTSEP = ",";
 	private static ObjectName   mbeanname = null;
 
-	private static String lastStatusCacheDumpDir;
+	private static String lastStatusCacheDumpFile;
 
 	private String hostServiceItemFormat = "[a-zA-Z1-9]*?.[a-zA-Z1-9]*?.[a-zA-Z1-9]*?\\[.*?\\]";
 
@@ -126,8 +114,17 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			logger.fatal("Mbean exception - " + e.getMessage());
 		}
 
-		lastStatusCacheDumpDir = ConfigurationManager.getInstance().getProperties().
-		getProperty("lastStatusCacheDumpDir","/var/tmp/lastStatusCacheDump");
+		lastStatusCacheDumpFile = 
+			ConfigurationManager.getInstance().getProperties().
+			getProperty("lastStatusCacheDumpDir","/var/tmp/") + "lastStatusCacheDump";
+
+		try {
+			fifosize = Integer.parseInt(
+					ConfigurationManager.getInstance().getProperties().
+					getProperty("lastStatusCacheSize","500"));
+		} catch (NumberFormatException ne) {
+			fifosize = 500;
+		}
 
 	}
 
@@ -260,6 +257,30 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
+	public Integer getByTimeIndex(String hostname, String serviceName,
+			String serviceItemName, long stime) {
+		logger.debug("Find cache index for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
+		
+		String key = hostname+"-"+serviceName+"-"+serviceItemName;
+		
+		Integer index = null;
+
+		synchronized (cache) {
+			LinkedList<LastStatus> list = cache.get(key); 
+			// list has no size
+			if (list == null || list.size() == 0) 
+				return null;
+
+			index = Query.nearestByIndex(stime, list);
+
+		}
+		if (index == null) 
+			return null;
+		else
+			return index;    
+	}
+	
+	
 	@Override
 	public  int size() {
 		return cache.size();
@@ -288,7 +309,7 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	@Override
 	public String getParametersByString(String parameters) {
 		String resultStr="";
-		StringTokenizer st = new StringTokenizer(parameters,";");
+		StringTokenizer st = new StringTokenizer(parameters,SEP);
 		StringBuffer strbuf = new StringBuffer();
 		logger.debug("Parameter string: " + parameters);
 		strbuf.append(resultStr);
@@ -299,7 +320,7 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			int indexstart=token.indexOf("[");
 			int indexend=token.indexOf("]");
 
-			String index = token.substring(indexstart+1, indexend);
+			String indexstr = token.substring(indexstart+1, indexend);
 
 			StringTokenizer parameter = new StringTokenizer(token.substring(0, indexstart),"-");
 
@@ -311,66 +332,10 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 					host + "-" +
 					service + "-"+
 					serviceitem + "[" +
-					index+"]");
+					indexstr+"]");
 
 
-			// Check the format of the index
-			/*
-			 * Format x[Y,Z,--]
-			 * A list of elements 
-			 */
-			if (index.contains(",")) {
-				StringTokenizer ind = new StringTokenizer(index,",");
-				while (ind.hasMoreTokens()) {
-					strbuf.append(
-							this.getIndex( 
-									host,
-									service, 
-									serviceitem,
-									Integer.parseInt((String)ind.nextToken())) + JEPLISTSEP);
-				}
-				strbuf.append(SEP);
-				
-			} else if (index.contains(":")) {
-				/*
-				 * Format x[Y:Z]
-				 * Elements from index to index
-				 */
-				StringTokenizer ind = new StringTokenizer(index,":");
-				int indstart = Integer.parseInt((String) ind.nextToken());
-				int indend = Integer.parseInt((String) ind.nextToken());
-
-				for (int i = indstart; i<indend+1; i++) {
-					strbuf.append(
-							this.getIndex( 
-									host,
-									service, 
-									serviceitem,
-									i) + JEPLISTSEP);
-
-				}
-				strbuf.append(SEP);
-				
-			} else if (CacheUtil.isByTime(index)){
-				/*
-				 * Format x[-Tc]
-				 * The element closest to time T at time granularity based on c 
-				 * that is S, M or H. 
-				 */ 
-				strbuf.append(
-						this.getByTime( 
-								host,
-								service, 
-								serviceitem,
-								System.currentTimeMillis() + CacheUtil.calculateByTime(index)*1000) + SEP);
-			} else {
-				strbuf.append(
-						this.getIndex( 
-								host,
-								service, 
-								serviceitem,
-								Integer.parseInt(index)) + SEP);
-			}
+			parseIndexString(strbuf, indexstr, host, service, serviceitem);
 		}    
 
 		resultStr=strbuf.toString();
@@ -378,6 +343,99 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		resultStr = cleanUp(resultStr, SEP);
 		logger.debug("Result string: "+ resultStr);
 		return resultStr;
+	}
+
+
+	private void parseIndexString(StringBuffer strbuf, String indexstr,
+			String host, String service, String serviceitem) {
+		
+		if (indexstr.contains(",")) {
+			// Check the format of the index
+			/*
+			 * Format x[Y,Z,--]
+			 * A list of elements 
+			 */
+			StringTokenizer ind = new StringTokenizer(indexstr,",");
+			while (ind.hasMoreTokens()) {
+				strbuf.append(
+						this.getIndex( 
+								host,
+								service, 
+								serviceitem,
+								Integer.parseInt((String)ind.nextToken())) + JEPLISTSEP);
+			}
+			strbuf.append(SEP);
+			
+		} else if (CacheUtil.isByFromToTime(indexstr)) {
+			/*
+			 * Format x[-Tc:-Tc]
+			 * The element closest to time T at time granularity based on c 
+			 * that is S, M or H. 
+			 */ 
+			StringTokenizer ind = new StringTokenizer(indexstr,":");
+			int indfrom = this.getByTimeIndex( 
+					host,
+					service, 
+					serviceitem,
+					System.currentTimeMillis() + CacheUtil.calculateByTime(ind.nextToken())*1000);
+			
+			int indto = this.getByTimeIndex( 
+					host,
+					service, 
+					serviceitem,
+					System.currentTimeMillis() + CacheUtil.calculateByTime(ind.nextToken())*1000);
+			
+			for (int i = indfrom; i<indto+1; i++) {
+				strbuf.append(
+						this.getIndex( 
+								host,
+								service, 
+								serviceitem,
+								i) + JEPLISTSEP);
+
+			}
+			strbuf.append(SEP);
+		}
+		else if (indexstr.contains(":")) {
+			/*
+			 * Format x[Y:Z]
+			 * Elements from index to index
+			 */
+			StringTokenizer ind = new StringTokenizer(indexstr,":");
+			int indstart = Integer.parseInt((String) ind.nextToken());
+			int indend = Integer.parseInt((String) ind.nextToken());
+
+			for (int i = indstart; i<indend+1; i++) {
+				strbuf.append(
+						this.getIndex( 
+								host,
+								service, 
+								serviceitem,
+								i) + JEPLISTSEP);
+
+			}
+			strbuf.append(SEP);
+			
+		} else if (CacheUtil.isByTime(indexstr)){
+			/*
+			 * Format x[-Tc]
+			 * The element closest to time T at time granularity based on c 
+			 * that is S, M or H. 
+			 */ 
+			strbuf.append(
+					this.getByTime( 
+							host,
+							service, 
+							serviceitem,
+							System.currentTimeMillis() + CacheUtil.calculateByTime(indexstr)*1000) + SEP);
+		} else {
+			strbuf.append(
+					this.getIndex( 
+							host,
+							service, 
+							serviceitem,
+							Integer.parseInt(indexstr)) + SEP);
+		}
 	}
 
 	
@@ -426,16 +484,42 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		return key; 
 	}
 
+	
+	
 	public static void loaddump() throws Exception{
 		Object xmlobj = null;
-		File configfile = new File(lastStatusCacheDumpDir);
-		JAXBContext jc;
+		File configfile = new File(lastStatusCacheDumpFile);
+		JAXBContext jc = null;
 		
 		long countEntries = 0;
 		long countKeys = 0;
 		
 		long start = System.currentTimeMillis();
 		
+		xmlobj = BackendStorage.getXMLFromBackend(xmlobj, configfile, jc);
+
+		LastStatusCache lsc = LastStatusCache.getInstance();
+
+		XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
+		for (XMLKey key:cache.getKey()) {
+			logger.debug("Loading cache - " + key.getId());
+			countKeys++;
+			for (XMLEntry entry:key.getEntry()) {
+
+				LastStatus ls = new LastStatus(entry);
+				lsc.addLast(ls, key.getId());
+				countEntries++;
+			}    	
+		}
+
+		long end = System.currentTimeMillis();
+		logger.info("Cache loaded " + countKeys + " keys and " +
+				countEntries + " entries in " + (end-start) + " ms");
+	}
+
+/*
+	private static Object getXMLFromBackend(Object xmlobj, File configfile, JAXBContext jc)
+			throws Exception {
 		try {
 			jc = JAXBContext.newInstance("com.ingby.socbox.bischeck.xsd.laststatuscache");
 		} catch (JAXBException e) {
@@ -457,8 +541,11 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		try {
 			schema = sf.newSchema(new File(xsdUrl.getFile()));
 		} catch (Exception e) {
-			logger.error("Could not vaildate xml file " + lastStatusCacheDumpDir + " with xsd file " +
-					"laststatuscache.xsd" + ": " + e.getMessage());
+			logger.error("Could not vaildate xml file " + 
+					configfile.getAbsolutePath() + 
+					" with xsd file " +
+					"laststatuscache.xsd" + ": " + 
+					e.getMessage());
 			throw new Exception(e.getMessage());
 		} 
 
@@ -474,53 +561,28 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		try {
 			xmlobj =  u.unmarshal(configfile);
 		} catch (JAXBException e) {
-			logger.error("Could not unmarshall the file " +  lastStatusCacheDumpDir +":" + e);
+			logger.error("Could not unmarshall the file " +  configfile.getAbsolutePath() +":" + e);
 			throw new Exception(e);
 		}
-		logger.debug("Create new object for xml file " +  lastStatusCacheDumpDir);
-
-		LastStatusCache lsc = LastStatusCache.getInstance();
-
-		XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
-		for (XMLKey key:cache.getKey()) {
-			logger.debug("Loading cache - " + key.getId());
-			countKeys++;
-			for (XMLEntry entry:key.getEntry()) {
-
-				LastStatus ls = new LastStatus(entry);
-				lsc.addLast(ls, key.getId());
-				countEntries++;
-			}    	
-		}
-
-		long end = System.currentTimeMillis();
-		logger.info("Cache loaded " + countKeys + " keys and " +
-				countEntries + " entries in " + (end-start) + " ms");
+		logger.debug("Create new object for xml file " +  configfile.getAbsolutePath());
+		return xmlobj;
 	}
 
-
+*/
+	
 	@Override
 	public void dump2file() {
-		String newline = System.getProperty("line.separator");
-		
+		BackendStorage.dump2file(cache,lastStatusCacheDumpFile);
+		/*
 		long start = System.currentTimeMillis();
 		long countEntries = 0;
 		long countKeys = 0;
-		File dumpfile = new File(lastStatusCacheDumpDir);
-		copyFile(dumpfile,new File(lastStatusCacheDumpDir+".bak"));
+		File dumpfile = new File(lastStatusCacheDumpFile);
+		copyFile(dumpfile,new File(lastStatusCacheDumpFile+".bak"));
 		FileWriter filewriter = null;
 		BufferedWriter dumpwriter = null;
 		logger.debug("Start dump cache");
-		/*
-		try {
-			logger.debug("Start sleep in 20 sec");
-            Thread.sleep(20000);
-            logger.debug("End sleep in 20 sec");
-		}
-		catch(InterruptedException e) {
-			logger.warn(e);
-		}
-*/
+		
 		try {
 			filewriter = new FileWriter(dumpfile);
 			dumpwriter = new BufferedWriter(filewriter);
@@ -595,70 +657,9 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	
 		logger.info("Cache dumped " + countKeys + " keys and " +
 				countEntries + " entries in " + (end-start) + " ms");
+	*/
 	}
 
-
-	private static String encode(String str) {
-		if (str == null) return null;
-		
-		StringBuffer sb = new StringBuffer(str.length());
-		int len = str.length();
-		char c;
-
-		for (int i = 0; i < len; i++){
-
-			c = str.charAt(i);
-			if (c == '"')
-				sb.append("&quot;");
-			else if (c == '&')
-				sb.append("&amp;");
-			else if (c == '<')
-				sb.append("&lt;");
-			else if (c == '>')
-				sb.append("&gt;");
-			else if (c == '\n')
-				// Handle Newline
-				sb.append("&lt;br/&gt;");
-		}
-		return sb.toString();
-	}
-
-	private static void copyFile(File sourceFile, File destFile) {
-		if (!sourceFile.exists()) return;
-		if(!destFile.exists()) {
-			try {
-				destFile.createNewFile();
-			} catch (IOException e) {
-				logger.error("Can not create destination file " + 
-						destFile.getAbsolutePath() + 
-						" with exception: " + 
-						e.getMessage());
-			}
-		}
-
-		FileChannel source = null;
-		FileChannel destination = null;
-		try {
-			source = new FileInputStream(sourceFile).getChannel();
-			destination = new FileOutputStream(destFile).getChannel();
-			destination.transferFrom(source, 0, source.size());
-		}
-		catch (IOException ioe) {
-			logger.error("Can not copy file: " + ioe.getMessage());
-		}
-		finally {
-			if(source != null) {
-				try {
-					source.close();
-				} catch (IOException ignore) {}
-			}
-			if(destination != null) {
-				try {
-					destination.close();
-				} catch (IOException ignore) {}
-			}
-		}
-	}
 
 
 	@Override

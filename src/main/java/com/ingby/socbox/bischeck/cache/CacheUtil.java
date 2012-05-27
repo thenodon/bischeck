@@ -9,15 +9,15 @@ public class CacheUtil {
 
 	static Logger  logger = Logger.getLogger(CacheUtil.class);
 	private static final String FINDINTIMEPATTERN = "^-[0-9]+ *[HMS]{1} *$";
+	private static final String FINDTOFROMTIMEPATTERN = "^-[0-9]+ *[HMS]{1}:-[0-9]+ *[HMS]{1} *$";
+	
     
+	
 	/**
-     * The method calculate the interval for continues scheduling if the format
-     * is time interval and time unit, like "50 S" where the scheduling occur.
-     * every 50 seconds.
-     * @param schedule the scheduling string
-     * @return the interval in seconds
-     * @throws Exception
-     */
+	 * 
+	 * @param schedule
+	 * @return
+	 */
     public static int calculateByTime(String schedule) {
         //"^[0-9]+ *[HMS]{1} *$" - check for a
         Pattern pattern = Pattern.compile(FINDINTIMEPATTERN);
@@ -51,5 +51,18 @@ public class CacheUtil {
     		return false;
     	}
     }
+
     
+    public static boolean isByFromToTime(String schedule) {
+    	Pattern pattern = Pattern.compile(FINDTOFROMTIMEPATTERN);
+
+    	// Determine if there is an exact match
+    	Matcher matcher = pattern.matcher(schedule);
+    	if (matcher.matches()) {
+    		return true;
+    	} else {
+    		return false;
+    	}
+    }
+
 }
