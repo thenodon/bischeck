@@ -80,8 +80,12 @@ public class Execute implements ExecuteMBean {
     private static final int RESTART = 1000;
 	private static final int OKAY = 0;
 	private static final int FAILED = 1;
-	private static final long LOOPTIMEOUT = 30000;
-	private static final long SHUTDOWNSLEEP = 3000; 
+	
+	private static final long LOOPTIMEOUTDEF = 30000;
+	private static final long SHUTDOWNSLEEPDEF = 3000; 
+    
+	private static long LOOPTIMEOUT = LOOPTIMEOUTDEF;
+	private static long SHUTDOWNSLEEP = SHUTDOWNSLEEPDEF; 
     
 	/*
 	 * The admin jobs are:
@@ -261,6 +265,8 @@ public class Execute implements ExecuteMBean {
 		}
 		ConfigurationManager.getInstance().getPidFile().deleteOnExit();
 
+		setupProperties();
+		
 		try {
 		    System.in.close();
 		} catch (IOException ignore) {}
@@ -271,6 +277,28 @@ public class Execute implements ExecuteMBean {
 	}
 
     
+	private void setupProperties() {
+		try {
+			LOOPTIMEOUT = Long.parseLong(
+					ConfigurationManager.getInstance().getProperties().
+					getProperty("loopTimeout",""+LOOPTIMEOUTDEF));
+		} catch (NumberFormatException ne) {
+			LOOPTIMEOUT = LOOPTIMEOUTDEF;
+		}
+		
+		try {
+
+			SHUTDOWNSLEEP = Long.parseLong(
+					ConfigurationManager.getInstance().getProperties().
+					getProperty("shutdownWait",""+SHUTDOWNSLEEPDEF));
+		} catch (NumberFormatException ne) {
+			SHUTDOWNSLEEP = SHUTDOWNSLEEPDEF; 
+		}
+
+	}
+
+
+
 	/**
      * The loop to enter until shutdown or reload signal. If in DEBUG log level
      * each quartz trigger scheduled is printed every LOOPTIMEOUT ms. 
@@ -356,7 +384,6 @@ public class Execute implements ExecuteMBean {
 	 * @throws SchedulerException if the scheduler can not be created or it can
 	 * not be started
 	 */
-	@SuppressWarnings("unchecked")
 	private Scheduler initScheduler(Scheduler sched) throws SchedulerException {
 		try {
             logger.info("Create scheduler");
@@ -457,7 +484,6 @@ public class Execute implements ExecuteMBean {
 
    
     
-    @SuppressWarnings("unchecked")
     @Override
     public String[] getTriggers() {
         List<String> triggerList = new ArrayList<String>();
@@ -466,8 +492,9 @@ public class Execute implements ExecuteMBean {
 
             List<String> triggerGroups = sched.getTriggerGroupNames();
             for (String triggergroup: triggerGroups) {
-                Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.groupEquals(triggergroup));
-
+                //Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.groupEquals(triggergroup));
+                Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggergroup));
+                
                 Iterator<TriggerKey> iter = keys.iterator();
                 while (iter.hasNext()) {
                     TriggerKey tiggerkey = iter.next();
@@ -494,7 +521,7 @@ public class Execute implements ExecuteMBean {
      * subtracted with the number of admin jobs ADMINJOBS. 
      * @return number of service jobs
      */
-    @SuppressWarnings("unchecked")
+    
 	public int getNumberOfTriggers() {
         int numberoftriggers = 0;
         
@@ -502,7 +529,9 @@ public class Execute implements ExecuteMBean {
             Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
             List<String> triggerGroups = sched.getTriggerGroupNames();
             for (String triggergroup: triggerGroups) {
-                Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.groupEquals(triggergroup));
+                //Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.groupEquals(triggergroup));
+                Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggergroup));
+                
                 numberoftriggers += keys.size();
             }
       
