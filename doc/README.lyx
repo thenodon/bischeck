@@ -103,11 +103,11 @@ A Business Activity Monitoring Server
 \end_layout
 
 \begin_layout Date
-Version 0.4.0 RC1 (alpha)
+Version 0.4.0 RC2 (alpha)
 \begin_inset Newline newline
 \end_inset
 
-2012-05-06
+2012-05-29
 \end_layout
 
 \begin_layout Standard
@@ -175,6 +175,11 @@ Support threshold based on fixed values and thresholds based on the measured
  value from other services.
  This it typical in process driven businesses.
  
+\end_layout
+
+\begin_layout Itemize
+Support for a large number of mathematical functions used to calculate threshold
+s.
 \end_layout
 
 \begin_layout Itemize
@@ -803,9 +808,9 @@ Service item cache - LastStatusCache
 \end_layout
 
 \begin_layout Standard
-bischeck keeps a none persistent cache of the measured service items.
+Bischeck keeps a persistent cache of the measured service items.
  The cache content can be used in the specification of execute statements
- of service items and in threshold classes to create dynamic and adaptive
+ of serviceitems and in threshold classes to create dynamic and adaptive
  thresholds, see section 
 \begin_inset CommandInset ref
 LatexCommand vref
@@ -815,6 +820,21 @@ reference "label:Twenty4HourThreshold-class"
 
 .
  
+\end_layout
+
+\begin_layout Section
+Methods to retrieve cache data
+\end_layout
+
+\begin_layout Standard
+There is a number of ways to retrieve data from the cache.
+ The cache support both retrieval by index or by time, and the retrieval
+ can be done for a single element or to a list of elements.
+ 
+\end_layout
+
+\begin_layout Subsection
+Retrieve single cache data element by index
 \end_layout
 
 \begin_layout Standard
@@ -834,6 +854,10 @@ erpserver-orders-ediOrders[0]
  
 \end_layout
 
+\begin_layout Subsection
+Retrieve single cache data element by time
+\end_layout
+
 \begin_layout Standard
 Data can also be retrieved from the cache by using a time offset, like the
  cache data of 
@@ -846,10 +870,225 @@ erpserver-orders-ediOrders
 -30M, erpserver-orders-ediOrders[-30M].
  
 \emph default
-This is useful since now relation between static index and service schedule
- needs to be known.
+This is useful since the relation between static index and service schedule
+ do not need to be known.
  The time definition support S for seconds, M for minutes and H for hours.
+\end_layout
+
+\begin_layout Subsection
+Retrieve a list of cache data elements by index
+\end_layout
+
+\begin_layout Standard
+For mathematical functions that operates of a list of elements, like a sum,
+ avg, max, bischeck support two methods to reterive the range by index.
+ The first method is to define a from 
+\begin_inset Quotes eld
+\end_inset
+
+to index
+\begin_inset Quotes erd
+\end_inset
+
+, like 
+\emph on
+erpserver-orders-ediOrders[0:9] 
+\emph default
+that will retrieve all cache elements from index 0 to 9 as a list separated
+ by 
+\begin_inset Quotes eld
+\end_inset
+
+,
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The choice of , as separator character is due to this is the separator character
+ used by JEP functions that take a list of values.
+\end_layout
+
+\end_inset
+
+.
  
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sum(erphost-orders-ediorders[0:9])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This will calculate the sum of the last 10 cached elements for 
+\emph on
+erpserver-orders-ediOrders
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+The second methods is to define a list of index that do not need to be in
+ sequence, like 
+\emph on
+erpserver-orders-ediOrders[1,3,5] 
+\emph default
+that will retrieve the elements for index 1, 3 and 5 as a list separated
+ by 
+\begin_inset Quotes eld
+\end_inset
+
+,
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sum(erphost-orders-ediorders[1,3,5])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Retrieve a list of cache data elements by time range
+\end_layout
+
+\begin_layout Standard
+To retrieve list of the data elements the expression use a combination of
+ range and by time, like 
+\emph on
+erpserver-orders-ediOrders[-30M:-120M].
+ 
+\emph default
+This will retrieve a list of all elements that exist in the cache between
+ 30 minutes to 120 minutes ago.
+\end_layout
+
+\begin_layout Section
+Mathematical expressions on cache data
+\end_layout
+
+\begin_layout Standard
+In places where cache data can be used, like thresholds and serviceitems,
+ it's possible to use mathematical expressions on the data.
+ In bischeck we use the mathematical package JEP to evaluate mathematical
+ expressions and formulas.
+ Lets look at some examples.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+erphost-orders-ediorders[0] / erphost-orders-ediorders[-30M]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This example will divide the last cached data, index 0, for 
+\emph on
+erphost-orders-ediorders
+\emph default
+ with the cached data of
+\emph on
+ erphost-orders-ediorders
+\emph default
+ 30 minutes ago.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+max(erphost-orders-ediorders[-5M],erphost-orders-ediorders[-10M],erphost-orders-
+ediorders[-15M]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the above the highest value will be returned of the cached data for 
+\emph on
+erphost-orders-ediorders
+\emph default
+ cached 5, 10 and 15 minutes ago.
+\end_layout
+
+\begin_layout Standard
+For more information of all functions that can be used please visit 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+www.sourceforge.net
+\end_layout
+
+\end_inset
+
+and download the JEP distribution to get access to the JEP version 2 documentati
+on.
+\end_layout
+
+\begin_layout Subsection
+JEP extensions
+\end_layout
+
+\begin_layout Standard
+With JEP it's easy to create additional functions.
+ With bischeck the following functions has been added as part of the distributio
+n.
+\end_layout
+
+\begin_layout Itemize
+avg(x1,x2,x3,...) - Calculates the average of the list of values.
+\end_layout
+
+\begin_layout Itemize
+max(x1,x2,x3,...) - Calculates the max value of the list of values.
+\end_layout
+
+\begin_layout Itemize
+min(x1,x2,x3,...) - Calculates the min value of the list of values.
 \end_layout
 
 \begin_layout Chapter
@@ -1827,6 +2066,21 @@ mindaysinfirstweek - define the week numbering according to ISO 8601, default
 firstdayofweek - define the week numbering according to ISO 8601, default
  is 2.
  
+\end_layout
+
+\begin_layout Itemize
+lastStatusCacheDumpDir - the directory where cache is stored, default is
+ /var/tmp.
+\end_layout
+
+\begin_layout Itemize
+lastStatusCacheSize - the maximum size of cached data per host, service
+ and serviceitem, default is 500.
+\end_layout
+
+\begin_layout Itemize
+runAfterDelay - is the delay time in seconds the depending service that
+ is triggered should be started, default is 10 seconds.
 \end_layout
 
 \begin_layout Standard
@@ -3877,6 +4131,16 @@ ce data can be retrieved from the a Nagios service.
 \end_layout
 
 \begin_layout Itemize
+Cache data can be retrieved as a list of elements based both on index and
+ time.
+\end_layout
+
+\begin_layout Itemize
+Support for additional mathematical functions like average, min and max
+ calculations on list of elements.
+\end_layout
+
+\begin_layout Itemize
 Bischeck can now support the usage of cached data in an execution statement
  of a serviceitem.
  This is typical useful when a serviceitem execute statement is depending
@@ -3962,8 +4226,8 @@ Bugs fixed and important issues
 \end_layout
 
 \begin_layout Itemize
-The Twenty4Thresholds class was previous version not doing a correct linear
- equation calculation if a expression based threshold was defined.
+The Twenty4Thresholds class was in previous version not doing a correct
+ linear equation calculation if a expression based threshold was defined.
  Lets illustrate the errors with this example from the 24thresholds.xml configura
 tion file having a mix with static and expression based thresholds.
  
@@ -4074,6 +4338,12 @@ status open
 
 \end_layout
 
+\begin_layout Standard
+This fix will improve the correctness and also the capability of threshold
+ adaptivity.
+ 
+\end_layout
+
 \end_deeper
 \begin_layout Itemize
 The Service interface has a number of new methods that should been there
@@ -4153,6 +4423,10 @@ All JAXB generated configuration classes now support serialization.
 \end_layout
 
 \begin_layout Itemize
+Quartz jar is upgraded from 2.0.1 to 2.1.5.
+\end_layout
+
+\begin_layout Itemize
 [TR-216] 
 \begin_inset Quotes eld
 \end_inset
@@ -4177,7 +4451,15 @@ Configuration Manager initialization failed with java.lang.NullPointerException
 \end_layout
 
 \begin_layout Itemize
-[TR-207] sudo in bischeckd script cause problem at boot
+[TR-207] 
+\begin_inset Quotes eld
+\end_inset
+
+sudo in bischeckd script cause problem at boot
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -4647,9 +4929,9 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 
 \end_deeper
 \begin_layout Itemize
-quartz-2.0.1.jar - 
+quartz-2.1.5.jar - 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -4664,7 +4946,7 @@ http://www.quartz-scheduler.org/
 \begin_deeper
 \begin_layout Itemize
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
