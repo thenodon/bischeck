@@ -44,6 +44,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.quartz.CronExpression;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -78,7 +79,7 @@ public class ConfigurationManager  {
     
     private static final String DEFAULT_TRESHOLD = "DummyThreshold";
 
-	private static final String INTERVALSCHEDULEPATTERN = "^[0-9]+ *[HMS]{1} *$";
+	public static final String INTERVALSCHEDULEPATTERN = "^[0-9]+ *[HMS]{1} *$";
 
     static Logger  logger = Logger.getLogger(ConfigurationManager.class);
 
@@ -490,31 +491,25 @@ public class ConfigurationManager  {
         
         if (isCronTrigger(schedule)) {
             // Cron schedule    
-            try {
                 trigger = newTrigger()
                 .withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
-                .withSchedule(cronSchedule(schedule))
+                .withSchedule(
+                		cronSchedule(schedule).withMisfireHandlingInstructionDoNothing())
                 .build();
-            } catch (ParseException e) {
-                logger.error("Tigger parse error for host " + service.getHost().getHostname() + 
-                        " and service " + service.getServiceName() + 
-                        " for schedule " + schedule);
-                throw new Exception(e.getMessage());
-            }
+            
             
         } else if (isIntervalTrigger(schedule)){
-            // Simple schedule
-            try {
+            //simpleSchedule();
+				// Simple schedule
+            
                 trigger = newTrigger()
                 .withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
-                .withSchedule(simpleSchedule().repeatSecondlyForever(calculateInterval(schedule)))
+                .withSchedule(
+                		//simpleSchedule().
+                		SimpleScheduleBuilder.
+                		repeatSecondlyForever(calculateInterval(schedule)).
+                		withMisfireHandlingInstructionNextWithRemainingCount())
                 .build();
-            } catch (Exception e) {
-                logger.error("Tigger parse error for host " + service.getHost().getHostname() + 
-                        " and service " + service.getServiceName() + 
-                        " for schedule " + schedule);
-                throw new Exception(e.getMessage());
-            }
         } else if (isRunAfterTrigger(schedule)) {
         	int index = schedule.indexOf("-");
         	String hostname = schedule.substring(0, index);
