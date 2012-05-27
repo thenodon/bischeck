@@ -119,7 +119,7 @@
 	                            <include name="*.jar" />
 	            </fileset>
 	         </classpath>
-	         <classfileset dir="${build.home}/classes" includes="testng/**/*.class"/>
+	         <classfileset dir="${build.home}/classes" includes="testng/**/*.class"/> 
 	       </testng>
 	     </target>
 
