@@ -112,11 +112,16 @@ function checkpackage() {
 }
 
 function distrocheck() {
-DISTRIBUTION=$(lsb_release -i | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
-if [ "$DISTRIBUTION" != "unknown" ] ; then 
+if [ -x lsb_release ] ; then
+  DISTRIBUTION=$(lsb_release -i | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
+  if [ "$DISTRIBUTION" != "unknown" ] ; then 
     VERSION=$(lsb_release -r | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
     echo ${DISTRIBUTION}:${VERSION}
+  fi
+else 
+   echo ""
 fi
+  
 
 }
 
@@ -189,6 +194,7 @@ if [ "x$DISTRO" = "x" ] ; then
   DISTROVERS=$(distrocheck | cut -f2 -d:)
   if [ "x$DISTRO" = "x" ] ; then
     echo "Can not determine distribution - please try set distribution name with -d"
+    echo "Supported distributions are rh, rhel, centos and debian"
     exit 1
   fi 
 else
@@ -231,7 +237,7 @@ headline "Pre-installation verification"
 echo "Checking software dependencies"
 
 #if [ "x$upgrade" = "xtrue" ] ; then
-#  checkpackage sqlite
+#  checkpackage redhat-lsb
 #  checkpackage javasqlite
 #fi
 
