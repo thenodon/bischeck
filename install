@@ -19,7 +19,7 @@
 # 
 ###########################################################
 
-umask u=rwx,g=rwx,o=
+#umask u=rwx,g=rwx,o=
 
 trap 'aborted' INT KILL HUP
 
@@ -384,8 +384,11 @@ if [ ! -d $BISHOME ] ; then
     
     echo "Change ownership and permissions to install user $USERINIT"
     chown -R $USERINIT:`id -gn $USERINIT` $BISHOME
+    # Make all files in etc readable only for group nagios
+    chmod 640 $BISHOME/etc/*
     # Jmx password files must be read only by user
     chmod 600 $BISHOME/etc/jmxremote.*
+    
     echo "Installations complete"
 else
    errormsg "Directory $BISHOME already exists"
