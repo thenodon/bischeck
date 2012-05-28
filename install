@@ -114,15 +114,21 @@ function checkpackage() {
 function distrocheck() {
 if [ -x lsb_release ] ; then
   DISTRIBUTION=$(lsb_release -i | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
-  if [ "$DISTRIBUTION" != "unknown" ] ; then 
+  if [ "$DISTRIBUTION" != "unknown" ] ; then
     VERSION=$(lsb_release -r | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
     echo ${DISTRIBUTION}:${VERSION}
   fi
-else 
+elif [ -f /etc/redhat-release ] ; then
+  DISTRIBUTION=$(cat /etc/redhat-release | tr '[:upper:]' '[:lower:]'| tr -s " "| cut -d" " -f1)
+  VERSION=$(cat /etc/redhat-release | tr '[:upper:]' '[:lower:]'| tr -s " "| cut -d" " -f3)
+  echo ${DISTRIBUTION}:${VERSION}
+elif [ -f /etc/debian_version ] ; then
+  DISTRIBUTION=debian
+  VERSION=$(cat /etc/debian_version)
+  echo ${DISTRIBUTION}:${VERSION}
+else
    echo ""
 fi
-  
-
 }
 
 
