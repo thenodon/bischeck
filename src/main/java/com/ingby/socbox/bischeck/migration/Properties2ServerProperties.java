@@ -127,8 +127,12 @@ public class Properties2ServerProperties {
     			newprop.setValue(property.getValue());
     			serverproplist.add(newprop);
     			deletelist.add(property);
+    		} else if (property.getKey().equals("cacheclear")) {
+    			property.setKey("thresholdCacheClear");
     		}
+    		
     	}
+    
     	
     	propertiesconfig.getProperty().removeAll(deletelist);
     	
