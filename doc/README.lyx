@@ -166,8 +166,12 @@ So what is the difference between business activity monitoring, BAM, and
 \end_layout
 
 \begin_layout Itemize
-Enable a dynamic configuration of threshold values depending of time of
- the day and day of month or week.
+Support for dynamic and adaptive thresholds.
+\end_layout
+
+\begin_layout Itemize
+Support dynamic configuration of thresholds depending of time of the day
+ and day of month or week.
 \end_layout
 
 \begin_layout Itemize
@@ -185,6 +189,7 @@ s.
 \begin_layout Itemize
 Data cache for all measured service items that can be retrieved based on
  index or time.
+ Cache data is the main source to create dynamic and adaptive thresholds.
 \end_layout
 
 \begin_layout Itemize
@@ -1065,8 +1070,8 @@ www.sourceforge.net
 
 \end_inset
 
-and download the JEP distribution to get access to the JEP version 2 documentati
-on.
+ and download the JEP distribution to get access to the JEP version 2 documentat
+ion.
 \end_layout
 
 \begin_layout Subsection
@@ -1981,6 +1986,13 @@ customlib
  directory.
 \end_layout
 
+\begin_layout Standard
+
+\series bold
+It is important is that the name field for host, service and serviceitem
+ do not include any space characters or the dash (-) character.
+\end_layout
+
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -2079,8 +2091,24 @@ lastStatusCacheSize - the maximum size of cached data per host, service
 \end_layout
 
 \begin_layout Itemize
-runAfterDelay - is the delay time in seconds the depending service that
- is triggered should be started, default is 10 seconds.
+runAfterDelay - the delay time in seconds used when a service is scheduled
+ to run with 
+\begin_inset Quotes eld
+\end_inset
+
+Service relation scheduling
+\begin_inset Quotes erd
+\end_inset
+
+, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Service-scheduling"
+
+\end_inset
+
+.
+ Default is 10 seconds.
 \end_layout
 
 \begin_layout Standard
@@ -2193,11 +2221,6 @@ value – the Service class name.
 customlib
 \emph default
  directory.
-\end_layout
-
-\begin_layout Standard
-Important is that the name field for host, service and service item are
- not allowed to include the dash (-) character.
 \end_layout
 
 \begin_layout Section
@@ -3177,8 +3200,8 @@ Configuration tools
 \end_layout
 
 \begin_layout Standard
-Bischeck provides no additional tools for configuration other than the normal
- editor to manage the xml configuration files.
+Bischeck provides by default no additional tools for configuration other
+ than the normal editor to manage the xml configuration files.
  The default configuration files in 
 \emph on
 etc
@@ -3187,6 +3210,22 @@ etc
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "label:Getting-started"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A web based configuration tool, bisconf, is under development.
+ Bisconf will be hosted on the bischeck project site, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://gforge.ingby.com/gf/project/bischeck
+\end_layout
 
 \end_inset
 
@@ -4822,8 +4861,7 @@ System requirements
 \end_layout
 
 \begin_layout Standard
-bischeck should run on any operating system that supports Java.
- bischeck has been with Java 6.
+bischeck should run on any operating system that supports Java 6.
  The installation script and init scripts are supported on Redhat and Debian
  equivalent Linux distributions.
  Running on none Linux operating system has not been tested.
