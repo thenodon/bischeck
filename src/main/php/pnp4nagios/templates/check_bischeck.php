@@ -3,31 +3,34 @@
 # Copyright (c) 2011 Anders HÃ¥Ã¥l, based on check_load
 # Plugin: check_bischeck
 #
-$opt[1] = "--title \"$hostname / $servicedesc\" ";
 #
 #
 #
-$def[1] = rrd::def("var1", $RRDFILE[1], $DS[1], "AVERAGE");
-$def[1] .= rrd::def("var2", $RRDFILE[1], $DS[2], "AVERAGE");
 
-
-#if ($WARN[1] != "") {
-#    $def[1] .= "HRULE:$WARN[1]#FFFF00 ";
-#}
-
-#if ($CRIT[1] != "") {
-#    $def[1] .= "HRULE:$CRIT[1]#FF0000 ";
-#}
-$def[1] .= rrd::area("var1", "#EACC00", "Measured  ");
-$def[1] .= rrd::gprint("var1", array("LAST", "AVERAGE", "MAX"), "%6.0lf");
-#$def[1] .= rrd::area("var2", "#EA8F00B0", "Threshold ") ;
-$def[1] .= rrd::line2("var2", "#555210", "Threshold ") ;
-$def[1] .= rrd::gprint("var2", array("LAST", "AVERAGE", "MAX"), "%6.0lf");
-
-if($WARN[1] != ""){
-        $def[1] .= rrd::hrule($WARN[1], "#FFFF00", "Warning   ".$WARN[1].$UNIT[1]."\\n");
+$index=1;
+foreach($DS as $i => $VAL){
+    if(!isset($def[$index])){
+        $def[$index] = "";
+    }
+    $def[$index] .= "DEF:var$i=$RRDFILE[$i]:$DS[$i]:AVERAGE " ;
+    if(!preg_match('/^threshold$/',$NAME[$i], $matches)){
+        $opt[$index] = "--title \"$hostname / $servicedesc / $NAME[$i] \" ";
+        $def[$index] .= rrd::gradient("var$i", "ff5c00", "ffdc00", "$NAME[$i]", 20 ) ;
+        $def[$index] .= rrd::line1("var$i", "#000000");
+        $def[$index] .= rrd::gprint("var$i", "LAST", "%6.0lf \\n");  
+	} else {
+        $def[$index] .= rrd::line2("var$i", "#555210", "$NAME[$i]") ;
+        $def[$index] .= rrd::gprint("var$i", "LAST", "%6.0lf \\n");
+        $val=$i-1;
+        if($WARN[$val] != ""){
+            $def[$index] .= rrd::hrule($WARN[$val], "#FFFF00", "Warning   ".$WARN[$val].$UNIT[$val]."\\n");
+        }
+        if($CRIT[$val] != ""){
+            $def[$index] .= rrd::hrule($CRIT[$val], "#FF0000", "Critical  ".$CRIT[$val].$UNIT[$val]."\\n");
+        }
+        $index=$index+1;
+    } 
 }
-if($CRIT[1] != ""){
-        $def[1] .= rrd::hrule($CRIT[1], "#FF0000", "Critical  ".$CRIT[1].$UNIT[1]."\\n");
-}
+ 
 ?>
+
