@@ -225,7 +225,7 @@ public class NSCAServer implements Server {
             (critValue) +";0; " + //;
             
             "threshold=" +
-            currentThreshold +";0;0;0;";
+            currentThreshold +";0;0;0; ";
             
             totalexectime = (totalexectime + serviceItem.getExecutionTime());
             count++;
@@ -233,7 +233,7 @@ public class NSCAServer implements Server {
 
         return " " + message + " | " + 
             perfmessage +
-            " avg-exec-time=" + ((totalexectime/count)+"ms");
+            "avg-exec-time=" + ((totalexectime/count)+"ms");
     }
 
 	public static Properties getServerProperties() {
