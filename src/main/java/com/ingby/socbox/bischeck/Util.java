@@ -76,7 +76,8 @@ public class Util {
      */
     public static Float roundOneDecimals(Float d) {
         if (d != null) {
-            DecimalFormat oneDForm = new DecimalFormat("#");
+            //DecimalFormat oneDForm = new DecimalFormat("#");
+            DecimalFormat oneDForm = new DecimalFormat("#.##");
             return Float.valueOf(oneDForm.format(d));
         }
         return null;
