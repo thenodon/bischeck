@@ -537,6 +537,12 @@ JDBCService manage services connecting to databases over JDBC.
 customlib
 \emph default
  in the bischeck install directory to automatically be found at start-up.
+ 
+\end_layout
+
+\begin_layout Standard
+A JDBC connection is described with a normal jdbc url and a additional driver
+ class.
 \end_layout
 
 \begin_layout Subsection
@@ -576,6 +582,22 @@ status open
 
 \end_inset
 
+.
+ A livestatus connection is specified with a url with the following format:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+livestatus://hostname:port
+\end_layout
+
+\end_inset
+
 
 \end_layout
 
@@ -590,7 +612,22 @@ LastCacheService enable connection to bischeck's internal cache where the
  from the cache.
  This can typical be used to create new virtual services based on mathematical
  expression for combination of cache entities.
- 
+ The connection url for the bischeck cache is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+bischeck://cache
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -877,7 +914,7 @@ erpserver-orders-ediOrders
 \emph default
 This is useful since the relation between static index and service schedule
  do not need to be known.
- The time definition support S for seconds, M for minutes and H for hours.
+ The time operator supported is S for seconds, M for minutes and H for hours.
 \end_layout
 
 \begin_layout Subsection
@@ -984,14 +1021,15 @@ Retrieve a list of cache data elements by time range
 \end_layout
 
 \begin_layout Standard
-To retrieve list of the data elements the expression use a combination of
- range and by time, like 
+To retrieve list of the data elements based on a time range the expression
+ has the format 
 \emph on
 erpserver-orders-ediOrders[-30M:-120M].
  
 \emph default
 This will retrieve a list of all elements that exist in the cache between
  30 minutes to 120 minutes ago.
+ The time operator supported is S for seconds, M for minutes and H for hours.
 \end_layout
 
 \begin_layout Section
@@ -4119,6 +4157,18 @@ nce and monitoring systems.
  configured in properties.xml has been moved to the servers.xml file in the
  NSCA section.
  The OpenTSDB server class should be regarded as beta.
+\end_layout
+
+\begin_layout Itemize
+[FR-204] The bischeck cache will be saved when the bischeck daemon is shutdown
+ and reloaded on bischeck startup.
+ Keeping the cache persistent between restarts is important since 0.4.0 support
+ time based cache retrieval.
+ The limitations is currently that if the bischeck daemon is killed by a
+ signal that can not be caught or the daemon crash the data will not be
+ saved.
+ This will be improved in future versions.
+ 
 \end_layout
 
 \begin_layout Itemize
