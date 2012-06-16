@@ -154,7 +154,7 @@ public class ConfigFileManager {
         try {
             schema = sf.newSchema(new File(xsdUrl.getFile()));
         } catch (Exception e) {
-            logger.error("Could not vaildate xml file " + xmlconf.xml() + " with xsd file " +
+            logger.error("Could not parse xsd file " +
             		xmlconf.xsd() + ": " + e.getMessage());
             throw new Exception(e.getMessage());
         } 
@@ -163,7 +163,7 @@ public class ConfigFileManager {
         try {
             u = jc.createUnmarshaller();
         } catch (JAXBException e) {
-            logger.error("Could not create an unmarshaller for for context");
+            logger.error("Could not create an unmarshaller for for context " + xmlconf.instance());
             throw new Exception(e);
         }
         u.setSchema(schema);
