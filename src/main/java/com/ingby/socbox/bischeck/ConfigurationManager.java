@@ -128,7 +128,7 @@ public class ConfigurationManager  {
         logger.setLevel(Level.WARN);
         
         if (line.hasOption("verify")) {
-            System.exit(confMgmr.verify());
+            System.exit(ValidateConfiguration.verify());
         }
 
         if (line.hasOption("pidfile")) {
@@ -638,7 +638,10 @@ public class ConfigurationManager  {
     	return true;
     }
     
-    
+    /*
+     * Moved to VaildateConfiguration
+     */
+    @Deprecated
     public int verify() {
         ConfigurationManager configMgr = null;
 
@@ -663,7 +666,7 @@ public class ConfigurationManager  {
         return 0;
     }
 
-    
+        
     public Properties getURL2Service() {
         return url2service;
     }
