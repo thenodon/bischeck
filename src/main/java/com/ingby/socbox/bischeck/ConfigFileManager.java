@@ -27,6 +27,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.ValidationEvent;
+import javax.xml.bind.ValidationEventLocator;
+import javax.xml.bind.util.ValidationEventCollector;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -167,13 +170,33 @@ public class ConfigFileManager {
             throw new Exception(e);
         }
         u.setSchema(schema);
-
+        ValidationEventCollector vec = new ValidationEventCollector();
+        u.setEventHandler( vec );
+        
         try {
             xmlobj =  u.unmarshal(configfile);
         } catch (JAXBException e) {
-            logger.error("Could not unmarshall the file " + xmlconf.xml() +":" + e);
-            throw new Exception(e);
+        	logger.error("Could not unmarshall the file " + xmlconf.xml() +":" + e);
+        	
+        	if (vec.hasEvents()) {
+        		StringBuffer strbuf = new StringBuffer();
+        		for( ValidationEvent event: vec.getEvents() ){
+        			
+        			strbuf.append(event.getMessage());
+        		    ValidationEventLocator locator = event.getLocator();
+        		    int line = locator.getLineNumber();
+        		    int column = locator.getColumnNumber();
+        		    strbuf.append(" Node:").append(locator.getNode());
+        		    strbuf.append(" Object:").append(locator.getObject());
+        		    strbuf.append(" - Error at line " + line + " column "+ column);
+        		}
+        		
+        		throw new Exception(strbuf.toString());
+            }
+            
+        	throw new Exception(e);
         }
+        
         logger.debug("Create new object for xml file " + xmlconf.xml());
         return xmlobj;
     }
@@ -222,7 +245,7 @@ public class ConfigFileManager {
             m = jc.createMarshaller();
             m.setProperty("jaxb.formatted.output",Boolean.TRUE);
         } catch (JAXBException e) {
-            logger.error("Could not create an marshaller for for context");
+            logger.error("Could not create an marshaller for for context " + xmlconf.xml());
             throw new Exception(e);
         }
         m.setSchema(schema);
@@ -233,8 +256,8 @@ public class ConfigFileManager {
             m.marshal(xmlobj, writer);
             
         } catch (JAXBException e) {
-            logger.error("Could not unmarshall the file " + xmlconf.xml() +":" + e);
-            throw new Exception(e);
+            logger.error("Could not marshall the file " + xmlconf.xml() +":" + e);
+            throw new Exception(xmlconf.xml() + ":" + e.toString());
         } finally {
         	writer.flush();
         	writer.close();
