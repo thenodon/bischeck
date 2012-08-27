@@ -1,6 +1,6 @@
 <?php
 #
-# Copyright (c) 2011 Anders HÃ¥Ã¥l, based on check_load
+# Copyright (c) 2012 Anders Håål Ingenjörsbyn, based on check_load
 # Plugin: check_bischeck
 #
 #
