@@ -103,11 +103,11 @@ A Business Activity Monitoring Server
 \end_layout
 
 \begin_layout Date
-Version 0.4.0 RC2 (alpha)
+Version 0.4.0 
 \begin_inset Newline newline
 \end_inset
 
-2012-05-29
+2012-08-31
 \end_layout
 
 \begin_layout Standard
@@ -137,7 +137,7 @@ Monitoring and surveillance is today common in any IT operation.
  not on the same level.
  Business operations teams seldom has any monitoring solution to understand
  what goes on in their business processes and applications.
- Business intelligence solutions can often tell what happened last month
+ Business intelligence solutions can often tell what happened last month,
  but from a more tactical operations view there is a gap.
  So why do not business operations team implement the same surveillance
  structure or use the existing IT operations infrastructure to understand
@@ -337,6 +337,17 @@ Hopefully these examples have convinced you that with bischeck you can do
 \end_layout
 
 \begin_layout Standard
+But complex threshold management is not limited to the area of BAM.
+ Even in the normal infrastructure and network monitoring the capabilities
+ are important.
+ A typical threshold for disk utilization is defined like 90% of total space.
+ This is of course important but it could be equally important to understand
+ the growth speed of the disk utilization, like if the size has grown with
+ 5% from yesterday.
+ This is simple in bischeck without develop a specialized check command.
+\end_layout
+
+\begin_layout Standard
 \begin_inset Float figure
 placement H
 wide false
@@ -404,7 +415,7 @@ status open
 
 \begin_layout Plain Layout
 
-http://gforge.ingby.com/gf/project/bischeck/
+http://www.bischeck.org
 \end_layout
 
 \end_inset
@@ -541,8 +552,8 @@ customlib
 \end_layout
 
 \begin_layout Standard
-A JDBC connection is described with a normal jdbc url and a additional driver
- class.
+A JDBC connection is described with a normal jdbc url and with an additional
+ driver class.
 \end_layout
 
 \begin_layout Subsection
@@ -601,6 +612,28 @@ livestatus://hostname:port
 
 \end_layout
 
+\begin_layout Standard
+The requirement for this type of connection is that livestatus is configured
+ as a xinetd service on the server running livestatus and Nagios.
+ To configure livestatus this way please see 
+\begin_inset Quotes eld
+\end_inset
+
+
+\begin_inset CommandInset href
+LatexCommand href
+name "Remote access to Livestatus via SSH or xinetd"
+target "http://mathias-kettner.de/checkmk_livestatus.html#H1:Remote access to Livestatus via SSH or xinetd"
+
+\end_inset
+
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsection
 Bischeck cache
 \end_layout
@@ -650,7 +683,11 @@ SQL
 \end_layout
 
 \begin_layout Standard
-SQLServiceItem enables execution of a SQL statements.
+The 
+\emph on
+SQLServiceItem
+\emph default
+ class enables execution of a SQL statements.
  Its important that the SQL statement only return one single number value,
  like a "
 \emph on
@@ -671,13 +708,20 @@ select sum(orderValue) from ....
 .
 \end_layout
 
+\begin_layout Standard
+The SQLServiceItem class can be used when the service url is a jdbc url.
+\end_layout
+
 \begin_layout Subsection
 Livestatus 
 \end_layout
 
 \begin_layout Standard
-With the Livestatus service item both state and performance data can be
- queried from a Nagios server.
+With the 
+\emph on
+LivestatusServiceItem
+\emph default
+ class both state and performance data can be queried for a Nagios service.
  The query is formatted as a json structure.
  To query a specific Nagios service state the following statement example
  can be used:
@@ -735,12 +779,24 @@ status open
 
 \end_layout
 
+\begin_layout Standard
+The 
+\emph on
+LivestatusServiceItem
+\emph default
+ class can be used for service url livestatus.
+\end_layout
+
 \begin_layout Subsection
 Cache calculations
 \end_layout
 
 \begin_layout Standard
-CalculateOnCache enable statement execution using measured values residing
+
+\emph on
+CalculateOnCache
+\emph default
+ service item class enable statement execution using measured values residing
  in the bischeck internal cache.
  Mathematical statements according to jep expressions capability is possible
  like:
@@ -778,6 +834,16 @@ erpserver-orders-ediOrders[1]" is less then 0.
 erpserver-orders-ediOrders[1]".
  The value to use from the cache is defined by an index [X], where 0 is
  the latest value retrieved for the specific host-service-item.
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+CalculateOnCache
+\emph default
+ class can be used with service url 
+\emph on
+bischeck://cache.
 \end_layout
 
 \begin_layout Chapter
@@ -850,7 +916,7 @@ Service item cache - LastStatusCache
 \end_layout
 
 \begin_layout Standard
-Bischeck keeps a persistent cache of the measured service items.
+Bischeck keeps a cache of the measured data points for every service items.
  The cache content can be used in the specification of execute statements
  of serviceitems and in threshold classes to create dynamic and adaptive
  thresholds, see section 
@@ -862,6 +928,31 @@ reference "label:Twenty4HourThreshold-class"
 
 .
  
+\end_layout
+
+\begin_layout Standard
+The cached data is saved to disk every time bischeck is stopped and reloaded
+ every time bischeck is started.
+ The stored data is written to a file called 
+\emph on
+lastStatusCacheDump
+\emph default
+ and located in the directory specified by the property 
+\emph on
+lastStatusCacheDumpDir
+\emph default
+, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:properties.xml"
+
+\end_inset
+
+.
+ Before a save is made a backup file is created in the same directory called
+ 
+\emph on
+lastStatusCacheDump.bak.
 \end_layout
 
 \begin_layout Section
@@ -1819,6 +1910,7 @@ status open
 \begin_layout Plain Layout
 
 					select count(*) from orders where createdate=&apos;%%yyyy-MM-dd%%&apos;
+     
 \end_layout
 
 \begin_layout Plain Layout
@@ -2070,7 +2162,7 @@ status open
 
 \begin_layout Plain Layout
 
-		<value>avalue</value> 
+		<value>avalue</value>   
 \end_layout
 
 \begin_layout Plain Layout
@@ -2121,6 +2213,7 @@ firstdayofweek - define the week numbering according to ISO 8601, default
 \begin_layout Itemize
 lastStatusCacheDumpDir - the directory where cache is stored, default is
  /var/tmp.
+ 
 \end_layout
 
 \begin_layout Itemize
@@ -2226,7 +2319,7 @@ status open
 
 \begin_layout Plain Layout
 
-		<value>LastCacheService</value>
+		<value>LastCacheService</value>  
 \end_layout
 
 \begin_layout Plain Layout
@@ -2512,7 +2605,7 @@ status open
 
 \begin_layout Plain Layout
 
-		<serviceitemname>outboundshipment</serviceitemname>
+		<serviceitemname>outboundshipment</serviceitemname>  
 \end_layout
 
 \begin_layout Plain Layout
@@ -2527,7 +2620,7 @@ status open
 
 \begin_layout Plain Layout
 
-			<!-- valid for any 21th day in the month -->
+			<!-- valid for any 21th day in the month -->  
 \end_layout
 
 \begin_layout Plain Layout
@@ -3262,7 +3355,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://gforge.ingby.com/gf/project/bischeck
+http://www.bischeck.org
 \end_layout
 
 \end_inset
@@ -3443,7 +3536,7 @@ target
  Different versions of bischeck can be checked out from the tags directory
  located in 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -3508,7 +3601,7 @@ status open
 
 \begin_layout Plain Layout
 
-http://gforge.ingby.com/gf/project/bischeck/frs
+http://www.bischeck.org
 \end_layout
 
 \end_inset
@@ -3546,7 +3639,12 @@ status open
 
 \begin_layout Plain Layout
 
-# ./install
+# ./install -u #Get usage
+\end_layout
+
+\begin_layout Plain Layout
+
+# ./install    #Install default
 \end_layout
 
 \begin_layout Plain Layout
@@ -4137,7 +4235,7 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.4.0 - 2012-xx-xx
+Release 0.4.0 - 2012-08-31
 \end_layout
 
 \begin_layout Subsection
@@ -4235,6 +4333,10 @@ Bischeck can now support the usage of cached data in an execution statement
  This is typical useful when a serviceitem execute statement is depending
  on other service data.
  For example in a SQL query string:
+\begin_inset Newline newline
+\end_inset
+
+
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true,language=sh,tabsize=4"
 inline false
@@ -4391,6 +4493,10 @@ status open
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 In the previous version the threshold value between 12:00 and 13:00 would
  be null since it was a mix of static and expression based thresholds.
  And between 15:00 and 16:00 the threshold would have been calculated as
@@ -4556,7 +4662,7 @@ Upgrading
 \end_layout
 
 \begin_layout Standard
-Release 0.3.3 is supported for upgrade to 0.4.0.
+Release 0.3.3 and 0.4.0_RC2 are supported for upgrade to 0.4.0.
 \end_layout
 
 \begin_layout Section
@@ -5327,6 +5433,25 @@ l
 \end_layout
 
 \begin_layout Chapter
+Bug reports and feature requests
+\end_layout
+
+\begin_layout Standard
+Please submit bug reports and feature requests on 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+www.bischeck.org
+\end_layout
+
+\end_inset
+
+ in the Forge section.
+\end_layout
+
+\begin_layout Chapter
 \begin_inset CommandInset label
 LatexCommand label
 name "label:Credits"
@@ -5340,10 +5465,7 @@ Credits
 Thanks to all people who has developed all the great software that bischeck
  depends on, and especially all who made Nagios and the Nagios community
  a success.
-\end_layout
-
-\begin_layout Standard
-A special thanks goes to Peter Johansson and his colleagues at DHL Freight
+ A special thanks goes to Peter Johansson and his colleagues at DHL Freight
  Sweden for sponsoring the development and providing ideas and important
  feedback.
  
