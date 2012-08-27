@@ -217,7 +217,7 @@ public class Execute implements ExecuteMBean {
         Scheduler sched = null;     
         
         try {
-			sched = initScheduler(sched);
+			sched = initScheduler();
 			initTriggers(sched); 
         } catch (SchedulerException e) {
         	logger.error("Scheduler init failed with: " + e.getMessage());
@@ -384,7 +384,8 @@ public class Execute implements ExecuteMBean {
 	 * @throws SchedulerException if the scheduler can not be created or it can
 	 * not be started
 	 */
-	private Scheduler initScheduler(Scheduler sched) throws SchedulerException {
+	private Scheduler initScheduler() throws SchedulerException {
+		Scheduler sched = null;
 		try {
             logger.info("Create scheduler");
             sched = StdSchedulerFactory.getDefaultScheduler();
