@@ -22,7 +22,8 @@ package com.ingby.socbox.bischeck.service;
 import org.apache.log4j.Logger;
 
 public class RunAfter {
-    static Logger  logger = Logger.getLogger(RunAfter.class);
+    @SuppressWarnings("unused")
+	private final static Logger LOGGER = Logger.getLogger(RunAfter.class);
 
 	private String hostname = null;
 	private String servicename = null;

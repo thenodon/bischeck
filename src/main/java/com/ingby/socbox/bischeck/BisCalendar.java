@@ -1,9 +1,9 @@
 package com.ingby.socbox.bischeck;
 
 import java.util.Calendar;
+
 import java.util.GregorianCalendar;
 
-import org.apache.log4j.Logger;
 
 /**
  * This calendar class implements ISO 8601 calendar.
@@ -13,10 +13,8 @@ import org.apache.log4j.Logger;
  * @author andersh
  *
  */
-public class BisCalendar {
-    
-    static Logger  logger = Logger.getLogger(BisCalendar.class);
-    
+public abstract class BisCalendar {
+     
     public static Calendar getInstance() {
         Calendar now = GregorianCalendar.getInstance();
         now.setFirstDayOfWeek(Integer.parseInt

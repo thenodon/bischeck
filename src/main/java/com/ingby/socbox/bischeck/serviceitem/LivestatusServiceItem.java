@@ -54,7 +54,9 @@ import com.ingby.socbox.bischeck.QueryNagiosPerfData;
  *
  */
 public class LivestatusServiceItem extends ServiceItemAbstract implements ServiceItem {
-    static Logger  logger = Logger.getLogger(LivestatusServiceItem.class);
+    
+	@SuppressWarnings("unused")
+	private final static Logger LOGGER = Logger.getLogger(LivestatusServiceItem.class);
 
     
     public LivestatusServiceItem(String name) {

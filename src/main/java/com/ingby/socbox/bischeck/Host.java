@@ -26,7 +26,7 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class Host {
 
-    static Logger  logger = Logger.getLogger(Host.class);
+    private final static Logger  LOGGER = Logger.getLogger(Host.class);
     
     private String hostname;
     private HashMap<String,Service> services = new HashMap<String,Service>();

@@ -46,7 +46,7 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  */
 public class NSCAServer implements Server {
 
-    static Logger  logger = Logger.getLogger(NSCAServer.class);
+    private final static Logger LOGGER = Logger.getLogger(NSCAServer.class);
     /**
      * The server map is used to manage multiple configuration based on the 
      * same NSCAServer class.
@@ -133,27 +133,28 @@ public class NSCAServer implements Server {
         
         payload.setLevel(level.toString());
         
-        logger.info("******************** "+ instanceName +" *******************");
-        logger.info("*");
-        logger.info("*    Host: " + service.getHost().getHostname());
-        logger.info("* Service: " + service.getServiceName());
-        logger.info("*   Level: " + level);
-        logger.info("* Message: ");
-        logger.info("* " + payload.getMessage());
-        logger.info("*");
-        logger.info("*********************************************");
+        LOGGER.info("******************** "+ instanceName +" *******************");
+        LOGGER.info("*");
+        LOGGER.info("*    Host: " + service.getHost().getHostname());
+        LOGGER.info("* Service: " + service.getServiceName());
+        LOGGER.info("*   Level: " + level);
+        LOGGER.info("* Message: ");
+        LOGGER.info("* " + payload.getMessage());
+        LOGGER.info("*");
+        LOGGER.info("*********************************************");
 
 
         long duration = 0;
         try {
-            long start = TimeMeasure.start();
+        	TimeMeasure tm = new TimeMeasure();
+            tm.start();
             sender.send(payload);
-            duration = TimeMeasure.stop(start);
-            logger.info("Nsca send execute: " + duration + " ms");
+            duration = tm.stop();
+            LOGGER.info("Nsca send execute: " + duration + " ms");
         } catch (NagiosException e) {
-            logger.warn("Nsca server error - " + e);
+            LOGGER.warn("Nsca server error - " + e);
         } catch (IOException e) {
-            logger.error("Network error - check nsca server and that service is started - " + e);
+            LOGGER.error("Network error - check nsca server and that service is started - " + e);
         }
     }
     

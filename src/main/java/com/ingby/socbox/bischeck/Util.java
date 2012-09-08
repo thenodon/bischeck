@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 
-public class Util {
+public abstract class Util {
     static Logger  logger = Logger.getLogger(Util.class);
 
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";

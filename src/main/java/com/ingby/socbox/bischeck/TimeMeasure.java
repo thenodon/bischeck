@@ -21,12 +21,15 @@ package com.ingby.socbox.bischeck;
 
 public class TimeMeasure {
 
-    public static long start() {
-        return System.currentTimeMillis();
+	private long start = 0L;
+	
+	
+    public void start() {
+        start = System.currentTimeMillis();
     }
 
     
-    public static long stop(long start) {
+    public long stop() {
         return (System.currentTimeMillis() - start);
     }
 

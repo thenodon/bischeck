@@ -32,7 +32,8 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem {
     
-    static Logger  logger = Logger.getLogger(CalculateOnCache.class);
+    @SuppressWarnings("unused")
+	private final static Logger LOGGER = Logger.getLogger(CalculateOnCache.class);
 
     private ExecuteJEP jep = null;
     

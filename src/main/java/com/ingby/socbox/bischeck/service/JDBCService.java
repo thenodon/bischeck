@@ -33,7 +33,7 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 
 public class JDBCService extends ServiceAbstract implements Service {
 
-    static Logger  logger = Logger.getLogger(JDBCService.class);
+    private final static Logger LOGGER = Logger.getLogger(JDBCService.class);
     
     static private int querytimeout = 10;
     private Connection connection;
@@ -43,7 +43,7 @@ public class JDBCService extends ServiceAbstract implements Service {
             querytimeout = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
                     getProperty("JDBCService.querytimeout","10"));
         } catch (NumberFormatException ne) {
-            logger.error("Property SQLSerivceItem.querytimeout is not " + 
+            LOGGER.error("Property SQLSerivceItem.querytimeout is not " + 
                     "set correct to an integer: " +
                     ConfigurationManager.getInstance().getProperties().getProperty(
                     "SQLSerivceItem.querytimeout"));
@@ -75,7 +75,7 @@ public class JDBCService extends ServiceAbstract implements Service {
         ResultSet res = null;
         try {
             statement = this.connection.createStatement();
-            logger.debug("query timeout " + querytimeout);
+            LOGGER.debug("query timeout " + querytimeout);
             statement.setQueryTimeout(querytimeout);
             res = statement.executeQuery(exec);
 

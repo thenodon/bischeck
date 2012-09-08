@@ -29,7 +29,7 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 
 public class ServiceFactory {
 
-    static Logger  logger = Logger.getLogger(ServiceFactory.class);
+    private final static Logger LOGGER = Logger.getLogger(ServiceFactory.class);
     
     @SuppressWarnings("unchecked")
     public static Service createService(String name, String url) throws Exception 
@@ -38,9 +38,9 @@ public class ServiceFactory {
         URI uri = null;
         try {
             uri= new URI(url);
-            logger.debug("uri - " + uri.toString());
+            LOGGER.debug("uri - " + uri.toString());
         } catch (URISyntaxException e) {
-            logger.warn("URL malformed - " + url + " - " + e.getMessage());
+            LOGGER.warn("URL malformed - " + url + " - " + e.getMessage());
             throw new Exception(e.getMessage());
         }
         
@@ -54,7 +54,7 @@ public class ServiceFactory {
             try { 
                 clazz = (Class<Service>) Thread.currentThread().getContextClassLoader().loadClass(clazzname);
             }catch (ClassNotFoundException ee) {
-                logger.fatal("Service class " + clazzname + " not found.");
+                LOGGER.fatal("Service class " + clazzname + " not found.");
                 throw new Exception(e.getMessage());
             }
         }
@@ -67,7 +67,7 @@ public class ServiceFactory {
         try {
             cons = clazz.getConstructor(param);
         } catch (Exception e) {
-            logger.error("Error getting class constructor for "+ clazz.getName());
+            LOGGER.error("Error getting class constructor for "+ clazz.getName());
             throw new Exception(e.getMessage());
         }
         
@@ -75,7 +75,7 @@ public class ServiceFactory {
         try {
             service = (Service) cons.newInstance(name);
         } catch (Exception e) {
-            logger.error("Error creating an instance of " + clazz.getName());
+            LOGGER.error("Error creating an instance of " + clazz.getName());
             throw new Exception(e.getMessage());
         }
         return service;

@@ -23,13 +23,12 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-public class CacheUtil {
+public abstract class CacheUtil {
 
 	static Logger  logger = Logger.getLogger(CacheUtil.class);
 	private static final String FINDINTIMEPATTERN = "^-[0-9]+ *[HMS]{1} *$";
 	private static final String FINDTOFROMTIMEPATTERN = "^-[0-9]+ *[HMS]{1}:-[0-9]+ *[HMS]{1} *$";
 	
-    
 	
 	/**
 	 * 

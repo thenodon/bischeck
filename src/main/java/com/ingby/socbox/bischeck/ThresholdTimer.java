@@ -20,6 +20,7 @@
 package com.ingby.socbox.bischeck;
 
 import java.text.ParseException;
+
 import java.util.Date;
 import org.apache.log4j.Logger;
 import org.quartz.CronTrigger;
@@ -29,7 +30,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 import static org.quartz.JobBuilder.*;
 import static org.quartz.TriggerBuilder.*;
@@ -39,10 +39,9 @@ import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 
 public class ThresholdTimer implements Job {
 
-    static Logger  logger = Logger.getLogger(ThresholdTimer.class);
+    private final static Logger  LOGGER = Logger.getLogger(ThresholdTimer.class);
 
-    static SchedulerFactory sf;
-    static Scheduler sched;
+    private static Scheduler sched;
 
     public static void init(ConfigurationManager configMgr) throws SchedulerException, ParseException {
     	
@@ -72,7 +71,7 @@ public class ThresholdTimer implements Job {
         
         sched.addJob(job, true);
         
-        logger.info(job.getDescription() + " has been scheduled to run at: " + ft
+        LOGGER.info(job.getDescription() + " has been scheduled to run at: " + ft
                 + " and repeat based on expression: "
                 + trigger.getCronExpression());
 

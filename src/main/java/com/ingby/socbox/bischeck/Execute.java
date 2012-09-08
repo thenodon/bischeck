@@ -62,10 +62,10 @@ import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 
 
-public class Execute implements ExecuteMBean {
+public final class Execute implements ExecuteMBean {
 
-    static Logger  logger = Logger.getLogger(Execute.class);
-    static Object syncObj = new Object();
+    private static final Logger LOGGER = Logger.getLogger(Execute.class);
+    private static Object syncObj = new Object();
     private Boolean shutdownRequested = false;
     private Boolean reloadRequested = false;
     private Integer reloadcount = 0;
@@ -84,8 +84,8 @@ public class Execute implements ExecuteMBean {
 	private static final long LOOPTIMEOUTDEF = 30000;
 	private static final long SHUTDOWNSLEEPDEF = 3000; 
     
-	private static long LOOPTIMEOUT = LOOPTIMEOUTDEF;
-	private static long SHUTDOWNSLEEP = SHUTDOWNSLEEPDEF; 
+	private static long looptimeout = LOOPTIMEOUTDEF;
+	private static long shutdownsleep = SHUTDOWNSLEEPDEF; 
     
 	/*
 	 * The admin jobs are:
@@ -103,19 +103,19 @@ public class Execute implements ExecuteMBean {
         try {
             mbeanname = new ObjectName(ExecuteMBean.BEANNAME);
         } catch (MalformedObjectNameException e) {
-            logger.error("MBean object name failed, " + e);
+            LOGGER.error("MBean object name failed, " + e);
         } catch (NullPointerException e) {
-            logger.error("MBean object name failed, " + e);
+            LOGGER.error("MBean object name failed, " + e);
         }
 
         try {
             mbs.registerMBean(exec, mbeanname);
         } catch (InstanceAlreadyExistsException e) {
-            logger.fatal("Mbean exception - " + e.getMessage());
+            LOGGER.fatal("Mbean exception - " + e.getMessage());
         } catch (MBeanRegistrationException e) {
-        	logger.fatal("Mbean exception - " + e.getMessage());
+        	LOGGER.fatal("Mbean exception - " + e.getMessage());
         } catch (NotCompliantMBeanException e) {
-        	logger.fatal("Mbean exception - " + e.getMessage());
+        	LOGGER.fatal("Mbean exception - " + e.getMessage());
         }
     }
     
@@ -156,17 +156,13 @@ public class Execute implements ExecuteMBean {
         		else 
         			ConfigurationManager.initonce();
         	} catch (Exception e) {
-        		logger.error("Creating bischeck Configuration Manager failed with:" + e.getMessage());
+        		LOGGER.error("Creating bischeck Configuration Manager failed with:" + e.getMessage());
         		System.exit(FAILED);
-        	}
-
-        	if (line.hasOption("host") && line.hasOption("service")) {
-        		// Not implemented
         	}
 
         	retStat = Execute.getInstance().daemon();
         	//retStat = (new Execute()).daemon();
-        	logger.info("Method Execute returned " + retStat);
+        	LOGGER.info("Method Execute returned " + retStat);
         } while (retStat == RESTART);
  
         LogManager.shutdown();
@@ -184,7 +180,7 @@ public class Execute implements ExecuteMBean {
     
     private int daemon() {
     	
-    	logger.info("******************** Startup *******************");
+    	LOGGER.info("******************** Startup *******************");
 
     	/*
     	 * Stuff that should only be done on the first start and never on reload
@@ -193,7 +189,7 @@ public class Execute implements ExecuteMBean {
         	try {
         		deamonInit();
         	} catch (Exception e) {
-        		logger.error("Deamon init failed with: " + e.getMessage());
+        		LOGGER.error("Deamon init failed with: " + e.getMessage());
         		return FAILED;
         	}	
         }
@@ -210,7 +206,7 @@ public class Execute implements ExecuteMBean {
         try {
         	LastStatusCache.loaddump();
         } catch (Exception e) {
-        	logger.warn("Loading cache failed: " + e.getMessage());
+        	LOGGER.warn("Loading cache failed: " + e.getMessage());
         }
 		
                 
@@ -220,7 +216,7 @@ public class Execute implements ExecuteMBean {
 			sched = initScheduler();
 			initTriggers(sched); 
         } catch (SchedulerException e) {
-        	logger.error("Scheduler init failed with: " + e.getMessage());
+        	LOGGER.error("Scheduler init failed with: " + e.getMessage());
         	return FAILED;
 		}
         
@@ -232,14 +228,14 @@ public class Execute implements ExecuteMBean {
   
         try {
             sched.shutdown();
-            logger.info("Scheduler shutdown");
+            LOGGER.info("Scheduler shutdown");
         } catch (SchedulerException e) {
-            logger.warn("Stopping Quartz scheduler failed with - " + e);
+            LOGGER.warn("Stopping Quartz scheduler failed with - " + e);
         }
         
         LastStatusCache.getInstance().dump2file();
         
-        logger.info("******************* Shutdown ********************");
+        LOGGER.info("******************* Shutdown ********************");
         
         if (reloadRequested) 
         	return RESTART;
@@ -258,7 +254,7 @@ public class Execute implements ExecuteMBean {
      */
 	private void deamonInit() throws Exception{
 		if (ConfigurationManager.getInstance().getPidFile().exists()) {
-		    logger.fatal("Pid file already exist - check if bischeck" + 
+		    LOGGER.fatal("Pid file already exist - check if bischeck" + 
 		    " already running");
 		    throw new Exception("Pid file already exist - check if bischeck" + 
 		    " already running"); 
@@ -279,20 +275,20 @@ public class Execute implements ExecuteMBean {
     
 	private void setupProperties() {
 		try {
-			LOOPTIMEOUT = Long.parseLong(
+			looptimeout = Long.parseLong(
 					ConfigurationManager.getInstance().getProperties().
 					getProperty("loopTimeout",""+LOOPTIMEOUTDEF));
 		} catch (NumberFormatException ne) {
-			LOOPTIMEOUT = LOOPTIMEOUTDEF;
+			looptimeout = LOOPTIMEOUTDEF;
 		}
 		
 		try {
 
-			SHUTDOWNSLEEP = Long.parseLong(
+			shutdownsleep = Long.parseLong(
 					ConfigurationManager.getInstance().getProperties().
 					getProperty("shutdownWait",""+SHUTDOWNSLEEPDEF));
 		} catch (NumberFormatException ne) {
-			SHUTDOWNSLEEP = SHUTDOWNSLEEPDEF; 
+			shutdownsleep = SHUTDOWNSLEEPDEF; 
 		}
 
 	}
@@ -308,24 +304,24 @@ public class Execute implements ExecuteMBean {
 		do {
             try {
                 synchronized(syncObj) {
-                    syncObj.wait(LOOPTIMEOUT);
+                    syncObj.wait(looptimeout);
                 }
             } catch (InterruptedException ignore) {}
         
             // If no remaining triggers - shutdown
             if (getNumberOfTriggers() == 0) {
-                logger.debug("Number of triggers zero");
+                LOGGER.debug("Number of triggers zero");
             	shutdown();
             }
             
-            if (logger.getEffectiveLevel() == Level.DEBUG) {
+            if (LOGGER.getEffectiveLevel() == Level.DEBUG) {
                 // Show next fire time for all triggers
                 String[] list = getTriggers();
-                logger.debug("****** Next fire time *********");
+                LOGGER.debug("****** Next fire time *********");
                 for (int i=0;i<list.length;i++) {
-                    logger.debug(list[i]);
+                    LOGGER.debug(list[i]);
                 }
-                logger.debug("*******************************");                
+                LOGGER.debug("*******************************");                
             } 
         
         } while (!isShutdownRequested());
@@ -342,7 +338,7 @@ public class Execute implements ExecuteMBean {
             ConfigurationManager.getInstance().getScheduleJobConfigs();
         
         for (ServiceJobConfig jobentry: schedulejobs) {
-            logger.info("Configure job " + jobentry.getService().getServiceName());
+            LOGGER.info("Configure job " + jobentry.getService().getServiceName());
             Map<String,Object> map = new HashMap<String, Object>();
             map.put("service", jobentry.getService());
             createJob(sched, jobentry, map);
@@ -368,9 +364,9 @@ public class Execute implements ExecuteMBean {
 
 
       				sched.scheduleJob(job, trigger);
-      				logger.info("Adding trigger to job " + trigger.toString());
+      				LOGGER.info("Adding trigger to job " + trigger.toString());
       			} catch (SchedulerException e) {
-      				logger.warn("Scheduled job failed with exception " + e);
+      				LOGGER.warn("Scheduled job failed with exception " + e);
       				throw e;
       			}
       		}
@@ -387,29 +383,29 @@ public class Execute implements ExecuteMBean {
 	private Scheduler initScheduler() throws SchedulerException {
 		Scheduler sched = null;
 		try {
-            logger.info("Create scheduler");
+            LOGGER.info("Create scheduler");
             sched = StdSchedulerFactory.getDefaultScheduler();
         } catch (SchedulerException e) {
-            logger.warn("Scheduler creation failed with exception " + e);    
+            LOGGER.warn("Scheduler creation failed with exception " + e);    
             throw e;
         }
         
         try {
-            logger.info("Start scheduler");
+            LOGGER.info("Start scheduler");
             sched.start();
-            logger.info("Start scheduler - done");
+            LOGGER.info("Start scheduler - done");
         } catch (SchedulerException e) {
-            logger.warn("Scheduler failed to start with exception " + e);
+            LOGGER.warn("Scheduler failed to start with exception " + e);
             throw e;
         }
         
         JobListener jobListener = new JobListenerLogger(); 
         try {
-            logger.info("Add scheduler listener");
+            LOGGER.info("Add scheduler listener");
             sched.getListenerManager().addJobListener(jobListener, allJobs());
-            logger.info("Add scheduler listener - done");
+            LOGGER.info("Add scheduler listener - done");
         } catch (SchedulerException e) {
-            logger.warn("Add listener failed with exception "+ e);
+            LOGGER.warn("Add listener failed with exception "+ e);
             throw e;    
         }
 		return sched;
@@ -445,24 +441,24 @@ public class Execute implements ExecuteMBean {
 
     @Override
     public void shutdown() {
-        logger.info("Shutdown request");        
+        LOGGER.info("Shutdown request");        
         shutdownRequested = true;
         synchronized(syncObj) {
         	syncObj.notify();
         }
 
         try {
-                Thread.sleep(SHUTDOWNSLEEP);
+                Thread.sleep(shutdownsleep);
         }
         catch(InterruptedException e) {
-            logger.error("Interrupted which waiting on main daemon thread to complete.");
+            LOGGER.error("Interrupted which waiting on main daemon thread to complete.");
         }
     }
 
     
     @Override
     public void reload() {
-    	logger.info("Reload request");
+    	LOGGER.info("Reload request");
     	reloadcount++;
     	reloadtime = System.currentTimeMillis();
         reloadRequested = true;
@@ -509,7 +505,7 @@ public class Execute implements ExecuteMBean {
         
         }
         catch (SchedulerException se) {
-            logger.error("Build trigger list failed, " + se);
+            LOGGER.error("Build trigger list failed, " + se);
         }
         
         String[] arr = new String[triggerList.size()];
@@ -537,7 +533,7 @@ public class Execute implements ExecuteMBean {
             }
       
         } catch (SchedulerException se) {
-            logger.error("Build trigger list failed, " + se);
+            LOGGER.error("Build trigger list failed, " + se);
         }
         
         return numberoftriggers-NUMOFADMINJOBS;
