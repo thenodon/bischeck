@@ -29,6 +29,8 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
+import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public abstract class Util {
     static Logger  logger = Logger.getLogger(Util.class);
@@ -118,5 +120,21 @@ public abstract class Util {
         }
         
         return arraystr;
+    }
+
+    
+    /**
+     * Create a host, service and service item name with - separator
+     * @param service
+     * @param serviceitem
+     * @return the host-service-serviceitem string
+     */
+    public static String fullName(Service service, ServiceItem serviceitem) {
+    	StringBuffer strbuf = new StringBuffer();
+    	
+    	strbuf.append(service.getHost().getHostname()).append("-");
+    	strbuf.append(service.getServiceName()).append("-");
+    	strbuf.append(serviceitem.getServiceItemName());
+    	return strbuf.toString();
     }
 }
