@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -34,11 +35,13 @@ import com.googlecode.jsendnsca.builders.MessagePayloadBuilder;
 import com.googlecode.jsendnsca.builders.NagiosSettingsBuilder;
 import com.googlecode.jsendnsca.encryption.Encryption;
 import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.TimeMeasure;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 /**
  * Nagios server integration over NSCA protocol, using the jnscasend package.
  * @author andersh
@@ -144,18 +147,21 @@ public class NSCAServer implements Server {
         LOGGER.info("*********************************************");
 
 
-        long duration = 0;
+        Long duration = null;
+    	final Timer timer = Metrics.newTimer(NSCAServer.class, 
+    			instanceName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    	final TimerContext context = timer.time();
+
         try {
-        	TimeMeasure tm = new TimeMeasure();
-            tm.start();
-            sender.send(payload);
-            duration = tm.stop();
-            LOGGER.info("Nsca send execute: " + duration + " ms");
-        } catch (NagiosException e) {
-            LOGGER.warn("Nsca server error - " + e);
+        	sender.send(payload);
+        }catch (NagiosException e) {
+        	LOGGER.warn("Nsca server error - " + e);
         } catch (IOException e) {
-            LOGGER.error("Network error - check nsca server and that service is started - " + e);
-        }
+        	LOGGER.error("Network error - check nsca server and that service is started - " + e);
+        } finally { 
+        	duration = context.stop()/1000000;
+        	LOGGER.info("Nsca send execute: " + duration + " ms");
+        }	    
     }
     
     
