@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.quartz.Job;
@@ -40,13 +41,16 @@ import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.TimeMeasure;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.threshold.Threshold;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 public class ServiceJob implements Job {
 
@@ -177,20 +181,24 @@ public class ServiceJob implements Job {
      * @throws Exception
      */
     private NAGIOSSTAT checkServiceItem(Service service) throws Exception {
-        
+    	
         NAGIOSSTAT servicestate= NAGIOSSTAT.OK;
         
         for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
             ServiceItem serviceitem = serviceitementry.getValue();
-            LOGGER.debug("Executing ServiceItem: "+ serviceitem.getServiceItemName());
+            
+            String fullservicename = Util.fullName(service, serviceitem);
+            
+            LOGGER.debug("Executing ServiceItem: "+ fullservicename);
             synchronized (service) {
 
-            	TimeMeasure tm = new TimeMeasure();
+            	final Timer timer = Metrics.newTimer(ServiceJob.class, 
+            			fullservicename, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+            	final TimerContext context = timer.time();
+            	
+            	Long executetime = null;
             	try {
             		
-            		tm.start();
-
-
                 	try {
                 		service.openConnection();
                 		//service.setConnectionEstablished(true);
@@ -208,20 +216,30 @@ public class ServiceJob implements Job {
                 		} catch (Exception ignore) {}
                 	}
 
-                	serviceitem.setExecutionTime(
-                			Long.valueOf(tm.stop()));
-                	LOGGER.debug("Time to execute " + 
-                			serviceitem.getExecution() + 
-                			" : " + serviceitem.getExecutionTime() +
-                	" ms");
                 } catch (Exception e) {
                 	LOGGER.error("Execution prepare and/or query \""+ serviceitem.getExecution() 
                 			+ "\" failed with " + e);
                 	throw new Exception("Execution prepare and/or query \""+ serviceitem.getExecution() 
                 			+ "\" failed. See bischeck log for more info.");
+                } finally {
+                	executetime = context.stop()/1000000;         	
                 }
+                
+                serviceitem.setExecutionTime(executetime);
+            	
+                LOGGER.debug("Time to execute " + 
+            			serviceitem.getExecution() + 
+            			" : " + serviceitem.getExecutionTime() +
+            	" ms");
+            	
             }
+
+            final Timer timer = Metrics.newTimer(Threshold.class, 
+        			fullservicename, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        	final TimerContext ctxthreshold = timer.time();
+        	
             try {
+            	
                 serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
                 // Always report the state for the worst service item 
                 LOGGER.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
@@ -238,7 +256,10 @@ public class ServiceJob implements Job {
             } catch (Exception e) {
                 LOGGER.error("Threshold excution error - " + e);
                 throw new Exception("Threshold excution error, see bischeck log for more info");
+            } finally {
+            	ctxthreshold.stop();
             }
+            
 
 
         } // for serviceitem
