@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.apache.log4j.Logger;
 import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.Util;
 
 
 public class ServiceFactory {
@@ -45,6 +46,11 @@ public class ServiceFactory {
         }
         
         String clazzname = ConfigurationManager.getInstance().getURL2Service().getProperty(uri.getScheme());
+        
+        if (clazzname == null) {
+            LOGGER.fatal("Service uri " + Util.obfuscatePassword(uri.toString()) + " is not matched in the urlservice.xml configuration file.");
+            throw new Exception("Service uri " + Util.obfuscatePassword(uri.toString()) + " is not matched in the urlservice.xml configuration file.");
+        }
         
         Class<Service> clazz = null;
         
