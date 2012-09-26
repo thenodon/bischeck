@@ -19,11 +19,18 @@
 
 package com.ingby.socbox.bischeck.servers;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -33,6 +40,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,6 +48,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
@@ -65,6 +74,8 @@ public class NRDPServer implements Server {
 	private String cmd;
 	private URL url;
 
+	private NagiosUtil nagutil = new NagiosUtil();
+	
 	private NRDPServer(String name) {
 		instanceName=name;
 	}
@@ -80,6 +91,7 @@ public class NRDPServer implements Server {
 
 
 	private void init(String name) {
+		
 		Properties defaultproperties = getServerProperties();
 		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
 		hostAddress = prop.getProperty("hostAddress",
@@ -133,7 +145,7 @@ public class NRDPServer implements Server {
 				xml = xmlNRDPFormat(level, 
 						service.getHost().getHostname(),
 						service.getServiceName(),
-						getMessage(service));
+						nagutil.createNagiosMessage(service));
 			} catch (Exception e) {
 				level=NAGIOSSTAT.CRITICAL;
 				xml = xmlNRDPFormat(level, 
@@ -150,8 +162,6 @@ public class NRDPServer implements Server {
 					service.getServiceName(),
 					Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
 		}
-
-
 
 		LOGGER.info("******************** "+ instanceName +" *******************");
 		LOGGER.info("*");
@@ -174,15 +184,9 @@ public class NRDPServer implements Server {
 	
 		try {
 			LOGGER.debug(urlstr);
-			conn = (HttpURLConnection) url.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
-
-			conn.setConnectTimeout(connectionTimeout);
 			String payload = cmd+xml;
-			conn.setRequestProperty("Content-Length", "" + 
-					Integer.toString(payload.getBytes().length));
-
+			conn = createHTTPConnection(payload);
+			
 			wr = new OutputStreamWriter(conn.getOutputStream());
 			wr.write(payload);
 			wr.flush();
@@ -201,26 +205,47 @@ public class NRDPServer implements Server {
 				LOGGER.error("Could not get a doc builder: " + e.getMessage());
 			}
 			
+			/*
+			 * Getting the value for status and message tags
+			 */
 			Document doc = null;
 			try {
-				doc = dBuilder.parse(conn.getInputStream());
+	
+
+				///
+				BufferedReader br
+	        	= new BufferedReader(new InputStreamReader(conn.getInputStream()));
+	 
+				StringBuilder sb = new StringBuilder();
+	 
+				String line;
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+				} 
+				
+				
+				//InputStream is = new ByteArrayInputStream(htmlstr.getBytes("UTF-8"));
+				InputStream is = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+				//////////////
+				LOGGER.info(sb.toString());
+				
+				doc = dBuilder.parse(is);
+				//				doc = dBuilder.parse(conn.getInputStream());
+				doc.getDocumentElement().normalize();
+				String rootNode =  doc.getDocumentElement().getNodeName();  
+	            NodeList responselist = doc.getElementsByTagName(rootNode);  
+	            String result = (String) ((Element) responselist.item(0)).getElementsByTagName("status").  
+	            	item(0).getChildNodes().item(0).getNodeValue().trim();  
+	            if (!result.equals("0")) {  
+	            	String message = (String) ((Element) responselist.item(0)).getElementsByTagName("message").  
+	            		item(0).getChildNodes().item(0).getNodeValue().trim();  
+	            	LOGGER.error("nrdp returned message \"" + message + "\" for xml:  " + xml);
+	            }
 			} catch (SAXException e) {
 				LOGGER.error("Could not parse response xml: "+ e.getMessage());
 			}
 			
-			/*
-			 * Getting the value for status and message tags
-			 */
-			doc.getDocumentElement().normalize();
-			String rootNode =  doc.getDocumentElement().getNodeName();  
-            NodeList responselist = doc.getElementsByTagName(rootNode);  
-            String result = (String) ((Element) responselist.item(0)).getElementsByTagName("status").  
-            	item(0).getChildNodes().item(0).getNodeValue().trim();  
-            if (!result.equals("0")) {  
-            	String message = (String) ((Element) responselist.item(0)).getElementsByTagName("message").  
-            		item(0).getChildNodes().item(0).getNodeValue().trim();  
-            	LOGGER.error("nrdp returned message \"" + message + "\" for xml:  " + xml);
-            }
+			
 
 		}catch (IOException e) {
 			LOGGER.error("Network error - check nrdp server and that service is started - " + e);
@@ -235,93 +260,50 @@ public class NRDPServer implements Server {
 
 	}
 
+	private HttpURLConnection createHTTPConnection(String payload)
+			throws IOException, ProtocolException {
+		HttpURLConnection conn;
+		conn = (HttpURLConnection) url.openConnection();
+
+		conn.setDoOutput(true);
+		// Check if you can set the agent 
+		conn.setRequestMethod("POST");
+
+		conn.setConnectTimeout(connectionTimeout);
+		conn.setRequestProperty("Content-Length", "" + 
+				Integer.toString(payload.getBytes().length));
+		conn.setRequestProperty("User-Agent", "bischeck");
+		conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+		conn.setRequestProperty("Accept","text/html,application/xhtml+xml,application/xml");//;q=0.9,*/*;q=0.8");
+		//conn.setRequestProperty("Accept-Encoding","gzip,deflate,sdch");
+		conn.setRequestProperty("Accept-Language","en-US,en;q=0.8");
+		conn.setRequestProperty("Accept-Charset","ISO-8859-1,utf-8");//;q=0.7,*;q=0.3");
+		return conn;
+	}
+
 	private String xmlNRDPFormat(NAGIOSSTAT level, String hostname,
 			String servicename, String output) {
 		StringBuffer strbuf = new StringBuffer();
 
-		strbuf.append("<?xml version='1.0'?>");
+		// Check encoding and character set and how it works out
+		strbuf.append("<?xml version='1.0' encoding='utf-8'?>");
 		strbuf.append("<checkresults>");
 		strbuf.append("<checkresult type='service'>");
 		strbuf.append("<hostname>").append(hostname).append("</hostname>");
 		strbuf.append("<servicename>").append(servicename).append("</servicename>");
 		strbuf.append("<state>").append(level).append("</state>");
-		strbuf.append("<output>").append(output).append("</output>");
+		strbuf.append("<output>").append(StringEscapeUtils.escapeHtml(output)).append("</output>");
 		strbuf.append("</checkresult>");
 		strbuf.append("</checkresults>");
-
-		return strbuf.toString();
-	}
-
-	private String getMessage(Service service) {
-		String message = "";
-		String perfmessage = "";
-		int count = 0;
-		long totalexectime = 0;
-
-		for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
-			ServiceItem serviceItem = serviceItementry.getValue();
-
-			Float warnValue = new Float(0);
-			Float critValue = new Float(0);
-			String method = "NA";;
-
-			Float currentThreshold = Util.roundOneDecimals(serviceItem.getThreshold().getThreshold());
-
-			if (currentThreshold != null) {
-
-				method = serviceItem.getThreshold().getCalcMethod();
-
-				if (method.equalsIgnoreCase("=")) {
-					warnValue = Util.roundOneDecimals(new Float ((1-serviceItem.getThreshold().getWarning())*currentThreshold));
-					critValue = Util.roundOneDecimals(new Float ((1-serviceItem.getThreshold().getCritical())*currentThreshold));
-					message = message + serviceItem.getServiceItemName() +
-					" = " + 
-					serviceItem.getLatestExecuted() +
-					" ("+ 
-					currentThreshold + " " + method + " " +
-					(warnValue) + " " + method + " +-W " + method + " " +
-					(critValue) + " " + method + " +-C " + method + " " +
-					") ";
-
-				} else {
-					warnValue = Util.roundOneDecimals(new Float (serviceItem.getThreshold().getWarning()*currentThreshold));
-					critValue = Util.roundOneDecimals(new Float (serviceItem.getThreshold().getCritical()*currentThreshold));
-					message = message + serviceItem.getServiceItemName() +
-					" = " + 
-					serviceItem.getLatestExecuted() +
-					" ("+ 
-					currentThreshold + " " + method + " " +
-					(warnValue) + " " + method + " W " + method + " " +
-					(critValue) + " " + method + " C " + method + " " +
-					") ";
-				}
-
-			} else {
-				message = message + serviceItem.getServiceItemName() +
-				" = " + 
-				serviceItem.getLatestExecuted() +
-				" (NA) ";
-				currentThreshold=new Float(0); //This is so the perfdata will be correct.
-			}
-
-
-
-			perfmessage = perfmessage + serviceItem.getServiceItemName() +
-			"=" + 
-			serviceItem.getLatestExecuted() + ";" +
-			(warnValue) +";" +
-			(critValue) +";0; " + //;
-
-			"threshold=" +
-			currentThreshold +";0;0;0; ";
-
-			totalexectime = (totalexectime + serviceItem.getExecutionTime());
-			count++;
+		
+		String utfenc = null;
+		try {
+			utfenc = URLEncoder.encode(strbuf.toString(),"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		return " " + message + " | " + 
-		perfmessage +
-		"avg-exec-time=" + ((totalexectime/count)+"ms");
+		return utfenc;
 	}
 
 	public static Properties getServerProperties() {
