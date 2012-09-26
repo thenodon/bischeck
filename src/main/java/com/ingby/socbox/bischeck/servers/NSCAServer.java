@@ -35,6 +35,7 @@ import com.googlecode.jsendnsca.builders.MessagePayloadBuilder;
 import com.googlecode.jsendnsca.builders.NagiosSettingsBuilder;
 import com.googlecode.jsendnsca.encryption.Encryption;
 import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
@@ -58,7 +59,8 @@ public class NSCAServer implements Server {
     
     private NagiosPassiveCheckSender sender = null;
     private String instanceName;
-    
+	private NagiosUtil nagutil = new NagiosUtil();
+
     
     /**
      * Retrieve the Server object. The method is invoked from class ServerExecutor
@@ -122,7 +124,7 @@ public class NSCAServer implements Server {
         if ( service.isConnectionEstablished() ) {
             try {
                 level = service.getLevel();
-                payload.setMessage(level + getMessage(service));
+                payload.setMessage(level + nagutil.createNagiosMessage(service));
             } catch (Exception e) {
                 level=NAGIOSSTAT.CRITICAL;
                 payload.setMessage(level + " " + e.getMessage());
