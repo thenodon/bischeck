@@ -621,35 +621,14 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 	    			return null;
 	    		
 	    		LOGGER.debug("Calculated value = " + value);
-	    		return Util.roundOneDecimals(value);
+	    		//return value;
+	    		return Util.roundDecimals(value);
 				
-	    			
-				
-				//this.jep.parseExpression(parsedstr);
-
-	    		/*	
-				if (jep.hasError()) {
-					logger.warn("Math jep expression error, " +jep.getErrorInfo());
-					return null;
-				}
-				
-	    			
-				float value = (float) jep.getValue();
-				logger.debug("Calculated value = " + value);
-				if (Float.isNaN(value)) {
-					calculatedValue=null;
-				} else {
-					calculatedValue = Util.roundOneDecimals(value);
-				}
-				*/
 			}
 		}
 		else {
 			return tcont.getFloatThreshold();
 		}
-		
-		//return calculatedValue;
-
     }
 
     @Override
