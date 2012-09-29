@@ -19,6 +19,7 @@
 
 package com.ingby.socbox.bischeck;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -27,15 +28,16 @@ import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class NagiosUtil {
-    static Logger  logger = Logger.getLogger(NagiosUtil.class);
-    
-    /**
-     * Formatting the data according to Nagios specification, including performance
-     * data. 
-     * @param service to format
-     * @return
-     */
-    public String createNagiosMessage(Service service) {
+	
+	private final static Logger LOGGER = Logger.getLogger(NagiosUtil.class);
+	
+	
+	/**
+	 * Formating to Nagios style
+	 * @param service
+	 * @return
+	 */
+	public String createNagiosMessage(Service service) {
 		String message = "";
 		String perfmessage = "";
 		int count = 0;
@@ -44,36 +46,36 @@ public class NagiosUtil {
 		for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
 			ServiceItem serviceItem = serviceItementry.getValue();
 
-			Float warnValue = new Float(0);
-			Float critValue = new Float(0);
+			BigDecimal warnValue = null;
+			BigDecimal critValue = null;
 			String method = "NA";;
 
-			Float currentThreshold = Util.roundOneDecimals(serviceItem.getThreshold().getThreshold());
-
+			Float currentThreshold = Util.roundDecimals(serviceItem.getThreshold().getThreshold());
+			String currentMeasure = serviceItem.getLatestExecuted();
 			if (currentThreshold != null) {
 
 				method = serviceItem.getThreshold().getCalcMethod();
 
 				if (method.equalsIgnoreCase("=")) {
-					warnValue = Util.roundOneDecimals(new Float ((1-serviceItem.getThreshold().getWarning())*currentThreshold));
-					critValue = Util.roundOneDecimals(new Float ((1-serviceItem.getThreshold().getCritical())*currentThreshold));
+					warnValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float ((1-serviceItem.getThreshold().getWarning())*currentThreshold)).toString().toString());
+					critValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float ((1-serviceItem.getThreshold().getCritical())*currentThreshold)).toString().toString());
 					message = message + serviceItem.getServiceItemName() +
 					" = " + 
 					serviceItem.getLatestExecuted() +
 					" ("+ 
-					currentThreshold + " " + method + " " +
+					new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString()) + " " + method + " " +
 					(warnValue) + " " + method + " +-W " + method + " " +
 					(critValue) + " " + method + " +-C " + method + " " +
 					") ";
 
 				} else {
-					warnValue = Util.roundOneDecimals(new Float (serviceItem.getThreshold().getWarning()*currentThreshold));
-					critValue = Util.roundOneDecimals(new Float (serviceItem.getThreshold().getCritical()*currentThreshold));
+					warnValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float (serviceItem.getThreshold().getWarning()*currentThreshold)).toString());
+					critValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float (serviceItem.getThreshold().getCritical()*currentThreshold)).toString());
 					message = message + serviceItem.getServiceItemName() +
 					" = " + 
 					serviceItem.getLatestExecuted() +
 					" ("+ 
-					currentThreshold + " " + method + " " +
+					new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString()) + " " + method + " " +
 					(warnValue) + " " + method + " W " + method + " " +
 					(critValue) + " " + method + " C " + method + " " +
 					") ";
@@ -96,7 +98,7 @@ public class NagiosUtil {
 			(critValue) +";0; " + //;
 
 			"threshold=" +
-			currentThreshold +";0;0;0; ";
+			new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString()) +";0;0;0; ";
 
 			totalexectime = (totalexectime + serviceItem.getExecutionTime());
 			count++;
