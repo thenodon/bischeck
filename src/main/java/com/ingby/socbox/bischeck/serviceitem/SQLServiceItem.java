@@ -100,7 +100,7 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     		else {
     			try {
     				Float value = Float.parseFloat(res);
-    				setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
+    				setLatestExecuted(Float.toString(Util.roundDecimals(value)));
     			} catch (NumberFormatException ne) {
     				setLatestExecuted(res);
     			}

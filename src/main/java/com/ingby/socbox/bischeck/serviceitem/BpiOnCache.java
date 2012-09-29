@@ -136,7 +136,7 @@ public class BpiOnCache extends ServiceItemAbstract implements ServiceItem {
             if (Float.isNaN(value)) {
                 setLatestExecuted(null);
             } else {
-                setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
+                setLatestExecuted(Float.toString(Util.roundDecimals(value)));
             }
         }
     }

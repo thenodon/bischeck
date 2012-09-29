@@ -144,23 +144,8 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     		if (value == null) {
     			setLatestExecuted(null);
     		} else {
-    			setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
+    			setLatestExecuted(Float.toString(Util.roundDecimals(value)));
     		}
-    		/*
-    		this.jep.parseExpression(cacheparsedstr);
-
-    		if (jep.hasError()) {
-    			throw new ParseException(jep.getErrorInfo());
-    		}
-
-    		float value = (float) jep.getValue();
-    		logger.debug("Calculated value = " + value);
-    		if (Float.isNaN(value)) {
-    			setLatestExecuted(null);
-    		} else {
-    			setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
-    		}
-    		 */
     	}
     }
 }
