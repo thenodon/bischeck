@@ -92,6 +92,22 @@ public abstract class QueryNagiosPerfData {
         return data;
     }
     
+    
+    /**
+     * Return the performance portion of the Nagios check output
+     * @param checkres
+     * @return
+     */
+    public static String getPerfdata(String checkres) {
+		return  checkres.substring(checkres.indexOf('|')+1);
+	}
+    
+    
+    /**
+     * Remove the UOM portion of the performance string
+     * @param s
+     * @return
+     */
     private static String removeUOM(String s) {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < s.length(); i++) {
