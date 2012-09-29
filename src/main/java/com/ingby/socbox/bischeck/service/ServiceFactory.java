@@ -81,7 +81,7 @@ public class ServiceFactory {
         try {
             service = (Service) cons.newInstance(name);
         } catch (Exception e) {
-            LOGGER.error("Error creating an instance of " + clazz.getName());
+            LOGGER.error("Error creating an instance of " + name + " with class " + clazz.getName());
             throw new Exception(e.getMessage());
         }
         return service;
