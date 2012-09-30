@@ -103,11 +103,11 @@ A Business Activity Monitoring Server
 \end_layout
 
 \begin_layout Date
-Version 0.4.0 
+Version 0.4.1 
 \begin_inset Newline newline
 \end_inset
 
-2012-08-31
+2012-10-01
 \end_layout
 
 \begin_layout Standard
@@ -227,7 +227,18 @@ Support for custom threshold classes to enable any way to define threshold
 
 \begin_layout Itemize
 Integrates with multiple monitoring and surveillance tools, like any Nagios
- like systems that supports the NSCA protocol
+ like systems that supports the Nagios Service Check Acceptor (NSCA) and/or
+ the Nagios Remote Data Processor (NRDP)
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[Beta in 0.4.1]
+\end_layout
+
+\end_inset
+
+ protocol
 \begin_inset Foot
 status open
 
@@ -553,7 +564,7 @@ customlib
 
 \begin_layout Standard
 A JDBC connection is described with a normal jdbc url and with an additional
- driver class.
+ driver class in the driver tag of the bischeck configuration.
 \end_layout
 
 \begin_layout Subsection
@@ -639,7 +650,7 @@ Bischeck cache
 \end_layout
 
 \begin_layout Standard
-LastCacheService enable connection to bischeck's internal cache where the
+LastCacheService enables connection to bischeck's internal cache where the
  measured data is stored.
  With the service any existing host->service->serviceitem can be retrieved
  from the cache.
@@ -656,6 +667,39 @@ status open
 \begin_layout Plain Layout
 
 bischeck://cache
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Shell (beta)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.1]
+\end_layout
+
+\end_inset
+
+ ShellService enables execution of programs and scripts on the localhost.
+ The connection url for the shell service is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+shell://localhost
 \end_layout
 
 \end_inset
@@ -709,7 +753,12 @@ select sum(orderValue) from ....
 \end_layout
 
 \begin_layout Standard
-The SQLServiceItem class can be used when the service url is a jdbc url.
+The SQLServiceItem class can be used when the service url is a 
+\emph on
+jdbc://...
+
+\emph default
+ url.
 \end_layout
 
 \begin_layout Subsection
@@ -784,7 +833,11 @@ The
 \emph on
 LivestatusServiceItem
 \emph default
- class can be used for service url livestatus.
+ class can be used for service url 
+\emph on
+livestatus://hostname:port
+\emph default
+.
 \end_layout
 
 \begin_layout Subsection
@@ -844,6 +897,81 @@ CalculateOnCache
  class can be used with service url 
 \emph on
 bischeck://cache.
+\end_layout
+
+\begin_layout Subsection
+Check commands (Beta)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.1]
+\end_layout
+
+\end_inset
+
+ With the 
+\emph on
+CheckCommandServiceItem
+\emph default
+ class performance data can be retrieved by executing a Nagios check command.
+ The check command that is executed must output performance data according
+ the Nagios specifications for the 
+\emph on
+CheckCommandServiceItem
+\emph default
+ to work.
+ The execstatement query is formatted as a json structure.
+ To execute a check command and retrieve a specific performance data the
+ following statement example can be used:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+{"check":"usr/lib/nagios/plugins/check_tcp -H localhost -p 22","label":"time"}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above will execute the check_tcp program and retrieve the performance
+ data with label time.
+ 
+\end_layout
+
+\begin_layout Standard
+The benefit of using a check command from bischeck would be if there is
+ a need to manage the performance data with dynamic thresholds that is not
+ possible in Nagios Core.
+\end_layout
+
+\begin_layout Standard
+Important is that there is no management of environment variables through
+ bischeck when executing a check command.
+ 
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+CheckCommandServiceItem
+\emph default
+ class can be used for service url 
+\emph on
+shell://localhost
+\emph default
+.
 \end_layout
 
 \begin_layout Chapter
@@ -1527,19 +1655,29 @@ Since bischeck support integration with multiple monitoring its not possible
 \end_layout
 
 \begin_layout Section
-Nagios integration with NSCA
+Nagios integration with NSCA and NRDP
 \end_layout
 
 \begin_layout Standard
-The data format between bischeck and Nagios follow the standard NSCA format.
+The data format between bischeck and Nagios follow the standard Nagios format.
  This means that the Nagios host and service names must be the same as you
  configure in bischeck.
- Since NSCA only works with passive checks the 
+ Since NSCA and NRDP
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.1]
+\end_layout
+
+\end_inset
+
+ works with passive checks the 
 \emph on
 check_dummy
 \emph default
- or equivalent check command should be used on the Nagios side.
- The data is packaged using the methods in jsendnsca.
+ or equivalent check command should be used on the Nagios side in the service
+ configuration.
  For a service in bischeck the data is split in the status and the performance
  output.
  The bischeck status output has the following format: 
@@ -1661,9 +1799,13 @@ The execution time of the service execute statement is always part of the
 
 \end_layout
 
+\begin_layout Subsection
+NSCA configuration
+\end_layout
+
 \begin_layout Standard
 The configuration parameters that need to be define in the server.xml for
- OpenTSDB are:
+ NSCA are:
 \end_layout
 
 \begin_layout Itemize
@@ -1686,7 +1828,38 @@ encryptionMode - the encryption mode used in the communication with the
 \end_layout
 
 \begin_layout Itemize
-password - the NSCA server password, no default.
+password - the NSCA server password, no by default.
+\end_layout
+
+\begin_layout Subsection
+NRDP configuration (Beta)
+\end_layout
+
+\begin_layout Standard
+The configuration parameters that need to be define in the server.xml for
+ NRDP are:
+\end_layout
+
+\begin_layout Itemize
+hostAddress - the IP or name for the NRDP server, default is localhost.
+\end_layout
+
+\begin_layout Itemize
+port - the socket port number on the NRDP server where NRDP is listening,
+ default is 80.
+\end_layout
+
+\begin_layout Itemize
+connectionTimeout - the timeout time in milliseconds before bischeck give
+ up on the the connection, default is 5000.
+\end_layout
+
+\begin_layout Itemize
+path - the URL path for NRDP, default is nrdp.
+\end_layout
+
+\begin_layout Itemize
+password - the NRDP server token, no by default.
 \end_layout
 
 \begin_layout Section
@@ -2119,8 +2292,8 @@ customlib
 \begin_layout Standard
 
 \series bold
-It is important is that the name field for host, service and serviceitem
- do not include any space characters or the dash (-) character.
+It is important that the name field for host, service and serviceitem do
+ not include any space characters or the dash (-) character.
 \end_layout
 
 \begin_layout Section
@@ -4235,6 +4408,88 @@ Releases
 \end_layout
 
 \begin_layout Section
+Release 0.4.1 - 2012-10-0X
+\end_layout
+
+\begin_layout Subsection
+New feature
+\end_layout
+
+\begin_layout Itemize
+[FR-224] 
+\series bold
+Beta
+\series default
+ support for NRDP through the new server class NRDPServer.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Beta
+\series default
+ support for executing check commands.
+ The check commands that can be used must support an output of performance
+ data.
+ Bischeck will not care about the status that comes from a check command.
+ Instead it will only use the performance data to evaluate its own threshold.
+ This include the new service class 
+\emph on
+ShellService
+\emph default
+ and serviceitem class 
+\emph on
+CheckCommandServiceItem
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+Instrumentation metrics provided by 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://metrics.codahale.com/"
+
+\end_inset
+
+ has been implemented to enable fine grain real time process measuring through
+ JMX.
+ This is implemented for 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+All external interfaces to measure response time
+\end_layout
+
+\begin_layout Itemize
+Service execution time
+\end_layout
+
+\begin_layout Itemize
+Threshold processing time, etc.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-226] has been fixed.
+ The bug was related to when bischeck was used with data points with many
+ decimals, like the result from a ping.
+ bischeck would strip of all decimals except 2 with caused small values
+ to become 0.
+ Now bischeck will determine the number of decimals used by the collected
+ data point and use it when formatting the calculated threshold, warning
+ and critical value.
+ This will hopefully make data presented in Nagios UIs and graphs like pnp4nagio
+s look better.
+\end_layout
+
+\begin_layout Section
 Release 0.4.0 - 2012-08-31
 \end_layout
 
@@ -5378,6 +5633,37 @@ status open
 \begin_layout Plain Layout
 
 http://commons.apache.org/collections/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+metrics-core.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/codahale/metrics
 \end_layout
 
 \end_inset
