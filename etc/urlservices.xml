@@ -17,5 +17,9 @@
     <value>LivestatusService</value>
   </urlproperty>
 
+  <urlproperty>
+    <key>shell</key>
+    <value>ShellService</value>
+  </urlproperty>
   
 </urlservices>
