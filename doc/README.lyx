@@ -4489,6 +4489,14 @@ Bugs fixed and important issues
 s look better.
 \end_layout
 
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.4.0 is supported for upgrade to 0.4.1.
+\end_layout
+
 \begin_layout Section
 Release 0.4.0 - 2012-08-31
 \end_layout
