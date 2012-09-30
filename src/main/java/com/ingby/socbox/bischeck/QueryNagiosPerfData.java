@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * @author andersh
  *
  */
-public class QueryNagiosPerfData {
+public abstract class QueryNagiosPerfData {
 
     public static void main(String[] args) {
         System.out.println(QueryNagiosPerfData.parse("load5","load1=0.160;15.000;30.000;0; load5=0.090;10.000;25.000;0; load15=0.020;5.000;20.000;0;"));
@@ -47,16 +47,16 @@ public class QueryNagiosPerfData {
     static Logger  logger = Logger.getLogger(QueryNagiosPerfData.class);
 
     //Find label entry from start of line or space until =
-    static Pattern labelMatch = Pattern.compile("(^| )(.*?)=");
+    private final static Pattern LABELMATCH = Pattern.compile("(^| )(.*?)=");
     //Find data from = to ; or space or end of line
-    static Pattern dataMatch = Pattern.compile("=(.*?)(;|$)");
+    private final static Pattern DATAMATCH = Pattern.compile("=(.*?)(;|$)");
     
     
     public static String parse(String label, String strtoparse) {
         logger.debug("Perf data to parse - " + strtoparse);
         
 
-        Matcher mat = labelMatch.matcher(strtoparse);
+        Matcher mat = LABELMATCH.matcher(strtoparse);
 
         String perflabel = null;
         boolean labelfound = false;
@@ -82,7 +82,7 @@ public class QueryNagiosPerfData {
             logger.debug(">"+perfdata+"<");        
         }
         
-        mat = dataMatch.matcher(perfdata);
+        mat = DATAMATCH.matcher(perfdata);
         String data = null;
         while (mat.find()) {
             data = removeUOM(mat.group().replaceAll("=","").replaceAll(";", ""));
@@ -92,6 +92,22 @@ public class QueryNagiosPerfData {
         return data;
     }
     
+    
+    /**
+     * Return the performance portion of the Nagios check output
+     * @param checkres
+     * @return
+     */
+    public static String getPerfdata(String checkres) {
+		return  checkres.substring(checkres.indexOf('|')+1);
+	}
+    
+    
+    /**
+     * Remove the UOM portion of the performance string
+     * @param s
+     * @return
+     */
     private static String removeUOM(String s) {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < s.length(); i++) {

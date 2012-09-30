@@ -32,7 +32,8 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem {
     
-    static Logger  logger = Logger.getLogger(CalculateOnCache.class);
+    @SuppressWarnings("unused")
+	private final static Logger LOGGER = Logger.getLogger(CalculateOnCache.class);
 
     private ExecuteJEP jep = null;
     
@@ -140,26 +141,13 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     	else {
     		
     		Float value = jep.execute(cacheparsedstr);
+    		
     		if (value == null) {
     			setLatestExecuted(null);
     		} else {
-    			setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
+    			setLatestExecuted(Float.toString(value));
+    			//setLatestExecuted(Float.toString(Util.roundDecimals(value)));
     		}
-    		/*
-    		this.jep.parseExpression(cacheparsedstr);
-
-    		if (jep.hasError()) {
-    			throw new ParseException(jep.getErrorInfo());
-    		}
-
-    		float value = (float) jep.getValue();
-    		logger.debug("Calculated value = " + value);
-    		if (Float.isNaN(value)) {
-    			setLatestExecuted(null);
-    		} else {
-    			setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
-    		}
-    		 */
     	}
     }
 }

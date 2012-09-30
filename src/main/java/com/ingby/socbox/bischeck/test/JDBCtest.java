@@ -1,6 +1,6 @@
 /*
 #
-# Copyright (C) 2010-2011 Anders Håål, Ingenjorsbyn AB
+# Copyright (C) 2010-2012 Anders Håål, Ingenjorsbyn AB
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 package com.ingby.socbox.bischeck.test;
 
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -29,10 +30,20 @@ import java.sql.Statement;
 
 public class JDBCtest {
     static public void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
-        String driverclassname = args[0];
+    	
+    	// "com.ibm.as400.access.AS400JDBCDriver"
+    	String driverclassname = args[0];
+    	
+        // "jdbc:as400://dax.dhl.com/PP01DAT01/prompt=false&user=andhaal&password=dsmprag10&error=full"
         String connectionname=args[1];
-        String sql=args[2];
-        String tablename=args[3];
+        
+        String sql=null;
+        String tablename=null;
+        
+        if (args.length == 3 )
+                sql=args[2];
+        if (args.length == 4 )
+                tablename=args[3];
 
         long execStart = 0l;
         long execEnd = 0l;
@@ -47,13 +58,13 @@ public class JDBCtest {
         System.out.println("SQL: " + sql);
         System.out.println("Table: " + tablename);
 
-        //Class.forName("com.ibm.as400.access.AS400JDBCDriver").newInstance();
         Class.forName(driverclassname).newInstance();
-        //Connection conn = DriverManager.getConnection("jdbc:as400://dax.dhl.com/PP01DAT01/prompt=false&user=andhaal&password=dsmprag10&error=full");
         openStart = System.currentTimeMillis();
         Connection conn = DriverManager.getConnection(connectionname);
         openEnd = System.currentTimeMillis();
 
+
+        if (tablename != null) {
         ResultSet rsCol = null;
         metaStart = System.currentTimeMillis();
         DatabaseMetaData md = conn.getMetaData();
@@ -65,10 +76,11 @@ public class JDBCtest {
             System.out.print(rsCol.getString("TYPE_NAME") + " : ");
             System.out.print(rsCol.getString("COLUMN_SIZE") + " : ");
             System.out.print(rsCol.getString("DATA_TYPE") + " : ");
-            
+
             System.out.println();
         }
-
+        }
+        if (sql !=null) {
         Statement stat = conn.createStatement();
         stat.setQueryTimeout(10);
         //ResultSet res = stat.executeQuery("select count(*) from PP01DAT01.EDISTAT where datercv='20110112'");
@@ -76,7 +88,7 @@ public class JDBCtest {
         execStart = System.currentTimeMillis();
         ResultSet res = stat.executeQuery(sql);
         execEnd = System.currentTimeMillis();
-        
+
         while (res.next())
             System.out.println(res.getString(1));
 
@@ -87,7 +99,7 @@ public class JDBCtest {
         try {
             res.close();
         } catch (SQLException ignore) {}
-
+        }
         try {
             conn.close();
         } catch (SQLException ignore) {}

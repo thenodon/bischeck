@@ -35,20 +35,20 @@ import org.apache.log4j.Logger;
  * @author andersh
  *
  */
-public class QueryDate {
+public abstract class QueryDate {
 
     public static void main(String[] args) {
         System.out.println(QueryDate.parse("select val1 from where formdate='%%yyyy-MM-dd%[M-1]%%' and todate='%%yy.MM.dd%[D2]%%';"));
         System.out.println(QueryDate.parse("select val1 from where formdate='%%yyyy-MM-dd%%' and todate='%%yy.MM.dd%%';"));
     }
     
-    static Logger  logger = Logger.getLogger(QueryDate.class);
+    private final static Logger  LOOGER = Logger.getLogger(QueryDate.class);
 
-    static Pattern pat = Pattern.compile("%%(.*?)%%");
-    static Pattern num = Pattern.compile("\\[([DMY].*?)\\]");
+    private final static Pattern DATEMARK = Pattern.compile("%%(.*?)%%");
+    private final static Pattern DATEINDICATOR = Pattern.compile("\\[([DMY].*?)\\]");
     
     public static String parse(String strtoparse) {
-        logger.debug("String to date parse - " + strtoparse);
+        LOOGER.debug("String to date parse - " + strtoparse);
         Calendar now = null;
 
         int count =0;
@@ -57,14 +57,14 @@ public class QueryDate {
         int numberofformats = (strtoparse.split("%%").length-1)/2;
         String datereplace[] = (String []) Array.newInstance(String.class, numberofformats);
 
-        Matcher mat = pat.matcher(strtoparse);
+        Matcher mat = DATEMARK.matcher(strtoparse);
 
         while (mat.find()) {
             
             String dateformat = mat.group();
             
             // Check if date calculations is needed
-            Matcher calc = num.matcher(dateformat);
+            Matcher calc = DATEINDICATOR.matcher(dateformat);
             // There is a calculation description
             int offsetValue=0;
             char offsetType;
@@ -88,7 +88,7 @@ public class QueryDate {
                     try {
                         offsetValue = Integer.parseInt(offset);
                     } catch (NumberFormatException ne) {
-                        logger.warn("Value to calculate date is not valid " + calc.group());
+                        LOOGER.warn("Value to calculate date is not valid " + calc.group());
                     }
                 }
                 
@@ -115,7 +115,7 @@ public class QueryDate {
         for (int i = 0; i< count; i++) {
             strtoparse = strtoparse.replaceFirst("%%(.*?)%%", datereplace[i]);
         }
-        logger.debug("Parsed string - " + strtoparse);
+        LOOGER.debug("Parsed string - " + strtoparse);
         return strtoparse;
     }
 }

@@ -37,7 +37,7 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class BpiOnCache extends ServiceItemAbstract implements ServiceItem {
     
-    static Logger  logger = Logger.getLogger(BpiOnCache.class);
+    private final static Logger LOGGER = Logger.getLogger(BpiOnCache.class);
 
     
     public static void main(String[] args) {
@@ -81,7 +81,7 @@ public class BpiOnCache extends ServiceItemAbstract implements ServiceItem {
             pat = Pattern.compile (LastStatusCache.getInstance().getHostServiceItemFormat());
             
         } catch (PatternSyntaxException e) {
-            logger.warn("Regex syntax exception, " + e);
+            LOGGER.warn("Regex syntax exception, " + e);
             throw e;
         }
         
@@ -107,7 +107,7 @@ public class BpiOnCache extends ServiceItemAbstract implements ServiceItem {
         }
         
         if (notANumber) { 
-            logger.debug("One or more of the parameters are null");
+            LOGGER.debug("One or more of the parameters are null");
             setLatestExecuted(null);
         } else  {
             StringBuffer sb = new StringBuffer ();
@@ -132,11 +132,11 @@ public class BpiOnCache extends ServiceItemAbstract implements ServiceItem {
             float value = (float) jep.getValue();
             */
             
-            logger.debug("Calculated value = " + value);
+            LOGGER.debug("Calculated value = " + value);
             if (Float.isNaN(value)) {
                 setLatestExecuted(null);
             } else {
-                setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
+                setLatestExecuted(Float.toString(Util.roundDecimals(value)));
             }
         }
     }

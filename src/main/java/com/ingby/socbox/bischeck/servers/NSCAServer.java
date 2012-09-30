@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -34,11 +35,14 @@ import com.googlecode.jsendnsca.builders.MessagePayloadBuilder;
 import com.googlecode.jsendnsca.builders.NagiosSettingsBuilder;
 import com.googlecode.jsendnsca.encryption.Encryption;
 import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.TimeMeasure;
+import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 /**
  * Nagios server integration over NSCA protocol, using the jnscasend package.
  * @author andersh
@@ -46,7 +50,7 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  */
 public class NSCAServer implements Server {
 
-    static Logger  logger = Logger.getLogger(NSCAServer.class);
+    private final static Logger LOGGER = Logger.getLogger(NSCAServer.class);
     /**
      * The server map is used to manage multiple configuration based on the 
      * same NSCAServer class.
@@ -55,7 +59,8 @@ public class NSCAServer implements Server {
     
     private NagiosPassiveCheckSender sender = null;
     private String instanceName;
-    
+	private NagiosUtil nagutil = new NagiosUtil();
+
     
     /**
      * Retrieve the Server object. The method is invoked from class ServerExecutor
@@ -119,7 +124,7 @@ public class NSCAServer implements Server {
         if ( service.isConnectionEstablished() ) {
             try {
                 level = service.getLevel();
-                payload.setMessage(level + getMessage(service));
+                payload.setMessage(level + nagutil.createNagiosMessage(service));
             } catch (Exception e) {
                 level=NAGIOSSTAT.CRITICAL;
                 payload.setMessage(level + " " + e.getMessage());
@@ -133,109 +138,35 @@ public class NSCAServer implements Server {
         
         payload.setLevel(level.toString());
         
-        logger.info("******************** "+ instanceName +" *******************");
-        logger.info("*");
-        logger.info("*    Host: " + service.getHost().getHostname());
-        logger.info("* Service: " + service.getServiceName());
-        logger.info("*   Level: " + level);
-        logger.info("* Message: ");
-        logger.info("* " + payload.getMessage());
-        logger.info("*");
-        logger.info("*********************************************");
+        LOGGER.info("******************** "+ instanceName +" *******************");
+        LOGGER.info("*");
+        LOGGER.info("*    Host: " + service.getHost().getHostname());
+        LOGGER.info("* Service: " + service.getServiceName());
+        LOGGER.info("*   Level: " + level);
+        LOGGER.info("* Message: ");
+        LOGGER.info("* " + payload.getMessage());
+        LOGGER.info("*");
+        LOGGER.info("*********************************************");
 
 
-        long duration = 0;
+        Long duration = null;
+    	final Timer timer = Metrics.newTimer(NSCAServer.class, 
+    			instanceName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    	final TimerContext context = timer.time();
+
         try {
-            long start = TimeMeasure.start();
-            sender.send(payload);
-            duration = TimeMeasure.stop(start);
-            logger.info("Nsca send execute: " + duration + " ms");
-        } catch (NagiosException e) {
-            logger.warn("Nsca server error - " + e);
+        	sender.send(payload);
+        }catch (NagiosException e) {
+        	LOGGER.warn("Nsca server error - " + e);
         } catch (IOException e) {
-            logger.error("Network error - check nsca server and that service is started - " + e);
-        }
+        	LOGGER.error("Network error - check nsca server and that service is started - " + e);
+        } finally { 
+        	duration = context.stop()/1000000;
+        	LOGGER.info("Nsca send execute: " + duration + " ms");
+        }	    
     }
     
     
-    /**
-     * Formatting the data according to Nagios specification, including performance
-     * data. 
-     * @param service
-     * @return
-     */
-    private String getMessage(Service service) {
-        String message = "";
-        String perfmessage = "";
-        int count = 0;
-        long totalexectime = 0;
-            
-        for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
-            ServiceItem serviceItem = serviceItementry.getValue();
-        
-            Float warnValue = new Float(0);
-            Float critValue = new Float(0);
-            String method = "NA";;
-            
-            Float currentThreshold = Util.roundOneDecimals(serviceItem.getThreshold().getThreshold());
-            
-            if (currentThreshold != null) {
-                
-                method = serviceItem.getThreshold().getCalcMethod();
-                
-                if (method.equalsIgnoreCase("=")) {
-                    warnValue = Util.roundOneDecimals(new Float ((1-serviceItem.getThreshold().getWarning())*currentThreshold));
-                    critValue = Util.roundOneDecimals(new Float ((1-serviceItem.getThreshold().getCritical())*currentThreshold));
-                    message = message + serviceItem.getServiceItemName() +
-                    " = " + 
-                    serviceItem.getLatestExecuted() +
-                    " ("+ 
-                    currentThreshold + " " + method + " " +
-                    (warnValue) + " " + method + " +-W " + method + " " +
-                    (critValue) + " " + method + " +-C " + method + " " +
-                    ") ";
-                    
-                } else {
-                    warnValue = Util.roundOneDecimals(new Float (serviceItem.getThreshold().getWarning()*currentThreshold));
-                    critValue = Util.roundOneDecimals(new Float (serviceItem.getThreshold().getCritical()*currentThreshold));
-                    message = message + serviceItem.getServiceItemName() +
-                    " = " + 
-                    serviceItem.getLatestExecuted() +
-                    " ("+ 
-                    currentThreshold + " " + method + " " +
-                    (warnValue) + " " + method + " W " + method + " " +
-                    (critValue) + " " + method + " C " + method + " " +
-                    ") ";
-                }
-                
-            } else {
-                message = message + serviceItem.getServiceItemName() +
-                " = " + 
-                serviceItem.getLatestExecuted() +
-                " (NA) ";
-                currentThreshold=new Float(0); //This is so the perfdata will be correct.
-            }
-            
-            
-            
-            perfmessage = perfmessage + serviceItem.getServiceItemName() +
-            "=" + 
-            serviceItem.getLatestExecuted() + ";" +
-            (warnValue) +";" +
-            (critValue) +";0; " + //;
-            
-            "threshold=" +
-            currentThreshold +";0;0;0; ";
-            
-            totalexectime = (totalexectime + serviceItem.getExecutionTime());
-            count++;
-        }
-
-        return " " + message + " | " + 
-            perfmessage +
-            "avg-exec-time=" + ((totalexectime/count)+"ms");
-    }
-
 	public static Properties getServerProperties() {
 		Properties defaultproperties = new Properties();
 	    

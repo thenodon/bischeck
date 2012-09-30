@@ -19,7 +19,7 @@
 
 package com.ingby.socbox.bischeck;
 
-public class ValidateConfiguration {
+public abstract class ValidateConfiguration {
 
 	
 	public static int verify() {

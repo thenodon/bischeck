@@ -28,7 +28,7 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class JobListenerLogger implements JobListener {
 
-    static Logger  logger = Logger.getLogger(JobListenerLogger.class);
+    private final static Logger  LOOGER = Logger.getLogger(JobListenerLogger.class);
     @Override
     public String getName() {
         return JobListenerLogger.class.getName();
@@ -38,7 +38,7 @@ public class JobListenerLogger implements JobListener {
     public void jobExecutionVetoed(JobExecutionContext arg0) {
         if (arg0 instanceof Service) {    
             Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-            logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed vetoed");
+            LOOGER.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed vetoed");
         }
     }
 
@@ -46,7 +46,7 @@ public class JobListenerLogger implements JobListener {
     public void jobToBeExecuted(JobExecutionContext arg0) {
         if (arg0 instanceof Service) {
             Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-            logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed");
+            LOOGER.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed");
         }
 
     }
@@ -56,7 +56,7 @@ public class JobListenerLogger implements JobListener {
             JobExecutionException arg1) {
         if (arg0 instanceof Service) {
             Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-            logger.info(service.getHost().getHostname() + ":" + service.getServiceName() + " execution completed");
+            LOOGER.info(service.getHost().getHostname() + ":" + service.getServiceName() + " execution completed");
         }    
     }
 

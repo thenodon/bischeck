@@ -32,7 +32,7 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class ServerExecutor {
 
-    static Logger  logger = Logger.getLogger(ServerExecutor.class);
+    private final static Logger LOGGER = Logger.getLogger(ServerExecutor.class);
     
     private static ServerExecutor serverexeutor= null;
     /**
@@ -49,7 +49,7 @@ public class ServerExecutor {
         try {
             serverSet = ConfigurationManager.getInstance().getServerClassMap();
         } catch (ClassNotFoundException e) {
-            logger.error("Class error in servers.xml - not server connection will be available: " + e);
+            LOGGER.error("Class error in servers.xml - not server connection will be available: " + e);
         }
     }
 
@@ -88,15 +88,15 @@ public class ServerExecutor {
                 server.send(service);
             
             } catch (IllegalArgumentException e) {
-                logger.error(e.toString() + ":" + e.getMessage());
+                LOGGER.error(e.toString() + ":" + e.getMessage());
             } catch (IllegalAccessException e) {
-                logger.error(e.toString() + ":" + e.getMessage());
+                LOGGER.error(e.toString() + ":" + e.getMessage());
             } catch (InvocationTargetException e) {
-                logger.error(e.toString() + ":" + e.getMessage());
+                LOGGER.error(e.toString() + ":" + e.getMessage());
             } catch (SecurityException e) {
-                logger.error(e.toString() + ":" + e.getMessage());
+                LOGGER.error(e.toString() + ":" + e.getMessage());
             } catch (NoSuchMethodException e) {
-                logger.error(e.toString() + ":" + e.getMessage());
+                LOGGER.error(e.toString() + ":" + e.getMessage());
             }
         }
     }

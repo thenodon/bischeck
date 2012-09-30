@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.quartz.Job;
@@ -40,17 +41,20 @@ import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.TimeMeasure;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.threshold.Threshold;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 public class ServiceJob implements Job {
 
-    static Logger  logger = Logger.getLogger(ServiceJob.class);
+    private final static Logger LOGGER = Logger.getLogger(ServiceJob.class);
 
     static private int runAfterDelay = 10; //in seconds
     
@@ -60,7 +64,7 @@ public class ServiceJob implements Job {
             runAfterDelay = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
                     getProperty("runAfterDelay", Integer.toString(runAfterDelay)));
         } catch (NumberFormatException ne) {
-            logger.error("Property " + 
+            LOGGER.error("Property " + 
             		runAfterDelay + 
                     " is not set correct to an integer: " +
                     ConfigurationManager.getInstance().getProperties().getProperty(
@@ -86,19 +90,19 @@ public class ServiceJob implements Job {
         executeService(service);
         // Check if there is any run after
        
-        logger.debug("Service " + runafter.getHostname() + "-" + runafter.getServicename() + " has runAfter " + 
+        LOGGER.debug("Service " + runafter.getHostname() + "-" + runafter.getServicename() + " has runAfter " + 
         		ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter));
         
         if (ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter)) {
         	for (Service servicetorunafter : ConfigurationManager.getInstance().getRunAfterMap().get(runafter)) {
-        		logger.debug("The services to run after is: " + servicetorunafter.getHost().getHostname() + 
+        		LOGGER.debug("The services to run after is: " + servicetorunafter.getHost().getHostname() + 
         				"-" + servicetorunafter.getServiceName());
         	}
         
         	try {
         		runImmediate(ConfigurationManager.getInstance().getRunAfterMap().get(runafter));
         	} catch (SchedulerException e) {
-        		logger.warn("Scheduled immediate job for host + " +
+        		LOGGER.warn("Scheduled immediate job for host + " +
         				runafter.getHostname() + 
         				" and service " +
         				runafter.getServicename() + 
@@ -124,7 +128,7 @@ public class ServiceJob implements Job {
     	Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
     	
     	for (Service service:services) {
-    		logger.debug("Service to run immiediate run - " + service.getHost().getHostname() + "-" + 
+    		LOGGER.debug("Service to run immiediate run - " + service.getHost().getHostname() + "-" + 
         			service.getServiceName());
         	
     		Map<String,Object> map = new HashMap<String, Object>();
@@ -177,23 +181,29 @@ public class ServiceJob implements Job {
      * @throws Exception
      */
     private NAGIOSSTAT checkServiceItem(Service service) throws Exception {
-        
+    	
         NAGIOSSTAT servicestate= NAGIOSSTAT.OK;
         
         for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
             ServiceItem serviceitem = serviceitementry.getValue();
-            logger.debug("Executing ServiceItem: "+ serviceitem.getServiceItemName());
+            
+            String fullservicename = Util.fullName(service, serviceitem);
+            
+            LOGGER.debug("Executing ServiceItem: "+ fullservicename);
             synchronized (service) {
 
+            	final Timer timer = Metrics.newTimer(ServiceJob.class, 
+            			fullservicename, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+            	final TimerContext context = timer.time();
+            	
+            	Long executetime = null;
             	try {
-            		long start = TimeMeasure.start();
-
-
+            		
                 	try {
                 		service.openConnection();
                 		//service.setConnectionEstablished(true);
                 	} catch (Exception e) {
-                		logger.error("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed with error " + e);
+                		LOGGER.error("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed with error " + e);
                 		service.setConnectionEstablished(false);
                 		return NAGIOSSTAT.CRITICAL;
                 	}
@@ -206,23 +216,33 @@ public class ServiceJob implements Job {
                 		} catch (Exception ignore) {}
                 	}
 
-                	serviceitem.setExecutionTime(
-                			Long.valueOf(TimeMeasure.stop(start)));
-                	logger.debug("Time to execute " + 
-                			serviceitem.getExecution() + 
-                			" : " + serviceitem.getExecutionTime() +
-                	" ms");
                 } catch (Exception e) {
-                	logger.error("Execution prepare and/or query \""+ serviceitem.getExecution() 
+                	LOGGER.error("Execution prepare and/or query \""+ serviceitem.getExecution() 
                 			+ "\" failed with " + e);
                 	throw new Exception("Execution prepare and/or query \""+ serviceitem.getExecution() 
                 			+ "\" failed. See bischeck log for more info.");
+                } finally {
+                	executetime = context.stop()/1000000;         	
                 }
+                
+                serviceitem.setExecutionTime(executetime);
+            	
+                LOGGER.debug("Time to execute " + 
+            			serviceitem.getExecution() + 
+            			" : " + serviceitem.getExecutionTime() +
+            	" ms");
+            	
             }
+
+            final Timer timer = Metrics.newTimer(Threshold.class, 
+        			fullservicename, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        	final TimerContext ctxthreshold = timer.time();
+        	
             try {
+            	
                 serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
                 // Always report the state for the worst service item 
-                logger.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
+                LOGGER.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
                 NAGIOSSTAT curstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
                 
                 LastStatusCache.getInstance().add(service,serviceitem);
@@ -231,12 +251,15 @@ public class ServiceJob implements Job {
                     servicestate = curstate;
                 }
             } catch (ClassNotFoundException e) {
-                logger.error("Threshold class not found - " + e);
+                LOGGER.error("Threshold class not found - " + e);
                 throw new Exception("Threshold class not found, see bischeck log for more info.");
             } catch (Exception e) {
-                logger.error("Threshold excution error - " + e);
+                LOGGER.error("Threshold excution error - " + e);
                 throw new Exception("Threshold excution error, see bischeck log for more info");
+            } finally {
+            	ctxthreshold.stop();
             }
+            
 
 
         } // for serviceitem

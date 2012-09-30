@@ -28,7 +28,7 @@ public class ThresholdFactory {
 
     private static HashMap<String,Threshold> cache = new HashMap<String,Threshold>();
 
-    static Logger  logger = Logger.getLogger(ThresholdFactory.class);
+    private static Logger LOGGER = Logger.getLogger(ThresholdFactory.class);
 
     public static Threshold getCurrent(Service service, ServiceItem serviceItem) 
     throws Exception, ClassNotFoundException {
@@ -39,7 +39,7 @@ public class ThresholdFactory {
             current = cache.get(service.getServiceName()+"-"+serviceItem.getServiceItemName());
 
             if (current == null) {
-                logger.debug("Threshold for " + 
+                LOGGER.debug("Threshold for " + 
                         service.getHost().getHostname() + ":" +
                         service.getServiceName() + ":" +
                         serviceItem.getServiceItemName() + ":" +
@@ -58,15 +58,15 @@ public class ThresholdFactory {
                                 current = (Threshold) Thread.currentThread().getContextClassLoader().
                                 loadClass(serviceItem.getThresholdClassName()).newInstance();
                             }catch (ClassNotFoundException ee) {
-                                logger.fatal("Service class " + serviceItem.getThresholdClassName() + " not found.");
+                                LOGGER.fatal("Service class " + serviceItem.getThresholdClassName() + " not found.");
                                 throw ee;
                             }
                         }
                     } catch (InstantiationException e) {
-                        logger.error("Failed to instance Threshold class " +
+                        LOGGER.error("Failed to instance Threshold class " +
                                 serviceItem.getThresholdClassName(), e);
                     } catch (IllegalAccessException e) {
-                        logger.error("Illegal access to instance Threshold class " +
+                        LOGGER.error("Illegal access to instance Threshold class " +
                                 serviceItem.getThresholdClassName(), e);
                     }                
                 
@@ -90,7 +90,7 @@ public class ThresholdFactory {
     
     public static void clearCache() {
         synchronized (cache) {
-            logger.info("Clear threshold cache");
+            LOGGER.info("Clear threshold cache");
             cache.clear();
         }
 

@@ -35,7 +35,7 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 
 public class LivestatusService extends ServiceAbstract implements Service {
 
-    static Logger  logger = Logger.getLogger(LivestatusService.class);
+    private final static Logger LOGGER = Logger.getLogger(LivestatusService.class);
     
     static private int querytimeout = 10000; //millisec
     private Socket clientSocket = null;
@@ -47,7 +47,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
             querytimeout = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
                     getProperty("LiveStatusService.querytimeout","10")) * 1000;
         } catch (NumberFormatException ne) {
-            logger.error("Property LiveStatusService.querytimeout is not " + 
+            LOGGER.error("Property LiveStatusService.querytimeout is not " + 
                     "set correct to an integer: " +
                     ConfigurationManager.getInstance().getProperties().getProperty(
                     "LiveStatusService.querytimeout"));
@@ -67,7 +67,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
         clientSocket = new Socket(url.getHost(), url.getPort());
         clientSocket.setSoTimeout(querytimeout);
         setConnectionEstablished(true);
-        logger.debug("Connected");
+        LOGGER.debug("Connected");
     }
 
     
@@ -75,7 +75,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
     public void closeConnection() {
         try {
             clientSocket.close();
-            logger.debug("Closed");
+            LOGGER.debug("Closed");
         } catch (IOException ignore) {}
     }
 
@@ -93,7 +93,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
         
         StringBuffer responseBuffer = new StringBuffer();
         
-        logger.debug("Execute request: " + message);
+        LOGGER.debug("Execute request: " + message);
         
         dataOut = new DataOutputStream(clientSocket.getOutputStream());
         dataOut.writeBytes(message);
@@ -107,7 +107,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
                 responseBuffer.append(responseLine);    
             }  
         } catch (SocketTimeoutException exptime) {
-            logger.error("Livestatus connection timed-out after " + querytimeout + " ms");
+            LOGGER.error("Livestatus connection timed-out after " + querytimeout + " ms");
             return null;
         } finally {    
             try {
@@ -123,7 +123,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
                 
         String responseMsg = new String(responseBuffer);
         
-        logger.debug("Received response: " + responseMsg);
+        LOGGER.debug("Received response: " + responseMsg);
         
         return responseMsg;
     }

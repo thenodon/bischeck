@@ -27,7 +27,7 @@ import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 
 public class LastCacheService extends ServiceAbstract implements Service {
 
-    static Logger  logger = Logger.getLogger(LastStatusCache.class);
+    private final static Logger LOGGER = Logger.getLogger(LastStatusCache.class);
 
     public static void main(String[] args) {
         LastCacheService bis = new LastCacheService("serviceName");

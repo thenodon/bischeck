@@ -39,7 +39,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class OpenTSDBServer implements Server {
 
-    static Logger  logger = Logger.getLogger(OpenTSDBServer.class);
+    private final static Logger LOGGER = Logger.getLogger(OpenTSDBServer.class);
     static Map<String,OpenTSDBServer> server = new HashMap<String,OpenTSDBServer>();
     
     
@@ -82,18 +82,19 @@ public class OpenTSDBServer implements Server {
         }
 
 
-        logger.info("******************** "+ instanceName +" *******************");
-        logger.info("*");
-        logger.info("*    Host: " + service.getHost().getHostname());
-        logger.info("* Service: " + service.getServiceName());
-        logger.info("* Message: ");
-        logger.info("* " + message);
-        logger.info("*");
-        logger.info("*********************************************");
+        LOGGER.info("******************** "+ instanceName +" *******************");
+        LOGGER.info("*");
+        LOGGER.info("*    Host: " + service.getHost().getHostname());
+        LOGGER.info("* Service: " + service.getServiceName());
+        LOGGER.info("* Message: ");
+        LOGGER.info("* " + message);
+        LOGGER.info("*");
+        LOGGER.info("*********************************************");
 
         long duration = 0;
         try {
-            long start = TimeMeasure.start();
+        	TimeMeasure tm = new TimeMeasure();
+            tm.start();
             InetAddress addr = InetAddress.getByName(hostAddress);
             SocketAddress sockaddr = new InetSocketAddress(addr, port);
 
@@ -105,12 +106,12 @@ public class OpenTSDBServer implements Server {
             out.println(message);
             out.flush();
             
-            duration = TimeMeasure.stop(start);
-            logger.info("OpenTSDB send execute: " + duration + " ms");
+            duration = tm.stop();
+            LOGGER.info("OpenTSDB send execute: " + duration + " ms");
         } catch (UnknownHostException e) {
-            logger.error("Don't know about host: " + hostAddress);
+            LOGGER.error("Don't know about host: " + hostAddress);
         } catch (IOException e) {
-            logger.error("Network error - check OpenTSDB server and that service is started - " + e);
+            LOGGER.error("Network error - check OpenTSDB server and that service is started - " + e);
         }
         finally {
             try {

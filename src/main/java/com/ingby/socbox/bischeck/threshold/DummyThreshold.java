@@ -23,7 +23,8 @@ import org.apache.log4j.Logger;
 
 public class DummyThreshold implements Threshold {
 
-    static Logger  logger = Logger.getLogger(DummyThreshold.class);
+    @SuppressWarnings("unused")
+	private final static Logger LOGGER = Logger.getLogger(DummyThreshold.class);
 
     
     private String serviceName;

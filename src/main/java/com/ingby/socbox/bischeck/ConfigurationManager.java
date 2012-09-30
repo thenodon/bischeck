@@ -75,13 +75,13 @@ import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlservices;
  *
  */
 
-public class ConfigurationManager  {
+public final class ConfigurationManager  {
     
     private static final String DEFAULT_TRESHOLD = "DummyThreshold";
 
 	public static final String INTERVALSCHEDULEPATTERN = "^[0-9]+ *[HMS]{1} *$";
 
-    static Logger  logger = Logger.getLogger(ConfigurationManager.class);
+    private final static Logger  LOOGER = Logger.getLogger(ConfigurationManager.class);
 
     /*
      * The ConfigurationManager 
@@ -125,7 +125,7 @@ public class ConfigurationManager  {
         ConfigurationManager.initonce();
         ConfigurationManager confMgmr = ConfigurationManager.getInstance();
         
-        logger.setLevel(Level.WARN);
+        LOOGER.setLevel(Level.WARN);
         
         if (line.hasOption("verify")) {
             System.exit(ValidateConfiguration.verify());
@@ -163,7 +163,7 @@ public class ConfigurationManager  {
         
         configMgr.allocateDataStructs();
         
-        logger.debug("Init");
+        LOOGER.debug("Init");
         try {
         	// Initialize all data structures. 
         	configMgr.initProperties();
@@ -180,7 +180,7 @@ public class ConfigurationManager  {
         	}
         	configMgr.getServerClassMap();
         } catch (Exception e) {
-        	logger.error("Configuration Manager initzialization failed with " + e);
+        	LOOGER.error("Configuration Manager initzialization failed with " + e);
         	throw e;
         }
     }
@@ -198,7 +198,7 @@ public class ConfigurationManager  {
         
         configMgr.allocateDataStructs();
         
-        logger.debug("Init");
+        LOOGER.debug("Init");
         try {
         	// Init all data structures. 
         	configMgr.initProperties();
@@ -215,7 +215,7 @@ public class ConfigurationManager  {
         	}
         	configMgr.getServerClassMap();
         } catch (Exception e) {
-        	logger.error("Configuration Manager initzialization failed with " + e);
+        	LOOGER.error("Configuration Manager initzialization failed with " + e);
         	throw e;
         }
 
@@ -266,10 +266,10 @@ public class ConfigurationManager  {
         try {
             ThresholdTimer.init(this);
         } catch (SchedulerException e) {
-            logger.fatal("Quartz scheduler failed with - " + e +" - existing!");
+            LOOGER.fatal("Quartz scheduler failed with - " + e +" - existing!");
             throw e;
         } catch (ParseException e) {
-            logger.fatal("Quartz scheduler failed with - " + e +" - existing!");
+            LOOGER.fatal("Quartz scheduler failed with - " + e +" - existing!");
             throw e;
         }
     }
@@ -366,11 +366,11 @@ public class ConfigurationManager  {
                 
             if (service.getDriverClassName() != null) {
             	if (service.getDriverClassName().trim().length() != 0) {
-            		logger.debug("Driver name: " + service.getDriverClassName().trim());
+            		LOOGER.debug("Driver name: " + service.getDriverClassName().trim());
             		try {
             			Class.forName(service.getDriverClassName()).newInstance();
             		} catch ( ClassNotFoundException e) {
-            			logger.error("Could not find the driver class - " + service.getDriverClassName() + 
+            			LOOGER.error("Could not find the driver class - " + service.getDriverClassName() + 
             					" " + e.toString());
             			throw new Exception(e.getMessage());
             		}
@@ -457,7 +457,7 @@ public class ConfigurationManager  {
     			//loadClass(clazzname);
     			clazz=(Class<Server>) Class.forName(clazzname);
     		}catch (ClassNotFoundException ee) {
-    			logger.fatal("Server class " + clazzname + " not found.");
+    			LOOGER.fatal("Server class " + clazzname + " not found.");
     			throw ee;
     		}
     	}
@@ -514,11 +514,11 @@ public class ConfigurationManager  {
         	int index = schedule.indexOf("-");
         	String hostname = schedule.substring(0, index);
         	String servicename = schedule.substring(index+1, schedule.length());
-        	logger.debug("Service will run after " + hostname + " " + servicename);
+        	LOOGER.debug("Service will run after " + hostname + " " + servicename);
         	RunAfter runafterkey = new RunAfter(hostname, servicename);
         	
         	if (!runafter.containsKey(runafterkey)) {
-        		logger.debug("Add service to " + hostname + " " + servicename);
+        		LOOGER.debug("Add service to " + hostname + " " + servicename);
         		runafter.put(runafterkey, new ArrayList<Service>());		
         	}
         	
@@ -551,7 +551,7 @@ public class ConfigurationManager  {
                     .startNow()
                     .build();
         } catch (Exception e) {
-            logger.error("Tigger parse error for host " + service.getHost().getHostname() + 
+            LOOGER.error("Tigger parse error for host " + service.getHost().getHostname() + 
                     " and service " + service.getServiceName() + 
                     " for schedule " + schedule);
             throw new Exception(e.getMessage());
@@ -578,7 +578,7 @@ public class ConfigurationManager  {
             String withoutSpace=schedule.replaceAll(" ","");
             char time = withoutSpace.charAt(withoutSpace.length()-1);
             String value = withoutSpace.substring(0, withoutSpace.length()-1);
-            logger.debug("Time selected "+ time + " : " + value);
+            LOOGER.debug("Time selected "+ time + " : " + value);
             switch (time) {
             case 'S' : return (Integer.parseInt(value)); 
             case 'M' : return (Integer.parseInt(value)*60); 
@@ -621,14 +621,14 @@ public class ConfigurationManager  {
     	if (hostafter != null && serviceafter != null) {
     		if (!(hostname.equals(hostafter.getHostname()) && 
     				servicename.equals(serviceafter.getServiceName()))) { 
-    			logger.warn("RunAfter host and/or service do not exists for host " + 
+    			LOOGER.warn("RunAfter host and/or service do not exists for host " + 
     					hostname + 
     					"-" +
     					servicename);
     			return false;
     		}
     	} else {
-    		logger.warn("RunAfter host and/or service do not exists for " + 
+    		LOOGER.warn("RunAfter host and/or service do not exists for " + 
 					hostname + 
 					"-" +
 					servicename);

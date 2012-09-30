@@ -21,7 +21,6 @@ package com.ingby.socbox.bischeck.service;
 
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -31,9 +30,9 @@ import org.apache.log4j.Logger;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 
 
-public class JDBCService extends ServiceAbstract implements Service {
+public class JDBCPoolService extends ServiceAbstract implements Service {
 
-    private final static Logger LOGGER = Logger.getLogger(JDBCService.class);
+    private final static Logger LOGGER = Logger.getLogger(JDBCPoolService.class);
     
     static private int querytimeout = 10;
     private Connection connection;
@@ -51,15 +50,15 @@ public class JDBCService extends ServiceAbstract implements Service {
     }
 
     
-    public JDBCService (String serviceName) {
+    public JDBCPoolService (String serviceName) {
         this.serviceName = serviceName;
     }
 
     
     @Override
-    public void openConnection() throws SQLException {
-        this.connection = DriverManager.getConnection(this.getConnectionUrl());
-        setConnectionEstablished(true);
+    public void openConnection() throws SQLException {   
+    	this.connection = JDBCPoolServiceUtil.getConnection(this.getConnectionUrl()) ;
+    	setConnectionEstablished(true);
     }
 
     

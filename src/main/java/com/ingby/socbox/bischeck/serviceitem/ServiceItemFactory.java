@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 
 public class ServiceItemFactory {
 
-    static Logger  logger = Logger.getLogger(ServiceItemFactory.class);
+    private final static Logger LOGGER = Logger.getLogger(ServiceItemFactory.class);
 
     @SuppressWarnings("unchecked")
     public static ServiceItem createServiceItem(String name, String clazzname) 
@@ -47,7 +47,7 @@ public class ServiceItemFactory {
                 getContextClassLoader().
                 loadClass(clazzname);
             }catch (ClassNotFoundException ee) {
-                logger.fatal("ServiceItem class " + clazzname + " not found.");
+                LOGGER.fatal("ServiceItem class " + clazzname + " not found.");
                 throw ee;
             }
         }

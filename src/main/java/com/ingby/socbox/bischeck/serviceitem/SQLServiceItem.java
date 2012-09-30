@@ -30,7 +30,9 @@ import com.ingby.socbox.bischeck.service.Service;
 
 
 public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
-    static Logger  logger = Logger.getLogger(SQLServiceItem.class);
+    
+	@SuppressWarnings("unused")
+	private final static Logger LOGGER = Logger.getLogger(SQLServiceItem.class);
 
     public static void main(String[] args) {
     	try {
@@ -93,16 +95,19 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     	}
     	else {
     		String res = service.executeStmt(cacheparsedstr);
+    		setLatestExecuted(res);
+    		/*
     		if (res == null)  
     			setLatestExecuted(res);
     		else {
     			try {
     				Float value = Float.parseFloat(res);
-    				setLatestExecuted(Float.toString(Util.roundOneDecimals(value)));
+    				setLatestExecuted(Float.toString(Util.roundDecimals(value)));
     			} catch (NumberFormatException ne) {
     				setLatestExecuted(res);
     			}
     		}
+    		*/
     		//setLatestExecuted(service.executeStmt(cacheparsedstr));
     	}
     }

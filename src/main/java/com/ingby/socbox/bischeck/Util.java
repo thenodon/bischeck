@@ -19,6 +19,7 @@
 
 package com.ingby.socbox.bischeck;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,9 +30,11 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
+import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
-public class Util {
-    static Logger  logger = Logger.getLogger(Util.class);
+public abstract class Util {
+	private final static Logger LOGGER = Logger.getLogger(Util.class);
 
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     private static final String SEP =";";
@@ -68,21 +71,67 @@ public class Util {
         return sdf.format(cal.getTime());
     }
     
+    /**
+     * Round a float to decimal
+     * @param d1  
+     * @return rounded to one decimal
+     */
+    public static Float roundByOtherString(String d1, Float d2) {
+        if (d1 != null) {
+        	int nrdec = getNumberOfDecimalPlace(d1);
+            //DecimalFormat oneDForm = new DecimalFormat("#");
+        	StringBuffer strbuf = new StringBuffer();
+        	strbuf.append("#.");
+            for (int i = 0; i< nrdec;i++) strbuf.append("#");
+            //LOGGER.info(d1 + ":" + nrdec + ":" + strbuf.toString());
+            DecimalFormat oneDForm = new DecimalFormat(strbuf.toString());
+        	//DecimalFormat oneDForm = new DecimalFormat("#.######");
+            //LOGGER.info(d1 + ":" + nrdec + ":" + strbuf.toString()+":"+Float.valueOf(oneDForm.format(d2)));
+            return Float.valueOf(oneDForm.format(d2));
+        }
+        return null;
+    }
+
     
     /**
-     * Round a float to one decimal
+     * Round a float to decimal
      * @param d  
      * @return rounded to one decimal
      */
-    public static Float roundOneDecimals(Float d) {
+    public static Float roundDecimals(Float d) {
         if (d != null) {
+        	int nrdec = getNumberOfDecimalPlace(d);
             //DecimalFormat oneDForm = new DecimalFormat("#");
-            DecimalFormat oneDForm = new DecimalFormat("#.##");
+        	StringBuffer strbuf = new StringBuffer();
+        	strbuf.append("#.");
+            for (int i = 0; i< nrdec;i++) strbuf.append("#");
+            DecimalFormat oneDForm = new DecimalFormat(strbuf.toString());
+        	//DecimalFormat oneDForm = new DecimalFormat("#.######");
             return Float.valueOf(oneDForm.format(d));
         }
         return null;
     }
 
+    
+    private static int getNumberOfDecimalPlace(double value) {
+        final BigDecimal bigDecimal = new BigDecimal("" + value);
+        final String s = bigDecimal.toPlainString();
+        final int index = s.indexOf('.');
+        if (index < 0) {
+            return 0;
+        }
+        //LOGGER.info(value + " number by double " + (s.length() - 1 - index));
+        return s.length() - 1 - index;
+    }
+    
+    private static int getNumberOfDecimalPlace(String value) {
+        final int index = value.indexOf('.');
+        if (index < 0) {
+            return 0;
+        }
+        //LOGGER.info(value + " number by string " + (value.length() - 1 - index));
+        return value.length() - 1 - index;
+    }
     
     /**
     * Parse out all host-service-item parameters from the calculation string
@@ -96,7 +145,7 @@ public class Util {
         try {
             pat = Pattern.compile (LastStatusCache.getInstance().getHostServiceItemFormat());        
         } catch (PatternSyntaxException e) {
-            logger.warn("Regex syntax exception, " + e);
+            LOGGER.warn("Regex syntax exception, " + e);
             throw e;
         }
         
@@ -118,5 +167,21 @@ public class Util {
         }
         
         return arraystr;
+    }
+
+    
+    /**
+     * Create a host, service and service item name with - separator
+     * @param service
+     * @param serviceitem
+     * @return the host-service-serviceitem string
+     */
+    public static String fullName(Service service, ServiceItem serviceitem) {
+    	StringBuffer strbuf = new StringBuffer();
+    	
+    	strbuf.append(service.getHost().getHostname()).append("-");
+    	strbuf.append(service.getServiceName()).append("-");
+    	strbuf.append(serviceitem.getServiceItemName());
+    	return strbuf.toString();
     }
 }
