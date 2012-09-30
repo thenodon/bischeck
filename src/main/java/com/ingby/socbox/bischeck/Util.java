@@ -77,17 +77,15 @@ public abstract class Util {
      * @return rounded to one decimal
      */
     public static Float roundByOtherString(String d1, Float d2) {
+    	LOGGER.debug("String to format from:"+d1+" value:"+d2);
         if (d1 != null) {
         	int nrdec = getNumberOfDecimalPlace(d1);
-            //DecimalFormat oneDForm = new DecimalFormat("#");
+            
         	StringBuffer strbuf = new StringBuffer();
         	strbuf.append("#.");
             for (int i = 0; i< nrdec;i++) strbuf.append("#");
-            //LOGGER.info(d1 + ":" + nrdec + ":" + strbuf.toString());
-            DecimalFormat oneDForm = new DecimalFormat(strbuf.toString());
-        	//DecimalFormat oneDForm = new DecimalFormat("#.######");
-            //LOGGER.info(d1 + ":" + nrdec + ":" + strbuf.toString()+":"+Float.valueOf(oneDForm.format(d2)));
-            return Float.valueOf(oneDForm.format(d2));
+            DecimalFormat decformatter = new DecimalFormat(strbuf.toString());
+        	return Float.valueOf(decformatter.format(d2));
         }
         return null;
     }
