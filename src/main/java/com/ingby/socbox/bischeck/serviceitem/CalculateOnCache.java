@@ -141,10 +141,12 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     	else {
     		
     		Float value = jep.execute(cacheparsedstr);
+    		
     		if (value == null) {
     			setLatestExecuted(null);
     		} else {
-    			setLatestExecuted(Float.toString(Util.roundDecimals(value)));
+    			setLatestExecuted(Float.toString(value));
+    			//setLatestExecuted(Float.toString(Util.roundDecimals(value)));
     		}
     	}
     }

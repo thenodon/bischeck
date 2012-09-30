@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.serviceitem;
 
@@ -37,87 +37,85 @@ import com.ingby.socbox.bischeck.service.ShellService;
  */
 
 public class CheckCommandServiceItem extends ServiceItemAbstract implements ServiceItem {
-    
+
 	@SuppressWarnings("unused")
 	private final static Logger LOGGER = Logger.getLogger(CheckCommandServiceItem.class);
 
 	public static void main(String[] args) {
-    	try {
+		try {
 			ConfigurationManager.init();
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-    	Service shell = new ShellService("serviceName");
-        
-        ServiceItem checkcommand = new CheckCommandServiceItem("serviceItemName");
-        checkcommand.setService(shell);
-        
-        checkcommand.setExecution("{\"check\":"+
-        		"\"/usr/lib/nagios/plugins/check_ping -H localhost -w 100.0,80% -c 200.0,90%\","+
-        		"\"label\":"+ 
-        		"\"rta\"}");
-    	
-        try {
+		Service shell = new ShellService("serviceName");
+
+		ServiceItem checkcommand = new CheckCommandServiceItem("serviceItemName");
+		checkcommand.setService(shell);
+
+		checkcommand.setExecution("{\"check\":"+
+				"\"/usr/lib/nagios/plugins/check_ping -H localhost -w 100.0,80% -c 200.0,90%\","+
+				"\"label\":"+ 
+		"\"rta\"}");
+
+		try {
 			checkcommand.execute();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Return value:" + checkcommand.getLatestExecuted());
-    
-	    checkcommand.setExecution("{\"check\":"+
-        		"\"/usr/lib/nagios/plugins/check_tcp -H localhost -p 22\","+
-        		"\"label\":"+ 
-        		"\"time\"}");
-    	
-        try {
+
+		checkcommand.setExecution("{\"check\":"+
+				"\"/usr/lib/nagios/plugins/check_tcp -H localhost -p 22\","+
+				"\"label\":"+ 
+		"\"time\"}");
+
+		try {
 			checkcommand.execute();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Return value:" + checkcommand.getLatestExecuted());
-    
-    }
-    public CheckCommandServiceItem(String name) {
-        this.serviceItemName = name;        
-    }
 
-    
-    @Override
-    public void execute() throws Exception {
-        /*
-         * Check the operation type - status
-         *  
-         */
-    	
-        JSONObject jsonStatement = JSONObject.fromObject(this.getExecution());
-        if (!validateExecStatement(jsonStatement)) {
-            throw new Exception("Not a valid check command operation " + jsonStatement.toString());
-        }
+	}
+	public CheckCommandServiceItem(String name) {
+		this.serviceItemName = name;        
+	}
 
-        String checkcommand = jsonStatement.getString("check");
 
-    	// Execute the check_command
-        LOGGER.info(checkcommand);
-    	String checkres =  service.executeStmt(checkcommand);
-    	LOGGER.info(checkres);
-    	// Error handling
-    	
-    	String perfres = QueryNagiosPerfData.getPerfdata(checkres);
-    	LOGGER.info(perfres);
-    	String checkvalue = QueryNagiosPerfData.parse(jsonStatement.getString("label"),perfres);
-        
-        setLatestExecuted(checkvalue);    
-    }
+	@Override
+	public void execute() throws Exception {
+		/*
+		 * Check the operation type - status
+		 *  
+		 */
 
-    private boolean validateExecStatement(JSONObject jsonStatement) {
-        if (!jsonStatement.containsKey("check"))  return false;
-        
-        if (!jsonStatement.containsKey("label")) return false; 
-            
-        return true;
-    }
+		JSONObject jsonStatement = JSONObject.fromObject(this.getExecution());
+		if (!validateExecStatement(jsonStatement)) {
+			throw new Exception("Not a valid check command operation " + jsonStatement.toString());
+		}
+
+		String checkcommand = jsonStatement.getString("check");
+
+		// Execute the check_command
+		String checkres =  service.executeStmt(checkcommand);
+		// Error handling
+
+		String perfres = QueryNagiosPerfData.getPerfdata(checkres);
+		String checkvalue = QueryNagiosPerfData.parse(jsonStatement.getString("label"),perfres);
+
+		setLatestExecuted(checkvalue);    
+	}
+
+	private boolean validateExecStatement(JSONObject jsonStatement) {
+
+		if (!jsonStatement.containsKey("check"))  return false;
+
+		if (!jsonStatement.containsKey("label")) return false; 
+
+		return true;
+	}
 
 }

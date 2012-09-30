@@ -621,8 +621,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 	    			return null;
 	    		
 	    		LOGGER.debug("Calculated value = " + value);
-	    		//return value;
-	    		return Util.roundDecimals(value);
+	    		return value;
+	    		//return Util.roundDecimals(value);
 				
 			}
 		}

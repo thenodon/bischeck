@@ -95,6 +95,8 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     	}
     	else {
     		String res = service.executeStmt(cacheparsedstr);
+    		setLatestExecuted(res);
+    		/*
     		if (res == null)  
     			setLatestExecuted(res);
     		else {
@@ -105,6 +107,7 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     				setLatestExecuted(res);
     			}
     		}
+    		*/
     		//setLatestExecuted(service.executeStmt(cacheparsedstr));
     	}
     }
