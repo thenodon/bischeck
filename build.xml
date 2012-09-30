@@ -165,8 +165,9 @@
             <fileset dir="${examples.home}"/>
         </copy>
         
-    	
+    	<!--
         <copy todir="${build.home}" file="${docs.home}/README" />
+    	-->
     	<copy todir="${build.home}" file="${docs.home}/README.pdf" />
         <copy todir="${build.home}" file="${docs.home}/LICENSE" />
     	<copy todir="${build.home}" file="${basedir}/install" />
