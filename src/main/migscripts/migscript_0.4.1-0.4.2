@@ -1,4 +1,5 @@
 #!/bin/sh
 
-
-cp -a $2/etc/ $1/etc/
+mv $1/etc/urlservices.xml $1/etc/urlservices.xml-0.4.2
+cp -a $2/etc/* $1/etc/
+mv $1/etc/urlservices.xml-0.4.2 $1/etc/urlservices.xml
