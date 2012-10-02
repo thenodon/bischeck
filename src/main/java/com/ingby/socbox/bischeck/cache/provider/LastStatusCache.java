@@ -89,7 +89,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 	private static String lastStatusCacheDumpFile;
 
-	private String hostServiceItemFormat = "[a-zA-Z1-9]*?.[a-zA-Z1-9]*?.[a-zA-Z1-9]*?\\[.*?\\]";
+	private String hostServiceItemFormat = "[a-zA-Z0-9]*?.[a-zA-Z0-9]*?.[a-zA-Z0-9]*?\\[.*?\\]";
 
 	static {
 		mbs = ManagementFactory.getPlatformMBeanServer();
