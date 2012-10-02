@@ -103,11 +103,11 @@ A Business Activity Monitoring Server
 \end_layout
 
 \begin_layout Date
-Version 0.4.1 
+Version 0.4.2 
 \begin_inset Newline newline
 \end_inset
 
-2012-10-01
+2012-10-03
 \end_layout
 
 \begin_layout Standard
@@ -1809,6 +1809,10 @@ The configuration parameters that need to be define in the server.xml for
 \end_layout
 
 \begin_layout Itemize
+class - NSCAServer
+\end_layout
+
+\begin_layout Itemize
 hostAddress - the IP or name for the NSCA server, default is localhost.
 \end_layout
 
@@ -1838,6 +1842,10 @@ NRDP configuration (Beta)
 \begin_layout Standard
 The configuration parameters that need to be define in the server.xml for
  NRDP are:
+\end_layout
+
+\begin_layout Itemize
+class - NRDPServer
 \end_layout
 
 \begin_layout Itemize
@@ -1924,6 +1932,10 @@ So for each host, service and service item configuration 4 lines of data
 \begin_layout Standard
 The configuration parameters that need to be define in the server.xml for
  OpenTSDB are:
+\end_layout
+
+\begin_layout Itemize
+class - OpenTSDBServer
 \end_layout
 
 \begin_layout Itemize
@@ -2561,17 +2573,7 @@ status open
 
 \begin_layout Plain Layout
 
-		<class>
-\end_layout
-
-\begin_layout Plain Layout
-
-	    	com.ingby.socbox.bischeck.servers.NSCAServer     
-\end_layout
-
-\begin_layout Plain Layout
-
-		</class>
+		<class>NSCAServer</class>
 \end_layout
 
 \begin_layout Plain Layout
@@ -4408,7 +4410,51 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.4.1 - 2012-10-0X
+Release 0.4.2 - 2012-10-03
+\end_layout
+
+\begin_layout Standard
+This is minor release that just fix a major bug in the cache parser.
+ Except for this bug fix the same that is specified for 0.4.1 is valid for
+ 0.4.2.
+ 
+\end_layout
+
+\begin_layout Subsection
+New feature
+\end_layout
+
+\begin_layout Itemize
+N/A
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-227] 
+\begin_inset Quotes eld
+\end_inset
+
+Cache parser do not work for host, service or serviceitems if the name include
+ 0 (zero)
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.4.0 and 0.4.1 is supported for upgrade to 0.4.2.
+\end_layout
+
+\begin_layout Section
+Release 0.4.1 - 2012-10-01
 \end_layout
 
 \begin_layout Subsection
@@ -4477,7 +4523,28 @@ Bugs fixed and important issues
 \end_layout
 
 \begin_layout Itemize
-[TR-226] has been fixed.
+[TR-225] 
+\begin_inset Quotes eld
+\end_inset
+
+A service url that has no equivalent in urlservices.xml generate a NullPointerExc
+eption
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+[TR-226] 
+\begin_inset Quotes eld
+\end_inset
+
+For thresholds with more the two decimals will not be correctly validated
+\begin_inset Quotes erd
+\end_inset
+
+ has been fixed.
  The bug was related to when bischeck was used with data points with many
  decimals, like the result from a ping.
  bischeck would strip of all decimals except 2 with caused small values
