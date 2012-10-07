@@ -29,15 +29,17 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.log4j.Logger;
 
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
+
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.ObjectDefinitions;
 
 public abstract class Util {
 	private final static Logger LOGGER = Logger.getLogger(Util.class);
 
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     private static final String SEP =";";
+    private static final String CACHE_KEY_SEP = "-";
 
     /**
      * Obfuscate a string including password= until none character or number. 
@@ -87,7 +89,7 @@ public abstract class Util {
             DecimalFormat decformatter = new DecimalFormat(strbuf.toString());
         	return Float.valueOf(decformatter.format(d2));
         }
-        return null;
+        return d2;
     }
 
     
@@ -141,7 +143,7 @@ public abstract class Util {
         Pattern pat = null;
         
         try {
-            pat = Pattern.compile (LastStatusCache.getInstance().getHostServiceItemFormat());        
+            pat = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());        
         } catch (PatternSyntaxException e) {
             LOGGER.warn("Regex syntax exception, " + e);
             throw e;
@@ -177,9 +179,24 @@ public abstract class Util {
     public static String fullName(Service service, ServiceItem serviceitem) {
     	StringBuffer strbuf = new StringBuffer();
     	
-    	strbuf.append(service.getHost().getHostname()).append("-");
-    	strbuf.append(service.getServiceName()).append("-");
+    	strbuf.append(service.getHost().getHostname()).append(CACHE_KEY_SEP);
+    	strbuf.append(service.getServiceName()).append(CACHE_KEY_SEP);
     	strbuf.append(serviceitem.getServiceItemName());
+    	return strbuf.toString();
+    }
+    
+    /**
+     * Create a host, service and service item name with - separator
+     * @param service
+     * @param serviceitem
+     * @return the host-service-serviceitem string
+     */
+    public static String fullName(String hostname, String servicename , String serviceitemname) {
+    	StringBuffer strbuf = new StringBuffer();
+    	
+    	strbuf.append(hostname).append(CACHE_KEY_SEP);
+    	strbuf.append(servicename).append(CACHE_KEY_SEP);
+    	strbuf.append(serviceitemname);
     	return strbuf.toString();
     }
 }
