@@ -28,10 +28,11 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.log4j.Logger;
 
+import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.Util;
 
 /**
- * This class manage parsing os cached data by replacing a cache entry name
+ * This class manage parsing of cached data by replacing a cache entry name
  * host-service-serviceitem[X] with the data in the cache. 
  * 
  * @author andersh
@@ -47,8 +48,7 @@ public class LastStatusCacheParse {
 		Pattern pat = null;
 		logger.debug("String to cache parse: " + str);
 		try {
-			pat = Pattern.compile (LastStatusCache.getInstance().getHostServiceItemFormat());
-
+			pat = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());
 		} catch (PatternSyntaxException e) {
 			logger.warn("Regex syntax exception, " + e);
 			throw e;

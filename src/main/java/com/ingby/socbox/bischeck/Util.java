@@ -39,9 +39,9 @@ public abstract class Util {
 
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     private static final String SEP =";";
-    private static final String CACHE_KEY_SEP = "-";
+    
 
-    /**
+	/**
      * Obfuscate a string including password= until none character or number. 
      * @param url typical a url string
      * @return Obfuscated string
@@ -179,8 +179,8 @@ public abstract class Util {
     public static String fullName(Service service, ServiceItem serviceitem) {
     	StringBuffer strbuf = new StringBuffer();
     	
-    	strbuf.append(service.getHost().getHostname()).append(CACHE_KEY_SEP);
-    	strbuf.append(service.getServiceName()).append(CACHE_KEY_SEP);
+    	strbuf.append(service.getHost().getHostname()).append(ObjectDefinitions.getCacheKeySep());
+    	strbuf.append(service.getServiceName()).append(ObjectDefinitions.getCacheKeySep());
     	strbuf.append(serviceitem.getServiceItemName());
     	return strbuf.toString();
     }
@@ -194,8 +194,8 @@ public abstract class Util {
     public static String fullName(String hostname, String servicename , String serviceitemname) {
     	StringBuffer strbuf = new StringBuffer();
     	
-    	strbuf.append(hostname).append(CACHE_KEY_SEP);
-    	strbuf.append(servicename).append(CACHE_KEY_SEP);
+    	strbuf.append(hostname).append(ObjectDefinitions.getCacheKeySep());
+    	strbuf.append(servicename).append(ObjectDefinitions.getCacheKeySep());
     	strbuf.append(serviceitemname);
     	return strbuf.toString();
     }

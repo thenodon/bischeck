@@ -38,6 +38,8 @@ import javax.xml.bind.JAXBContext;
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.ObjectDefinitions;
+import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.service.Service;
@@ -89,8 +91,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 	private static String lastStatusCacheDumpFile;
 
-	private String hostServiceItemFormat = "[a-zA-Z0-9]*?.[a-zA-Z0-9]*?.[a-zA-Z0-9]*?\\[.*?\\]";
-
+	
 	static {
 		mbs = ManagementFactory.getPlatformMBeanServer();
 
@@ -144,12 +145,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	 */
 	public  void add(Service service, ServiceItem serviceitem) {
 
-		String hostname = service.getHost().getHostname();
-		String serviceName = service.getServiceName();
-		String serviceItemName = serviceitem.getServiceItemName();
-
-		String key = hostname+"-"+serviceName+"-"+serviceItemName;
-
+		String key = Util.fullName(service, serviceitem);
 		add(new LastStatus(serviceitem), key);    
 
 	}
@@ -166,8 +162,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	public  void add(String hostname, String serviceName,
 			String serviceItemName, String measuredValue,
 			Float thresholdValue) {
-		String key = hostname+"-"+serviceName+"-"+serviceItemName;
-
+		
+		String key = Util.fullName( hostname, serviceName, serviceItemName);
 		add(new LastStatus(measuredValue,thresholdValue), key);
 	}
 
@@ -247,7 +243,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	public String getIndex(String hostname, String serviceName,
 			String serviceItemName, int index) {
 
-		String key = hostname+"-"+serviceName+"-"+serviceItemName;
+		String key = Util.fullName( hostname, serviceName, serviceItemName);
 		LastStatus ls = null;
 
 		synchronized (cache) {
@@ -282,7 +278,9 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	public String getByTime(String hostname, String serviceName,
 			String serviceItemName, long stime) {
 		logger.debug("Find cache data for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
-		String key = hostname+"-"+serviceName+"-"+serviceItemName;
+
+		String key = Util.fullName( hostname, serviceName, serviceItemName);
+		
 		LastStatus ls = null;
 
 		synchronized (cache) {
@@ -314,8 +312,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 			String serviceItemName, long stime) {
 		logger.debug("Find cache index for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
 		
-		String key = hostname+"-"+serviceName+"-"+serviceItemName;
-		
+		String key = Util.fullName( hostname, serviceName, serviceItemName);
 		Integer index = null;
 
 		synchronized (cache) {
@@ -353,7 +350,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
      */
     public int sizeLru(String hostname, String serviceName,
 			String serviceItemName) {
-		String key = hostname+"-"+serviceName+"-"+serviceItemName;
+
+    	String key = Util.fullName( hostname, serviceName, serviceItemName);
 		return cache.get(key).size();
 	}
 
@@ -362,7 +360,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	public void listLru(String hostname, String serviceName,
 			String serviceItemName) {
 
-		String key = hostname+"-"+serviceName+"-"+serviceItemName;
+		String key = Util.fullName( hostname, serviceName, serviceItemName);
 		int size = cache.get(key).size();
 		for (int i = 0; i < size;i++)
 			System.out.println(i +" : "+cache.get(key).get(i).getValue());
@@ -391,12 +389,18 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 			String indexstr = token.substring(indexstart+1, indexend);
 
-			StringTokenizer parameter = new StringTokenizer(token.substring(0, indexstart),"-");
+			String parameter1 = token.substring(0, indexstart);
+			String parameter2 = parameter1.replaceAll(ObjectDefinitions.getCacheQuoteString(), ObjectDefinitions.getQuoteConversionString());
+			StringTokenizer parameter = new StringTokenizer(parameter2,ObjectDefinitions.getCacheKeySep());
+						
+			String host = ((String) parameter.nextToken()).
+				replaceAll(ObjectDefinitions.getQuoteConversionString(), ObjectDefinitions.getCacheKeySep());
+			String service = (String) parameter.nextToken().
+				replaceAll(ObjectDefinitions.getQuoteConversionString(), ObjectDefinitions.getCacheKeySep());
+			String serviceitem = (String) parameter.nextToken().
+				replaceAll(ObjectDefinitions.getQuoteConversionString(), ObjectDefinitions.getCacheKeySep());        
 
-			String host = (String) parameter.nextToken();
-			String service = (String) parameter.nextToken();
-			String serviceitem = (String) parameter.nextToken();        
-
+			
 			logger.debug("Get from the LastStatusCahce " + 
 					host + "-" +
 					service + "-"+
@@ -528,14 +532,6 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	}
 
 	
-	/**
-	 * Return the regex for the host-service-serviceitem format
-	 * @return
-	 */
-	public String getHostServiceItemFormat(){
-		return hostServiceItemFormat;
-	}
-
 
 	/*
 	 * (non-Javadoc)
