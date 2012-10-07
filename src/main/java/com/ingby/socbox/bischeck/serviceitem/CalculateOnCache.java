@@ -22,7 +22,6 @@ package com.ingby.socbox.bischeck.serviceitem;
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
@@ -115,17 +114,14 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
         } catch (Exception e) {
             e.printStackTrace();
         }    
-    
     }
 
     
     public CalculateOnCache(String name) {
         this.serviceItemName = name;    
         this.jep = new ExecuteJEP();
-        //this.jep.addStandardFunctions();
-        //this.jep.addStandardConstants();
-                 
     }
+    
     
     /**
      * The serviceitem 
@@ -146,7 +142,6 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     			setLatestExecuted(null);
     		} else {
     			setLatestExecuted(Float.toString(value));
-    			//setLatestExecuted(Float.toString(Util.roundDecimals(value)));
     		}
     	}
     }
