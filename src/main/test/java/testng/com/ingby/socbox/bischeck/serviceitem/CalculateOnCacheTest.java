@@ -112,13 +112,13 @@ public class CalculateOnCacheTest {
 		coc.setService(bis);
 		
 		String host1 = "host1_score.ingby.com";
-		String service1 ="service-dash";
+		String service1 ="service-dash@";
 		String serviceitem1 = "service_item@0. space";
-		String hsi1 = host1+"-"+"service\\-dash"+"-"+serviceitem1;
+		String hsi1 = host1+"-"+"service\\-dash@"+"-"+serviceitem1;
 		String host2 = "host2_score.ingby.com";
-		String service2 ="service-dash";
+		String service2 ="service-dash@";
 		String serviceitem2 = ".service_item0. space";
-		String hsi2 = host2+"-"+"service\\-dash"+"-"+serviceitem2;
+		String hsi2 = host2+"-"+"service\\-dash@"+"-"+serviceitem2;
 		
 		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "1.0",null);
 		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "2.0",null);
