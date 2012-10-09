@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
 
+import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.service.LastCacheService;
@@ -78,8 +79,7 @@ public class BpiOnCache extends ServiceItemAbstract implements ServiceItem {
         Pattern pat = null;
         
         try {
-            pat = Pattern.compile (LastStatusCache.getInstance().getHostServiceItemFormat());
-            
+            pat = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());       
         } catch (PatternSyntaxException e) {
             LOGGER.warn("Regex syntax exception, " + e);
             throw e;
