@@ -107,7 +107,7 @@ Version 0.4.2
 \begin_inset Newline newline
 \end_inset
 
-2012-10-03
+2012-10-10
 \end_layout
 
 \begin_layout Standard
@@ -1332,6 +1332,67 @@ ion.
 \end_layout
 
 \begin_layout Subsection
+JEP standard functions
+\end_layout
+
+\begin_layout Standard
+The standard JEP functions supported are:
+\end_layout
+
+\begin_layout Itemize
+round(x,y) - rounding the value of x to y number of decimals.
+\end_layout
+
+\begin_layout Itemize
+ceil(x) - calculate the ceiling value of x.
+\end_layout
+
+\begin_layout Itemize
+floor(x) - calculate the floor value of x.
+\end_layout
+
+\begin_layout Itemize
+abs(x) - calculate the absolute value of x.
+\end_layout
+
+\begin_layout Itemize
+mod(x,y) - calculate the modulus of x % y.
+\end_layout
+
+\begin_layout Itemize
+sqrt(x) - calculate the square root of x.
+\end_layout
+
+\begin_layout Itemize
+sum(x1,x2,x3,.....) - calculate the sum of the list of values.
+\end_layout
+
+\begin_layout Itemize
+ln(x) - calculate the natural logarithm of x.
+\end_layout
+
+\begin_layout Itemize
+log(x) - calculate the logarithm base 10 of x.
+\end_layout
+
+\begin_layout Itemize
+exp(x) - calculate the exponential value of x.
+\end_layout
+
+\begin_layout Itemize
+pow(x,y) - calculate the x as the power of y.
+\end_layout
+
+\begin_layout Itemize
+rand() - random value between 0 and 1
+\end_layout
+
+\begin_layout Itemize
+if(cond, trueval, falseval) - if the cond expression is true trueval is
+ returned, if false falseval is returned.
+\end_layout
+
+\begin_layout Subsection
 JEP extensions
 \end_layout
 
@@ -1342,15 +1403,15 @@ n.
 \end_layout
 
 \begin_layout Itemize
-avg(x1,x2,x3,...) - Calculates the average of the list of values.
+avg(x1,x2,x3,...) - Calculate the average of the list of values.
 \end_layout
 
 \begin_layout Itemize
-max(x1,x2,x3,...) - Calculates the max value of the list of values.
+max(x1,x2,x3,...) - Calculate the max value of the list of values.
 \end_layout
 
 \begin_layout Itemize
-min(x1,x2,x3,...) - Calculates the min value of the list of values.
+min(x1,x2,x3,...) - Calculate the min value of the list of values.
 \end_layout
 
 \begin_layout Chapter
@@ -1976,6 +2037,65 @@ $BISHOME/etc
 \emph default
 .
  Remember that all xml configuration files should use HTML encoded characters.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Naming-standard"
+
+\end_inset
+
+Naming standard
+\end_layout
+
+\begin_layout Standard
+The rules for naming hosts, services and serviceitems must adhere to the
+ following rules:
+\end_layout
+
+\begin_layout Itemize
+hostname - can include any character from a-z, A-Z and 0-9.
+ The hostname can also include the following special character, dash (-),
+ dot (.) and underscore (_).
+ Its not allowed to start the name with any of the special characters.
+ Examples of valid names are erphost.xyz.com and erp1_host.my-domain.com.
+\end_layout
+
+\begin_layout Itemize
+service and serviceitem - can include any character from a-z, A-Z and 0-9.
+ The name can also include the following special characters, dash (-), dot
+ (.), underscore (_), at sign (@) and space ( ).
+ Its not allowed to start or end the name with dash (-) and space ( ).
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+When using a host-servie-serviceitem[X] expression in the execstatement
+ tag of a serviceitem in the bischeck.xml configuration file or in the hour
+ tag of the 24threshold.xml configuration file a dash (-) in any of the names
+ must be quoted with a backslash (
+\backslash
+), like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+erp1_host.my
+\backslash
+-domain.com-@service1-item.1.1[1]
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -4410,7 +4530,7 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.4.2 - 2012-10-03
+Release 0.4.2 - 2012-10-10
 \end_layout
 
 \begin_layout Standard
@@ -4425,7 +4545,16 @@ New feature
 \end_layout
 
 \begin_layout Itemize
-N/A
+Related to bug [TR-227 ] the naming of host, service and serviceitem names
+ has been improved.
+ For more info please see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Naming-standard"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -4465,7 +4594,8 @@ Upgrading
 \end_layout
 
 \begin_layout Standard
-Release 0.4.0 and 0.4.1 is supported for upgrade to 0.4.2.
+Release 0.3.3, 0.4.0 and 0.4.1 is supported for upgrade to 0.4.2.
+ 
 \end_layout
 
 \begin_layout Section
