@@ -72,10 +72,11 @@ public class LastStatusCacheParse {
 		ArrayList<String> paramOut = new ArrayList<String>();
 
 		while (st.hasMoreTokens()) {
-			String retvalue = st.nextToken(); 
-
-			if (retvalue.equalsIgnoreCase("null")) { 
+			String retvalue = st.nextToken();
+			
+			if (retvalue.matches("(?i).*null*")) {
 				notANumber= true;
+				break;
 			}
 
 			paramOut.add(retvalue);
