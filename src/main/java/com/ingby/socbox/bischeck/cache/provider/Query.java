@@ -122,7 +122,8 @@ public class Query {
 	 * @param to
 	 * @param from
 	 * @param listtosearch
-	 * @return a copy of list and its elements 
+	 * @return a copy of list and its elements
+	 * @deprecated 
 	 */
 	static public LinkedList<LastStatus> findByListToFrom(long fromtime, long totime, LinkedList<LastStatus> listtosearch){
 		LinkedList<LastStatus> list = new LinkedList<LastStatus>();
