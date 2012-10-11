@@ -4575,6 +4575,19 @@ Cache parser do not work for host, service or serviceitems if the name include
 \end_layout
 
 \begin_layout Itemize
+[TR-228] 
+\begin_inset Quotes eld
+\end_inset
+
+Threshold factory return wrong threshold definition if service and serviceitem
+ name is the same for different hosts
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
 Fixed migration script from 0.4.0 to copy 
 \emph on
 etc
