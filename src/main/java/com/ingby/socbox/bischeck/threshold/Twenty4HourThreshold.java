@@ -38,7 +38,6 @@ import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.ConfigFileManager;
 import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHoliday;
@@ -66,6 +65,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     private ThresholdContainer thresholdByPeriod[] = new ThresholdContainer[24];
     private String calcMethod;
 
+    private Float currentthreshold = null;
+    private Integer currenthour = null;
+    private Integer currentminute = null;
 
     public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
@@ -577,25 +579,38 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     
     @Override
     public Float getThreshold() {
-        Calendar c = BisCalendar.getInstance();
+    	LOGGER.debug("Call getThreshold");
+    	Calendar c = BisCalendar.getInstance();
         int hourThreshold = c.get(Calendar.HOUR_OF_DAY);
         int minuteThreshold = c.get(Calendar.MINUTE);
 
+        if (currenthour != null && currentminute != null)
+        	if (currenthour == hourThreshold && currentminute == minuteThreshold)
+        		return currentthreshold;
         
+        LOGGER.debug("Cache miss getThreshold");
+    	
         if (thresholdByPeriod[hourThreshold] == null || 
         		thresholdByPeriod[(hourThreshold+1)%24] == null) {
-            return null;
+            currentthreshold = null;
+        } else {
+
+        	Float calculatedfirst = calculateForInterval(thresholdByPeriod[hourThreshold]);
+        	Float calculatednext = calculateForInterval(thresholdByPeriod[(hourThreshold+1)%24]);
+
+        	if (calculatedfirst == null || calculatednext == null) {
+        		currentthreshold = null;
+        	} else {
+        		currentthreshold = minuteThreshold*(calculatednext - calculatedfirst)/60 + calculatedfirst;
+        	}
+        	
         }
-
-        Float calculatedfirst = calculateForInterval(thresholdByPeriod[hourThreshold]);
-        Float calculatednext = calculateForInterval(thresholdByPeriod[(hourThreshold+1)%24]);
         
-        if (calculatedfirst == null || calculatednext == null)
-        	return null;
-        
-        return minuteThreshold*(calculatednext - calculatedfirst)/60 + calculatedfirst;
+        currenthour = hourThreshold;
+        currentminute = minuteThreshold;
+        return currentthreshold;
     }
-
+    
     
     private Float calculateForInterval(ThresholdContainer tcont) {
 		
