@@ -1,6 +1,8 @@
 #!/bin/sh
 
-
+mv $1/etc/urlservices.xml $1/etc/urlservices.xml-0.4.2
 cp $2/etc/*.xml $1/etc
+mv $1/etc/urlservices.xml-0.4.2 $1/etc/urlservices.xml
+
 $1/bin/bischeck migration.Properties2ServerProperties -s $1/etc -d $1/etc
 
