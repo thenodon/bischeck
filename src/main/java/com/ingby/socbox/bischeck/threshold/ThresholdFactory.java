@@ -36,7 +36,7 @@ public class ThresholdFactory {
         
         synchronized (cache) {
             /* check if the threshold exists in cache or evaluate new value */
-            current = cache.get(service.getServiceName()+"-"+serviceItem.getServiceItemName());
+            current = cache.get(service.getHost().getHostname()+"-"+service.getServiceName()+"-"+serviceItem.getServiceItemName());
 
             if (current == null) {
                 LOGGER.debug("Threshold for " + 
@@ -80,7 +80,7 @@ public class ThresholdFactory {
                 
                 current.init();
 
-                cache.put(service.getServiceName()+"-"+serviceItem.getServiceItemName(),current);
+                cache.put(service.getHost().getHostname()+"-"+service.getServiceName()+"-"+serviceItem.getServiceItemName(),current);
             }
         }
 
