@@ -158,6 +158,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
      * @param serviceItemName
      * @param measuredValue
      * @param thresholdValue
+     * @deprecated
      */
 	public  void add(String hostname, String serviceName,
 			String serviceItemName, String measuredValue,
@@ -193,7 +194,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 	
 	/**
-	 * Add cache element in the end of the list
+	 * Add cache element in the end of the list. Used by loaddump()
 	 * @param ls
 	 * @param key
 	 */
@@ -224,12 +225,13 @@ public class LastStatusCache implements LastStatusCacheMBean {
      * @param serviceItemName
      * @return last inserted value 
      */
+	/*
 	public String getFirst(String hostname, String serviceName,
 			String serviceItemName) {
 
 		return getIndex(hostname, serviceName, serviceItemName, 0);
 	}
-
+*/
 
 	/**
 	 * Get the value in the cache for the host, service and service item at 
@@ -240,7 +242,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	 * @param index
 	 * @return the value
 	 */
-	public String getIndex(String hostname, String serviceName,
+	private String getIndex(String hostname, String serviceName,
 			String serviceItemName, int index) {
 
 		String key = Util.fullName( hostname, serviceName, serviceItemName);
@@ -275,7 +277,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
      * @param time
      * @return the value
      */
-	public String getByTime(String hostname, String serviceName,
+	private String getByTime(String hostname, String serviceName,
 			String serviceItemName, long stime) {
 		logger.debug("Find cache data for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
 
@@ -308,7 +310,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	 * @param stime
 	 * @return
 	 */
-	public Integer getByTimeIndex(String hostname, String serviceName,
+	private Integer getByTimeIndex(String hostname, String serviceName,
 			String serviceItemName, long stime) {
 		logger.debug("Find cache index for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
 		
@@ -336,11 +338,11 @@ public class LastStatusCache implements LastStatusCacheMBean {
      * and service item entries. 
      * @return size of the cache index
      */
-	public  int size() {
+	
+	private  int size() {
 		return cache.size();
 	}
-
-
+	 
 	/**
      * The size for the specific host, service, service item entry.
      * @param hostname
