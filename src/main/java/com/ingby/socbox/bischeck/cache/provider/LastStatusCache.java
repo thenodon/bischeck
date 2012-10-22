@@ -455,26 +455,32 @@ public class LastStatusCache implements LastStatusCacheMBean {
 			 * that is S, M or H. 
 			 */ 
 			StringTokenizer ind = new StringTokenizer(indexstr,":");
-			int indfrom = this.getByTimeIndex( 
+			Integer indfrom = this.getByTimeIndex( 
 					host,
 					service, 
 					serviceitem,
 					System.currentTimeMillis() + CacheUtil.calculateByTime(ind.nextToken())*1000);
 			
-			int indto = this.getByTimeIndex( 
+			Integer indto = this.getByTimeIndex( 
 					host,
 					service, 
 					serviceitem,
 					System.currentTimeMillis() + CacheUtil.calculateByTime(ind.nextToken())*1000);
 			
-			for (int i = indfrom; i<indto+1; i++) {
-				strbuf.append(
-						this.getIndex( 
-								host,
-								service, 
-								serviceitem,
-								i) + JEPLISTSEP);
+			// If any of the index returned is null it means that there is 
+			// no cache data in the from or to time and then return a single null
+			if (indfrom == null || indto == null) {
+				strbuf.append("null" + JEPLISTSEP);
+			} else { 
+				for (int i = indfrom; i<indto+1; i++) {
+					strbuf.append(
+							this.getIndex( 
+									host,
+									service, 
+									serviceitem,
+									i) + JEPLISTSEP);
 
+				}
 			}
 			strbuf.append(SEP);
 		}
@@ -522,6 +528,9 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 	
 	private String cleanUp(String str, String sep) {
+		
+		str = cleanUpNullInLists(str);
+		
 		// This line replace all lists that will end with ,;
 		str = str.replaceAll(",;", ";");
 		// remove the last sep character
@@ -532,6 +541,10 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	}
 
 	
+	private String cleanUpNullInLists(String str) {
+		str = str.replaceAll(",null", "");
+		return str;
+	}
 
 	/*
 	 * (non-Javadoc)
