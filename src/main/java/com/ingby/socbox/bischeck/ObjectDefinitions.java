@@ -1,5 +1,9 @@
 package com.ingby.socbox.bischeck;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 public class ObjectDefinitions {
 	
 	private static final String ILLEGAL_OBJECT_NAME_CHARS = "`+~!$%^&*|'\"<>?,()=";
@@ -37,5 +41,48 @@ public class ObjectDefinitions {
 	
 	public static String getQuoteConversionString() {
 		return QUOTE_CONVERSION_STRING;
+	}
+	public static String verifyHostServiceServiceItem(String name) {
+		Pattern pat = null;
+	        
+		try {
+            pat = Pattern.compile ("^"+HOST_SERVICE_ITEM_REGEXP+"$");        
+        } catch (PatternSyntaxException e) {
+           
+        }
+        
+        Matcher mat = pat.matcher (name);
+        mat.find();
+        return mat.group();    
+	}
+	
+	
+	public static String verifyHostName(String hostname) {
+		Pattern pat = null;
+	        
+		try {
+            pat = Pattern.compile ("^"+OBJECT_HOSTNAME+"$");        
+        } catch (PatternSyntaxException e) {
+           
+        }
+        
+        Matcher mat = pat.matcher (hostname);
+        mat.find();
+        return mat.group();   
+	}
+	
+	
+	public static String verifyServiceAndServiceItemName(String name) {
+		Pattern pat = null;
+	        
+		try {
+            pat = Pattern.compile ("^"+OBJECT_REGEXP+"$");        
+        } catch (PatternSyntaxException e) {
+           
+        }
+        
+        Matcher mat = pat.matcher (name);
+        mat.find();
+        return mat.group();
 	}
 }
