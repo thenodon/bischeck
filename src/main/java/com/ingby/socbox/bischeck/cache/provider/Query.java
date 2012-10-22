@@ -29,28 +29,14 @@ public class Query {
 
 	static Logger  logger = Logger.getLogger(Query.class);
 
-	public static void main(String[] args) {
-		LinkedList<LastStatus> list = new LinkedList<LastStatus>();
-		for (int i = 1; i < 11; i++) {
-			LastStatus l = new LastStatus(""+i, (float) i,  (long) (i*10));
-			list.addFirst(l);
-		}
-		for (int i = 0; i < 10; i++) {
-			
-			System.out.println(i + "> " + list.get(i).getTimestamp());
-		}
-		System.out.println(nearest(54, list).getValue());
-		System.out.println(nearest(55, list).getValue());
-		System.out.println(nearest(0, list).getValue());
-		
-		
-		System.out.println("Size of copy " + findByListToFrom(0, 101, list).size());
-		System.out.println("Size of copy " + findByListToFrom(31, 56, list).size());
-		System.out.println("Size of copy " + findByListToFrom(11,91 , list).size());
-		
-		
-	}
 	
+	/**
+	 * The method search for the LastStatus object stored in the cache that has 
+	 * a timestamp closest to the time parameter.
+	 * @param time 
+	 * @param listtosearch
+	 * @return the LastStatus object closes to the time
+	 */
 	public static LastStatus nearest(long time, LinkedList<LastStatus> listtosearch) {
 		
 		logger.debug("Find value in cache at " + new java.util.Date(time));
@@ -85,8 +71,14 @@ public class Query {
 		return nearest;
 	}
 	
-
-	protected static Integer nearestByIndex(long time, LinkedList<LastStatus> listtosearch) {
+	
+	/**
+	 * Return the cache index closes to the timestamp define in time
+	 * @param time
+	 * @param listtosearch
+	 * @return cache index
+	 */
+	public static Integer nearestByIndex(long time, LinkedList<LastStatus> listtosearch) {
 		
 		logger.debug("Find value in cache at " + new java.util.Date(time));
         
@@ -130,7 +122,8 @@ public class Query {
 	 * @param to
 	 * @param from
 	 * @param listtosearch
-	 * @return a copy of list and its elements 
+	 * @return a copy of list and its elements
+	 * @deprecated 
 	 */
 	static public LinkedList<LastStatus> findByListToFrom(long fromtime, long totime, LinkedList<LastStatus> listtosearch){
 		LinkedList<LastStatus> list = new LinkedList<LastStatus>();
