@@ -44,6 +44,13 @@ public class LastStatusCacheParse {
 	private static final String SEP = ";";
 	static Logger  logger = Logger.getLogger(LastStatusCacheParse.class);
 
+	/**
+     * This method manage parsing of cached data by replacing a cache entry name
+     * host-service-serviceitem[X] with the data in the cache. 
+     * @param str the expression including cache entries to replace with data
+     * @return - a string where the cache entries are replaced with data or null
+     * if any of the cache entries was "null" 
+     */
 	public static String parse(String str) {
 		Pattern pat = null;
 		logger.debug("String to cache parse: " + str);
