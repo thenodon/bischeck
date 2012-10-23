@@ -131,11 +131,11 @@ Introduction
 
 \begin_layout Standard
 Monitoring and surveillance is today common in any IT operation.
- The market is mature and a number of excellent solutions exists, especially
+ The market is mature and a number of excellent solutions exist, especially
  in the open source market, like Nagios.
- But when it comes to monitoring of business applications the maturity is
- not on the same level.
- Business operations teams seldom has any monitoring solution to understand
+ But when it comes to monitoring of business applications, the maturity
+ is not at the same level.
+ Business operations teams seldom have any monitoring solutions to understand
  what goes on in their business processes and applications.
  Business intelligence solutions can often tell what happened last month,
  but from a more tactical operations view there is a gap.
@@ -147,7 +147,7 @@ Monitoring and surveillance is today common in any IT operation.
 \begin_inset Quotes eld
 \end_inset
 
-why number of orders have dropped under the current threshold
+why the number of orders have dropped under the current threshold
 \begin_inset Quotes erd
 \end_inset
 
@@ -157,10 +157,10 @@ why number of orders have dropped under the current threshold
 \end_layout
 
 \begin_layout Standard
-So what is the difference between business activity monitoring, BAM, and
- traditional IT infrastructure monitoring? Basically its the same, some
- entity to measure and for that entity define thresholds levels that will
- generate warning or critical alarms.
+What is the difference between business activity monitoring, BAM, and traditiona
+l IT infrastructure monitoring? Basically it is the same.
+ Some entity to measure and for that entity to define threshold levels that
+ will generate warnings or critical alarms.
  The demands we have seen in addition to the basic functionality are the
  following features provided by bischeck:
 \end_layout
@@ -171,13 +171,13 @@ Support for dynamic and adaptive thresholds.
 
 \begin_layout Itemize
 Support dynamic configuration of thresholds depending of time of the day
- and day of month or week.
+ and day of week or month.
 \end_layout
 
 \begin_layout Itemize
-Support threshold based on fixed values and thresholds based on the measured
- value from other services.
- This it typical in process driven businesses.
+Support thresholds based on fixed values as well as thresholds based on
+ measured values from other services.
+ This is typical for process driven businesses.
  
 \end_layout
 
@@ -193,21 +193,21 @@ Data cache for all measured service items that can be retrieved based on
 \end_layout
 
 \begin_layout Itemize
-Support multiple scheduling schema per service.
- This enable a fine grain control of when a service should be run.
- bischeck support interval scheduling, cron scheduling and service relation
+Support for multiple scheduling schemas per service.
+ This enables a fine grained control of when a service should be run.
+ bischeck supports interval scheduling, cron scheduling and service relation
  based scheduling.
 \end_layout
 
 \begin_layout Itemize
-Configure services that are based on multiple measured values of other services,
- what could be described as "virtual" entities.
+Configuration of services based on multiple measured values of other services,
+ which could be described as "virtual" entities.
  
 \end_layout
 
 \begin_layout Itemize
-Support date macros in the execution statements of a service, typical used
- in a 
+Support for date macros in the execution statements of a service, typically
+ used in a 
 \emph on
 where
 \emph default
@@ -215,7 +215,7 @@ where
 \end_layout
 
 \begin_layout Itemize
-Support a multitude of ways to connected to the source system by allowing
+Support for a multitude of ways to connect to source systems by allowing
  custom developed service connection methods.
 \end_layout
 
@@ -226,7 +226,7 @@ Support for custom threshold classes to enable any way to define threshold
 \end_layout
 
 \begin_layout Itemize
-Integrates with multiple monitoring and surveillance tools, like any Nagios
+Integration with multiple monitoring and surveillance tools, like any Nagios
  like systems that supports the Nagios Service Check Acceptor (NSCA) and/or
  the Nagios Remote Data Processor (NRDP)
 \begin_inset Note Greyedout
@@ -263,7 +263,7 @@ status open
 \end_layout
 
 \begin_layout Standard
-Lets look at 3 examples that would be solved by using bischeck: 
+Let us look at 3 examples that can be solved by using bischeck: 
 \begin_inset Newline newline
 \end_inset
 
@@ -277,14 +277,14 @@ Example 1 – Monitor the number of orders received during the day
 \end_layout
 
 \begin_layout Standard
-The order management application receive orders 24 hours a day during Monday
+The order management application receives orders 24 hours a day during Monday
  to Friday.
- The total aggregated number of orders are different depending on time of
- the day.
- The business expect to have a total numbers of orders of 1500 at 13:00,
+ The total aggregated number of orders varies as a function of the time
+ of the day.
+ The business expects to have a total number of orders of 1500 at 13:00,
  at 14:00 the order count should be 2300, at 15:00 it should be 3400, etc.
- Between every hour the business want to interpolate that the order rate
- are according to a linear equation between the defined hour rates.
+ Between every hour the business requirement is to interpolate the order
+ rate according to a linear function between the defined hour rates.
  This means that the threshold at 13:20 is (2300-1500)*20/60+1500 = 1767.
  The warning alarm level should be between 90% and 70% of the threshold
  and critical alarm if the measured value is below 70% of the threshold.
@@ -302,8 +302,8 @@ Example 2 – Monitor the number of created invoices in relation to the number
 \end_layout
 
 \begin_layout Standard
-The invoice system should invoice at lest 80% of the daily incoming orders
- in the same day with one hour delay.
+The invoice system should invoice at least 80% of the daily incoming orders
+ in the same day with a maximum of one hour delay.
  This means that the measured value of orders with one hour delay must be
  used as a threshold for the number of created invoices.
 \begin_inset Newline newline
@@ -315,8 +315,8 @@ The invoice system should invoice at lest 80% of the daily incoming orders
 
 
 \series bold
-Example 3 – Monitor the current number of orders and if the inflow is zero
- we need an alarm
+Example 3 – Monitor the current number of orders and if the incoming flow
+ is zero we need an alarm
 \series default
  
 \end_layout
@@ -325,13 +325,12 @@ Example 3 – Monitor the current number of orders and if the inflow is zero
 The order system have a table with all received orders, but the requirement
  is that we need to monitor how many that has been received during the last
  10 minutes.
- If this value is zero an alarm must be generated since its an indication
- that the sales system are not generating orders.
+ If this value is zero an alarm must be generated since that is an indication
+ that the sales system is not generating orders.
  To achieve this monitoring we use the last and the previous sample of the
  total number of orders from example 1 and create the difference between
- the two to get a new virtual entity to measure, with an threshold level
+ the two to get a new virtual entity to measure, with a threshold level
  of 0.
- 
 \begin_inset Newline newline
 \end_inset
 
