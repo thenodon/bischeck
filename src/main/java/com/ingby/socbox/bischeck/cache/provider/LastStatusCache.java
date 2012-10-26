@@ -81,6 +81,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 	private static HashMap<String,LinkedList<LastStatus>> cache = new HashMap<String,LinkedList<LastStatus>>();
 	private static int fifosize = 500;
+	private static boolean notFullListParse = false;
 	private static LastStatusCache lsc = new LastStatusCache();
 	private static MBeanServer mbs = null;
 	private final static String BEANNAME = "com.ingby.socbox.bischeck:name=Cache";
@@ -125,6 +126,11 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		} catch (NumberFormatException ne) {
 			fifosize = 500;
 		}
+		
+		if (ConfigurationManager.getInstance().getProperties().
+				getProperty("fullListDef","false").equalsIgnoreCase("true"))
+			notFullListParse=true;
+		
 
 	}
 
@@ -529,7 +535,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	
 	private String cleanUp(String str, String sep) {
 		
-		str = cleanUpNullInLists(str);
+		if (notFullListParse)
+			str = cleanUpNullInLists(str);
 		
 		// This line replace all lists that will end with ,;
 		str = str.replaceAll(",;", ";");
