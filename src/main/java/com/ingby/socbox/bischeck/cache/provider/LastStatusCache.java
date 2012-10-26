@@ -128,7 +128,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		}
 		
 		if (ConfigurationManager.getInstance().getProperties().
-				getProperty("fullListDef","false").equalsIgnoreCase("true"))
+				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
 			notFullListParse=true;
 		
 
