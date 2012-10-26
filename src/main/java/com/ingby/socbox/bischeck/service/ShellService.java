@@ -51,12 +51,36 @@ public class ShellService extends ServiceAbstract implements Service {
     
     @Override 
     public String executeStmt(String exec) throws Exception  {
+    	Runtime run = null;
+    	Process pr = null;
+    	BufferedReader buf = null;
+    	String ret = null;
     	
-    	Runtime run = Runtime.getRuntime();
-    	Process pr = run.exec(exec);
-    	pr.waitFor();
-    	BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-    	String ret = buf.readLine();
+    	try {
+    		run = Runtime.getRuntime();
+        	pr = run.exec(exec);
+        	pr.waitFor();
+        	buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+    		ret = buf.readLine();
+    	} finally {
+    		try {
+    			buf.close();
+    		}catch (Exception ignore){}
+    	
+    		try {
+    			pr.getErrorStream().close();
+    		}catch (Exception ignore){}
+    		try {
+    			pr.getInputStream().close();
+    		}catch (Exception ignore){}
+    		try {
+    			pr.getOutputStream().close();
+    		}catch (Exception ignore){}
+    		try {
+    			pr.destroy();
+    		}catch (Exception ignore){}
+    	}
+    	
     	return ret;    	
     }    
 }
