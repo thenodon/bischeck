@@ -22,12 +22,12 @@ package com.ingby.socbox.bischeck.service;
 
 import org.apache.log4j.Logger;
 
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
+import com.ingby.socbox.bischeck.cache.CacheFactory;
 
 
 public class LastCacheService extends ServiceAbstract implements Service {
 
-    private final static Logger LOGGER = Logger.getLogger(LastStatusCache.class);
+    private final static Logger LOGGER = Logger.getLogger(LastCacheService.class);
 
     public static void main(String[] args) {
         LastCacheService bis = new LastCacheService("serviceName");
@@ -72,6 +72,6 @@ public class LastCacheService extends ServiceAbstract implements Service {
      * return is the value of each separated by ,
      */
     public String executeStmt(String exec) throws Exception {
-        return LastStatusCache.getInstance().getParametersByString(exec);        
+        return CacheFactory.getInstance().getParametersByString(exec);
     }
 }
