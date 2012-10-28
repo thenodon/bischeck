@@ -25,8 +25,6 @@ import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 
-import com.ingby.socbox.bischeck.ConfigurationManager;
-
 
 public class ShellService extends ServiceAbstract implements Service {
 
@@ -52,11 +50,36 @@ public class ShellService extends ServiceAbstract implements Service {
     @Override 
     public String executeStmt(String exec) throws Exception  {
     	
-    	Runtime run = Runtime.getRuntime();
-    	Process pr = run.exec(exec);
-    	pr.waitFor();
-    	BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-    	String ret = buf.readLine();
+    	Runtime run = null;
+    	Process pr = null;
+    	BufferedReader buf = null;
+    	String ret = null;
+    	
+    	try {
+    		run = Runtime.getRuntime();
+        	pr = run.exec(exec);
+        	pr.waitFor();
+        	buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+    		ret = buf.readLine();
+    	} finally {
+    		try {
+    			buf.close();
+    		}catch (Exception ignore){}
+    	
+    		try {
+    			pr.getErrorStream().close();
+    		}catch (Exception ignore){}
+    		try {
+    			pr.getInputStream().close();
+    		}catch (Exception ignore){}
+    		try {
+    			pr.getOutputStream().close();
+    		}catch (Exception ignore){}
+    		try {
+    			pr.destroy();
+    		}catch (Exception ignore){}
+    	}
+    	
     	return ret;    	
     }    
 }
