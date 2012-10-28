@@ -57,7 +57,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
+import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 
@@ -200,15 +200,6 @@ public final class Execute implements ExecuteMBean {
     	shutdownRequested = false;
     	reloadRequested = false;
         
-    	/*
-         * Reload cache
-         */
-        try {
-        	LastStatusCache.loaddump();
-        } catch (Exception e) {
-        	LOGGER.warn("Loading cache failed: " + e.getMessage());
-        }
-		
                 
         Scheduler sched = null;     
         
@@ -233,8 +224,8 @@ public final class Execute implements ExecuteMBean {
             LOGGER.warn("Stopping Quartz scheduler failed with - " + e);
         }
         
-        LastStatusCache.getInstance().dump2file();
-        
+        //LastStatusCache.getInstance().dump2file();
+        CacheFactory.close();
         LOGGER.info("******************* Shutdown ********************");
         
         if (reloadRequested) 
