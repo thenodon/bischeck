@@ -22,6 +22,20 @@ public class ObjectDefinitions {
 
 	private static final String CACHE_QUOTE_STRING = "\\\\" + CACHE_KEY_SEP;
 	
+	private static final String FINDTOFROMTIMEPATTERN = "^-[0-9]+ *[HMS]{1}:-[0-9]+ *[HMS]{1} *$";
+		
+	private static final String FINDINTIMEPATTERN = "^-[0-9]+ *[HMS]{1} *$";
+	
+	
+	public static String getFindintimepattern() {
+		return FINDINTIMEPATTERN;
+	}
+
+	public static String getFindtofromtimepattern() {
+		return FINDTOFROMTIMEPATTERN;
+	}
+
+	
     public static String getCacheQuoteString() {
 		return CACHE_QUOTE_STRING;
 	}
