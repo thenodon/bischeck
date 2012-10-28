@@ -142,8 +142,10 @@ public class BackendStorage {
 						dumpwriter.newLine();
 						dumpwriter.write("      <timestamp>"+ls.getTimestamp()+"</timestamp>");
 						dumpwriter.newLine();
-						dumpwriter.write("      <threshold>"+ls.getThreshold()+"</threshold>");
-						dumpwriter.newLine();
+						if (ls.getThreshold() != null) {
+							dumpwriter.write("      <threshold>"+ls.getThreshold()+"</threshold>");
+							dumpwriter.newLine();
+						}
 						dumpwriter.write("      <calcmethod>"+encode(ls.getCalcmetod())+"</calcmethod>");
 						dumpwriter.newLine();
 						dumpwriter.write("    </entry>");
