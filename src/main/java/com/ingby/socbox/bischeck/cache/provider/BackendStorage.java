@@ -48,7 +48,15 @@ public class BackendStorage {
 
 	static Logger  logger = Logger.getLogger(BackendStorage.class);
 
-	public static Object getXMLFromBackend(Object xmlobj, File configfile, JAXBContext jc)
+	/**
+	 * Reads the cache data from file and loads into the LastStatusCache
+	 * @param xmlobj
+	 * @param dumpFile
+	 * @param jc
+	 * @return
+	 * @throws Exception
+	 */
+	public static Object getXMLFromBackend(Object xmlobj, File dumpFile, JAXBContext jc)
 	throws Exception {
 		try {
 			jc = JAXBContext.newInstance("com.ingby.socbox.bischeck.xsd.laststatuscache");
@@ -72,7 +80,7 @@ public class BackendStorage {
 			schema = sf.newSchema(new File(xsdUrl.getFile()));
 		} catch (Exception e) {
 			logger.error("Could not vaildate xml file " + 
-					configfile.getAbsolutePath() + 
+					dumpFile.getAbsolutePath() + 
 					" with xsd file " +
 					"laststatuscache.xsd" + ": " + 
 					e.getMessage());
@@ -89,24 +97,34 @@ public class BackendStorage {
 		u.setSchema(schema);
 
 		try {
-			xmlobj =  u.unmarshal(configfile);
+			xmlobj =  u.unmarshal(dumpFile);
 		} catch (JAXBException e) {
-			logger.error("Could not unmarshall the file " +  configfile.getAbsolutePath() +":" + e);
+			logger.error("Could not unmarshall the file " +  dumpFile.getAbsolutePath() +":" + e);
 			throw new Exception(e);
 		}
-		logger.debug("Create new object for xml file " +  configfile.getAbsolutePath());
+		logger.debug("Create new object for xml file " +  dumpFile.getAbsolutePath());
 		return xmlobj;
 	}
 
+	
+	/**
+	 * Delete the the dumpfile
+	 * @param dumpfilename
+	 * @return
+	 */
+	public static boolean clearDumpFile(String dumpfilename) {
+		File dumpfile = new File(dumpfilename);
+		return dumpfile.delete();
+	}
 
-
-	public static void dump2file(HashMap<String,LinkedList<LastStatus>> cache, String lastStatusCacheDumpFile) {
+	
+	public static void dump2file(HashMap<String,LinkedList<LastStatus>> cache, String dumpfilename) {
 
 		long start = System.currentTimeMillis();
 		long countEntries = 0;
 		long countKeys = 0;
-		File dumpfile = new File(lastStatusCacheDumpFile);
-		copyFile(dumpfile,new File(lastStatusCacheDumpFile+".bak"));
+		File dumpfile = new File(dumpfilename);
+		copyFile(dumpfile,new File(dumpfilename+".bak"));
 		FileWriter filewriter = null;
 		BufferedWriter dumpwriter = null;
 		logger.debug("Start dump cache");
