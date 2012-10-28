@@ -42,6 +42,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
@@ -57,7 +58,7 @@ public class ServiceJob implements Job {
     private final static Logger LOGGER = Logger.getLogger(ServiceJob.class);
 
     static private int runAfterDelay = 10; //in seconds
-    
+    static private boolean saveNullOnConnectionError;
     
     static {
         try {
@@ -70,6 +71,10 @@ public class ServiceJob implements Job {
                     ConfigurationManager.getInstance().getProperties().getProperty(
                     "runAfterDelay"));
         }
+
+        saveNullOnConnectionError = Boolean.parseBoolean(ConfigurationManager.getInstance().getProperties().
+        		getProperty("saveNullOnConnectionError", "false").toLowerCase());
+
     }
     
         
@@ -90,14 +95,16 @@ public class ServiceJob implements Job {
         executeService(service);
         // Check if there is any run after
        
-        LOGGER.debug("Service " + runafter.getHostname() + "-" + runafter.getServicename() + " has runAfter " + 
+        if (LOGGER.isDebugEnabled()) 
+        	LOGGER.debug("Service " + runafter.getHostname() + "-" + runafter.getServicename() + " has runAfter " + 
         		ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter));
         
         if (ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter)) {
         	for (Service servicetorunafter : ConfigurationManager.getInstance().getRunAfterMap().get(runafter)) {
-        		LOGGER.debug("The services to run after is: " + servicetorunafter.getHost().getHostname() + 
+        		if (LOGGER.isDebugEnabled()) 
+        			LOGGER.debug("The services to run after is: " + servicetorunafter.getHost().getHostname() + 
         				"-" + servicetorunafter.getServiceName());
-        	}
+        		}
         
         	try {
         		runImmediate(ConfigurationManager.getInstance().getRunAfterMap().get(runafter));
@@ -128,7 +135,8 @@ public class ServiceJob implements Job {
     	Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
     	
     	for (Service service:services) {
-    		LOGGER.debug("Service to run immiediate run - " + service.getHost().getHostname() + "-" + 
+    		if (LOGGER.isDebugEnabled())
+    			LOGGER.debug("Service to run immiediate run - " + service.getHost().getHostname() + "-" + 
         			service.getServiceName());
         	
     		Map<String,Object> map = new HashMap<String, Object>();
@@ -187,9 +195,12 @@ public class ServiceJob implements Job {
         for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
             ServiceItem serviceitem = serviceitementry.getValue();
             
+            // Get the threshold class
+            serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
+
             String fullservicename = Util.fullName(service, serviceitem);
-            
-            LOGGER.debug("Executing ServiceItem: "+ fullservicename);
+            if (LOGGER.isDebugEnabled())
+            	LOGGER.debug("Executing ServiceItem: "+ fullservicename);
             synchronized (service) {
 
             	final Timer timer = Metrics.newTimer(ServiceJob.class, 
@@ -201,8 +212,13 @@ public class ServiceJob implements Job {
             		
                 	try {
                 		service.openConnection();
-                		//service.setConnectionEstablished(true);
                 	} catch (Exception e) {
+                   		
+                		if (saveNullOnConnectionError) {
+                			serviceitem.setLatestExecuted("null");
+                   			LastStatusCache.getInstance().add(service,serviceitem);
+                		}
+         
                 		LOGGER.error("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed with error " + e);
                 		service.setConnectionEstablished(false);
                 		return NAGIOSSTAT.CRITICAL;
@@ -226,11 +242,11 @@ public class ServiceJob implements Job {
                 }
                 
                 serviceitem.setExecutionTime(executetime);
-            	
-                LOGGER.debug("Time to execute " + 
+            	if (LOGGER.isDebugEnabled())
+            		LOGGER.debug("Time to execute " + 
             			serviceitem.getExecution() + 
             			" : " + serviceitem.getExecutionTime() +
-            	" ms");
+            		" ms");
             	
             }
 
@@ -238,24 +254,17 @@ public class ServiceJob implements Job {
         			fullservicename, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
         	final TimerContext ctxthreshold = timer.time();
         	
-            try {
-            	
-                serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
+            try {	
                 // Always report the state for the worst service item 
-                LOGGER.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
+                if(LOGGER.isDebugEnabled())
+                	LOGGER.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
                 NAGIOSSTAT curstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
                 
-                LastStatusCache.getInstance().add(service,serviceitem);
+                CacheFactory.getInstance().add(service,serviceitem);
                 
                 if (curstate.val() > servicestate.val() ) { 
                     servicestate = curstate;
                 }
-            } catch (ClassNotFoundException e) {
-                LOGGER.error("Threshold class not found - " + e);
-                throw new Exception("Threshold class not found, see bischeck log for more info.");
-            } catch (Exception e) {
-                LOGGER.error("Threshold excution error - " + e);
-                throw new Exception("Threshold excution error, see bischeck log for more info");
             } finally {
             	ctxthreshold.stop();
             }
