@@ -34,7 +34,7 @@ public class ServerExecutor {
 
     private final static Logger LOGGER = Logger.getLogger(ServerExecutor.class);
     
-    private static ServerExecutor serverexeutor= null;
+    private static ServerExecutor serverexecutor= null;
     /**
      * The serverSet holds all server configuration from servers.xml where 
      * the key is the name of the configuration, server name="NSCA">, the 
@@ -59,10 +59,10 @@ public class ServerExecutor {
      * @return
      */
     synchronized public static ServerExecutor getInstance() {
-        if (serverexeutor == null) {
-            serverexeutor= new ServerExecutor();
+        if (serverexecutor == null) {
+            serverexecutor= new ServerExecutor();
         }
-        return serverexeutor;
+        return serverexecutor;
     }
 
     
