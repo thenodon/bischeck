@@ -20,17 +20,10 @@
 package testng.com.ingby.socbox.bischeck;
 
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+
 import org.testng.annotations.Test;
 
-
-import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
-import com.ingby.socbox.bischeck.service.LastCacheService;
-import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.serviceitem.CalculateOnCache;
-import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class NamingTest {
 
@@ -57,9 +50,6 @@ public class NamingTest {
 	public void verifyNamingException() {
 		ObjectDefinitions.verifyHostName("_bischeck.ingby.com");
 	}
-	
-		
-
 	
 }
 

@@ -49,36 +49,41 @@ public class CacheTest {
 	@BeforeTest
     public void beforeTest() throws Exception {
 	
-		System.setProperty("bishome", ".");
-		ConfigurationManager.initonce();
+
 		confMgmr = ConfigurationManager.getInstance();
+	
+		if (confMgmr == null) {
+			System.setProperty("bishome", ".");
+			ConfigurationManager.init();
+			confMgmr = ConfigurationManager.getInstance();
+			
+		}
 		
 		cache = CacheFactory.getInstance();
-		
 		cache.clear();
 		if (cache instanceof LastStatusCache)
 			((LastStatusCache) cache).setFullListDef();
 		
-		System.out.println("Cachekey " + cachekey);
-		
-		// Set the current time to 50 minutes ago (10*300)
-		long current = System.currentTimeMillis() - 10*300*1000;
-		
-		for (int i = 1; i < 11; i++) {
-			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
-			
-			cache.add(ls, hostname, servicename, serviceitemname);
-		
-		}
-			
-    }
+	}
 
 	@AfterTest
 	public void afterTest() {
 		cache.close();
 	}
+
 	@Test (groups = { "Cache" })
 	public void verifyCache() {
+		cache.clear();
+		
+		long current = System.currentTimeMillis() - 10*300*1000;
+		
+		for (int i = 1; i < 11; i++) {
+			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
+			System.out.println(CacheTest.class.getName()+">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
+			cache.add(ls, hostname, servicename, serviceitemname);
+		
+		}
+		
 		
 		Assert.assertEquals(CacheUtil.parse(cachekey + "[0]"),"10");
 		Assert.assertEquals(CacheUtil.parse(cachekey + "[9]"),"1");
