@@ -107,7 +107,7 @@ Version 0.4.2
 \begin_inset Newline newline
 \end_inset
 
-2012-10-10
+2012-11-01
 \end_layout
 
 \begin_layout Standard
@@ -131,11 +131,11 @@ Introduction
 
 \begin_layout Standard
 Monitoring and surveillance is today common in any IT operation.
- The market is mature and a number of excellent solutions exists, especially
+ The market is mature and a number of excellent solutions exist, especially
  in the open source market, like Nagios.
- But when it comes to monitoring of business applications the maturity is
- not on the same level.
- Business operations teams seldom has any monitoring solution to understand
+ But when it comes to monitoring of business applications, the maturity
+ is not at the same level.
+ Business operations teams seldom have any monitoring solutions to understand
  what goes on in their business processes and applications.
  Business intelligence solutions can often tell what happened last month,
  but from a more tactical operations view there is a gap.
@@ -147,7 +147,7 @@ Monitoring and surveillance is today common in any IT operation.
 \begin_inset Quotes eld
 \end_inset
 
-why number of orders have dropped under the current threshold
+why the number of orders have dropped under the current threshold
 \begin_inset Quotes erd
 \end_inset
 
@@ -157,10 +157,10 @@ why number of orders have dropped under the current threshold
 \end_layout
 
 \begin_layout Standard
-So what is the difference between business activity monitoring, BAM, and
- traditional IT infrastructure monitoring? Basically its the same, some
- entity to measure and for that entity define thresholds levels that will
- generate warning or critical alarms.
+What is the difference between business activity monitoring, BAM, and traditiona
+l IT infrastructure monitoring? Basically it is the same.
+ Some entity to measure and for that entity to define threshold levels that
+ will generate warnings or critical alarms.
  The demands we have seen in addition to the basic functionality are the
  following features provided by bischeck:
 \end_layout
@@ -171,13 +171,13 @@ Support for dynamic and adaptive thresholds.
 
 \begin_layout Itemize
 Support dynamic configuration of thresholds depending of time of the day
- and day of month or week.
+ and day of week or month.
 \end_layout
 
 \begin_layout Itemize
-Support threshold based on fixed values and thresholds based on the measured
- value from other services.
- This it typical in process driven businesses.
+Support thresholds based on fixed values as well as thresholds based on
+ measured values from other services.
+ This is typical for process driven businesses.
  
 \end_layout
 
@@ -193,21 +193,21 @@ Data cache for all measured service items that can be retrieved based on
 \end_layout
 
 \begin_layout Itemize
-Support multiple scheduling schema per service.
- This enable a fine grain control of when a service should be run.
- bischeck support interval scheduling, cron scheduling and service relation
+Support for multiple scheduling schemas per service.
+ This enables a fine grained control of when a service should be run.
+ bischeck supports interval scheduling, cron scheduling and service relation
  based scheduling.
 \end_layout
 
 \begin_layout Itemize
-Configure services that are based on multiple measured values of other services,
- what could be described as "virtual" entities.
+Configuration of services based on multiple measured values of other services,
+ which could be described as "virtual" entities.
  
 \end_layout
 
 \begin_layout Itemize
-Support date macros in the execution statements of a service, typical used
- in a 
+Support for date macros in the execution statements of a service, typically
+ used in a 
 \emph on
 where
 \emph default
@@ -215,7 +215,7 @@ where
 \end_layout
 
 \begin_layout Itemize
-Support a multitude of ways to connected to the source system by allowing
+Support for a multitude of ways to connect to source systems by allowing
  custom developed service connection methods.
 \end_layout
 
@@ -226,7 +226,7 @@ Support for custom threshold classes to enable any way to define threshold
 \end_layout
 
 \begin_layout Itemize
-Integrates with multiple monitoring and surveillance tools, like any Nagios
+Integration with multiple monitoring and surveillance tools, like any Nagios
  like systems that supports the Nagios Service Check Acceptor (NSCA) and/or
  the Nagios Remote Data Processor (NRDP)
 \begin_inset Note Greyedout
@@ -263,7 +263,7 @@ status open
 \end_layout
 
 \begin_layout Standard
-Lets look at 3 examples that would be solved by using bischeck: 
+Let us look at 3 examples that can be solved by using bischeck: 
 \begin_inset Newline newline
 \end_inset
 
@@ -277,14 +277,14 @@ Example 1 – Monitor the number of orders received during the day
 \end_layout
 
 \begin_layout Standard
-The order management application receive orders 24 hours a day during Monday
+The order management application receives orders 24 hours a day during Monday
  to Friday.
- The total aggregated number of orders are different depending on time of
- the day.
- The business expect to have a total numbers of orders of 1500 at 13:00,
+ The total aggregated number of orders varies as a function of the time
+ of the day.
+ The business expects to have a total number of orders of 1500 at 13:00,
  at 14:00 the order count should be 2300, at 15:00 it should be 3400, etc.
- Between every hour the business want to interpolate that the order rate
- are according to a linear equation between the defined hour rates.
+ Between every hour the business requirement is to interpolate the order
+ rate according to a linear function between the defined hour rates.
  This means that the threshold at 13:20 is (2300-1500)*20/60+1500 = 1767.
  The warning alarm level should be between 90% and 70% of the threshold
  and critical alarm if the measured value is below 70% of the threshold.
@@ -302,8 +302,8 @@ Example 2 – Monitor the number of created invoices in relation to the number
 \end_layout
 
 \begin_layout Standard
-The invoice system should invoice at lest 80% of the daily incoming orders
- in the same day with one hour delay.
+The invoice system should invoice at least 80% of the daily incoming orders
+ in the same day with a maximum of one hour delay.
  This means that the measured value of orders with one hour delay must be
  used as a threshold for the number of created invoices.
 \begin_inset Newline newline
@@ -315,8 +315,8 @@ The invoice system should invoice at lest 80% of the daily incoming orders
 
 
 \series bold
-Example 3 – Monitor the current number of orders and if the inflow is zero
- we need an alarm
+Example 3 – Monitor the current number of orders and if the incoming flow
+ is zero we need an alarm
 \series default
  
 \end_layout
@@ -325,13 +325,12 @@ Example 3 – Monitor the current number of orders and if the inflow is zero
 The order system have a table with all received orders, but the requirement
  is that we need to monitor how many that has been received during the last
  10 minutes.
- If this value is zero an alarm must be generated since its an indication
- that the sales system are not generating orders.
+ If this value is zero an alarm must be generated since that is an indication
+ that the sales system is not generating orders.
  To achieve this monitoring we use the last and the previous sample of the
  total number of orders from example 1 and create the difference between
- the two to get a new virtual entity to measure, with an threshold level
+ the two to get a new virtual entity to measure, with a threshold level
  of 0.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -2547,6 +2546,33 @@ reference "label:Service-scheduling"
  Default is 10 seconds.
 \end_layout
 
+\begin_layout Itemize
+notFullListParse - if set to true a reference to a cache item where a list
+ is used, like 
+\emph on
+erpserver-orders-ediorders[1:10],
+\emph default
+ will return data even if not index in the list has data.
+ The first index must have data otherwise null is returned.
+ 
+\end_layout
+
+\begin_layout Itemize
+stateOnNull - the Nagios state to be used if a execstatment in a service
+ item return null.
+ The property can be set to an integer 0,1,2 or 3 or to a string OK, WARNING,
+ CRITICAL or UNKNOWN.
+ The default is UNKNOWN.
+\end_layout
+
+\begin_layout Itemize
+saveNullOnConnectionError - this property define if a null value should
+ be stored in the cache if you have your service class has a connection
+ exception of any sort.
+ The default is false.
+ 
+\end_layout
+
 \begin_layout Standard
 The properties.xml file can also include class specific properties typical
  used for custom developed service, service item and threshold classes.
@@ -4530,14 +4556,12 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.4.2 - 2012-10-10
+Release 0.4.2 - 2012-11-01
 \end_layout
 
 \begin_layout Standard
-This is minor release that just fix a major bug in the cache parser.
- Except for this bug fix the same that is specified for 0.4.1 is valid for
- 0.4.2.
- 
+This is minor release.
+ The beta functionality described for 0.4.1 is applicable for 0.4.2.
 \end_layout
 
 \begin_layout Subsection
@@ -4555,6 +4579,49 @@ reference "label:Naming-standard"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Itemize
+Execution statements and thresholds hour specification where cache data
+ is retrieved as a list, like in a function as avg(x-y-z[4:10]) and avg(4,6,8),
+ can now be configured to not return a null value if at least the first
+ index in the list definition has a cached value.
+ This means for the example that if, at least, index 4 as a value for the
+ x-y-z an average will be calculated.
+ To support backwards capability the new functionality will only be used
+ if the property 
+\emph on
+notFullListParse
+\emph default
+ is set to true in the properties.xml.
+ The default value is false.
+\end_layout
+
+\begin_layout Itemize
+There has been some discussion about what Nagios state should be sent if
+ the a the returned execute statement of a service item is null.
+ In previous releases this has been hard coded to OK, but now its possible
+ to define it by setting the property 
+\emph on
+stateOnNull
+\emph default
+.
+ The property can be set to an integer 0,1,2 or 3 or to a string OK, WARNING,
+ CRITICAL or UNKNOWN.
+ The default is UNKNOWN.
+\end_layout
+
+\begin_layout Itemize
+When a service class get an exception when doing a connection the previous
+ versions did not save any data to the cache.
+ If the property 
+\emph on
+saveNullOnConnectionError
+\emph default
+ you will now get a null value inserted into the cache when a connection
+ exception is thrown.
+ For backwards compatibility the default value of the property is false.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -4575,6 +4642,31 @@ Cache parser do not work for host, service or serviceitems if the name include
 \end_layout
 
 \begin_layout Itemize
+[TR-228] 
+\begin_inset Quotes eld
+\end_inset
+
+Threshold factory return wrong threshold definition if service and serviceitem
+ name is the same for different hosts
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+[TR-229] 
+\begin_inset Quotes eld
+\end_inset
+
+When using service ShellService the number of open files limit will be reached
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
 Fixed migration script from 0.4.0 to copy 
 \emph on
 etc
@@ -4585,8 +4677,8 @@ etc
 urlservices.xm
 \emph default
 l will be overwritten.
- Existing 0.4.0 configuration will still be available in the bischeck_0.4.0
- directory.
+ Existing 0.4.0 configuration will still be available in the previous version
+ backup directory, bischeck_0.4.0.
 \end_layout
 
 \begin_layout Subsection
