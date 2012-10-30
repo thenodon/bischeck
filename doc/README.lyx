@@ -2546,6 +2546,33 @@ reference "label:Service-scheduling"
  Default is 10 seconds.
 \end_layout
 
+\begin_layout Itemize
+notFullListParse - if set to true a reference to a cache item where a list
+ is used, like 
+\emph on
+erpserver-orders-ediorders[1:10],
+\emph default
+ will return data even if not index in the list has data.
+ The first index must have data otherwise null is returned.
+ 
+\end_layout
+
+\begin_layout Itemize
+stateOnNull - the Nagios state to be used if a execstatment in a service
+ item return null.
+ The property can be set to an integer 0,1,2 or 3 or to a string OK, WARNING,
+ CRITICAL or UNKNOWN.
+ The default is UNKNOWN.
+\end_layout
+
+\begin_layout Itemize
+saveNullOnConnectionError - this property define if a null value should
+ be stored in the cache if you have your service class has a connection
+ exception of any sort.
+ The default is false.
+ 
+\end_layout
+
 \begin_layout Standard
 The properties.xml file can also include class specific properties typical
  used for custom developed service, service item and threshold classes.
@@ -4529,14 +4556,12 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.4.2 - 2012-10-10
+Release 0.4.2 - 2012-11-01
 \end_layout
 
 \begin_layout Standard
-This is minor release that just fix a major bug in the cache parser.
- Except for this bug fix the same that is specified for 0.4.1 is valid for
- 0.4.2.
- 
+This is minor release.
+ The beta functionality described for 0.4.1 is applicable for 0.4.2.
 \end_layout
 
 \begin_layout Subsection
@@ -4554,6 +4579,49 @@ reference "label:Naming-standard"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Itemize
+Execution statements and thresholds hour specification where cache data
+ is retrieved as a list, like in a function as avg(x-y-z[4:10]) and avg(4,6,8),
+ can now be configured to not return a null value if at least the first
+ index in the list definition has a cached value.
+ This means for the example that if, at least, index 4 as a value for the
+ x-y-z an average will be calculated.
+ To support backwards capability the new functionality will only be used
+ if the property 
+\emph on
+notFullListParse
+\emph default
+ is set to true in the properties.xml.
+ The default value is false.
+\end_layout
+
+\begin_layout Itemize
+There has been some discussion about what Nagios state should be sent if
+ the a the returned execute statement of a service item is null.
+ In previous releases this has been hard coded to OK, but now its possible
+ to define it by setting the property 
+\emph on
+stateOnNull
+\emph default
+.
+ The property can be set to an integer 0,1,2 or 3 or to a string OK, WARNING,
+ CRITICAL or UNKNOWN.
+ The default is UNKNOWN.
+\end_layout
+
+\begin_layout Itemize
+When a service class get an exception when doing a connection the previous
+ versions did not save any data to the cache.
+ If the property 
+\emph on
+saveNullOnConnectionError
+\emph default
+ you will now get a null value inserted into the cache when a connection
+ exception is thrown.
+ For backwards compatibility the default value of the property is false.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -4587,6 +4655,18 @@ Threshold factory return wrong threshold definition if service and serviceitem
 \end_layout
 
 \begin_layout Itemize
+[TR-229] 
+\begin_inset Quotes eld
+\end_inset
+
+When using service ShellService the number of open files limit will be reached
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
 Fixed migration script from 0.4.0 to copy 
 \emph on
 etc
@@ -4597,8 +4677,8 @@ etc
 urlservices.xm
 \emph default
 l will be overwritten.
- Existing 0.4.0 configuration will still be available in the bischeck_0.4.0
- directory.
+ Existing 0.4.0 configuration will still be available in the previous version
+ backup directory, bischeck_0.4.0.
 \end_layout
 
 \begin_layout Subsection
