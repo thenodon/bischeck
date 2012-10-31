@@ -103,7 +103,7 @@ A Business Activity Monitoring Server
 \end_layout
 
 \begin_layout Date
-Version 0.4.2 
+Version 0.4.2 Release candidate 1
 \begin_inset Newline newline
 \end_inset
 
@@ -4556,7 +4556,7 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.4.2 - 2012-11-01
+Release 0.4.2_RC1 - 2012-11-01
 \end_layout
 
 \begin_layout Standard
@@ -4667,6 +4667,18 @@ When using service ShellService the number of open files limit will be reached
 \end_layout
 
 \begin_layout Itemize
+[TR-230] 
+\begin_inset Quotes eld
+\end_inset
+
+NRDP submissions all come in as OK
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
 Fixed migration script from 0.4.0 to copy 
 \emph on
 etc
@@ -4687,7 +4699,7 @@ Upgrading
 
 \begin_layout Standard
 Release 0.3.3, 0.4.0 and 0.4.1 is supported for upgrade to 0.4.2.
- 
+ The upgrading is NOT applicable for release candidate.
 \end_layout
 
 \begin_layout Section
