@@ -51,7 +51,6 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
@@ -291,7 +290,7 @@ public class NRDPServer implements Server {
 		strbuf.append("<checkresult type='service'>");
 		strbuf.append("<hostname>").append(hostname).append("</hostname>");
 		strbuf.append("<servicename>").append(servicename).append("</servicename>");
-		strbuf.append("<state>").append(level).append("</state>");
+		strbuf.append("<state>").append(level.val()).append("</state>");
 		strbuf.append("<output>").append(StringEscapeUtils.escapeHtml(output)).append("</output>");
 		strbuf.append("</checkresult>");
 		strbuf.append("</checkresults>");
