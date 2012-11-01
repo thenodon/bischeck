@@ -43,7 +43,6 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold;
@@ -216,7 +215,7 @@ public class ServiceJob implements Job {
                    		
                 		if (saveNullOnConnectionError) {
                 			serviceitem.setLatestExecuted("null");
-                   			LastStatusCache.getInstance().add(service,serviceitem);
+                			CacheFactory.getInstance().add(service,serviceitem);
                 		}
          
                 		LOGGER.error("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed with error " + e);
