@@ -1,7 +1,6 @@
 package com.ingby.socbox.bischeck.cache;
 
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
-import com.sun.swing.internal.plaf.synth.resources.synth;
 
 public class CacheFactory {
 	static CacheInf cache = null;
