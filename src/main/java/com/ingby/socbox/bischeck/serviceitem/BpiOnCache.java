@@ -26,14 +26,10 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.log4j.Logger;
-import org.nfunk.jep.JEP;
-import org.nfunk.jep.ParseException;
+
 
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.Util;
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
-import com.ingby.socbox.bischeck.service.LastCacheService;
-import com.ingby.socbox.bischeck.service.Service;
 
 
 public class BpiOnCache extends ServiceItemAbstract implements ServiceItem {
@@ -41,29 +37,7 @@ public class BpiOnCache extends ServiceItemAbstract implements ServiceItem {
     private final static Logger LOGGER = Logger.getLogger(BpiOnCache.class);
 
     
-    public static void main(String[] args) {
-        Service bis = new LastCacheService("serviceName");
-        ServiceItem coc = new BpiOnCache("serviceItemName");
-        coc.setService(bis);
-        
-
-        try {
-            
-            LastStatusCache.getInstance().add("host1", "web", "state", "1",null);
-            LastStatusCache.getInstance().add("host2", "web", "state", "1",null);
-            LastStatusCache.getInstance().add("host3", "web", "state", "0",null);
-            
-            coc.setExecution("if ((host1-web-state[0] == 0) &&  (host2-web-state[0] == 0) , 0, 1)");
-            coc.setExecution("if ((host1-web-state[0] + host2-web-state[0] + host3-web-state[0]) > 2 , , 0)");
-            coc.execute();
-            System.out.println("test boolean " + coc.getLatestExecuted());
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }    
-    
-    }
-
+  
     
     public BpiOnCache(String name) {
         this.serviceItemName = name;    

@@ -22,9 +22,8 @@ package com.ingby.socbox.bischeck.serviceitem;
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
 import com.ingby.socbox.bischeck.service.JDBCService;
 import com.ingby.socbox.bischeck.service.Service;
 
@@ -89,26 +88,13 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     
     @Override
     public void execute() throws Exception {
-    	String cacheparsedstr = LastStatusCacheParse.parse(getExecution());
+    	String cacheparsedstr = CacheUtil.parse(getExecution());
     	if (cacheparsedstr == null) {
     		setLatestExecuted(null);
     	}
     	else {
     		String res = service.executeStmt(cacheparsedstr);
     		setLatestExecuted(res);
-    		/*
-    		if (res == null)  
-    			setLatestExecuted(res);
-    		else {
-    			try {
-    				Float value = Float.parseFloat(res);
-    				setLatestExecuted(Float.toString(Util.roundDecimals(value)));
-    			} catch (NumberFormatException ne) {
-    				setLatestExecuted(res);
-    			}
-    		}
-    		*/
-    		//setLatestExecuted(service.executeStmt(cacheparsedstr));
     	}
     }
 }

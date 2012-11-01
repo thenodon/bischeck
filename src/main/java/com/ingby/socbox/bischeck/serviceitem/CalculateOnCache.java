@@ -21,12 +21,8 @@ package com.ingby.socbox.bischeck.serviceitem;
 
 import org.apache.log4j.Logger;
 
-import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
+import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
-import com.ingby.socbox.bischeck.service.LastCacheService;
-import com.ingby.socbox.bischeck.service.Service;
 
 
 public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem {
@@ -50,7 +46,7 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     @Override
     public void execute() throws Exception {                
         
-    	String cacheparsedstr = LastStatusCacheParse.parse(getExecution());
+    	String cacheparsedstr = CacheUtil.parse(getExecution());
     	
     	if (cacheparsedstr == null) {
     		setLatestExecuted(null);

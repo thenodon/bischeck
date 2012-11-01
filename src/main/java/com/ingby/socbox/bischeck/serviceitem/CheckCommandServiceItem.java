@@ -26,8 +26,6 @@ import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.QueryNagiosPerfData;
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
-import com.ingby.socbox.bischeck.service.JDBCService;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ShellService;
 
