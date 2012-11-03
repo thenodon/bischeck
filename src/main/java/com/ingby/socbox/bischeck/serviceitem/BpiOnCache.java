@@ -31,6 +31,7 @@ import org.nfunk.jep.ParseException;
 
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
@@ -88,7 +89,7 @@ public class BpiOnCache extends ServiceItemAbstract implements ServiceItem {
         Matcher mat = pat.matcher (this.getExecution());
 
         String arraystr="";
-        arraystr = Util.parseParameters(this.getExecution());
+        arraystr = CacheUtil.parseParameters(this.getExecution());
         
         StringTokenizer st = new StringTokenizer(this.service.executeStmt(arraystr),",");
         

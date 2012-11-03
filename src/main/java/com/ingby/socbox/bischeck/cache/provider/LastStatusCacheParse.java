@@ -29,7 +29,7 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ObjectDefinitions;
-import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.CacheUtil;
 
 /**
  * This class manage parsing of cached data by replacing a cache entry name
@@ -64,7 +64,7 @@ public class LastStatusCacheParse {
 		Matcher mat = pat.matcher (str);
 
 		String arraystr="";
-		arraystr = Util.parseParameters(str);
+		arraystr = CacheUtil.parseParameters(str);
 		
 		
 		// If no cache definition present return the orignal string
