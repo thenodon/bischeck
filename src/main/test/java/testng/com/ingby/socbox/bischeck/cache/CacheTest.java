@@ -104,29 +104,31 @@ public class CacheTest {
 	@Test (groups = { "Cache" })
 	public void verifyCacheNullValue() {
 		cache.clear();
-		
+		System.out.println(hostname+"-"+servicename+"-"+serviceitemname);
 		long current = System.currentTimeMillis() - 20*300*1000;
-		
+		int prev=0;
 		for (int i = 1; i < 11; i++) {
-			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
-			System.out.println(CacheTest.class.getName()+">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
+			LastStatus ls = new LastStatus(""+ (i+prev), (float) (i+prev),  current + (i+prev)*300*1000);
+			System.out.println(CacheTest.class.getName()+">> " + (i+prev)+":"+ls.getValue() +">"+ new java.util.Date(ls.getTimestamp()).toString());
 			cache.add(ls, hostname, servicename, serviceitemname);
-			ls = new LastStatus(null, (float) i,  current + i*300*1000);
+			ls = new LastStatus(null, (float) (i+1+prev),  current + (i+1+prev)*300*1000);
+			System.out.println(CacheTest.class.getName()+">> " + (i+1+prev)+":"+ls.getValue() +">"+ new java.util.Date(ls.getTimestamp()).toString());
 			cache.add(ls, hostname, servicename, serviceitemname);
-		
+			prev=i;
 		}
 		
 		if (cache instanceof LastStatusCache)
 			((LastStatusCache) cache).setFullListDef(false);
 	
-		
 		Assert.assertNull(CacheUtil.parse(cachekey + "[2:6]"));
-	
+		Assert.assertNull(CacheUtil.parse(cachekey + "[-15M:-40M]"));
+		
 		if (cache instanceof LastStatusCache)
 			((LastStatusCache) cache).setFullListDef(true);
 		
-		Assert.assertEquals(CacheUtil.parse(cachekey + "[2:6]"),"9,8");
+		Assert.assertEquals(CacheUtil.parse(cachekey + "[2:6]"),"17,15");
+		Assert.assertEquals(CacheUtil.parse(cachekey + "[-15M:-40M]"),"17,15,13");
 		
-		}
+	}
 	
 }
