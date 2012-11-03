@@ -547,12 +547,21 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		return str;
 	}
 
-	
+	/*
 	private String cleanUpNullInLists(String str) {
 		str = str.replaceAll(",null", "");
 		return str;
 	}
-
+	*
+	*/
+	
+	private String cleanUpNullInLists(String str) {
+		str = str.replaceAll("null,", "");
+		if (str.equals(SEP))
+			return "null,;";
+		return str;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getLastStatusCacheCount()
