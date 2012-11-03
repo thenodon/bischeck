@@ -1,6 +1,6 @@
 package com.ingby.socbox.bischeck.cache;
 
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
+import com.ingby.socbox.bischeck.cache.provider.laststatuscache.LastStatusCache;
 
 public class CacheFactory {
 	static CacheInf cache = null;
