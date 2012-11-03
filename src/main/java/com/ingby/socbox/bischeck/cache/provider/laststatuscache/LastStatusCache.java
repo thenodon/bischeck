@@ -579,7 +579,6 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	
 	private String cleanUpNullInLists(String str) {
-		//str = str.replaceAll(",null", "");
 		str = str.replaceAll("null,", "");
 		if (str.equals(SEP))
 			return "null,;";

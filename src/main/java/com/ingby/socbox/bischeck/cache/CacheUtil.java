@@ -27,14 +27,10 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ObjectDefinitions;
-import com.ingby.socbox.bischeck.Util;
-//import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 
 public abstract class CacheUtil {
 
-	static Logger  logger = Logger.getLogger(CacheUtil.class);
-	//private static final String FINDINTIMEPATTERN = "^-[0-9]+ *[HMS]{1} *$";
-	//private static final String FINDTOFROMTIMEPATTERN = "^-[0-9]+ *[HMS]{1}:-[0-9]+ *[HMS]{1} *$";
+	private final static Logger  LOGGER = Logger.getLogger(CacheUtil.class);
 	private static final String SEP = ";";	
 	
 	/**
@@ -52,14 +48,14 @@ public abstract class CacheUtil {
             String withoutSpace=schedule.replaceAll(" ","");
             char time = withoutSpace.charAt(withoutSpace.length()-1);
             String value = withoutSpace.substring(0, withoutSpace.length()-1);
-            logger.debug("Time selected "+ time + " : " + value);
+            LOGGER.debug("Time selected "+ time + " : " + value);
             switch (time) {
             case 'S' : return (Integer.parseInt(value)); 
             case 'M' : return (Integer.parseInt(value)*60); 
             case 'H' : return (Integer.parseInt(value)*60*60);
             }
         }
-        logger.warn("Cache calculate by time do not parse string " + schedule + " correctly");
+        LOGGER.warn("Cache calculate by time do not parse string " + schedule + " correctly");
         return 0;
     }
     
@@ -99,18 +95,18 @@ public abstract class CacheUtil {
      */
     public static String parse(String str) {
 		Pattern pat = null;
-		logger.debug("String to cache parse: " + str);
+		LOGGER.debug("String to cache parse: " + str);
 		try {
 			pat = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());
 		} catch (PatternSyntaxException e) {
-			logger.warn("Regex syntax exception, " + e);
+			LOGGER.warn("Regex syntax exception, " + e);
 			throw e;
 		}
 
 		Matcher mat = pat.matcher (str);
 
 		String arraystr="";
-		arraystr = Util.parseParameters(str);
+		arraystr = CacheUtil.parseParameters(str);
 		
 		
 		// If no cache definition present return the orignal string
@@ -136,7 +132,7 @@ public abstract class CacheUtil {
 		}
 
 		if (notANumber) { 
-			logger.debug("One or more of the parameters are null");
+			LOGGER.debug("One or more of the parameters are null");
 			return null;
 		} else  {
 			StringBuffer sb = new StringBuffer ();
@@ -147,10 +143,47 @@ public abstract class CacheUtil {
 				mat.appendReplacement (sb, paramOut.get(i++));
 			}
 			mat.appendTail (sb);
-			logger.debug("Parsed string with cache data: " + sb.toString());
+			LOGGER.debug("Parsed string with cache data: " + sb.toString());
 			return sb.toString();
 			
 		}
+	}
+
+
+	/**
+	* Parse out all host-service-item parameters from the calculation string
+	* @param execute expression string
+	* @return a comma separated string of the found host-service-item parameters from the 
+	* input parameter
+	*/
+	public static String parseParameters(String execute) throws PatternSyntaxException {
+	    Pattern pat = null;
+	    
+	    try {
+	        pat = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());        
+	    } catch (PatternSyntaxException e) {
+	        LOGGER.warn("Regex syntax exception, " + e);
+	        throw e;
+	    }
+	    
+	    Matcher mat = pat.matcher (execute);
+	
+	    // empty array to be filled with the cache fields to find
+	    String arraystr="";
+	    StringBuffer strbuf = new StringBuffer();
+	    strbuf.append(arraystr);
+	    while (mat.find ()) {
+	        String param = mat.group();
+	        strbuf.append(param+SEP);    
+	    }
+	    
+	    arraystr=strbuf.toString();
+	    
+	    if (arraystr.length() != 0 && arraystr.lastIndexOf(SEP) == arraystr.length()-1 ) {
+	        arraystr = arraystr.substring(0, arraystr.length()-1);
+	    }
+	    
+	    return arraystr;
 	}
 
 }

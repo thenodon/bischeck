@@ -23,9 +23,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.apache.log4j.Logger;
 
@@ -38,7 +35,6 @@ public abstract class Util {
 	private final static Logger LOGGER = Logger.getLogger(Util.class);
 
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
-    private static final String SEP =";";
     
 
 	/**
@@ -132,43 +128,6 @@ public abstract class Util {
         //LOGGER.info(value + " number by string " + (value.length() - 1 - index));
         return value.length() - 1 - index;
     }
-    
-    /**
-    * Parse out all host-service-item parameters from the calculation string
-    * @param execute expression string
-    * @return a comma separated string of the found host-service-item parameters from the 
-    * input parameter
-    */
-    public static String parseParameters(String execute) throws PatternSyntaxException {
-        Pattern pat = null;
-        
-        try {
-            pat = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());        
-        } catch (PatternSyntaxException e) {
-            LOGGER.warn("Regex syntax exception, " + e);
-            throw e;
-        }
-        
-        Matcher mat = pat.matcher (execute);
-
-        // empty array to be filled with the cache fields to find
-        String arraystr="";
-        StringBuffer strbuf = new StringBuffer();
-        strbuf.append(arraystr);
-        while (mat.find ()) {
-            String param = mat.group();
-            strbuf.append(param+SEP);    
-        }
-        
-        arraystr=strbuf.toString();
-        
-        if (arraystr.length() != 0 && arraystr.lastIndexOf(SEP) == arraystr.length()-1 ) {
-            arraystr = arraystr.substring(0, arraystr.length()-1);
-        }
-        
-        return arraystr;
-    }
-
     
     /**
      * Create a host, service and service item name with - separator
