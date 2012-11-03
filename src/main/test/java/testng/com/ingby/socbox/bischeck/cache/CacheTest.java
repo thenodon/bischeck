@@ -32,7 +32,7 @@ import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
+import com.ingby.socbox.bischeck.cache.provider.laststatuscache.LastStatusCache;
 
 public class CacheTest {
 
@@ -60,9 +60,6 @@ public class CacheTest {
 		}
 		
 		cache = CacheFactory.getInstance();
-		cache.clear();
-		if (cache instanceof LastStatusCache)
-			((LastStatusCache) cache).setFullListDef();
 		
 	}
 
@@ -74,7 +71,9 @@ public class CacheTest {
 	@Test (groups = { "Cache" })
 	public void verifyCache() {
 		cache.clear();
-		
+		if (cache instanceof LastStatusCache)
+			((LastStatusCache) cache).setFullListDef(true);
+			
 		long current = System.currentTimeMillis() - 10*300*1000;
 		
 		for (int i = 1; i < 11; i++) {
@@ -84,6 +83,8 @@ public class CacheTest {
 		
 		}
 		
+		if (cache instanceof LastStatusCache)
+			((LastStatusCache) cache).setFullListDef(true);
 		
 		Assert.assertEquals(CacheUtil.parse(cachekey + "[0]"),"10");
 		Assert.assertEquals(CacheUtil.parse(cachekey + "[9]"),"1");
@@ -99,5 +100,33 @@ public class CacheTest {
 		Assert.assertNull(CacheUtil.parse(cachekey + "[-100M:-120M]"));
 		
 	}
-
+	
+	@Test (groups = { "Cache" })
+	public void verifyCacheNullValue() {
+		cache.clear();
+		
+		long current = System.currentTimeMillis() - 20*300*1000;
+		
+		for (int i = 1; i < 11; i++) {
+			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
+			System.out.println(CacheTest.class.getName()+">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
+			cache.add(ls, hostname, servicename, serviceitemname);
+			ls = new LastStatus(null, (float) i,  current + i*300*1000);
+			cache.add(ls, hostname, servicename, serviceitemname);
+		
+		}
+		
+		if (cache instanceof LastStatusCache)
+			((LastStatusCache) cache).setFullListDef(false);
+	
+		
+		Assert.assertNull(CacheUtil.parse(cachekey + "[2:6]"));
+	
+		if (cache instanceof LastStatusCache)
+			((LastStatusCache) cache).setFullListDef(true);
+		
+		Assert.assertEquals(CacheUtil.parse(cachekey + "[2:6]"),"9,8");
+		
+		}
+	
 }
