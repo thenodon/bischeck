@@ -165,6 +165,9 @@ public final class Execute implements ExecuteMBean {
         	LOGGER.info("Method Execute returned " + retStat);
         } while (retStat == RESTART);
  
+        // New location
+        LastStatusCache.getInstance().dump2file();
+        
         LogManager.shutdown();
         System.exit(retStat);
     }
@@ -233,7 +236,7 @@ public final class Execute implements ExecuteMBean {
             LOGGER.warn("Stopping Quartz scheduler failed with - " + e);
         }
         
-        LastStatusCache.getInstance().dump2file();
+        //LastStatusCache.getInstance().dump2file();
         
         LOGGER.info("******************* Shutdown ********************");
         
