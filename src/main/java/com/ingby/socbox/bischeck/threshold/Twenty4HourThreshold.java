@@ -38,6 +38,7 @@ import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.ConfigFileManager;
 import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHoliday;
@@ -665,8 +666,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     	//Float calculatedValue = null;
 
 		if (tcont.isExpInd()) {
-
-			String parsedstr = CacheUtil.parse(tcont.getExpThreshold());
+	    	
+			String parsedstr = CacheEvaluator.parse(tcont.getExpThreshold());
 
 			if (parsedstr == null) {
 				return null;
