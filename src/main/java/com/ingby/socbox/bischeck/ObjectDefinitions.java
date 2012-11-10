@@ -26,7 +26,12 @@ public class ObjectDefinitions {
 		
 	private static final String FINDINTIMEPATTERN = "^-[0-9]+ *[HMS]{1} *$";
 	
+	private static final Pattern patternHostServiceServiceItem = Pattern.compile ("^"+HOST_SERVICE_ITEM_REGEXP+"$");        
+
+	private static final Pattern patternHost = Pattern.compile ("^"+OBJECT_HOSTNAME+"$");
 	
+	private static final Pattern patternServiceAndServiceItem = Pattern.compile ("^"+OBJECT_REGEXP+"$");        
+    
 	public static String getFindintimepattern() {
 		return FINDINTIMEPATTERN;
 	}
@@ -57,21 +62,22 @@ public class ObjectDefinitions {
 		return QUOTE_CONVERSION_STRING;
 	}
 	public static String verifyHostServiceServiceItem(String name) {
-		Pattern pat = null;
-	        
+		//Pattern pat = null;
+	    /*    
 		try {
             pat = Pattern.compile ("^"+HOST_SERVICE_ITEM_REGEXP+"$");        
         } catch (PatternSyntaxException e) {
            
         }
-        
-        Matcher mat = pat.matcher (name);
+        */
+        Matcher mat = patternHostServiceServiceItem.matcher (name);
         mat.find();
         return mat.group();    
 	}
 	
 	
 	public static String verifyHostName(String hostname) {
+		/*
 		Pattern pat = null;
 	        
 		try {
@@ -79,14 +85,15 @@ public class ObjectDefinitions {
         } catch (PatternSyntaxException e) {
            
         }
-        
-        Matcher mat = pat.matcher (hostname);
+        */
+        Matcher mat = patternHost.matcher (hostname);
         mat.find();
         return mat.group();   
 	}
 	
 	
 	public static String verifyServiceAndServiceItemName(String name) {
+	/*
 		Pattern pat = null;
 	        
 		try {
@@ -94,8 +101,8 @@ public class ObjectDefinitions {
         } catch (PatternSyntaxException e) {
            
         }
-        
-        Matcher mat = pat.matcher (name);
+      */  
+        Matcher mat = patternServiceAndServiceItem.matcher (name);
         mat.find();
         return mat.group();
 	}
