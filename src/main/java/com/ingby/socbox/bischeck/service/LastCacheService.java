@@ -22,6 +22,7 @@ package com.ingby.socbox.bischeck.service;
 
 import org.apache.log4j.Logger;
 
+import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 
 
@@ -72,6 +73,7 @@ public class LastCacheService extends ServiceAbstract implements Service {
      * return is the value of each separated by ,
      */
     public String executeStmt(String exec) throws Exception {
-        return CacheFactory.getInstance().getParametersByString(exec);
+        //return CacheFactory.getInstance().getParametersByString(exec);
+    	return CacheEvaluator.parse(exec);
     }
 }
