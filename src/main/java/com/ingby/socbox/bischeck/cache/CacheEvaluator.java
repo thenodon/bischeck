@@ -1,14 +1,13 @@
 package com.ingby.socbox.bischeck.cache;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -21,33 +20,72 @@ public class CacheEvaluator {
 	private String parsedstatement = null;
 	private List<String> cacheEntriesName = null;
 	private List<String> cacheEntriesValue = null;
-	
+	private static final Pattern patternHostServiceItem = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());
+    
+	/**
+	 * 
+	 * @param statement
+	 * @return
+	 */
 	public static String parse(String statement) {
-		LOGGER.setLevel(Level.DEBUG);
 		CacheEvaluator cacheeval = new CacheEvaluator(statement);
 		cacheeval.parse();
 		return cacheeval.getParsedStatement();
 	}
 	
+	
+	/**
+	 * 
+	 * @param statement
+	 */
 	public CacheEvaluator(String statement) {
 		this.statement = statement;
 	}
 
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getParsedStatement() {
 		return parsedstatement;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public List<String> statementValues() {
+		return Collections.unmodifiableList(cacheEntriesValue);
+	}
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public List<String> statementEntries() {
+		return Collections.unmodifiableList(cacheEntriesName);
+	}
+	
+	
+	/***
+	 * 
+	 */
     public void parse() {
-		Pattern pat = null;
-		LOGGER.debug("String to cache parse: " + statement);
+		//Pattern pat = null;
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("String to cache parse: " + statement);
+		/*
 		try {
 			pat = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());
 		} catch (PatternSyntaxException e) {
 			LOGGER.warn("Regex syntax exception, " + e);
 			throw e;
 		}
-
-		Matcher mat = pat.matcher (statement);
+		*/
+		Matcher mat = patternHostServiceItem.matcher (statement);
 
 		//String arraystr="";
 		cacheEntriesName = parseParameters(statement);
@@ -67,8 +105,9 @@ public class CacheEvaluator {
 		Iterator<String> iter = cacheEntriesValue.iterator();
 		
 		while (iter.hasNext()) {
-			String retvalue = iter.next(); 
-			LOGGER.debug(">>> retvalue " + retvalue);
+			String retvalue = iter.next();
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug(">>> retvalue " + retvalue);
 			if (retvalue.matches("(?i).*null*")) {
 				notANumber= true;
 				break;
@@ -76,37 +115,45 @@ public class CacheEvaluator {
 		}
 
 		if (notANumber) { 
-			LOGGER.debug("One or more of the parameters are null");
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("One or more of the parameters are null");
 			parsedstatement = null;
 		} else  {
 			StringBuffer sb = new StringBuffer ();
-			mat = pat.matcher (statement);
+			mat = patternHostServiceItem.matcher (statement);
 
 			int i=0;
 			while (mat.find ()) {
 				mat.appendReplacement (sb, cacheEntriesValue.get(i++));
 			}
 			mat.appendTail (sb);
-			LOGGER.debug("Parsed string with cache data: " + sb.toString());
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Parsed string with cache data: " + sb.toString());
 			parsedstatement = sb.toString();
 		}
 	}
 
     
+    /**
+     * 
+     * @param execute
+     * @return
+     * @throws PatternSyntaxException
+     */
 	private static List<String> parseParameters(String execute) throws PatternSyntaxException {
 		
 		List<String> cacheNameList = new ArrayList<String>();
 		    
-		Pattern pat = null;
-	    
+		//Pattern pat = null;
+	    /*
 	    try {
 	        pat = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());        
 	    } catch (PatternSyntaxException e) {
 	        LOGGER.warn("Regex syntax exception, " + e);
 	        throw e;
 	    }
-	    
-	    Matcher mat = pat.matcher (execute);
+	    */
+	    Matcher mat = patternHostServiceItem.matcher (execute);
 	
 	    // empty array to be filled with the cache fields to find
 	    
