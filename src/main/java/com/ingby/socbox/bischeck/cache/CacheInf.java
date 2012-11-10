@@ -1,6 +1,8 @@
 package com.ingby.socbox.bischeck.cache;
 
 
+import java.util.List;
+
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
@@ -45,19 +47,15 @@ public interface CacheInf {
     public int sizeLru(String hostname, String serviceName,
 			String serviceItemName);
 
-
-	@Deprecated
-	public void listLru(String hostname, String serviceName,
-			String serviceItemName);
 	
 	/**
-     * Takes a list of ; separated host-service-serviceitems[x] and return the 
-     * a string with each of the corresponding values from the cache with , as
+     * Takes a list of host-service-serviceitems[x] and return the 
+     * a list with each of the corresponding values from the cache with , as
      * separator.
      * @param parameters
-     * @return 
+     * @return
      */
-    public String getParametersByString(String parameters);
+    public List<String> getValues(List<String> listofenties);
 
     
     /**
