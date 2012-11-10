@@ -44,16 +44,16 @@ public abstract class QueryNagiosPerfData {
         
     }
     
-    static Logger  logger = Logger.getLogger(QueryNagiosPerfData.class);
+    private final static Logger  LOGGER = Logger.getLogger(QueryNagiosPerfData.class);
 
     //Find label entry from start of line or space until =
     private final static Pattern LABELMATCH = Pattern.compile("(^| )(.*?)=");
     //Find data from = to ; or space or end of line
     private final static Pattern DATAMATCH = Pattern.compile("=(.*?)(;|$)");
     
-    
     public static String parse(String label, String strtoparse) {
-        logger.debug("Perf data to parse - " + strtoparse);
+        if (LOGGER.isDebugEnabled())
+        	LOGGER.debug("Perf data to parse - " + strtoparse);
         
 
         Matcher mat = LABELMATCH.matcher(strtoparse);
@@ -62,7 +62,8 @@ public abstract class QueryNagiosPerfData {
         boolean labelfound = false;
         while (mat.find()) {            
             perflabel = mat.group().trim();
-            logger.debug("<"+perflabel+">");
+            if (LOGGER.isDebugEnabled())
+            	LOGGER.debug("<"+perflabel+">");
             if (perflabel.equals(label+"=") || perflabel.equals("'"+label+"'"+"=")) {
                 labelfound=true; 
                 break;
@@ -79,14 +80,16 @@ public abstract class QueryNagiosPerfData {
         String perfdata = null;
         while (mat.find()) {
             perfdata = mat.group();
-            logger.debug(">"+perfdata+"<");        
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug(">"+perfdata+"<");        
         }
         
         mat = DATAMATCH.matcher(perfdata);
         String data = null;
         while (mat.find()) {
             data = removeUOM(mat.group().replaceAll("=","").replaceAll(";", ""));
-            logger.debug("<>"+data+"<>");        
+            if (LOGGER.isDebugEnabled())
+            	LOGGER.debug("<>"+data+"<>");        
         }
         
         return data;
