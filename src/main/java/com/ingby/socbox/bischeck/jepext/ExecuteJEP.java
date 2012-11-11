@@ -65,6 +65,10 @@ public class ExecuteJEP {
         parser.addFunction("avgNull", new com.ingby.socbox.bischeck.jepext.Average(true));
         parser.addFunction("max", new com.ingby.socbox.bischeck.jepext.Max());
 		parser.addFunction("min", new com.ingby.socbox.bischeck.jepext.Min());
+		parser.removeFunction("sum");
+		parser.addFunction("sum", new com.ingby.socbox.bischeck.jepext.Sum());
+        parser.addFunction("sumNull", new com.ingby.socbox.bischeck.jepext.Sum(true));
+        
 		
 	}
 
