@@ -65,7 +65,6 @@ public class Average extends PostfixMathCommand {
 		int numofdeleted = 0;
 		if (supportNull) {
 			numofdeleted = Util.deleteNullFromStack(stack);
-			System.out.println("NUM OF DEL :" + numofdeleted);
 			curNumberOfParameters = curNumberOfParameters -numofdeleted;
 		}
 		

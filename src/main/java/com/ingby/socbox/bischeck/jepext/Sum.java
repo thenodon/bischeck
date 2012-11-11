@@ -66,7 +66,6 @@ public class Sum extends org.nfunk.jep.function.Sum {
 		int numofdeleted = 0;
 		if (supportNull) {
 			numofdeleted = Util.deleteNullFromStack(stack);
-			System.out.println("NUM OF DEL :" + numofdeleted);
 			curNumberOfParameters = curNumberOfParameters -numofdeleted;
 		}
 		super.run(stack);
