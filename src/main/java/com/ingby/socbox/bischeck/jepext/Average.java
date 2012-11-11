@@ -26,6 +26,8 @@ import org.nfunk.jep.*;
 import org.nfunk.jep.function.Add;
 import org.nfunk.jep.function.PostfixMathCommand;
 
+import com.ingby.socbox.bischeck.ConfigurationManager;
+
 public class Average extends PostfixMathCommand {
 
 	private Add addFun = new Add();
@@ -37,6 +39,13 @@ public class Average extends PostfixMathCommand {
 	public Average() {
 		// Use a variable number of arguments
 		numberOfParameters = -1;
+		try {
+		if (ConfigurationManager.getInstance().getProperties().
+				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
+			supportNull=true;
+		} catch (NullPointerException ne) {
+			supportNull=false;
+		}
 	}
 
 	public Average(boolean supportNull) {
@@ -55,7 +64,7 @@ public class Average extends PostfixMathCommand {
 		checkStack(stack);// check the stack
 		int numofdeleted = 0;
 		if (supportNull) {
-			numofdeleted = deleteNullFromStack(stack);
+			numofdeleted = Util.deleteNullFromStack(stack);
 			System.out.println("NUM OF DEL :" + numofdeleted);
 			curNumberOfParameters = curNumberOfParameters -numofdeleted;
 		}
@@ -81,48 +90,5 @@ public class Average extends PostfixMathCommand {
 		// push the result on the inStack
 		
 		stack.push(sum);
-	}
-
-		/*
-		// initialize the result to the first argument
-		Object sum = null;//= stack.pop();
-		Object param = null;
-		int i = 0;
-		int count = 0;
-		// repeat summation for each one of the current parameters
-		while (i < (curNumberOfParameters)) {
-			// get the parameter from the stack
-		
-			param = stack.pop();
-			
-			if ( !( param instanceof String)) {
-				if (count == 0)
-					sum = param;
-				else
-					sum = addFun.add(param, sum);
-				count++;
-				
-			}
-			i++;
-			
-		}
-		
-		// Calculate the average 
-		sum = (Double) sum / count;
-		// push the result on the inStack
-		stack.push(sum);
-	}
-*/
-	private int deleteNullFromStack(Stack<Object> stack) {
-		Iterator<Object> itr = stack.iterator();
-		int countNull = 0;
-		while (itr.hasNext()) {
-			Object obj = itr.next();
-			if (obj instanceof Null) {
-				countNull++;
-				itr.remove();
-			}
-		}
-		return countNull;
 	}
 }
