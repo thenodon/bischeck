@@ -1,7 +1,11 @@
 package com.ingby.socbox.bischeck.jepext;
 
 import org.apache.log4j.Logger;
+import org.nfunk.jep.ASTFunNode;
+import org.nfunk.jep.ASTStart;
+import org.nfunk.jep.ASTVarNode;
 import org.nfunk.jep.JEP;
+import org.nfunk.jep.Node;
 /*
 #
 # Copyright (C) 2010-2012 Anders Håål, Ingenjorsbyn AB
@@ -24,16 +28,19 @@ import org.nfunk.jep.ParseException;
 
 
 public class ExecuteJEP {
-    static Logger  logger = Logger.getLogger(ExecuteJEP.class);
+    private final static Logger LOGGER = Logger.getLogger(ExecuteJEP.class);
 
 	private JEP parser = null;
+
+	
 	
 	public ExecuteJEP() {
-		logger.debug("Create");
+		
 		parser = new JEP();
         parser.addStandardFunctions();
         parser.addStandardConstants();
-        
+        Object MyNULL = new Null(); // create a null value
+        parser.addConstant("null",MyNULL);
         /*
         String func1 = "avg";
         String func1class = "com.ingby.socbox.bischeck.jepext.Average";
@@ -55,17 +62,18 @@ public class ExecuteJEP {
 		}
         */
         parser.addFunction("avg", new com.ingby.socbox.bischeck.jepext.Average());
+        parser.addFunction("avgNull", new com.ingby.socbox.bischeck.jepext.Average(true));
         parser.addFunction("max", new com.ingby.socbox.bischeck.jepext.Max());
 		parser.addFunction("min", new com.ingby.socbox.bischeck.jepext.Min());
 		
 	}
 
 	public Float execute(String executeexp) throws ParseException {
-		logger.debug("Parse :" + executeexp);
-		parser.parseExpression(executeexp);
 		
+		LOGGER.debug("Parse :" + executeexp);
+		parser.parseExpression(executeexp);
 		if (parser.hasError()) {
-			logger.warn("Math jep expression error, " +parser.getErrorInfo());
+			LOGGER.warn("Math jep expression error, " +parser.getErrorInfo());
 			throw new ParseException(parser.getErrorInfo());
 		}
 		
@@ -74,7 +82,29 @@ public class ExecuteJEP {
 			value=null;
 		}
 		
-		logger.debug("Calculated :" + value);
+		LOGGER.debug("Calculated :" + value);
 		return value;
 	}
+	
+	void replaceNull (Node node) {
+		System.out.println("Node " + node.toString() + ":"+ node.getClass().getName());
+		int numofNodes = node.jjtGetNumChildren();
+		System.out.println("Parent " + node.jjtGetParent().toString() + ":"+ node.jjtGetParent().getClass().getName());
+		if ((node.jjtGetParent() instanceof ASTFunNode || 
+				node.jjtGetParent() instanceof ASTStart) && node instanceof ASTVarNode) {
+			System.out.println("     DELETE NODE " + node.toString());
+			
+			node = null;
+			return;
+		}
+		if( numofNodes == 0)
+			return;
+		else {
+				
+			for (int i = 0; i < numofNodes; i++) {
+				replaceNull(node.jjtGetChild(i));
+			}
+			return;
+		}
+	} 
 }

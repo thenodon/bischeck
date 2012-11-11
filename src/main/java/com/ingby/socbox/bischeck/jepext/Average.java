@@ -15,58 +15,114 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.jepext;
 
 
 import java.util.*;
+
 import org.nfunk.jep.*;
 import org.nfunk.jep.function.Add;
 import org.nfunk.jep.function.PostfixMathCommand;
 
 public class Average extends PostfixMathCommand {
-		
+
 	private Add addFun = new Add();
+	private boolean supportNull = false;
 
-		/**
-		 * Constructor.
-		 */
-		public Average() {
-			// Use a variable number of arguments
-			numberOfParameters = -1;
-		}
-
-		/**
-		 * Calculates the result of summing up all parameters, which are assumed to
-		 * be of the Double type.
-		 */
-		@SuppressWarnings("unchecked")
-		@Override
-		public void run(Stack stack) throws ParseException {
-			checkStack(stack);// check the stack
-
-			if (curNumberOfParameters < 1) throw new ParseException("No arguments for Sum");
-
-			// initialize the result to the first argument
-			Object sum = stack.pop();
-			Object param;
-			int i = 1;
-	        
-			// repeat summation for each one of the current parameters
-			while (i < curNumberOfParameters) {
-				// get the parameter from the stack
-				param = stack.pop();
-				
-				// add it to the sum (order is important for String arguments)
-				sum = addFun.add(param, sum);
-				
-				i++;
-			}
-			// Calculate the average 
-			sum = (Double) sum / i;
-			// push the result on the inStack
-			
-			stack.push(sum);
-		}
+	/**
+	 * Constructor.
+	 */
+	public Average() {
+		// Use a variable number of arguments
+		numberOfParameters = -1;
 	}
+
+	public Average(boolean supportNull) {
+		// Use a variable number of arguments
+		numberOfParameters = -1;
+		this.supportNull  = supportNull;
+	}
+
+	/**
+	 * Calculates the result of summing up all parameters, which are assumed to
+	 * be of the Double type.
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void run(Stack stack) throws ParseException {
+		checkStack(stack);// check the stack
+		int numofdeleted = 0;
+		if (supportNull) {
+			numofdeleted = deleteNullFromStack(stack);
+			System.out.println("NUM OF DEL :" + numofdeleted);
+			curNumberOfParameters = curNumberOfParameters -numofdeleted;
+		}
+		
+		if (curNumberOfParameters < 1) throw new ParseException("No arguments for Sum");
+
+		// initialize the result to the first argument
+		Object sum = stack.pop();
+		Object param;
+		int i = 1;
+        
+		// repeat summation for each one of the current parameters
+		while (i < curNumberOfParameters) {
+			// get the parameter from the stack
+			param = stack.pop();
+			
+			// add it to the sum (order is important for String arguments)
+			sum = addFun.add(param, sum);	
+			i++;
+		}
+		// Calculate the average 
+		sum = (Double) sum / i;
+		// push the result on the inStack
+		
+		stack.push(sum);
+	}
+
+		/*
+		// initialize the result to the first argument
+		Object sum = null;//= stack.pop();
+		Object param = null;
+		int i = 0;
+		int count = 0;
+		// repeat summation for each one of the current parameters
+		while (i < (curNumberOfParameters)) {
+			// get the parameter from the stack
+		
+			param = stack.pop();
+			
+			if ( !( param instanceof String)) {
+				if (count == 0)
+					sum = param;
+				else
+					sum = addFun.add(param, sum);
+				count++;
+				
+			}
+			i++;
+			
+		}
+		
+		// Calculate the average 
+		sum = (Double) sum / count;
+		// push the result on the inStack
+		stack.push(sum);
+	}
+*/
+	private int deleteNullFromStack(Stack<Object> stack) {
+		Iterator<Object> itr = stack.iterator();
+		int countNull = 0;
+		while (itr.hasNext()) {
+			Object obj = itr.next();
+			if (obj instanceof Null) {
+				countNull++;
+				itr.remove();
+			}
+		}
+		return countNull;
+	}
+}
