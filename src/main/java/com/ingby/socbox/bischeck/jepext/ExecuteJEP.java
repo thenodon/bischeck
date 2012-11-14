@@ -1,11 +1,3 @@
-package com.ingby.socbox.bischeck.jepext;
-
-import org.apache.log4j.Logger;
-import org.nfunk.jep.ASTFunNode;
-import org.nfunk.jep.ASTStart;
-import org.nfunk.jep.ASTVarNode;
-import org.nfunk.jep.JEP;
-import org.nfunk.jep.Node;
 /*
 #
 # Copyright (C) 2010-2012 Anders Håål, Ingenjorsbyn AB
@@ -24,7 +16,18 @@ import org.nfunk.jep.Node;
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 */
+
+package com.ingby.socbox.bischeck.jepext;
+
+import java.util.concurrent.TimeUnit;
+
+import org.apache.log4j.Logger;
+import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
+
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 
 public class ExecuteJEP {
@@ -75,13 +78,22 @@ public class ExecuteJEP {
 	public Float execute(String executeexp) throws ParseException {
 		if (LOGGER.isDebugEnabled()) 
 			LOGGER.debug("Parse :" + executeexp);
-		parser.parseExpression(executeexp);
-		if (parser.hasError()) {
-			LOGGER.warn("Math jep expression error, " +parser.getErrorInfo());
-			throw new ParseException(parser.getErrorInfo());
+		final Timer timer = Metrics.newTimer(ExecuteJEP.class, 
+				"Calulate", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext context = timer.time();
+		Float value = null;
+		try {
+			parser.parseExpression(executeexp);
+			if (parser.hasError()) {
+				LOGGER.warn("Math jep expression error, " +parser.getErrorInfo());
+				throw new ParseException(parser.getErrorInfo());
+			}
+
+			value = (float) parser.getValue();
+		} finally {
+			context.stop();
 		}
-		
-		Float value = (float) parser.getValue();
+
 		if (Float.isNaN(value)) {
 			value=null;
 		}
