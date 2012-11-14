@@ -43,7 +43,7 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 public abstract class ServiceAbstract {
 
-    static Logger  logger = Logger.getLogger(ServiceAbstract.class);
+    private final static Logger  LOGGER = Logger.getLogger(ServiceAbstract.class);
     
     protected HashMap<String,ServiceItem> servicesItems = new HashMap<String,ServiceItem>();
     protected String serviceName;
