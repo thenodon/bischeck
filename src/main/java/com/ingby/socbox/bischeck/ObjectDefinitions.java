@@ -2,9 +2,8 @@ package com.ingby.socbox.bischeck;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
-public class ObjectDefinitions {
+public abstract class ObjectDefinitions {
 	
 	private static final String ILLEGAL_OBJECT_NAME_CHARS = "`+~!$%^&*|'\"<>?,()=";
 
@@ -26,11 +25,11 @@ public class ObjectDefinitions {
 		
 	private static final String FINDINTIMEPATTERN = "^-[0-9]+ *[HMS]{1} *$";
 	
-	private static final Pattern patternHostServiceServiceItem = Pattern.compile ("^"+HOST_SERVICE_ITEM_REGEXP+"$");        
+	private static final Pattern PATTERN_HOST_SERVICE_SERVICEITEM = Pattern.compile ("^"+HOST_SERVICE_ITEM_REGEXP+"$");        
 
-	private static final Pattern patternHost = Pattern.compile ("^"+OBJECT_HOSTNAME+"$");
+	private static final Pattern PATTERN_HOSTNAME = Pattern.compile ("^"+OBJECT_HOSTNAME+"$");
 	
-	private static final Pattern patternServiceAndServiceItem = Pattern.compile ("^"+OBJECT_REGEXP+"$");        
+	private static final Pattern PATTERN_SERVICE_AND_SERVICEITEM = Pattern.compile ("^"+OBJECT_REGEXP+"$");        
     
 	public static String getFindintimepattern() {
 		return FINDINTIMEPATTERN;
@@ -70,7 +69,7 @@ public class ObjectDefinitions {
            
         }
         */
-        Matcher mat = patternHostServiceServiceItem.matcher (name);
+        Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (name);
         mat.find();
         return mat.group();    
 	}
@@ -86,7 +85,7 @@ public class ObjectDefinitions {
            
         }
         */
-        Matcher mat = patternHost.matcher (hostname);
+        Matcher mat = PATTERN_HOSTNAME.matcher (hostname);
         mat.find();
         return mat.group();   
 	}
@@ -102,7 +101,7 @@ public class ObjectDefinitions {
            
         }
       */  
-        Matcher mat = patternServiceAndServiceItem.matcher (name);
+        Matcher mat = PATTERN_SERVICE_AND_SERVICEITEM.matcher (name);
         mat.find();
         return mat.group();
 	}
