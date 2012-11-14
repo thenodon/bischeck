@@ -30,8 +30,8 @@ public abstract class CacheUtil {
 
 	private final static Logger  LOGGER = Logger.getLogger(CacheUtil.class);
 	//"^[0-9]+ *[HMS]{1} *$" - check for a
-	private final static Pattern patternFindintime = Pattern.compile(ObjectDefinitions.getFindintimepattern());
-	private final static Pattern patternFindtofromtime = Pattern.compile(ObjectDefinitions.getFindtofromtimepattern());
+	private final static Pattern PATTERN_FIND_IN_TIME = Pattern.compile(ObjectDefinitions.getFindintimepattern());
+	private final static Pattern PATTERN_FIND_TO_FROM_TIME = Pattern.compile(ObjectDefinitions.getFindtofromtimepattern());
 	
 	
 	/**
@@ -42,7 +42,7 @@ public abstract class CacheUtil {
     public static int calculateByTime(String schedule) {
    
     	// Determine if there is an exact match
-        Matcher matcher = patternFindintime.matcher(schedule);
+        Matcher matcher = PATTERN_FIND_IN_TIME.matcher(schedule);
         if (matcher.matches()) {
             String withoutSpace=schedule.replaceAll(" ","");
             char time = withoutSpace.charAt(withoutSpace.length()-1);
@@ -63,7 +63,7 @@ public abstract class CacheUtil {
     	//Pattern pattern = Pattern.compile(ObjectDefinitions.getFindintimepattern());
 
     	// Determine if there is an exact match
-    	Matcher matcher = patternFindintime.matcher(schedule);
+    	Matcher matcher = PATTERN_FIND_IN_TIME.matcher(schedule);
     	if (matcher.matches()) {
     		return true;
     	} else {
@@ -74,7 +74,7 @@ public abstract class CacheUtil {
     
     public static boolean isByFromToTime(String schedule) {
     	// Determine if there is an exact match
-    	Matcher matcher = patternFindtofromtime.matcher(schedule);
+    	Matcher matcher = PATTERN_FIND_TO_FROM_TIME.matcher(schedule);
     	if (matcher.matches()) {
     		return true;
     	} else {
