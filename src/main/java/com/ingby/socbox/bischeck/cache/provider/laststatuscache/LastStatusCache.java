@@ -78,7 +78,7 @@ import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
  * @author andersh
  *
  */
-public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
+public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	private final static Logger LOGGER = Logger.getLogger(LastStatusCache.class);
 
@@ -525,14 +525,13 @@ public class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private void load() throws Exception{
 		Object xmlobj = null;
 		File dumpFile = new File(lastStatusCacheDumpFile);
-		JAXBContext jc = null;
 		
 		long countEntries = 0;
 		long countKeys = 0;
 		
 		long start = System.currentTimeMillis();
 		
-		xmlobj = BackendStorage.getXMLFromBackend(xmlobj, dumpFile, jc);
+		xmlobj = BackendStorage.getXMLFromBackend(xmlobj, dumpFile);
 
 		
 
