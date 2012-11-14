@@ -28,7 +28,7 @@ public class ThresholdFactory {
 
     private static HashMap<String,Threshold> cache = new HashMap<String,Threshold>();
 
-    private static Logger LOGGER = Logger.getLogger(ThresholdFactory.class);
+    private final static Logger LOGGER = Logger.getLogger(ThresholdFactory.class);
 
     public static Threshold getCurrent(Service service, ServiceItem serviceItem) 
     throws Exception, ClassNotFoundException {
