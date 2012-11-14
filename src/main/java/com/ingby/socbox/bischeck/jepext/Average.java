@@ -26,8 +26,6 @@ import org.nfunk.jep.*;
 import org.nfunk.jep.function.Add;
 import org.nfunk.jep.function.PostfixMathCommand;
 
-import com.ingby.socbox.bischeck.ConfigurationManager;
-
 public class Average extends PostfixMathCommand {
 
 	private Add addFun = new Add();
@@ -39,13 +37,7 @@ public class Average extends PostfixMathCommand {
 	public Average() {
 		// Use a variable number of arguments
 		numberOfParameters = -1;
-		try {
-		if (ConfigurationManager.getInstance().getProperties().
-				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
-			supportNull=true;
-		} catch (NullPointerException ne) {
-			supportNull=false;
-		}
+		this.supportNull = Util.getSupportNull();
 	}
 
 	public Average(boolean supportNull) {
@@ -62,27 +54,31 @@ public class Average extends PostfixMathCommand {
 	@Override
 	public void run(Stack stack) throws ParseException {
 		checkStack(stack);// check the stack
-		int numofdeleted = 0;
+		
+		System.out.println ("CURRENT " + curNumberOfParameters);
 		if (supportNull) {
-			numofdeleted = Util.deleteNullFromStack(stack);
-			curNumberOfParameters = curNumberOfParameters -numofdeleted;
+			curNumberOfParameters -= Util.deleteNullFromStack(stack);
 		}
 		
 		if (curNumberOfParameters < 1) throw new ParseException("No arguments for Sum");
 
 		// initialize the result to the first argument
 		Object sum = stack.pop();
+		System.out.println ("CURRENT stack" + stack.size() + ":" + sum.toString());
+		
 		Object param;
 		int i = 1;
         
 		// repeat summation for each one of the current parameters
-		while (i < curNumberOfParameters) {
+		while (i < (curNumberOfParameters)) {
 			// get the parameter from the stack
 			param = stack.pop();
-			
+			System.out.println ("CURRENT stack" + stack.size() + ":" + param.toString());
 			// add it to the sum (order is important for String arguments)
 			sum = addFun.add(param, sum);	
 			i++;
+			
+			
 		}
 		// Calculate the average 
 		sum = (Double) sum / i;

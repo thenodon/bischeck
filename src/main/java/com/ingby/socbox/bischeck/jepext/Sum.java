@@ -23,10 +23,7 @@ package com.ingby.socbox.bischeck.jepext;
 import java.util.*;
 
 import org.nfunk.jep.*;
-import org.nfunk.jep.function.Add;
 
-
-import com.ingby.socbox.bischeck.ConfigurationManager;
 
 public class Sum extends org.nfunk.jep.function.Sum {
 
@@ -38,13 +35,7 @@ public class Sum extends org.nfunk.jep.function.Sum {
 	public Sum() {
 		// Use a variable number of arguments
 		super();
-		try {
-		if (ConfigurationManager.getInstance().getProperties().
-				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
-			supportNull=true;
-		} catch (NullPointerException ne) {
-			supportNull=false;
-		}
+		this.supportNull = Util.getSupportNull();
 		
 	}
 
@@ -63,10 +54,8 @@ public class Sum extends org.nfunk.jep.function.Sum {
 	public void run(Stack stack) throws ParseException {
 		
 		checkStack(stack);// check the stack
-		int numofdeleted = 0;
 		if (supportNull) {
-			numofdeleted = Util.deleteNullFromStack(stack);
-			curNumberOfParameters = curNumberOfParameters -numofdeleted;
+			curNumberOfParameters -= Util.deleteNullFromStack(stack);
 		}
 		super.run(stack);
 	}

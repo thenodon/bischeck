@@ -73,8 +73,8 @@ public class ExecuteJEP {
 	}
 
 	public Float execute(String executeexp) throws ParseException {
-		
-		LOGGER.debug("Parse :" + executeexp);
+		if (LOGGER.isDebugEnabled()) 
+			LOGGER.debug("Parse :" + executeexp);
 		parser.parseExpression(executeexp);
 		if (parser.hasError()) {
 			LOGGER.warn("Math jep expression error, " +parser.getErrorInfo());
@@ -86,29 +86,9 @@ public class ExecuteJEP {
 			value=null;
 		}
 		
-		LOGGER.debug("Calculated :" + value);
+		if (LOGGER.isDebugEnabled()) 
+			LOGGER.debug("Calculated :" + value);
+		
 		return value;
 	}
-	
-	void replaceNull (Node node) {
-		System.out.println("Node " + node.toString() + ":"+ node.getClass().getName());
-		int numofNodes = node.jjtGetNumChildren();
-		System.out.println("Parent " + node.jjtGetParent().toString() + ":"+ node.jjtGetParent().getClass().getName());
-		if ((node.jjtGetParent() instanceof ASTFunNode || 
-				node.jjtGetParent() instanceof ASTStart) && node instanceof ASTVarNode) {
-			System.out.println("     DELETE NODE " + node.toString());
-			
-			node = null;
-			return;
-		}
-		if( numofNodes == 0)
-			return;
-		else {
-				
-			for (int i = 0; i < numofNodes; i++) {
-				replaceNull(node.jjtGetChild(i));
-			}
-			return;
-		}
-	} 
 }
