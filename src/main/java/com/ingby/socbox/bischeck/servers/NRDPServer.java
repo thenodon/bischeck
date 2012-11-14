@@ -56,7 +56,7 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
-public class NRDPServer implements Server {
+public final class NRDPServer implements Server {
 
 	private final static Logger LOGGER = Logger.getLogger(NRDPServer.class);
 

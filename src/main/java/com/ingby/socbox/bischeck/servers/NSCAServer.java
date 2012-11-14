@@ -48,7 +48,7 @@ import com.yammer.metrics.core.TimerContext;
  * @author andersh
  *
  */
-public class NSCAServer implements Server {
+public final class NSCAServer implements Server {
 
     private final static Logger LOGGER = Logger.getLogger(NSCAServer.class);
     /**

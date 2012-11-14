@@ -37,7 +37,7 @@ import com.ingby.socbox.bischeck.TimeMeasure;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
-public class OpenTSDBServer implements Server {
+public final class OpenTSDBServer implements Server {
 
     private final static Logger LOGGER = Logger.getLogger(OpenTSDBServer.class);
     static Map<String,OpenTSDBServer> server = new HashMap<String,OpenTSDBServer>();

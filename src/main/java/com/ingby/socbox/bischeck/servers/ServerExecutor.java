@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
 
-public class ServerExecutor {
+public final class ServerExecutor {
 
     private final static Logger LOGGER = Logger.getLogger(ServerExecutor.class);
     
