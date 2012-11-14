@@ -111,9 +111,9 @@ public abstract class QueryDate {
             count++;
         }
         
-        // Replace the orignal string with the new date values 
+        // Replace the original string with the new date values 
         for (int i = 0; i< count; i++) {
-            strtoparse = strtoparse.replaceFirst("%%(.*?)%%", datereplace[i]);
+            strtoparse.replaceFirst("%%(.*?)%%", datereplace[i]);
         }
         LOOGER.debug("Parsed string - " + strtoparse);
         return strtoparse;
