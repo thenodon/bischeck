@@ -20,7 +20,7 @@ public class CacheEvaluator {
 	private String parsedstatement = null;
 	private List<String> cacheEntriesName = null;
 	private List<String> cacheEntriesValue = null;
-	private static final Pattern patternHostServiceItem = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());
+	private static final Pattern PATTERN_HOST_SERVICE_SERVICEITEM = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());
     
 	/**
 	 * 
@@ -77,17 +77,9 @@ public class CacheEvaluator {
 		//Pattern pat = null;
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("String to cache parse: " + statement);
-		/*
-		try {
-			pat = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());
-		} catch (PatternSyntaxException e) {
-			LOGGER.warn("Regex syntax exception, " + e);
-			throw e;
-		}
-		*/
-		Matcher mat = patternHostServiceItem.matcher (statement);
+		
+		Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (statement);
 
-		//String arraystr="";
 		cacheEntriesName = parseParameters(statement);
 		
 		
@@ -120,7 +112,7 @@ public class CacheEvaluator {
 			parsedstatement = null;
 		} else  {
 			StringBuffer sb = new StringBuffer ();
-			mat = patternHostServiceItem.matcher (statement);
+			mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (statement);
 
 			int i=0;
 			while (mat.find ()) {
@@ -144,16 +136,7 @@ public class CacheEvaluator {
 		
 		List<String> cacheNameList = new ArrayList<String>();
 		    
-		//Pattern pat = null;
-	    /*
-	    try {
-	        pat = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());        
-	    } catch (PatternSyntaxException e) {
-	        LOGGER.warn("Regex syntax exception, " + e);
-	        throw e;
-	    }
-	    */
-	    Matcher mat = patternHostServiceItem.matcher (execute);
+	    Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (execute);
 	
 	    // empty array to be filled with the cache fields to find
 	    
