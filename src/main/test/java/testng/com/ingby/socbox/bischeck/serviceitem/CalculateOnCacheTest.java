@@ -24,14 +24,12 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import testng.com.ingby.socbox.bischeck.cache.CacheTest;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
-import com.ingby.socbox.bischeck.cache.provider.laststatuscache.LastStatusCache;
 import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.CalculateOnCache;
@@ -101,9 +99,6 @@ public class CalculateOnCacheTest {
 			cache.add(ls, hostname2, servicename2, serviceitemname2);
 			
 		}
-		LastStatus ls = null;
-		
-		//Assert.assertEquals(cache.size(),2);
 		
 		coc.setExecution("if (("+cachekey1+"[2] - " +cachekey2 +"[1]) < 0, " + cachekey1 +"[2] - " + cachekey2 +"[9], 0)");
 		coc.execute();
@@ -132,6 +127,16 @@ public class CalculateOnCacheTest {
 		coc.execute();
 		Assert.assertEquals(coc.getLatestExecuted(),"8.0");
 		
+		coc.setExecution("10 * 0.8");
+		coc.execute();
+		Assert.assertEquals(coc.getLatestExecuted(),"8.0");
+		
+		coc.setExecution("xyz * 0.8");
+		try {
+			coc.execute();
+		} catch (org.nfunk.jep.ParseException pe) {
+			Assert.assertNotNull(pe);
+		}
     }
 
 }
