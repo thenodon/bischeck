@@ -28,9 +28,9 @@ import org.testng.annotations.Test;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
-import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.provider.laststatuscache.LastStatusCache;
 
@@ -86,18 +86,18 @@ public class CacheTest {
 		if (cache instanceof LastStatusCache)
 			((LastStatusCache) cache).setFullListDef(true);
 		
-		Assert.assertEquals(CacheUtil.parse(cachekey + "[0]"),"10");
-		Assert.assertEquals(CacheUtil.parse(cachekey + "[9]"),"1");
-		Assert.assertEquals(CacheUtil.parse(cachekey + "[3:6]"),"7,6,5,4");
+		Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0]"),"10");
+		Assert.assertEquals(CacheEvaluator.parse(cachekey + "[9]"),"1");
+		Assert.assertEquals(CacheEvaluator.parse(cachekey + "[3:6]"),"7,6,5,4");
 		// Test that a limited list will be returned even with some index out of
 		// bounds
-		Assert.assertEquals(CacheUtil.parse(cachekey + "[6:12]"),"4,3,2,1");
-		Assert.assertEquals(CacheUtil.parse(cachekey + "[-10M]"),"8");
-		Assert.assertEquals(CacheUtil.parse(cachekey + "[-10M:-20M]"),"8,7,6");
+		Assert.assertEquals(CacheEvaluator.parse(cachekey + "[6:12]"),"4,3,2,1");
+		Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-10M]"),"8");
+		Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-10M:-20M]"),"8,7,6");
 		// Test all keys outside range return "null"
-		Assert.assertNull(CacheUtil.parse(cachekey + "[12:20]"));
+		Assert.assertNull(CacheEvaluator.parse(cachekey + "[12:20]"));
 		// Test that a time range with no data in the cache returns "null"
-		Assert.assertNull(CacheUtil.parse(cachekey + "[-100M:-120M]"));
+		Assert.assertNull(CacheEvaluator.parse(cachekey + "[-100M:-120M]"));
 		
 	}
 	
@@ -120,14 +120,14 @@ public class CacheTest {
 		if (cache instanceof LastStatusCache)
 			((LastStatusCache) cache).setFullListDef(false);
 	
-		Assert.assertNull(CacheUtil.parse(cachekey + "[2:6]"));
-		Assert.assertNull(CacheUtil.parse(cachekey + "[-15M:-40M]"));
+		Assert.assertNull(CacheEvaluator.parse(cachekey + "[2:6]"));
+		Assert.assertNull(CacheEvaluator.parse(cachekey + "[-15M:-40M]"));
 		
 		if (cache instanceof LastStatusCache)
 			((LastStatusCache) cache).setFullListDef(true);
 		
-		Assert.assertEquals(CacheUtil.parse(cachekey + "[2:6]"),"17,15");
-		Assert.assertEquals(CacheUtil.parse(cachekey + "[-15M:-40M]"),"17,15,13");
+		Assert.assertEquals(CacheEvaluator.parse(cachekey + "[2:6]"),"17,15");
+		Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-15M:-40M]"),"17,15,13");
 		
 	}
 	
