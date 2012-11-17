@@ -77,7 +77,7 @@ import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
  */
 public class LastStatusCache implements LastStatusCacheMBean {
 
-	static Logger  logger = Logger.getLogger(LastStatusCache.class);
+	private final static Logger  LOGGER = Logger.getLogger(LastStatusCache.class);
 
 	private static HashMap<String,LinkedList<LastStatus>> cache = new HashMap<String,LinkedList<LastStatus>>();
 	private static int fifosize = 500;
@@ -99,20 +99,20 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		try {
 			mbeanname = new ObjectName(BEANNAME);
 		} catch (MalformedObjectNameException e) {
-			logger.error("MBean object name failed, " + e);
+			LOGGER.error("MBean object name failed, " + e);
 		} catch (NullPointerException e) {
-			logger.error("MBean object name failed, " + e);
+			LOGGER.error("MBean object name failed, " + e);
 		}
 
 
 		try {
 			mbs.registerMBean(lsc, mbeanname);
 		} catch (InstanceAlreadyExistsException e) {
-			logger.fatal("Mbean exception - " + e.getMessage());
+			LOGGER.fatal("Mbean exception - " + e.getMessage());
 		} catch (MBeanRegistrationException e) {
-			logger.fatal("Mbean exception - " + e.getMessage());
+			LOGGER.fatal("Mbean exception - " + e.getMessage());
 		} catch (NotCompliantMBeanException e) {
-			logger.fatal("Mbean exception - " + e.getMessage());
+			LOGGER.fatal("Mbean exception - " + e.getMessage());
 		}
 
 		lastStatusCacheDumpFile = 
@@ -256,11 +256,13 @@ public class LastStatusCache implements LastStatusCacheMBean {
 			try {
 				ls = cache.get(key).get(index);
 			} catch (NullPointerException ne) {
-				logger.warn("No objects in the cache");
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("No objects in the cache");
 				return null;
 			}    
 			catch (IndexOutOfBoundsException ie) {
-				logger.warn("No objects in the cache on index " + index);
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("No objects in the cache on index " + index);
 				return null;
 			}
 		}
@@ -283,7 +285,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
      */
 	public String getByTime(String hostname, String serviceName,
 			String serviceItemName, long stime) {
-		logger.debug("Find cache data for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Find cache data for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
 
 		String key = Util.fullName( hostname, serviceName, serviceItemName);
 		
@@ -316,7 +319,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	 */
 	public Integer getByTimeIndex(String hostname, String serviceName,
 			String serviceItemName, long stime) {
-		logger.debug("Find cache index for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Find cache index for " + hostname+"-"+serviceName+" at time " + new java.util.Date(stime));
 		
 		String key = Util.fullName( hostname, serviceName, serviceItemName);
 		Integer index = null;
@@ -384,7 +388,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		String resultStr="";
 		StringTokenizer st = new StringTokenizer(parameters,SEP);
 		StringBuffer strbuf = new StringBuffer();
-		logger.debug("Parameter string: " + parameters);
+		LOGGER.debug("Parameter string: " + parameters);
 		strbuf.append(resultStr);
 
 		while (st.hasMoreTokens()){
@@ -406,8 +410,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
 			String serviceitem = (String) parameter.nextToken().
 				replaceAll(ObjectDefinitions.getQuoteConversionString(), ObjectDefinitions.getCacheKeySep());        
 
-			
-			logger.debug("Get from the LastStatusCahce " + 
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Get from the LastStatusCahce " + 
 					host + "-" +
 					service + "-"+
 					serviceitem + "[" +
@@ -420,7 +424,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		resultStr=strbuf.toString();
 		
 		resultStr = cleanUp(resultStr, SEP);
-		logger.debug("Result string: "+ resultStr);
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Result string: "+ resultStr);
 		return resultStr;
 	}
 
@@ -612,7 +617,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 		XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
 		for (XMLKey key:cache.getKey()) {
-			logger.debug("Loading cache - " + key.getId());
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Loading cache - " + key.getId());
 			countKeys++;
 			for (XMLEntry entry:key.getEntry()) {
 
@@ -623,7 +629,8 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		}
 
 		long end = System.currentTimeMillis();
-		logger.info("Cache loaded " + countKeys + " keys and " +
+		if (LOGGER.isDebugEnabled())
+			LOGGER.info("Cache loaded " + countKeys + " keys and " +
 				countEntries + " entries in " + (end-start) + " ms");
 	}
 
