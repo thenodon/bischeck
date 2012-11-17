@@ -22,6 +22,7 @@ package com.ingby.socbox.bischeck.cache.provider;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -30,6 +31,10 @@ import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
+import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 /**
  * This class manage parsing of cached data by replacing a cache entry name
@@ -45,12 +50,12 @@ public class LastStatusCacheParse {
 	static Logger  logger = Logger.getLogger(LastStatusCacheParse.class);
 
 	/**
-     * This method manage parsing of cached data by replacing a cache entry name
-     * host-service-serviceitem[X] with the data in the cache. 
-     * @param str the expression including cache entries to replace with data
-     * @return - a string where the cache entries are replaced with data or null
-     * if any of the cache entries was "null" 
-     */
+	 * This method manage parsing of cached data by replacing a cache entry name
+	 * host-service-serviceitem[X] with the data in the cache. 
+	 * @param str the expression including cache entries to replace with data
+	 * @return - a string where the cache entries are replaced with data or null
+	 * if any of the cache entries was "null" 
+	 */
 	public static String parse(String str) {
 		Pattern pat = null;
 		logger.debug("String to cache parse: " + str);
@@ -64,23 +69,34 @@ public class LastStatusCacheParse {
 		Matcher mat = pat.matcher (str);
 
 		String arraystr="";
-		arraystr = CacheUtil.parseParameters(str);
-		
-		
-		// If no cache definition present return the orignal string
-		if (arraystr.length() == 0) 
-			return str;
-		
-		// If cache entries in the string parse and replace
-		StringTokenizer st = new StringTokenizer(LastStatusCache.getInstance().getParametersByString(arraystr),SEP);
-		
+		final Timer timer = Metrics.newTimer(LastStatusCache.class, 
+				str.replaceAll("[^a-zA-Z0-9_\\.-]", "_"), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext context = timer.time();
+
+		StringTokenizer st = null;
+		try {
+
+			arraystr = CacheUtil.parseParameters(str);
+
+
+			// If no cache definition present return the orignal string
+			if (arraystr.length() == 0) 
+				return str;
+
+			// If cache entries in the string parse and replace
+			st = new StringTokenizer(LastStatusCache.getInstance().getParametersByString(arraystr),SEP);
+		} finally {
+			context.stop();
+		}
+
 		// Indicator to see if any parameters are null since then no calc will be done
 		boolean notANumber = false;
 		ArrayList<String> paramOut = new ArrayList<String>();
 
+
 		while (st.hasMoreTokens()) {
 			String retvalue = st.nextToken();
-			
+
 			if (retvalue.matches("(?i).*null*")) {
 				notANumber= true;
 				break;
@@ -103,8 +119,9 @@ public class LastStatusCacheParse {
 			mat.appendTail (sb);
 			logger.debug("Parsed string with cache data: " + sb.toString());
 			return sb.toString();
-			
+
 		}
+
 	}
 
 }
