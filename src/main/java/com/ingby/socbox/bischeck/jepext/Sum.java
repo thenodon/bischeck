@@ -23,26 +23,25 @@ package com.ingby.socbox.bischeck.jepext;
 import java.util.*;
 
 import org.nfunk.jep.*;
-import org.nfunk.jep.function.Add;
-import org.nfunk.jep.function.PostfixMathCommand;
 
-public class Average extends PostfixMathCommand {
 
-	private Add addFun = new Add();
+public class Sum extends org.nfunk.jep.function.Sum {
+
 	private boolean supportNull = false;
 
 	/**
 	 * Constructor.
 	 */
-	public Average() {
+	public Sum() {
 		// Use a variable number of arguments
-		numberOfParameters = -1;
+		super();
 		this.supportNull = Util.getSupportNull();
+		
 	}
 
-	public Average(boolean supportNull) {
+	public Sum(boolean supportNull) {
 		// Use a variable number of arguments
-		numberOfParameters = -1;
+		super();
 		this.supportNull  = supportNull;
 	}
 
@@ -53,32 +52,13 @@ public class Average extends PostfixMathCommand {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run(Stack stack) throws ParseException {
-		checkStack(stack);// check the stack
 		
+		checkStack(stack);// check the stack
 		if (supportNull) {
 			curNumberOfParameters -= Util.deleteNullFromStack(stack);
 		}
-		
-		if (curNumberOfParameters < 1) throw new ParseException("No arguments for Sum");
-
-		// initialize the result to the first argument
-		Object sum = stack.pop();
-		
-		Object param;
-		int i = 1;
-        
-		// repeat summation for each one of the current parameters
-		while (i < (curNumberOfParameters)) {
-			// get the parameter from the stack
-			param = stack.pop();
-			// add it to the sum (order is important for String arguments)
-			sum = addFun.add(param, sum);	
-			i++;
-		}
-		// Calculate the average 
-		sum = (Double) sum / i;
-		// push the result on the inStack
-		
-		stack.push(sum);
+		super.run(stack);
 	}
+
+	
 }

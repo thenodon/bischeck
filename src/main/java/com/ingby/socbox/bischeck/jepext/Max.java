@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.jepext;
 
@@ -25,46 +25,59 @@ import org.nfunk.jep.*;
 import org.nfunk.jep.function.PostfixMathCommand;
 
 public class Max extends PostfixMathCommand {
-		
-		/**
-		 * Constructor.
-		 */
-		public Max() {
-			// Use a variable number of arguments
-			numberOfParameters = -1;
-		}
 
-		/**
-		 * Calculates the result of summing up all parameters, which are assumed to
-		 * be of the Double type.
-		 */
-		@SuppressWarnings("unchecked")
-		@Override
-		public void run(Stack stack) throws ParseException {
-			checkStack(stack);// check the stack
+	private boolean supportNull = false;
 
-			if (curNumberOfParameters < 1) throw new ParseException("No arguments for Sum");
-
-			// initialize the result to the first argument
-			Object max = stack.pop();
-			Object param;
-			int i = 1;
-	        
-			// repeat summation for each one of the current parameters
-			while (i < curNumberOfParameters) {
-				// get the parameter from the stack
-				param = stack.pop();
-				
-				// add it to the sum (order is important for String arguments)
-				if ((Double) max <= (Double) param) {
-					max = param;
-				}
-				
-				i++;
-			}
-			
-			// push the result on the inStack
-			
-			stack.push(max);
-		}
+	/**
+	 * Constructor.
+	 */
+	public Max() {
+		// Use a variable number of arguments
+		numberOfParameters = -1;
+		this.supportNull = Util.getSupportNull();
 	}
+
+	public Max(boolean supportNull) {
+		// Use a variable number of arguments
+		numberOfParameters = -1;
+		this.supportNull  = supportNull;
+	}
+
+	/**
+	 * Calculates the result of summing up all parameters, which are assumed to
+	 * be of the Double type.
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void run(Stack stack) throws ParseException {
+		checkStack(stack);// check the stack
+	
+		if (supportNull) {
+			curNumberOfParameters = curNumberOfParameters - Util.deleteNullFromStack(stack);
+		}
+	
+		if (curNumberOfParameters < 1) throw new ParseException("No arguments for Sum");
+
+		// initialize the result to the first argument
+		Object max = stack.pop();
+		Object param;
+		int i = 1;
+
+		// repeat summation for each one of the current parameters
+		while (i < curNumberOfParameters) {
+			// get the parameter from the stack
+			param = stack.pop();
+
+			// add it to the sum (order is important for String arguments)
+			if ((Double) max <= (Double) param) {
+				max = param;
+			}
+
+			i++;
+		}
+
+		// push the result on the inStack
+
+		stack.push(max);
+	}
+}

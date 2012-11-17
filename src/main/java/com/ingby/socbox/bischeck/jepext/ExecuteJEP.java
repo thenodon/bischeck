@@ -31,16 +31,19 @@ import com.yammer.metrics.core.TimerContext;
 
 
 public class ExecuteJEP {
-    static Logger  logger = Logger.getLogger(ExecuteJEP.class);
+    private final static Logger LOGGER = Logger.getLogger(ExecuteJEP.class);
 
 	private JEP parser = null;
+
+	
 	
 	public ExecuteJEP() {
-		logger.debug("Create");
+		
 		parser = new JEP();
         parser.addStandardFunctions();
         parser.addStandardConstants();
-        
+        Object MyNULL = new Null(); // create a null value
+        parser.addConstant("null",MyNULL);
         /*
         String func1 = "avg";
         String func1class = "com.ingby.socbox.bischeck.jepext.Average";
@@ -62,37 +65,42 @@ public class ExecuteJEP {
 		}
         */
         parser.addFunction("avg", new com.ingby.socbox.bischeck.jepext.Average());
+        parser.addFunction("avgNull", new com.ingby.socbox.bischeck.jepext.Average(true));
         parser.addFunction("max", new com.ingby.socbox.bischeck.jepext.Max());
 		parser.addFunction("min", new com.ingby.socbox.bischeck.jepext.Min());
+		parser.removeFunction("sum");
+		parser.addFunction("sum", new com.ingby.socbox.bischeck.jepext.Sum());
+        parser.addFunction("sumNull", new com.ingby.socbox.bischeck.jepext.Sum(true));
+        
 		
 	}
 
 	public Float execute(String executeexp) throws ParseException {
-		logger.debug("Parse :" + executeexp);
+		if (LOGGER.isDebugEnabled()) 
+			LOGGER.debug("Parse :" + executeexp);
 		final Timer timer = Metrics.newTimer(ExecuteJEP.class, 
-    			"Calulate", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-    	final TimerContext context = timer.time();
-    	
-    	Float value = null;
-    	try {
-    		parser.parseExpression(executeexp);
+				"Calulate", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext context = timer.time();
+		Float value = null;
+		try {
+			parser.parseExpression(executeexp);
+			if (parser.hasError()) {
+				LOGGER.warn("Math jep expression error, " +parser.getErrorInfo());
+				throw new ParseException(parser.getErrorInfo());
+			}
 
+			value = (float) parser.getValue();
+		} finally {
+			context.stop();
+		}
 
-    		if (parser.hasError()) {
-    			logger.warn("Math jep expression error, " +parser.getErrorInfo());
-    			throw new ParseException(parser.getErrorInfo());
-    		}
-
-    		value = (float) parser.getValue();
-    	} finally {
-    		context.stop();
-    	}
-    	
 		if (Float.isNaN(value)) {
 			value=null;
 		}
 		
-		logger.debug("Calculated :" + value);
+		if (LOGGER.isDebugEnabled()) 
+			LOGGER.debug("Calculated :" + value);
+		
 		return value;
 	}
 }
