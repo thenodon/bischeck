@@ -47,7 +47,6 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLKey;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
-import com.sun.org.apache.xerces.internal.impl.dv.xs.FullDVFactory;
 
 
 /**
