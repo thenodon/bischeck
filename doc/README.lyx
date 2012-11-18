@@ -103,11 +103,11 @@ A Business Activity Monitoring Server
 \end_layout
 
 \begin_layout Date
-Version 0.4.2 Release candidate 1
+Version 0.4.2 Release candidate 2
 \begin_inset Newline newline
 \end_inset
 
-2012-11-01
+2012-11-18
 \end_layout
 
 \begin_layout Standard
@@ -674,7 +674,7 @@ bischeck://cache
 \end_layout
 
 \begin_layout Subsection
-Shell (beta)
+Shell
 \end_layout
 
 \begin_layout Standard
@@ -899,7 +899,7 @@ bischeck://cache.
 \end_layout
 
 \begin_layout Subsection
-Check commands (Beta)
+Check commands
 \end_layout
 
 \begin_layout Standard
@@ -1297,8 +1297,8 @@ status open
 
 \begin_layout Plain Layout
 
-max(erphost-orders-ediorders[-5M],erphost-orders-ediorders[-10M],erphost-orders-
-ediorders[-15M]
+max(erphost-orders-ediorders[-5M], erphost-orders-ediorders[-10M], erphost-order
+s-ediorders[-15M])
 \end_layout
 
 \end_inset
@@ -1411,6 +1411,161 @@ max(x1,x2,x3,...) - Calculate the max value of the list of values.
 
 \begin_layout Itemize
 min(x1,x2,x3,...) - Calculate the min value of the list of values.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Null-value-in"
+
+\end_inset
+
+Null value in the cache
+\end_layout
+
+\begin_layout Standard
+Null values represent the existent of no data.
+ A null value in the cache can exists due to different reasons.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The connection specified in the service fails.
+ By default a null value will not be stored when this happens but if the
+ property 
+\emph on
+saveNullOnConnectionError
+\emph default
+ is set to true a null value will be inserted in the cache.
+\end_layout
+
+\begin_layout Enumerate
+If the execstatement specified for the serviceitem return null, a null value
+ is inserted in the cache.
+\end_layout
+
+\begin_layout Standard
+When accessing the cache by index or by time like, erphost-orders-ediorders[10]
+ or erphost-orders-ediorders[-5M] , it will return null:
+\end_layout
+
+\begin_layout Itemize
+If null is stored in the cache at the index.
+\end_layout
+
+\begin_layout Itemize
+If null is stored in the cache at the index that the time specification
+ resolves to.
+\end_layout
+
+\begin_layout Itemize
+If the index is not yet been populated with data.
+\end_layout
+
+\begin_layout Itemize
+If the index is out of bound of the specified cache size.
+\end_layout
+
+\begin_layout Standard
+When using cache data with mathematical function that takes a list of arguments,
+ the null value can be handled in different ways depending how the cache
+ data is retrieved and how the property 
+\emph on
+notFullListParse
+\emph default
+ is set.
+ Lets show an example to explain the different scenarios.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sum(erphost-orders-ediorders[0],erphost-orders-phoneorders[0]) * erphost-orders-
+state[0]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the above example the sum function will evaluate to null if erphost-orders-ed
+iorders[0] and/or erphost-orders-phoneorders[0] return null.
+ If the the property 
+\emph on
+notFullListParse
+\emph default
+ is set the sum function will only return null if both erphost-orders-ediorders[
+0] 
+\series bold
+and
+\series default
+ erphost-orders-phoneorders[0] return null.
+ The whole statement will return null independent of the 
+\emph on
+notFullListParse
+\emph default
+ property if erphost-orders-state[0] returns null.
+ 
+\end_layout
+
+\begin_layout Standard
+By the example we can see that the property 
+\emph on
+notFullListParse 
+\emph default
+has effect on how null is managed for functions that manage a list of data
+ like sum, avg, max, min, etc.
+ What the 
+\emph on
+notFullListParse
+\emph default
+ property do is that it will filter out all null values when they occur
+ in a function that take a list of data.
+ This works in the same way if ranges are used as the example below.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sum(erphost-orders-ediorders[0:100],erphost-orders-phoneorders[-5M:-15M])
+ * erphost-orders-state[0]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If the 
+\emph on
+notFullListParse
+\emph default
+ is set to true all the cache data in erphost-orders-ediorders[0:100] and
+ erphost-orders-phoneorders[-5M:-15M] will be filtered out.
+ For functions like avg the average will only be based on the none null
+ values.
+\end_layout
+
+\begin_layout Standard
+The only exception to this rule is when using time range like erphost-orders-pho
+neorders[-5M:-15M].
+ A time range will resolve to null if the lower or higher boundaries are
+ not in the range of the data that exists in the cache.
 \end_layout
 
 \begin_layout Chapter
@@ -1896,7 +2051,7 @@ password - the NSCA server password, no by default.
 \end_layout
 
 \begin_layout Subsection
-NRDP configuration (Beta)
+NRDP configuration
 \end_layout
 
 \begin_layout Standard
@@ -1928,6 +2083,24 @@ path - the URL path for NRDP, default is nrdp.
 
 \begin_layout Itemize
 password - the NRDP server token, no by default.
+\end_layout
+
+\begin_layout Subsection
+Nagios state on null
+\end_layout
+
+\begin_layout Standard
+If the service connection fail or the service item execstatement returns
+ a null value its not possible to calculate thresholds and to determine
+ the state that should be propagated to Nagios.
+ The state that should be communicate to Nagios in this type of situation
+ is defined by property 
+\emph on
+stateOnNull
+\emph default
+, that can be set to CRITICAL (2), WARNING (1), OK (0) or UNKNOWN (3).
+ Default is UNKNOWN.
+ 
 \end_layout
 
 \begin_layout Section
@@ -2420,13 +2593,6 @@ customlib
  directory.
 \end_layout
 
-\begin_layout Standard
-
-\series bold
-It is important that the name field for host, service and serviceitem do
- not include any space characters or the dash (-) character.
-\end_layout
-
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -2552,9 +2718,16 @@ notFullListParse - if set to true a reference to a cache item where a list
 \emph on
 erpserver-orders-ediorders[1:10],
 \emph default
- will return data even if not index in the list has data.
- The first index must have data otherwise null is returned.
- 
+ will return data even if not all index in the list has data.
+ Read more about how this property affect the retrieval of cache data in
+ section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Null-value-in"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Itemize
@@ -4556,12 +4729,12 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.4.2_RC1 - 2012-11-01
+Release 0.4.2_RC2 - 2012-11-18
 \end_layout
 
 \begin_layout Standard
 This is minor release.
- The beta functionality described for 0.4.1 is applicable for 0.4.2.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -4583,11 +4756,9 @@ reference "label:Naming-standard"
 
 \begin_layout Itemize
 Execution statements and thresholds hour specification where cache data
- is retrieved as a list, like in a function as avg(x-y-z[4:10]) and avg(4,6,8),
- can now be configured to not return a null value if at least the first
- index in the list definition has a cached value.
- This means for the example that if, at least, index 4 as a value for the
- x-y-z an average will be calculated.
+ is retrieved as a list, like in a function as avg(x-y-z[4:10]) and max(x-y-z[-5
+M:-15M]), can now be configured to return a value as long as at lest one
+ index in the range is not null.
  To support backwards capability the new functionality will only be used
  if the property 
 \emph on
@@ -4595,6 +4766,14 @@ notFullListParse
 \emph default
  is set to true in the properties.xml.
  The default value is false.
+ Read more about this option 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Null-value-in"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Itemize
@@ -4612,7 +4791,7 @@ stateOnNull
 \end_layout
 
 \begin_layout Itemize
-When a service class get an exception when doing a connection the previous
+When a service class get an exception when creating a connection the previous
  versions did not save any data to the cache.
  If the property 
 \emph on
@@ -4740,7 +4919,7 @@ CheckCommandServiceItem
 \end_layout
 
 \begin_layout Itemize
-Instrumentation metrics provided by 
+[FR-223] Instrumentation metrics provided by 
 \begin_inset CommandInset href
 LatexCommand href
 target "http://metrics.codahale.com/"
