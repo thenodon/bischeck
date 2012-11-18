@@ -74,15 +74,7 @@ public class JEPExtTest {
 		expr = "avgNull(null,null,null,null,null)";
 		Assert.assertNull(calc(expr));
 		
-		
-		expr = "avg(null,null,null,4,2)";
-		
-		if (supportNull)
-			Assert.assertEquals(calc(expr),new Float(3.0));
-		else 
-			Assert.assertNull(calc(expr));
-
-		
+			
 		if (supportNull) {
 			expr = "avg(null,null,null,4,2)";	
 			Assert.assertEquals(calc(expr),new Float(3.0));
@@ -99,6 +91,8 @@ public class JEPExtTest {
 			expr = "avg(null,2,6,null,null,1,2,null) / (sum(null,2,6,null,null,1,2,null) * max(2,6,100,1,2))";
 			Assert.assertEquals(calc(expr),new Float(0.0025));
 			
+			expr = "avg(null,null) / avg(2,6,null,1,2)";
+			Assert.assertNull(calc(expr));
 			
 		}else {
 			expr = "avg(null,null,null,4,2)";
