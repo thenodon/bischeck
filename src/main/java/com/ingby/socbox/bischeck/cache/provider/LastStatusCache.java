@@ -47,6 +47,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLKey;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
+import com.sun.org.apache.xerces.internal.impl.dv.xs.FullDVFactory;
 
 
 /**
@@ -257,12 +258,13 @@ public class LastStatusCache implements LastStatusCacheMBean {
 				ls = cache.get(key).get(index);
 			} catch (NullPointerException ne) {
 				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("No objects in the cache");
+					LOGGER.debug("No objects in the cache for " + key + "["+index+"]");
 				return null;
 			}    
 			catch (IndexOutOfBoundsException ie) {
+
 				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("No objects in the cache on index " + index);
+					LOGGER.debug("Index is out of bounds for" + key + "["+index+"]");
 				return null;
 			}
 		}
@@ -364,17 +366,6 @@ public class LastStatusCache implements LastStatusCacheMBean {
     	String key = Util.fullName( hostname, serviceName, serviceItemName);
 		return cache.get(key).size();
 	}
-
-
-	@Deprecated
-	public void listLru(String hostname, String serviceName,
-			String serviceItemName) {
-
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		int size = cache.get(key).size();
-		for (int i = 0; i < size;i++)
-			System.out.println(i +" : "+cache.get(key).get(i).getValue());
-	}
 	
 	
 	/**
@@ -391,6 +382,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		LOGGER.debug("Parameter string: " + parameters);
 		strbuf.append(resultStr);
 
+		
 		while (st.hasMoreTokens()){
 			String token = (String)st.nextToken();
 
@@ -539,26 +531,20 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 	
 	private String cleanUp(String str, String sep) {
+		String cleanupstr = null;
 		
 		if (notFullListParse)
-			str = cleanUpNullInLists(str);
+			cleanupstr = cleanUpNullInLists(str);
 		
 		// This line replace all lists that will end with ,;
-		str = str.replaceAll(",;", ";");
+		cleanupstr.replaceAll(",;", ";");
 		// remove the last sep character
-		if (str.lastIndexOf(sep) == str.length()-1) {
-			str = str.substring(0, str.length()-1);
+		if (cleanupstr.lastIndexOf(sep) == cleanupstr.length()-1) {
+			cleanupstr = cleanupstr.substring(0, str.length()-1);
 		}
-		return str;
+		return cleanupstr;
 	}
 
-	/*
-	private String cleanUpNullInLists(String str) {
-		str = str.replaceAll(",null", "");
-		return str;
-	}
-	*
-	*/
 	
 	private String cleanUpNullInLists(String str) {
 		str = str.replaceAll("null,", "");
