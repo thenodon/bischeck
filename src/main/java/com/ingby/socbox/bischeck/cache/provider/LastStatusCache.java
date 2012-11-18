@@ -530,28 +530,28 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 	
 	private String cleanUp(String str, String sep) {
-		String cleanupstr = null;
-		
+
 		if (notFullListParse)
-			cleanupstr = cleanUpNullInLists(str);
-		
+			str = cleanUpNullInLists(str);
+
 		// This line replace all lists that will end with ,;
-		cleanupstr.replaceAll(",;", ";");
+		str = str.replaceAll(",;", ";");
 		// remove the last sep character
-		if (cleanupstr.lastIndexOf(sep) == cleanupstr.length()-1) {
-			cleanupstr = cleanupstr.substring(0, str.length()-1);
+		if (str.lastIndexOf(sep) == str.length()-1) {
+			str = str.substring(0, str.length()-1);
 		}
-		return cleanupstr;
+		return str;
 	}
 
-	
+
 	private String cleanUpNullInLists(String str) {
 		str = str.replaceAll("null,", "");
 		if (str.equals(SEP))
 			return "null,;";
 		return str;
 	}
-	
+
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getLastStatusCacheCount()
