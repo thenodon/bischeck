@@ -25,7 +25,7 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ObjectDefinitions;
-import com.ingby.socbox.bischeck.Util;
+
 
 public abstract class CacheUtil {
 
