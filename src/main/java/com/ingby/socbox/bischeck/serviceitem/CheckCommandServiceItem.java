@@ -107,7 +107,7 @@ public class CheckCommandServiceItem extends ServiceItemAbstract implements Serv
 		setLatestExecuted(checkvalue);    
 	}
 
-	private boolean validateExecStatement(JSONObject jsonStatement) {
+	private boolean validateExecStatement(final JSONObject jsonStatement) {
 
 		if (!jsonStatement.containsKey("check"))  return false;
 
