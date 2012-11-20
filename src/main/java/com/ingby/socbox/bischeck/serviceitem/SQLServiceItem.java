@@ -96,19 +96,6 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     	else {
     		String res = service.executeStmt(cacheparsedstr);
     		setLatestExecuted(res);
-    		/*
-    		if (res == null)  
-    			setLatestExecuted(res);
-    		else {
-    			try {
-    				Float value = Float.parseFloat(res);
-    				setLatestExecuted(Float.toString(Util.roundDecimals(value)));
-    			} catch (NumberFormatException ne) {
-    				setLatestExecuted(res);
-    			}
-    		}
-    		*/
-    		//setLatestExecuted(service.executeStmt(cacheparsedstr));
     	}
     }
 }
