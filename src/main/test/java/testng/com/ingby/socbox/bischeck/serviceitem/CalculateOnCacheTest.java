@@ -32,11 +32,24 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class CalculateOnCacheTest {
 	ConfigurationManager confMgmr;
+	private boolean supportNull = false;
 	@BeforeTest
     public void beforeTest() throws Exception {
-            ConfigurationManager.initonce();
-    		confMgmr = ConfigurationManager.getInstance();
-    		
+		
+		confMgmr = ConfigurationManager.getInstance();
+		
+		if (confMgmr == null) {
+			System.setProperty("bishome", ".");
+			ConfigurationManager.init();
+			confMgmr = ConfigurationManager.getInstance();
+		}
+		if (ConfigurationManager.getInstance().getProperties().
+				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
+			supportNull  =true;
+
+		//cache = CacheFactory.getInstance();		
+		
+		//cache.clear();
     }
 
 	@Test (groups = { "ServiceItem" })
@@ -168,6 +181,49 @@ public class CalculateOnCacheTest {
 
     }
 
+    @Test (groups = { "ServiceItem" })
+    public void verifyNull() throws Exception {
+    	Service bis = new LastCacheService("serviceName");
+		ServiceItem coc = new CalculateOnCache("serviceItemName");
+		coc.setService(bis);
+		
+		String host1 = "host1null";
+		String service1 ="service1null";
+		String serviceitem1 = "service_item1null";
+		String hsi1 = host1+"-"+service1+"-"+serviceitem1;
+		String host2 = "host2null";
+		String service2 ="service2null";
+		String serviceitem2 = ".service_item2null";
+		String hsi2 = host2+"-"+service2+"-"+serviceitem2;
+		
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "1.0",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "2.0",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "3.0",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "4.0",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "5.0",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "6.0",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "7.0",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "8.0",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "9.0",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "10.0",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "null",null);
+		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "12.0",null);
+
+		LastStatusCache.getInstance().add(host2, service2, serviceitem2, "100.0",null);
+
+		//Assert.assertEquals(LastStatusCache.getInstance().size(),2);
+		
+		coc.setExecution("avg("+hsi1+"[0]," +hsi2 +"[0])");
+		coc.execute();
+		Assert.assertEquals(coc.getLatestExecuted(),"56.0");
+		
+		coc.setExecution("avg("+hsi1+"[1]," +hsi2 +"[0])");
+		coc.execute();
+		if (supportNull)
+			Assert.assertEquals(coc.getLatestExecuted(),"100.0");
+		else
+			Assert.assertNull(coc.getLatestExecuted());
+    }    
 }
 
 
