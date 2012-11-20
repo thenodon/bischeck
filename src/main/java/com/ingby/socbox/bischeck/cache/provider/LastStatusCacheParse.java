@@ -29,9 +29,10 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.log4j.Logger;
 
+import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
-import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
+
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -48,7 +49,7 @@ public class LastStatusCacheParse {
 
 	private static final String SEP = ";";
 	static Logger  logger = Logger.getLogger(LastStatusCacheParse.class);
-
+	static boolean notNullSupport = ConfigurationManager.getInstance().getProperties().getProperty("notFullListParse","false").equalsIgnoreCase("false");
 	/**
 	 * This method manage parsing of cached data by replacing a cache entry name
 	 * host-service-serviceitem[X] with the data in the cache. 
@@ -93,11 +94,10 @@ public class LastStatusCacheParse {
 		boolean notANumber = false;
 		ArrayList<String> paramOut = new ArrayList<String>();
 
-
 		while (st.hasMoreTokens()) {
 			String retvalue = st.nextToken();
 
-			if (retvalue.matches("(?i).*null*")) {
+			if (notNullSupport && retvalue.matches("(?i).*null*")) {
 				notANumber= true;
 				break;
 			}
@@ -118,6 +118,7 @@ public class LastStatusCacheParse {
 			}
 			mat.appendTail (sb);
 			logger.debug("Parsed string with cache data: " + sb.toString());
+			
 			return sb.toString();
 
 		}
