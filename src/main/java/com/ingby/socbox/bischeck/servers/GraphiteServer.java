@@ -1,0 +1,232 @@
+/*
+#
+# Copyright (C) 2010-2012 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+*/
+
+package com.ingby.socbox.bischeck.servers;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.log4j.Logger;
+
+import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.TimeMeasure;
+import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+
+/**
+ * This class is responsible to send bischeck data to a graphite server
+ * @author andersh
+ *
+ */
+public final class GraphiteServer implements Server {
+
+    private final static Logger LOGGER = Logger.getLogger(GraphiteServer.class);
+    static Map<String,GraphiteServer> server = new HashMap<String,GraphiteServer>();
+    
+    
+    private String instanceName;
+    private int port;
+    private String hostAddress;
+    private int connectionTimeout;
+    
+    private GraphiteServer (String name) {
+    	Properties defaultproperties = getServerProperties();
+        Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+        hostAddress = prop.getProperty("hostAddress",
+        		defaultproperties.getProperty("hostAddress"));
+        port = Integer.parseInt(prop.getProperty("port",
+        		defaultproperties.getProperty("port")));
+        connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
+        		defaultproperties.getProperty("connectionTimeout")));
+        instanceName = name;
+    }
+    
+    synchronized public static Server getInstance(String name) {
+        if (!server.containsKey(name) ) {
+            server.put(name,new GraphiteServer(name));
+        }
+        return server.get(name);
+    }
+
+    @Override
+    synchronized public void send(Service service) {
+        Socket graphiteSocket = null;
+        PrintWriter out = null;
+
+        String message;    
+        if ( service.isConnectionEstablished()) {
+            message = getMessage(service);
+        } else {
+            message = null;
+        }
+
+
+        LOGGER.info("******************** "+ instanceName +" *******************");
+        LOGGER.info("*");
+        LOGGER.info("*    Host: " + service.getHost().getHostname());
+        LOGGER.info("* Service: " + service.getServiceName());
+        LOGGER.info("* Message: ");
+        LOGGER.info("* " + message);
+        LOGGER.info("*");
+        LOGGER.info("*********************************************");
+
+        long duration = 0;
+        try {
+        	TimeMeasure tm = new TimeMeasure();
+            tm.start();
+            InetAddress addr = InetAddress.getByName(hostAddress);
+            SocketAddress sockaddr = new InetSocketAddress(addr, port);
+
+            graphiteSocket = new Socket();
+            
+            graphiteSocket.connect(sockaddr,connectionTimeout);
+                        
+            out = new PrintWriter(graphiteSocket.getOutputStream(), true);
+            out.println(message);
+            out.flush();
+            
+            duration = tm.stop();
+            LOGGER.info("Graphite send execute: " + duration + " ms");
+        } catch (UnknownHostException e) {
+            LOGGER.error("Don't know about host: " + hostAddress);
+        } catch (IOException e) {
+            LOGGER.error("Network error - check Graphite server and that service is started - " + e);
+        }
+        finally {
+            try {
+                out.close();
+            } catch (Exception ignore) {}    
+            try {
+                graphiteSocket.close();
+            } catch (Exception ignore) {}    
+        }
+
+    }
+
+    private String getMessage(Service service) {
+
+        StringBuffer strbuf = new StringBuffer();
+        long currenttime = System.currentTimeMillis()/1000;
+        for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
+            ServiceItem serviceItem = serviceItementry.getValue();
+            //metric_path value timestamp\n
+            
+            strbuf = formatRow(strbuf, 
+                    currenttime,
+                    service.getHost().getHostname(), 
+                    service.getServiceName(), 
+                    serviceItem.getServiceItemName(), 
+                    "measured", 
+                    checkNull(serviceItem.getLatestExecuted()));
+
+            strbuf = formatRow(strbuf, 
+                    currenttime,
+                    service.getHost().getHostname(), 
+                    service.getServiceName(), 
+                    serviceItem.getServiceItemName(), 
+                    "threshold", 
+                    checkNull(serviceItem.getThreshold().getThreshold()));
+
+            strbuf = formatRow(strbuf, 
+                    currenttime,
+                    service.getHost().getHostname(), 
+                    service.getServiceName(), 
+                    serviceItem.getServiceItemName(), 
+                    "warning", 
+                    checkNullMultiple(serviceItem.getThreshold().getWarning(),
+                            serviceItem.getThreshold().getThreshold()));
+
+            strbuf = formatRow(strbuf, 
+                    currenttime,
+                    service.getHost().getHostname(), 
+                    service.getServiceName(), 
+                    serviceItem.getServiceItemName(), 
+                    "critical", 
+                    checkNullMultiple(serviceItem.getThreshold().getCritical(),
+                            serviceItem.getThreshold().getThreshold()));
+        }
+        return strbuf.toString();
+    }
+    
+    private String checkNull(String str) {
+        if (str == null)
+            return "NaN";
+        else
+            return str;
+    }
+
+    private String checkNull(Float number) {
+        if (number == null)
+            return "NaN";
+        else
+            return String.valueOf(number);
+    }
+    
+    private String checkNullMultiple(Float number1, Float number2) {
+        Float sum;
+        try {
+            sum = number1 * number2;
+        } catch (NullPointerException e) {
+            return "NaN";
+        }
+        return String.valueOf(sum);
+    }
+    
+    private StringBuffer formatRow(StringBuffer strbuf, 
+            long currenttime, 
+            String host, 
+            String servicename, 
+            String serviceitemname, 
+            String metric, 
+            String value) {
+        
+        strbuf.
+        append(host).
+        append(".").
+        append(servicename).
+        append(".").
+        append(serviceitemname).
+        append(".").
+        append(metric).
+        append(" ").
+        append(value).
+        append(" ").
+        append(currenttime).append("\n");
+        
+        return strbuf;
+    }
+    
+    public static Properties getServerProperties() {
+		Properties defaultproperties = new Properties();
+	    
+		defaultproperties.setProperty("hostAddress","localhost");
+    	defaultproperties.setProperty("port","2003");
+    	defaultproperties.setProperty("connectionTimeout","5000");
+	
+		return defaultproperties;
+	}
+}
