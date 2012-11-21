@@ -51,7 +51,8 @@ public class CalculateOnCacheTest {
 		
 		//cache.clear();
     }
-
+	
+	/*
 	@Test (groups = { "ServiceItem" })
     public void verifyServiceItem() throws Exception {
     	Service bis = new LastCacheService("serviceName");
@@ -118,6 +119,7 @@ public class CalculateOnCacheTest {
 
     }
 
+	
     @Test (groups = { "ServiceItem" })
     public void verifyNaming() throws Exception {
     	Service bis = new LastCacheService("serviceName");
@@ -180,7 +182,7 @@ public class CalculateOnCacheTest {
 		//Assert.assertEquals(LastStatusCache.getInstance().size(),2);
 
     }
-
+*/
     @Test (groups = { "ServiceItem" })
     public void verifyNull() throws Exception {
     	Service bis = new LastCacheService("serviceName");
@@ -223,6 +225,16 @@ public class CalculateOnCacheTest {
 			Assert.assertEquals(coc.getLatestExecuted(),"100.0");
 		else
 			Assert.assertNull(coc.getLatestExecuted());
+
+		// Testing if a null*4 will work
+		System.out.println("avg("+hsi1+"[1]*4," +hsi2 +"[0])");
+		coc.setExecution("avg(multNull("+hsi1+"[1],4)," +hsi2 +"[0], multNull(2,"+hsi1+"[0],4))");
+		coc.execute();
+		if (supportNull)
+			Assert.assertEquals(coc.getLatestExecuted(),"98.0");
+		else
+			Assert.assertNull(coc.getLatestExecuted());
+
     }    
 }
 
