@@ -52,7 +52,6 @@ public class CalculateOnCacheTest {
 		//cache.clear();
     }
 	
-	/*
 	@Test (groups = { "ServiceItem" })
     public void verifyServiceItem() throws Exception {
     	Service bis = new LastCacheService("serviceName");
@@ -182,7 +181,7 @@ public class CalculateOnCacheTest {
 		//Assert.assertEquals(LastStatusCache.getInstance().size(),2);
 
     }
-*/
+
     @Test (groups = { "ServiceItem" })
     public void verifyNull() throws Exception {
     	Service bis = new LastCacheService("serviceName");

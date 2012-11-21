@@ -74,6 +74,8 @@ public class JEPExtTest {
 		expr = "avgNull(null,null,null,null,null)";
 		Assert.assertNull(calc(expr));
 		
+		expr = "multNull(4.0,6.0)";
+		Assert.assertEquals(calc(expr),new Float("24.0"));
 				
 		if (supportNull) {
 			System.out.println("Null in function tests");
@@ -94,6 +96,9 @@ public class JEPExtTest {
 			Assert.assertEquals(calc(expr),new Float(0.0025));
 			
 			expr = "avg(null,null) / avg(2,6,null,1,2)";
+			Assert.assertNull(calc(expr));
+			
+			expr = "avg(null*2,2)";
 			Assert.assertNull(calc(expr));
 			
 		}else {
