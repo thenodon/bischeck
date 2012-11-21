@@ -226,11 +226,19 @@ public class CalculateOnCacheTest {
 			Assert.assertNull(coc.getLatestExecuted());
 
 		// Testing if a null*4 will work
-		System.out.println("avg("+hsi1+"[1]*4," +hsi2 +"[0])");
+		System.out.println("avg(multNull("+hsi1+"[1],4)," +hsi2 +"[0], multNull(2,"+hsi1+"[0],4))");
 		coc.setExecution("avg(multNull("+hsi1+"[1],4)," +hsi2 +"[0], multNull(2,"+hsi1+"[0],4))");
 		coc.execute();
 		if (supportNull)
 			Assert.assertEquals(coc.getLatestExecuted(),"98.0");
+		else
+			Assert.assertNull(coc.getLatestExecuted());
+
+		System.out.println("avg(multNull("+hsi1+"[1],4)," +hsi2 +"[0], multNull(2,"+hsi1+"[0],4))");
+		coc.setExecution("avg(divNull("+hsi1+"[1],4)," +hsi2 +"[0], divNull("+hsi1+"[0],4))");
+		coc.execute();
+		if (supportNull)
+			Assert.assertEquals(coc.getLatestExecuted(),"51.5");
 		else
 			Assert.assertNull(coc.getLatestExecuted());
 
