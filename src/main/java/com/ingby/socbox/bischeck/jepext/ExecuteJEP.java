@@ -72,6 +72,7 @@ public class ExecuteJEP {
 		parser.addFunction("sum", new com.ingby.socbox.bischeck.jepext.Sum());
         parser.addFunction("sumNull", new com.ingby.socbox.bischeck.jepext.Sum(true));
         parser.addFunction("multNull", new com.ingby.socbox.bischeck.jepext.NullableMultiply());
+        parser.addFunction("divNull", new com.ingby.socbox.bischeck.jepext.NullableDivide());
             
 		
 	}
