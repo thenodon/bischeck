@@ -38,7 +38,6 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
