@@ -52,16 +52,25 @@ public final class GraphiteServer implements Server {
     private int port;
     private String hostAddress;
     private int connectionTimeout;
+	private String doNotSendRegex;
+	private String doNotSendRegexDelim;
+	private MatchServiceToSend msts = null;
     
     private GraphiteServer (String name) {
+    
     	Properties defaultproperties = getServerProperties();
         Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+    
         hostAddress = prop.getProperty("hostAddress",
         		defaultproperties.getProperty("hostAddress"));
         port = Integer.parseInt(prop.getProperty("port",
         		defaultproperties.getProperty("port")));
         connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
         		defaultproperties.getProperty("connectionTimeout")));
+        doNotSendRegex = prop.getProperty("doNotSendRegex",
+        		defaultproperties.getProperty("doNotSendRegex"));
+        doNotSendRegexDelim = prop.getProperty("doNotSendRegexDelim",
+        		defaultproperties.getProperty("doNotSendRegexDelim"));
         instanceName = name;
     }
     
@@ -72,19 +81,52 @@ public final class GraphiteServer implements Server {
         return server.get(name);
     }
 
+	private boolean doNotSend(Service service) {
+		if (msts == null)
+			msts = new MatchServiceToSend(MatchServiceToSend.ConvertString2List(doNotSendRegex,doNotSendRegexDelim));
+		/*
+		 * Loop through all host, service and serviceitems and check if 
+		 * match regex described doNotSendRegex 
+		 */
+		for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) { 
+			ServiceItem serviceItem = serviceItementry.getValue();
+
+			StringBuffer st = new StringBuffer().
+			append(service.getHost().getHostname()).append("-").
+			append(service.getServiceName()).append("-").
+			append(serviceItem.getServiceItemName());
+			if (msts.isMatch(st.toString())) {
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("Matching regex - will not send " + st.toString());	
+				return true;
+			}
+		}
+		return false;
+	}
+	
     @Override
     synchronized public void send(Service service) {
         Socket graphiteSocket = null;
         PrintWriter out = null;
-
         String message;    
+
+        /*
+         * Check if the message should be sent
+         */
+        
+        if(!doNotSendRegex.isEmpty()) {
+        	if (doNotSend(service)) {
+        		return;
+        	}
+        }
+        
         if ( service.isConnectionEstablished()) {
             message = getMessage(service);
         } else {
             message = null;
         }
 
-
+        
         LOGGER.info("******************** "+ instanceName +" *******************");
         LOGGER.info("*");
         LOGGER.info("*    Host: " + service.getHost().getHostname());
@@ -124,7 +166,6 @@ public final class GraphiteServer implements Server {
                 graphiteSocket.close();
             } catch (Exception ignore) {}    
         }
-
     }
 
     private String getMessage(Service service) {
@@ -226,7 +267,8 @@ public final class GraphiteServer implements Server {
 		defaultproperties.setProperty("hostAddress","localhost");
     	defaultproperties.setProperty("port","2003");
     	defaultproperties.setProperty("connectionTimeout","5000");
-	
+    	defaultproperties.setProperty("doNotSendRegex","");
+    	defaultproperties.setProperty("doNotSendRegexDelim","%");
 		return defaultproperties;
 	}
 }
