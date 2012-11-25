@@ -43,22 +43,19 @@ public class CacheTest {
 	String qhostname = "test\\-server.ingby.com";
 	String servicename = "service@first";
 	String serviceitemname = "_service.item_123";
-	//String cachekey = Util.fullName(hostname, servicename, serviceitemname);
 	String cachekey = Util.fullName(qhostname, servicename, serviceitemname);
 	
 	@BeforeTest
     public void beforeTest() throws Exception {
 	
-
 		confMgmr = ConfigurationManager.getInstance();
 	
 		if (confMgmr == null) {
 			System.setProperty("bishome", ".");
 			ConfigurationManager.init();
-			confMgmr = ConfigurationManager.getInstance();
-			
+			confMgmr = ConfigurationManager.getInstance();	
 		}
-		
+			
 		cache = CacheFactory.getInstance();
 		
 	}
@@ -100,7 +97,9 @@ public class CacheTest {
 		Assert.assertNull(CacheEvaluator.parse(cachekey + "[-100M:-120M]"));
 		
 	}
-	
+	/**
+	 * Populate a list where every second object is null
+	 */
 	@Test (groups = { "Cache" })
 	public void verifyCacheNullValue() {
 		cache.clear();
@@ -111,6 +110,7 @@ public class CacheTest {
 			LastStatus ls = new LastStatus(""+ (i+prev), (float) (i+prev),  current + (i+prev)*300*1000);
 			System.out.println(CacheTest.class.getName()+">> " + (i+prev)+":"+ls.getValue() +">"+ new java.util.Date(ls.getTimestamp()).toString());
 			cache.add(ls, hostname, servicename, serviceitemname);
+			// Add a null 
 			ls = new LastStatus(null, (float) (i+1+prev),  current + (i+1+prev)*300*1000);
 			System.out.println(CacheTest.class.getName()+">> " + (i+1+prev)+":"+ls.getValue() +">"+ new java.util.Date(ls.getTimestamp()).toString());
 			cache.add(ls, hostname, servicename, serviceitemname);

@@ -30,6 +30,7 @@ import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
+
 import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.CalculateOnCache;
@@ -55,6 +56,7 @@ public class CalculateOnCacheTest {
 	String serviceitemname2 = ".service_item0. space";
 	String qserviceitemname2 = ".service_item0. space";
 	String cachekey2 = Util.fullName(qhostname2, qservicename2, qserviceitemname2);
+	private boolean supportNull = false;
 	
 	
 	@BeforeTest
@@ -69,7 +71,12 @@ public class CalculateOnCacheTest {
 			ConfigurationManager.init();
 			confMgmr = ConfigurationManager.getInstance();
 		}
-		
+	
+		if (ConfigurationManager.getInstance().getProperties().
+				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
+			supportNull=true;
+
+
 		cache = CacheFactory.getInstance();		
 		
 		cache.clear();
@@ -138,7 +145,117 @@ public class CalculateOnCacheTest {
 			Assert.assertNotNull(pe);
 		}
     }
+    
+ 
+    @Test (groups = { "ServiceItem" })
+    public void verifyServiceNull() throws Exception {
 
+    	Service bis = new LastCacheService("serviceName");
+		ServiceItem coc = new CalculateOnCache("serviceItemName");
+		coc.setService(bis);
+		
+		String host1 = "host1null";
+		String service1 ="service1null";
+		String serviceitem1 = "service_item1null";
+		String cachekey1 = Util.fullName(host1, service1, serviceitem1);
+
+		String host2 = "host2null";
+		String service2 ="service2null";
+		String serviceitem2 = "service_item2null";
+		
+		String cachekey2 = Util.fullName(host2, service2, serviceitem2);
+
+		LastStatus ls = new LastStatus("null", (float) 1);
+		cache.add(ls,host1, service1, serviceitem1);
+		
+		ls = new LastStatus("24.0", (float) 1);
+		cache.add(ls,host1, service1, serviceitem1);
+		
+		ls = new LastStatus("null", (float) 1);
+		cache.add(ls,host1, service1, serviceitem1);
+
+		ls = new LastStatus("12.0", (float) 1);
+		cache.add(ls,host1, service1, serviceitem1);
+		
+		ls = new LastStatus("100.0", (float) 1);
+		cache.add(ls,host2, service2, serviceitem2);
+
+		
+		coc.setExecution("avg("+cachekey1+"[0]," +cachekey2 +"[0])");
+		coc.execute();
+		Assert.assertEquals(coc.getLatestExecuted(),"56.0");
+
+		if(supportNull) {
+			System.out.println("SUPPORT NULL");
+			/* All avg calculations from different caches */
+			/**********************************************/
+			/* Calculate avg where one item is null */
+			coc.setExecution("avg("+cachekey1+"[1]," +cachekey2 +"[0])");
+			coc.execute();
+			Assert.assertEquals(coc.getLatestExecuted(),"100.0");
+			
+			/* Calculate avg where one item is null and multiple * with 
+			 * one of null
+			 */
+			coc.setExecution("avg("+cachekey1+"[1]," +cachekey2 +"[0]) * "+cachekey1+"[1]");
+			coc.execute();
+			Assert.assertNull(coc.getLatestExecuted());
+			
+			/* Calculate avg where one item is null and multiple * with a null 
+			 * item with a constant
+			 */
+			coc.setExecution("avg("+cachekey1+"[1]*2," +cachekey2 +"[0])");
+			coc.execute();
+			Assert.assertNull(coc.getLatestExecuted());
+			
+			/* Both are value and a multiple with constant */
+			coc.setExecution("avg("+cachekey1+"[0]*2," +cachekey2 +"[1])");
+			coc.execute();
+			Assert.assertEquals(coc.getLatestExecuted(),"24.0");
+			
+			/* Same but with multNull function */
+			/***********************************/
+			/* Calculate avg where one item is null and multiple * with 
+			 * one of null
+			 * avg(null,multNull(100,null)) = null
+			 */
+			coc.setExecution("avg("+cachekey1+"[1], multNull(" +cachekey2 +"[0], "+cachekey1+"[1]))");
+			coc.execute();
+			Assert.assertNull(coc.getLatestExecuted());
+			
+			/* Calculate avg where one item is null and multiple * with a null 
+			 * item with a constant
+			 * * avg(multNull(null,2),100) = 100
+			 */
+			coc.setExecution("avg(multNull("+cachekey1+"[1],2)," +cachekey2 +"[0])");
+			coc.execute();
+			Assert.assertEquals(coc.getLatestExecuted(),"100.0");
+			
+			/*
+			 * avg(multNull(null,2),multNull(100,2),multNull(24,2)) = 124
+			 */
+			coc.setExecution("avg(multNull("+cachekey1+"[1],2), multNull(" +cachekey2 +"[0],2),multNull("+cachekey1+"[2],2))");
+			coc.execute();
+			Assert.assertEquals(coc.getLatestExecuted(),"124.0");
+			
+			/*
+			 * avg(multNull(null,2),multNull(100,2),multNull(24,2)) = 124
+			 */
+			coc.setExecution("avg(divNull("+cachekey1+"[1],2), divNull(" +cachekey2 +"[0],2),divNull("+cachekey1+"[2],2))");
+			coc.execute();
+			Assert.assertEquals(coc.getLatestExecuted(),"31.0");
+			
+			
+		} else {
+			System.out.println("DO NOT SUPPORT NULL");
+			coc.setExecution("avg("+cachekey1+"[1]," +cachekey2 +"[0])");
+			coc.execute();
+			Assert.assertNull(coc.getLatestExecuted());
+			coc.setExecution("avg("+cachekey1+"[1]," +cachekey2 +"[0]) * "+cachekey1+"[1]");
+			coc.execute();
+			Assert.assertNull(coc.getLatestExecuted());
+		}
+    }    
 }
 
 
