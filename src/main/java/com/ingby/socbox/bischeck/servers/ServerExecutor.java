@@ -43,7 +43,7 @@ public final class ServerExecutor {
      */
     private Map<String,Class<?>> serverSet = new HashMap<String,Class<?>>();
     private static final String GETINSTANCE = "getInstance";
-    
+    private static final String UNREGISTER = "unregister";
     
     private ServerExecutor() {
         try {
@@ -65,6 +65,37 @@ public final class ServerExecutor {
         return serverexecutor;
     }
 
+    
+    /**
+     * Call all registered Server implementations and invoke their 
+     * unregister(name) method to remove them from the Map of their class 
+     * specific Server class.
+     * This call is used when it need to be reloaded to re-read configuration.
+     * The "name" is what its register as for the specific Server 
+     * implementation. 
+     */
+    synchronized public void unregisterAll() {
+    	Iterator<String> iter = serverSet.keySet().iterator();
+        
+        while (iter.hasNext()) {    
+            String name = iter.next();
+            try {    
+                Method method = serverSet.get(name).getMethod(UNREGISTER,String.class);
+                method.invoke(null,name);
+            } catch (IllegalArgumentException e) {
+                LOGGER.error(e.toString() + ":" + e.getMessage());
+            } catch (IllegalAccessException e) {
+                LOGGER.error(e.toString() + ":" + e.getMessage());
+            } catch (InvocationTargetException e) {
+                LOGGER.error(e.toString() + ":" + e.getMessage());
+            } catch (SecurityException e) {
+                LOGGER.error(e.toString() + ":" + e.getMessage());
+            } catch (NoSuchMethodException e) {
+                LOGGER.error(e.toString() + ":" + e.getMessage());
+            }
+        }
+    	serverexecutor = null;
+    }
     
     /**
      * The execute method is called every time a ServiceJob has been execute 

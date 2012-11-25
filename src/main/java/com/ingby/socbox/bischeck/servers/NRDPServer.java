@@ -60,7 +60,7 @@ public final class NRDPServer implements Server {
 
 	private final static Logger LOGGER = Logger.getLogger(NRDPServer.class);
 
-	static Map<String,NRDPServer> nrdpServers = new HashMap<String,NRDPServer>();
+	static Map<String,NRDPServer> servers = new HashMap<String,NRDPServer>();
 
 	private String instanceName;
 
@@ -79,16 +79,34 @@ public final class NRDPServer implements Server {
 		instanceName=name;
 	}
 
+	
+	/**
+     * Retrieve the Server object. The method is invoked from class ServerExecutor
+     * execute method. The created Server object is placed in the class internal 
+     * Server object list.
+     * @param name the name of the configuration in server.xml like
+     * {@code &lt;server name="my"&gt;}
+     * @return Server object
+     */
 	synchronized public static Server getInstance(String name) {
-
-		if (!nrdpServers.containsKey(name) ) {
-			nrdpServers.put(name,new NRDPServer(name));
-			nrdpServers.get(name).init(name);
+		
+		if (!servers.containsKey(name) ) {
+			servers.put(name,new NRDPServer(name));
+			servers.get(name).init(name);
 		}
-		return nrdpServers.get(name);
+		return servers.get(name);
 	}
 
-
+    
+	/**
+     * Unregister the server and its configuration
+     * @param name of the server instance
+     */
+    synchronized public static void unregister(String name) {
+    	servers.remove(name);
+    }
+    
+    
 	private void init(String name) {
 		
 		Properties defaultproperties = getServerProperties();

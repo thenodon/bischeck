@@ -45,7 +45,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 public final class GraphiteServer implements Server {
 
     private final static Logger LOGGER = Logger.getLogger(GraphiteServer.class);
-    static Map<String,GraphiteServer> server = new HashMap<String,GraphiteServer>();
+    static Map<String,GraphiteServer> servers = new HashMap<String,GraphiteServer>();
     
     
     private String instanceName;
@@ -74,13 +74,33 @@ public final class GraphiteServer implements Server {
         instanceName = name;
     }
     
+    
+    /**
+     * Retrieve the Server object. The method is invoked from class ServerExecutor
+     * execute method. The created Server object is placed in the class internal 
+     * Server object list.
+     * @param name the name of the configuration in server.xml like
+     * {@code &lt;server name="myGraphite"&gt;}
+     * @return Server object
+     */
     synchronized public static Server getInstance(String name) {
-        if (!server.containsKey(name) ) {
-            server.put(name,new GraphiteServer(name));
+    	
+        if (!servers.containsKey(name) ) {
+            servers.put(name,new GraphiteServer(name));
         }
-        return server.get(name);
+        return servers.get(name);
     }
 
+   
+    /**
+     * Unregister the server and its configuration
+     * @param name of the server instance
+     */
+    synchronized public static void unregister(String name) {
+    	servers.remove(name);
+    }
+    
+    
 	private boolean doNotSend(Service service) {
 		if (msts == null)
 			msts = new MatchServiceToSend(MatchServiceToSend.ConvertString2List(doNotSendRegex,doNotSendRegexDelim));

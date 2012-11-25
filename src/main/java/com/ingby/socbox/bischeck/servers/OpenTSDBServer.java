@@ -40,7 +40,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 public final class OpenTSDBServer implements Server {
 
     private final static Logger LOGGER = Logger.getLogger(OpenTSDBServer.class);
-    static Map<String,OpenTSDBServer> server = new HashMap<String,OpenTSDBServer>();
+    static Map<String,OpenTSDBServer> servers = new HashMap<String,OpenTSDBServer>();
     
     
     private String instanceName;
@@ -60,15 +60,33 @@ public final class OpenTSDBServer implements Server {
         instanceName = name;
     }
     
+    
+    /**
+     * Retrieve the Server object. The method is invoked from class ServerExecutor
+     * execute method. The created Server object is placed in the class internal 
+     * Server object list.
+     * @param name the name of the configuration in server.xml like
+     * {@code &lt;server name="my"&gt;}
+     * @return Server object
+     */
     synchronized public static Server getInstance(String name) {
-        if (!server.containsKey(name) ) {
-            server.put(name,new OpenTSDBServer(name));
+    
+    	if (!servers.containsKey(name) ) {
+            servers.put(name,new OpenTSDBServer(name));
         }
-        return server.get(name);
-
-        //return new OpenTSDBServer(name);
+        return servers.get(name);
     }
-
+    
+    
+    /**
+     * Unregister the server and its configuration
+     * @param name of the server instance
+     */
+    synchronized public static void unregister(String name) {
+    	servers.remove(name);
+    }
+    
+    
     @Override
     synchronized public void send(Service service) {
         Socket opentsdbSocket = null;

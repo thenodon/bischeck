@@ -58,6 +58,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 
 import com.ingby.socbox.bischeck.cache.CacheFactory;
+import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 
@@ -204,7 +205,7 @@ public final class Execute implements ExecuteMBean {
         Scheduler sched = null;     
         
         try {
-			sched = initScheduler();
+        	sched = initScheduler();
 			initTriggers(sched); 
         } catch (SchedulerException e) {
         	LOGGER.error("Scheduler init failed with: " + e.getMessage());
@@ -223,7 +224,7 @@ public final class Execute implements ExecuteMBean {
         } catch (SchedulerException e) {
             LOGGER.warn("Stopping Quartz scheduler failed with - " + e);
         }
-        
+        ServerExecutor.getInstance().unregisterAll();
         //LastStatusCache.getInstance().dump2file();
         CacheFactory.close();
         LOGGER.info("******************* Shutdown ********************");
