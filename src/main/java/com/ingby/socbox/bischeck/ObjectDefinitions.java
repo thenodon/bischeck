@@ -14,7 +14,6 @@ public abstract class ObjectDefinitions {
 		OBJECT_REGEXP +
 		"\\[.*?\\]";
 	
-	
 	private static final String QUOTE_CONVERSION_STRING = "~";
 	
 	private static final String CACHE_KEY_SEP = "-";
@@ -31,6 +30,7 @@ public abstract class ObjectDefinitions {
 	
 	private static final Pattern PATTERN_SERVICE_AND_SERVICEITEM = Pattern.compile ("^"+OBJECT_REGEXP+"$");        
     
+	
 	public static String getFindintimepattern() {
 		return FINDINTIMEPATTERN;
 	}
@@ -44,10 +44,12 @@ public abstract class ObjectDefinitions {
 		return CACHE_QUOTE_STRING;
 	}
 
+    
 	public static String getCacheKeySep() {
 		return CACHE_KEY_SEP;
 	}
     
+	
 	public static String getIllegalObjectNameChars() {
 		return ILLEGAL_OBJECT_NAME_CHARS;
 	}
@@ -57,51 +59,28 @@ public abstract class ObjectDefinitions {
 		return HOST_SERVICE_ITEM_REGEXP;
 	}
 	
+	
 	public static String getQuoteConversionString() {
 		return QUOTE_CONVERSION_STRING;
 	}
+	
+	
 	public static String verifyHostServiceServiceItem(String name) {
-		//Pattern pat = null;
-	    /*    
-		try {
-            pat = Pattern.compile ("^"+HOST_SERVICE_ITEM_REGEXP+"$");        
-        } catch (PatternSyntaxException e) {
-           
-        }
-        */
-        Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (name);
+	    Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (name);
         mat.find();
         return mat.group();    
 	}
 	
 	
 	public static String verifyHostName(String hostname) {
-		/*
-		Pattern pat = null;
-	        
-		try {
-            pat = Pattern.compile ("^"+OBJECT_HOSTNAME+"$");        
-        } catch (PatternSyntaxException e) {
-           
-        }
-        */
-        Matcher mat = PATTERN_HOSTNAME.matcher (hostname);
+	    Matcher mat = PATTERN_HOSTNAME.matcher (hostname);
         mat.find();
         return mat.group();   
 	}
 	
 	
 	public static String verifyServiceAndServiceItemName(String name) {
-	/*
-		Pattern pat = null;
-	        
-		try {
-            pat = Pattern.compile ("^"+OBJECT_REGEXP+"$");        
-        } catch (PatternSyntaxException e) {
-           
-        }
-      */  
-        Matcher mat = PATTERN_SERVICE_AND_SERVICEITEM.matcher (name);
+	    Matcher mat = PATTERN_SERVICE_AND_SERVICEITEM.matcher (name);
         mat.find();
         return mat.group();
 	}
