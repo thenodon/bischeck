@@ -38,7 +38,6 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
@@ -48,14 +47,14 @@ import com.yammer.metrics.core.TimerContext;
  * @author andersh
  *
  */
-public class NSCAServer implements Server {
+public final class NSCAServer implements Server {
 
     private final static Logger LOGGER = Logger.getLogger(NSCAServer.class);
     /**
      * The server map is used to manage multiple configuration based on the 
      * same NSCAServer class.
      */
-    static Map<String,NSCAServer> nscaServers = new HashMap<String,NSCAServer>();
+    static Map<String,NSCAServer> servers = new HashMap<String,NSCAServer>();
     
     private NagiosPassiveCheckSender sender = null;
     private String instanceName;
@@ -66,17 +65,28 @@ public class NSCAServer implements Server {
      * Retrieve the Server object. The method is invoked from class ServerExecutor
      * execute method. The created Server object is placed in the class internal 
      * Server object list.
-     * @param name the name of the configuration in server.xml, server name="myNSCA">
+     * @param name the name of the configuration in server.xml like 
+     * {@code &lt;server name="my"&gt;}
      * @return Server object
      */
     synchronized public static Server getInstance(String name) {
 
-        if (!nscaServers.containsKey(name) ) {
-            nscaServers.put(name,new NSCAServer(name));
-            nscaServers.get(name).init(name);
+        if (!servers.containsKey(name) ) {
+            servers.put(name,new NSCAServer(name));
+            servers.get(name).init(name);
         }
-        return nscaServers.get(name);
+        return servers.get(name);
     }
+    
+    
+    /**
+     * Unregister the server and its configuration
+     * @param name of the server instance
+     */
+    synchronized public static void unregister(String name) {
+    	servers.remove(name);
+    }
+    
     
     /**
      * Constructor 

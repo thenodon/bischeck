@@ -30,11 +30,11 @@ import org.apache.log4j.Logger;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
 
-public class ServerExecutor {
+public final class ServerExecutor {
 
     private final static Logger LOGGER = Logger.getLogger(ServerExecutor.class);
     
-    private static ServerExecutor serverexeutor= null;
+    private static ServerExecutor serverexecutor= null;
     /**
      * The serverSet holds all server configuration from servers.xml where 
      * the key is the name of the configuration, server name="NSCA">, the 
@@ -43,7 +43,7 @@ public class ServerExecutor {
      */
     private Map<String,Class<?>> serverSet = new HashMap<String,Class<?>>();
     private static final String GETINSTANCE = "getInstance";
-    
+    private static final String UNREGISTER = "unregister";
     
     private ServerExecutor() {
         try {
@@ -59,12 +59,43 @@ public class ServerExecutor {
      * @return
      */
     synchronized public static ServerExecutor getInstance() {
-        if (serverexeutor == null) {
-            serverexeutor= new ServerExecutor();
+        if (serverexecutor == null) {
+            serverexecutor= new ServerExecutor();
         }
-        return serverexeutor;
+        return serverexecutor;
     }
 
+    
+    /**
+     * Call all registered Server implementations and invoke their 
+     * unregister(name) method to remove them from the Map of their class 
+     * specific Server class.
+     * This call is used when it need to be reloaded to re-read configuration.
+     * The "name" is what its register as for the specific Server 
+     * implementation. 
+     */
+    synchronized public void unregisterAll() {
+    	Iterator<String> iter = serverSet.keySet().iterator();
+        
+        while (iter.hasNext()) {    
+            String name = iter.next();
+            try {    
+                Method method = serverSet.get(name).getMethod(UNREGISTER,String.class);
+                method.invoke(null,name);
+            } catch (IllegalArgumentException e) {
+                LOGGER.error(e.toString() + ":" + e.getMessage());
+            } catch (IllegalAccessException e) {
+                LOGGER.error(e.toString() + ":" + e.getMessage());
+            } catch (InvocationTargetException e) {
+                LOGGER.error(e.toString() + ":" + e.getMessage());
+            } catch (SecurityException e) {
+                LOGGER.error(e.toString() + ":" + e.getMessage());
+            } catch (NoSuchMethodException e) {
+                LOGGER.error(e.toString() + ":" + e.getMessage());
+            }
+        }
+    	serverexecutor = null;
+    }
     
     /**
      * The execute method is called every time a ServiceJob has been execute 

@@ -37,26 +37,40 @@ import com.ingby.socbox.bischeck.TimeMeasure;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
-public final class OpenTSDBServer implements Server {
+/**
+ * This class is responsible to send bischeck data to a graphite server
+ * @author andersh
+ *
+ */
+public final class GraphiteServer implements Server {
 
-    private final static Logger LOGGER = Logger.getLogger(OpenTSDBServer.class);
-    static Map<String,OpenTSDBServer> servers = new HashMap<String,OpenTSDBServer>();
+    private final static Logger LOGGER = Logger.getLogger(GraphiteServer.class);
+    static Map<String,GraphiteServer> servers = new HashMap<String,GraphiteServer>();
     
     
     private String instanceName;
     private int port;
     private String hostAddress;
     private int connectionTimeout;
+	private String doNotSendRegex;
+	private String doNotSendRegexDelim;
+	private MatchServiceToSend msts = null;
     
-    private OpenTSDBServer (String name) {
+    private GraphiteServer (String name) {
+    
     	Properties defaultproperties = getServerProperties();
         Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+    
         hostAddress = prop.getProperty("hostAddress",
         		defaultproperties.getProperty("hostAddress"));
         port = Integer.parseInt(prop.getProperty("port",
         		defaultproperties.getProperty("port")));
         connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
         		defaultproperties.getProperty("connectionTimeout")));
+        doNotSendRegex = prop.getProperty("doNotSendRegex",
+        		defaultproperties.getProperty("doNotSendRegex"));
+        doNotSendRegexDelim = prop.getProperty("doNotSendRegexDelim",
+        		defaultproperties.getProperty("doNotSendRegexDelim"));
         instanceName = name;
     }
     
@@ -66,18 +80,18 @@ public final class OpenTSDBServer implements Server {
      * execute method. The created Server object is placed in the class internal 
      * Server object list.
      * @param name the name of the configuration in server.xml like
-     * {@code &lt;server name="my"&gt;}
+     * {@code &lt;server name="myGraphite"&gt;}
      * @return Server object
      */
     synchronized public static Server getInstance(String name) {
-    
-    	if (!servers.containsKey(name) ) {
-            servers.put(name,new OpenTSDBServer(name));
+    	
+        if (!servers.containsKey(name) ) {
+            servers.put(name,new GraphiteServer(name));
         }
         return servers.get(name);
     }
-    
-    
+
+   
     /**
      * Unregister the server and its configuration
      * @param name of the server instance
@@ -87,19 +101,52 @@ public final class OpenTSDBServer implements Server {
     }
     
     
+	private boolean doNotSend(Service service) {
+		if (msts == null)
+			msts = new MatchServiceToSend(MatchServiceToSend.ConvertString2List(doNotSendRegex,doNotSendRegexDelim));
+		/*
+		 * Loop through all host, service and serviceitems and check if 
+		 * match regex described doNotSendRegex 
+		 */
+		for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) { 
+			ServiceItem serviceItem = serviceItementry.getValue();
+
+			StringBuffer st = new StringBuffer().
+			append(service.getHost().getHostname()).append("-").
+			append(service.getServiceName()).append("-").
+			append(serviceItem.getServiceItemName());
+			if (msts.isMatch(st.toString())) {
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("Matching regex - will not send " + st.toString());	
+				return true;
+			}
+		}
+		return false;
+	}
+	
     @Override
     synchronized public void send(Service service) {
-        Socket opentsdbSocket = null;
+        Socket graphiteSocket = null;
         PrintWriter out = null;
-
         String message;    
+
+        /*
+         * Check if the message should be sent
+         */
+        
+        if(!doNotSendRegex.isEmpty()) {
+        	if (doNotSend(service)) {
+        		return;
+        	}
+        }
+        
         if ( service.isConnectionEstablished()) {
             message = getMessage(service);
         } else {
             message = null;
         }
 
-
+        
         LOGGER.info("******************** "+ instanceName +" *******************");
         LOGGER.info("*");
         LOGGER.info("*    Host: " + service.getHost().getHostname());
@@ -116,30 +163,29 @@ public final class OpenTSDBServer implements Server {
             InetAddress addr = InetAddress.getByName(hostAddress);
             SocketAddress sockaddr = new InetSocketAddress(addr, port);
 
-            opentsdbSocket = new Socket();
+            graphiteSocket = new Socket();
             
-            opentsdbSocket.connect(sockaddr,connectionTimeout);
+            graphiteSocket.connect(sockaddr,connectionTimeout);
                         
-            out = new PrintWriter(opentsdbSocket.getOutputStream(), true);
+            out = new PrintWriter(graphiteSocket.getOutputStream(), true);
             out.println(message);
             out.flush();
             
             duration = tm.stop();
-            LOGGER.info("OpenTSDB send execute: " + duration + " ms");
+            LOGGER.info("Graphite send execute: " + duration + " ms");
         } catch (UnknownHostException e) {
             LOGGER.error("Don't know about host: " + hostAddress);
         } catch (IOException e) {
-            LOGGER.error("Network error - check OpenTSDB server and that service is started - " + e);
+            LOGGER.error("Network error - check Graphite server and that service is started - " + e);
         }
         finally {
             try {
                 out.close();
             } catch (Exception ignore) {}    
             try {
-                opentsdbSocket.close();
+                graphiteSocket.close();
             } catch (Exception ignore) {}    
         }
-
     }
 
     private String getMessage(Service service) {
@@ -148,7 +194,7 @@ public final class OpenTSDBServer implements Server {
         long currenttime = System.currentTimeMillis()/1000;
         for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
             ServiceItem serviceItem = serviceItementry.getValue();
-            //put proc.loadavg.1m 1288946927 0.36 host=foo
+            //metric_path value timestamp\n
             
             strbuf = formatRow(strbuf, 
                     currenttime,
@@ -220,20 +266,17 @@ public final class OpenTSDBServer implements Server {
             String value) {
         
         strbuf.
-        append("put bischeck").
+        append(host).
+        append(".").
+        append(servicename).
+        append(".").
+        append(serviceitemname).
         append(".").
         append(metric).
         append(" ").
-        append(currenttime).
-        append(" ").
         append(value).
-        append(" host=").
-        append(host).
-        append(" service=").
-        append(servicename).
-        append(" serviceitem=").
-        append(serviceitemname).
-        append("\n");
+        append(" ").
+        append(currenttime).append("\n");
         
         return strbuf;
     }
@@ -242,9 +285,10 @@ public final class OpenTSDBServer implements Server {
 		Properties defaultproperties = new Properties();
 	    
 		defaultproperties.setProperty("hostAddress","localhost");
-    	defaultproperties.setProperty("port","5667");
+    	defaultproperties.setProperty("port","2003");
     	defaultproperties.setProperty("connectionTimeout","5000");
-	
+    	defaultproperties.setProperty("doNotSendRegex","");
+    	defaultproperties.setProperty("doNotSendRegexDelim","%");
 		return defaultproperties;
 	}
 }
