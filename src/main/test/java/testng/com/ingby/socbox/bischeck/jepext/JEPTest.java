@@ -19,79 +19,74 @@
 
 package testng.com.ingby.socbox.bischeck.jepext;
 
-import org.nfunk.jep.JEP;
+import org.nfunk.jep.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 
 public class JEPTest {
 
-	JEP parser = null;
+	static ExecuteJEP parser = null;
 	@BeforeTest
     public void beforeTest()  {
-		parser = new JEP();        // Create a new parser	
-		parser.addStandardFunctions();
-		parser.addStandardConstants();
-		
-    }
+		parser = new ExecuteJEP();        // Create a new parser	
+	}
     
     @Test (groups = { "JEP" })
     public void verifyFunctions() throws Exception {
     	String expr = "round(2.123456,2)";
-    	Assert.assertEquals(calc(parser,expr),new Double(2.12));
+    	Assert.assertEquals(calc(expr),new Float(2.12));
     	expr = "round(2.123456,5)";
-    	Assert.assertEquals(calc(parser,expr),new Double(2.12346));
+    	Assert.assertEquals(calc(expr),new Float(2.12346));
     	expr = "ceil(2.123)";
-    	Assert.assertEquals(calc(parser,expr),new Double(3));
+    	Assert.assertEquals(calc(expr),new Float(3));
     	expr = "floor(2.123)";
-    	Assert.assertEquals(calc(parser,expr),new Double(2));
+    	Assert.assertEquals(calc(expr),new Float(2));
     	expr = "abs(-2.123)";
-    	Assert.assertEquals(calc(parser,expr),new Double(2.123));
+    	Assert.assertEquals(calc(expr),new Float(2.123));
     	expr = "mod(4,6)";
-    	Assert.assertEquals(calc(parser,expr),new Double(4));
+    	Assert.assertEquals(calc(expr),new Float(4));
     	expr = "sqrt(4)";
-    	Assert.assertEquals(calc(parser,expr),new Double(2));
+    	Assert.assertEquals(calc(expr),new Float(2));
     	expr = "sum(4,6)";
-    	Assert.assertEquals(calc(parser,expr),new Double(10));
+    	Assert.assertEquals(calc(expr),new Float(10));
+    	expr = "sumNull(4,null,6)";
+    	Assert.assertEquals(calc(expr),new Float(10));
+    	
     	//expr = "signum(-10)";
-    	//Assert.assertEquals(calc(parser,expr),new Double(-1));
+    	//Assert.assertEquals(calc(parser,expr),new Float(-1));
     	expr = "ln(2)";
-    	Assert.assertEquals(calc(parser,expr),new Double(0.6931471805599453));
+    	Assert.assertEquals(calc(expr),new Float(0.6931471805599453));
     	expr = "log(10)";
-    	Assert.assertEquals(calc(parser,expr),new Double(1));
+    	Assert.assertEquals(calc(expr),new Float(1));
     	//expr = "lg(2)";
-    	//Assert.assertEquals(calc(parser,expr),new Double(-1));
+    	//Assert.assertEquals(calc(parser,expr),new Float(-1));
     	expr = "exp(2)";
-    	Assert.assertEquals(calc(parser,expr),new Double(7.38905609893065));
+    	Assert.assertEquals(calc(expr),new Float(7.38905609893065));
     	expr = "pow(2,2)";
-    	Assert.assertEquals(calc(parser,expr),new Double(4));
+    	Assert.assertEquals(calc(expr),new Float(4));
     	expr = "rand()";
-    	Assert.assertNotEquals(calc(parser,expr),new Double(-1));
+    	Assert.assertNotEquals(calc(expr),new Float(-1));
     	expr = "if(2 > 1, 1, -1)";
-    	Assert.assertEquals(calc(parser,expr),new Double(1));
+    	Assert.assertEquals(calc(expr),new Float(1));
     	expr = "if(2 < 1, 1, -1)";
-    	Assert.assertEquals(calc(parser,expr),new Double(-1));
-
-
+    	Assert.assertEquals(calc(expr),new Float(-1));
     }
     
-    public static Double calc(JEP parser, String expr) {
-		double value;
-		parser.parseExpression(expr);                 // Parse the expression
-		if (parser.hasError()) {
+    public static Float calc(String expr) {
+		Float value = null;
+		try {
+		value = parser.execute(expr);                 // Parse the expression
+		} catch (ParseException pe) {
 			System.out.println("Error while parsing");
-			System.out.println(parser.getErrorInfo());
-			return new Double(-1);
+			System.out.println(pe.getMessage());
+			return new Float(-1);
 		}
 		
-		value = parser.getValue();                    // Get the value
-		if (parser.hasError()) {
-			System.out.println("Error during evaluation");
-			System.out.println(parser.getErrorInfo());
-			return new Double(-1);
-		}
-		System.out.println(expr + " > " + value);
 		return value;
 	}
 }
+
+    

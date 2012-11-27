@@ -183,7 +183,7 @@ public class CalculateOnCacheTest {
     }
 
     @Test (groups = { "ServiceItem" })
-    public void verifyNull() throws Exception {
+    public void verifyServiceNull() throws Exception {
     	Service bis = new LastCacheService("serviceName");
 		ServiceItem coc = new CalculateOnCache("serviceItemName");
 		coc.setService(bis);

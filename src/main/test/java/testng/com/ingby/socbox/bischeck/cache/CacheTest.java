@@ -40,7 +40,6 @@ public class CacheTest {
 	String qhostname = "test\\-server.ingby.com";
 	String servicename = "service@first";
 	String serviceitemname = "_service.item_123";
-	//String cachekey = Util.fullName(hostname, servicename, serviceitemname);
 	String cachekey = Util.fullName(qhostname, servicename, serviceitemname);
 
 	private boolean supportNull = false;
@@ -48,15 +47,14 @@ public class CacheTest {
 	@BeforeTest
     public void beforeTest() throws Exception {
 	
-
 		confMgmr = ConfigurationManager.getInstance();
 	
 		if (confMgmr == null) {
 			System.setProperty("bishome", ".");
 			ConfigurationManager.init();
-			confMgmr = ConfigurationManager.getInstance();
-			
+			confMgmr = ConfigurationManager.getInstance();	
 		}
+		
 		if (ConfigurationManager.getInstance().getProperties().
 				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
 			supportNull =true;
