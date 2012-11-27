@@ -23,7 +23,12 @@ package com.ingby.socbox.bischeck;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,7 +91,8 @@ public final class Execute implements ExecuteMBean {
 	private static final long SHUTDOWNSLEEPDEF = 3000; 
     
 	private static long looptimeout = LOOPTIMEOUTDEF;
-	private static long shutdownsleep = SHUTDOWNSLEEPDEF; 
+	private static long shutdownsleep = SHUTDOWNSLEEPDEF;
+	private static String bischeckversion; 
     
 	/*
 	 * The admin jobs are:
@@ -162,7 +168,6 @@ public final class Execute implements ExecuteMBean {
         	}
 
         	retStat = Execute.getInstance().daemon();
-        	//retStat = (new Execute()).daemon();
         	LOGGER.info("Method Execute returned " + retStat);
         } while (retStat == RESTART);
  
@@ -224,8 +229,9 @@ public final class Execute implements ExecuteMBean {
         } catch (SchedulerException e) {
             LOGGER.warn("Stopping Quartz scheduler failed with - " + e);
         }
+        
         ServerExecutor.getInstance().unregisterAll();
-        //LastStatusCache.getInstance().dump2file();
+       
         CacheFactory.close();
         LOGGER.info("******************* Shutdown ********************");
         
@@ -261,6 +267,7 @@ public final class Execute implements ExecuteMBean {
 		System.out.close();
 		System.err.close();
 
+		bischeckversion = readBischeckVersion();
 		addDaemonShutdownHook();
 	}
 
@@ -471,7 +478,23 @@ public final class Execute implements ExecuteMBean {
     	return reloadcount;
     }
 
-   
+    
+    @Override
+    public String getBischeckHome() {
+    	return System.getProperty("bishome");
+    }
+    
+    
+    @Override
+    public String getXmlConfigDir() {
+    	return System.getProperty("xmlconfigdir");   
+    }
+    
+    @Override 
+    public String getBischeckVersion() {
+    	return bischeckversion;
+    }
+
     
     @Override
     public String[] getTriggers() {
@@ -530,6 +553,45 @@ public final class Execute implements ExecuteMBean {
         
         return numberoftriggers-NUMOFADMINJOBS;
     }
+
+	
+	private String readBischeckVersion() {
+		String bischeckversion;
+		FileInputStream fstream = null;
+		DataInputStream in = null;
+		BufferedReader br = null;
+		String path = null;
+		
+		if (System.getProperty("bishome") != null)
+			path=System.getProperty("bishome");
+		else {
+			LOGGER.error("System property bishome must be set");
+		}
+
+		try {
+			fstream = new FileInputStream(path + File.separator + "version.txt");
+
+			in = new DataInputStream(fstream);
+			br = new BufferedReader(new InputStreamReader(in));
+			bischeckversion = br.readLine();
+			LOGGER.info("Bisheck version is " + bischeckversion);
+		} catch (Exception ioe) {
+			bischeckversion = "N/A";
+			LOGGER.error("Can not determine the bischeck version");
+		}
+		finally {
+			try {
+				br.close();
+			} catch (Exception ignore) {}
+			try {
+				in.close();
+			} catch (Exception ignore) {}
+			try {
+				fstream.close();
+			} catch (Exception ignore) {}	
+		}
+		return bischeckversion;
+	}
 
 }
 

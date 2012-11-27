@@ -61,5 +61,25 @@ public interface ExecuteMBean {
     public Integer getReloadCount();
     
     
+    /**
+     * Get the bischeck install directory
+     * @return install directory 
+     */
+    public String getBischeckHome();
+    
+    
+    /**
+     * Get the path relative to the bischeck install directory where 
+     * configuration files resides.
+     * @return configuration file directory
+     */
+    public String getXmlConfigDir();
+    
+    
+    /**
+     * Return the version of bischeck
+     * @return current version
+     */
+    public String getBischeckVersion();
     
 }
