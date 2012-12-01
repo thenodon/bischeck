@@ -9,7 +9,7 @@
     <!-- ==== File and Directory Names =================================== -->
     <property name="app.name" value="bischeck" />
     <property name="app.path" value="/${app.name}" />
-    <property name="app.version" value="0.4.2_RC2" />
+    <property name="app.version" value="0.4.2" />
     <property name="build.home" value="${basedir}/target" />
     <property name="dist.home" value="${basedir}/dist" />
     <property name="bin.home" value="${basedir}/bin" />
@@ -214,6 +214,7 @@
 
             <doctitle><![CDATA[<h1>Bischeck</h1>]]></doctitle>
             <bottom><![CDATA[<i>Copyright &#169; 2010-2011 Anders Haal. All Rights Reserved.</i>]]></bottom>
+        	<link href="http://docs.oracle.com/javase/6/docs/api/" packagelistLoc="http://docs.oracle.com/javase/6/docs/api/"/>
         </javadoc>
     </target>
 
