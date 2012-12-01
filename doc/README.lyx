@@ -103,11 +103,11 @@ A Business Activity Monitoring Server
 \end_layout
 
 \begin_layout Date
-Version 0.4.2 Release candidate 2
+Version 0.4.2 Release candidate 3
 \begin_inset Newline newline
 \end_inset
 
-2012-11-18
+2012-11-x
 \end_layout
 
 \begin_layout Standard
@@ -233,7 +233,7 @@ Integration with multiple monitoring and surveillance tools, like any Nagios
 status open
 
 \begin_layout Plain Layout
-[Beta in 0.4.1]
+[New in 0.4.2]
 \end_layout
 
 \end_inset
@@ -249,7 +249,17 @@ Nagios Core, Nagios XI, Icinga, OP5 Monitor, Shinken, Opsview, Centreon,
 
 \end_inset
 
-, OpenTSDB and more.
+, OpenTSDB, Graphite 
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.2]
+\end_layout
+
+\end_inset
+
+ and more.
 \begin_inset Note Greyedout
 status open
 
@@ -1392,6 +1402,12 @@ if(cond, trueval, falseval) - if the cond expression is true trueval is
 \end_layout
 
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "Label:JEP-extensions"
+
+\end_inset
+
 JEP extensions
 \end_layout
 
@@ -1402,15 +1418,25 @@ n.
 \end_layout
 
 \begin_layout Itemize
-avg(x1,x2,x3,...) - Calculate the average of the list of values.
+avg(x1,x2,x3,...) - Calculate the average of the list of numbers.
 \end_layout
 
 \begin_layout Itemize
-max(x1,x2,x3,...) - Calculate the max value of the list of values.
+max(x1,x2,x3,...) - Calculate the max value of the list of numbers.
 \end_layout
 
 \begin_layout Itemize
-min(x1,x2,x3,...) - Calculate the min value of the list of values.
+min(x1,x2,x3,...) - Calculate the min value of the list of numbers.
+\end_layout
+
+\begin_layout Itemize
+multNull((x1,x2,x3,...) - Multiply the numbers in the list, but if any of the
+ numbers are null the function will return null.
+\end_layout
+
+\begin_layout Itemize
+multDiv(x1,x2) - Divide the numbers, but if any of the numbers are null
+ the function will return null.
 \end_layout
 
 \begin_layout Section
@@ -1486,8 +1512,8 @@ status open
 
 \begin_layout Plain Layout
 
-sum(erphost-orders-ediorders[0],erphost-orders-phoneorders[0]) * erphost-orders-
-state[0]
+sum(erphost-orders-ediorders[0], erphost-orders-phoneorders[0]) * erphost-orders
+-state[0]
 \end_layout
 
 \end_inset
@@ -1496,14 +1522,24 @@ state[0]
 \end_layout
 
 \begin_layout Standard
-In the above example the sum function will evaluate to null if erphost-orders-ed
-iorders[0] and/or erphost-orders-phoneorders[0] return null.
+In the above example the 
+\emph on
+sum
+\emph default
+ function will evaluate to null if erphost-orders-ediorders[0] 
+\bar under
+and/or 
+\bar default
+erphost-orders-phoneorders[0] return null.
  If the the property 
 \emph on
 notFullListParse
 \emph default
- is set the sum function will only return null if both erphost-orders-ediorders[
-0] 
+ is set the 
+\emph on
+sum
+\emph default
+ function will only return null if both erphost-orders-ediorders[0] 
 \series bold
 and
 \series default
@@ -1522,7 +1558,11 @@ By the example we can see that the property
 notFullListParse 
 \emph default
 has effect on how null is managed for functions that manage a list of data
- like sum, avg, max, min, etc.
+ like 
+\emph on
+sum, avg, max, min
+\emph default
+, etc.
  What the 
 \emph on
 notFullListParse
@@ -1555,7 +1595,10 @@ If the
 \emph on
 notFullListParse
 \emph default
- is set to true all the cache data in erphost-orders-ediorders[0:100] and
+ is set to true all the cache data in erphost-orders-ediorders[0:100] 
+\bar under
+and
+\bar default
  erphost-orders-phoneorders[-5M:-15M] will be filtered out.
  For functions like avg the average will only be based on the none null
  values.
@@ -1566,6 +1609,98 @@ The only exception to this rule is when using time range like erphost-orders-pho
 neorders[-5M:-15M].
  A time range will resolve to null if the lower or higher boundaries are
  not in the range of the data that exists in the cache.
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+nullFullListParse
+\emph default
+ property also have another implication and that if using mathematical expressio
+ns inside a function that take a list of values.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+avg(erphost-orders-ediorders[0] * 2, erphost-orders-phoneorders[0] * 3)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above example will result in null for the whole 
+\emph on
+avg
+\emph default
+ function if any of erphost-orders-ediorders[0] 
+\bar under
+or
+\bar default
+ erphost-orders-phoneorders[0] is null since the multiply with a constant
+ will fail if any of the cache data are null.
+ To manage this the 
+\emph on
+multNull
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+
+\emph on
+See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Label:JEP-extensions"
+
+\end_inset
+
+ for more information about functions that manage null.
+\end_layout
+
+\end_inset
+
+ 
+\emph default
+function must be used instead of the * operator.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+avg(multNull(erphost-orders-ediorders[0],2), multNull(erphost-orders-phoneorders
+[0],3))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using multNull will result in that the 
+\emph on
+avg
+\emph default
+ function will return null only if both erphost-orders-ediorders[0] 
+\bar under
+and
+\bar default
+ erphost-orders-phoneorders[0] are null.
 \end_layout
 
 \begin_layout Chapter
@@ -1860,8 +1995,8 @@ Server integration
 \end_layout
 
 \begin_layout Standard
-Since bischeck support integration with multiple monitoring its not possible
- to define a single message format or protocol.
+Since bischeck support integration with multiple monitoring infrastructures
+ its not possible to define a single message format or protocol.
  For that reason each Server class implementation is responsible for message
  formatting and communication with the integrated server.
  If the server system is not responding the message will be dropped on the
@@ -2104,6 +2239,12 @@ stateOnNull
 \end_layout
 
 \begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:OpenTSDB"
+
+\end_inset
+
 OpenTSDB
 \end_layout
 
@@ -2113,7 +2254,7 @@ OpenTSDB is an monitoring system that provide storage and indexing of high
  Access to the data in through a graphical web console provide easy way
  to view many different data sources for advanced analysis.
  The OpenTSDB integration is provided over OpenTSDB text based protocol.
- From bischeck the format will be the following for put host erpserver,
+ From bischeck the format will be the following for the host erpserver,
  service orders and service item ediOrders:
 \end_layout
 
@@ -2183,6 +2324,173 @@ port - the socket port number on the OpenTSDB server where OpenTSDB is listening
 \begin_layout Itemize
 connectionTimeout - the timeout time in milliseconds before bischeck give
  up on the the connection, default is 5000.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Graphite"
+
+\end_inset
+
+Graphite
+\end_layout
+
+\begin_layout Standard
+Graphite is an monitoring system that provide excellent graphing.
+ Access to the data in through a graphical web console provide easy way
+ to view many different data sources for advanced analysis.
+ The Graphite integration is provided over Graphites text based protocol.
+ The format has the following simple format:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+metric_path value timestamp
+\backslash
+n
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The metric_path is the dot separated string like foo.bar.baz.
+ Value is a number and timestamp is the UNIX epoch time in milliseconds.
+ 
+\end_layout
+
+\begin_layout Standard
+From bischeck the format will be the following for the host erpserver, service
+ orders and service item ediOrders:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+erpserver.orders.ediOrders.measured 12000 1288946927
+\backslash
+n
+\end_layout
+
+\begin_layout Plain Layout
+
+erpserver.orders.ediOrders.threshold 11000 1288946927
+\backslash
+n
+\end_layout
+
+\begin_layout Plain Layout
+
+erpserver.orders.ediOrders.warning 9900 1288946927
+\backslash
+n
+\end_layout
+
+\begin_layout Plain Layout
+
+erpserver.orders.ediOrders.critical 7700 1288946927
+\backslash
+n
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So for each host, service and service item configuration 4 lines of data
+ will be sent to the Graphite server for the measured, threshold, warning
+ and critical value.
+\end_layout
+
+\begin_layout Standard
+The Graphite server integration support a method to filter what data that
+ will be sent to Graphite.
+ The filter is defined by regular expression with the property 
+\emph on
+doNotSendRegex
+\emph default
+.
+ If a host-service-serviceitem in anyway match the regular expression it
+ will not be sent to Graphite.
+ Multiple regular expressions can be defined by a list of regular expressions
+ in the property 
+\emph on
+doNotSendRegex
+\emph default
+ by setting a delimiter between the regular expressions defined by the property
+ 
+\emph on
+doNotSendRegexDelim
+\emph default
+.
+ For example the regular expression 
+\emph on
+^erpserver
+\emph default
+ will not send any host-service-serviceitem that begins with the string
+ erpserver.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The configuration parameters that need to be define in the server.xml for
+ OpenTSDB are:
+\end_layout
+
+\begin_layout Itemize
+class - GraphiteServer
+\end_layout
+
+\begin_layout Itemize
+hostAddress - the IP or name for the Graphite server, default is localhost.
+\end_layout
+
+\begin_layout Itemize
+port - the socket port number on the Graphite server where Graphite is listening
+, default is 2003.
+\end_layout
+
+\begin_layout Itemize
+connectionTimeout - the timeout time in milliseconds before bischeck give
+ up on the the connection, default is 5000.
+\end_layout
+
+\begin_layout Itemize
+doNotSendRegex - A list of regular expressions.
+ Default is no regular expressions.
+\end_layout
+
+\begin_layout Itemize
+doNotSendRegexDelim - The delimiter to separate regular expressions in the
+ property doNotSendRegex, default is 
+\begin_inset Quotes eld
+\end_inset
+
+%
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Chapter
@@ -3702,6 +4010,13 @@ status open
 
 \end_layout
 
+\begin_layout Standard
+The initial start time for an interval based schedule is calculated as a
+ time randomly in the specified interval.
+ For 10M this means that the service first schedule is between 0 to 10 minutes
+ from the start time of bischeck or at a reload.
+\end_layout
+
 \begin_layout Section
 Cron based scheduling
 \end_layout
@@ -4729,16 +5044,52 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.4.2_RC2 - 2012-11-18
-\end_layout
-
-\begin_layout Standard
-This is minor release.
- 
+Release 0.4.2 - 2012-12-X
 \end_layout
 
 \begin_layout Subsection
 New feature
+\end_layout
+
+\begin_layout Itemize
+[FR-234] Distribute the start time when running interval based scheduling.
+ This will increase the distribution of service executions especially if
+ bischeck is configured with many services that is executed on the same
+ interval.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-233] Support for server integration with Graphite.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Graphite"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+[FR-232] Support for executing check commands.
+ The check commands that can be used must support an output of performance
+ data.
+ Bischeck will not care about the status that comes from a check command.
+ Instead it will only use the performance data to evaluate its own threshold.
+ This include the new service class 
+\emph on
+ShellService
+\emph default
+ and serviceitem class 
+\emph on
+CheckCommandServiceItem
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+[FR-224] Support for NRDP through the new server class NRDPServer.
 \end_layout
 
 \begin_layout Itemize
@@ -4800,6 +5151,13 @@ saveNullOnConnectionError
  you will now get a null value inserted into the cache when a connection
  exception is thrown.
  For backwards compatibility the default value of the property is false.
+ 
+\end_layout
+
+\begin_layout Itemize
+More mathematical functions like multNull and multDiv that support null
+ value as part of the calculation and can be used with functions that take
+ a list of numbers to manage calculation where cache data may be null.
  
 \end_layout
 

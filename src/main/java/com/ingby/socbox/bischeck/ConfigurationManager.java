@@ -27,6 +27,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -499,24 +500,24 @@ public final class ConfigurationManager  {
             
             
         } else if (isIntervalTrigger(schedule)){
-            //simpleSchedule();
-				// Simple schedule
-            
-                trigger = newTrigger()
-                .withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
-                .withSchedule(
-                		//simpleSchedule().
-                		SimpleScheduleBuilder.
-                		repeatSecondlyForever(calculateInterval(schedule)).
-                		withMisfireHandlingInstructionNextWithRemainingCount())
-                .build();
+        	// Simple schedule
+        	trigger = newTrigger()
+        	.withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
+        	.startAt(randomStartTime(calculateInterval(schedule)))
+        	.withSchedule(
+        			//simpleSchedule().
+        			SimpleScheduleBuilder.
+        			repeatSecondlyForever(calculateInterval(schedule)).
+        			withMisfireHandlingInstructionNextWithRemainingCount())
+        			.build();
+        	
         } else if (isRunAfterTrigger(schedule)) {
         	int index = schedule.indexOf("-");
         	String hostname = schedule.substring(0, index);
         	String servicename = schedule.substring(index+1, schedule.length());
         	LOOGER.debug("Service will run after " + hostname + " " + servicename);
         	RunAfter runafterkey = new RunAfter(hostname, servicename);
-        	
+
         	if (!runafter.containsKey(runafterkey)) {
         		LOOGER.debug("Add service to " + hostname + " " + servicename);
         		runafter.put(runafterkey, new ArrayList<Service>());		
@@ -530,6 +531,21 @@ public final class ConfigurationManager  {
         return trigger;
     }
 
+    
+    /**
+     * The method calculate Date based on the 
+     * current-time + random(0,intervalinsec). This value is used to set the
+     * Initial start time of an interval schedule. 
+     * @param intervalinsec the interval to calculate the offset from
+     * @return a Date that is current-time + current-time + random(0,intervalinsec) 
+     */
+    private Date randomStartTime(int intervalinsec) {
+    	long randomininterval = ((long) (Math.random()*intervalinsec*1000));
+    	long starttime = System.currentTimeMillis()+randomininterval;
+    	return new Date(starttime);
+    	
+    }
+    
     
     /**
      * Creates a simple or cron trigger based on format.
