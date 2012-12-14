@@ -24,6 +24,8 @@ import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.apache.log4j.Logger;
+
+import com.ingby.socbox.bischeck.ClassCache;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 
@@ -55,10 +57,10 @@ public class ServiceFactory {
         Class<Service> clazz = null;
         
         try {
-            clazz = (Class<Service>) Thread.currentThread().getContextClassLoader().loadClass("com.ingby.socbox.bischeck.service."+clazzname);
+            clazz = (Class<Service>) ClassCache.getClassByName("com.ingby.socbox.bischeck.service."+clazzname);
         } catch (ClassNotFoundException e) {
             try { 
-                clazz = (Class<Service>) Thread.currentThread().getContextClassLoader().loadClass(clazzname);
+                clazz = (Class<Service>) ClassCache.getClassByName(clazzname);
             }catch (ClassNotFoundException ee) {
                 LOGGER.fatal("Service class " + clazzname + " not found.");
                 throw new Exception(e.getMessage());
