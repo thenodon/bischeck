@@ -40,7 +40,7 @@ import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
-import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
+import com.ingby.socbox.bischeck.jepext.ExecuteJEPPool;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHoliday;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHours;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLMonths;
@@ -54,7 +54,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     private final static Logger LOGGER = Logger.getLogger(Twenty4HourThreshold.class);
 
-    private ExecuteJEP jep = null;
+	private static XMLTwenty4Threshold twenty4hourconfig;
+
+    //private ExecuteJEP jep = null;
 
     private String serviceName;
     private String serviceItemName;
@@ -131,7 +133,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     
     public Twenty4HourThreshold() {
-        this.jep = new ExecuteJEP();
+        //this.jep = new ExecuteJEP();
         this.state = NAGIOSSTAT.OK;
     
         Integer stateAsInt = null;
@@ -449,15 +451,30 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         }
     }
 
+    public static void unregister() {
+    	twenty4hourconfig = null;
+    }
+    
+    
+    private synchronized static XMLTwenty4Threshold configInit() throws Exception {
+    	if (twenty4hourconfig == null) {
+    		ConfigFileManager xmlfilemgr = new ConfigFileManager();
+    		//XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
+    		twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD);
+    	}
+    	return twenty4hourconfig;
+    }
+    
     
     private void init(Calendar now) throws Exception  {
-        
+        /*
         //ConfigurationManager configMgr = ConfigurationManager.getInstance();
     	ConfigFileManager xmlfilemgr = new ConfigFileManager();
         //XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
         XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD);
-        
-        
+        */
+    	XMLTwenty4Threshold twenty4hourconfig = configInit();
+    	
         int year=now.get(Calendar.YEAR);
         int month=now.get(Calendar.MONTH) + 1;
         int dayofmonth=now.get(Calendar.DAY_OF_MONTH);
@@ -661,13 +678,27 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 			}
 			else {
 			
-				Float value;
+				//Float value;
+				Float value = null;
+	    		ExecuteJEP jep = ExecuteJEPPool.getInstance().checkOut();
+	    		try {
+	    			value = jep.execute(parsedstr);
+	    		} catch (ParseException e) { 
+					return null;
+				} finally {
+	    			ExecuteJEPPool.getInstance().checkIn(jep);
+	    			jep = null;
+	    		}
+				
+				
+				
+				/*
 				try {
 					value = jep.execute(parsedstr);
 				} catch (ParseException e) { 
 					return null;
 				}
-				
+				*/
 	    		if (value == null) 
 	    			return null;
 	    		
