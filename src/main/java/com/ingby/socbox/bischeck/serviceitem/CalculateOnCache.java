@@ -31,14 +31,11 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     
     @SuppressWarnings("unused")
 	private final static Logger LOGGER = Logger.getLogger(CalculateOnCache.class);
-
-    //private ExecuteJEP jep = null;
     
 
     
     public CalculateOnCache(String name) {
         this.serviceItemName = name;    
-        //this.jep = new ExecuteJEP();
     }
     
     
@@ -49,7 +46,6 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     public void execute() throws Exception {                
         
     	
-    	//String cacheparsedstr = CacheEvaluator.parse(getExecution());
     	String cacheparsedstr = service.executeStmt(getExecution());
     	
     	if (cacheparsedstr == null) {
@@ -60,7 +56,6 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     		Float value = null;
     		ExecuteJEP jep = ExecuteJEPPool.getInstance().checkOut();
     		try {
-    		//Float value = jep.execute(cacheparsedstr);
     			value = jep.execute(cacheparsedstr);
     		} finally {
     			ExecuteJEPPool.getInstance().checkIn(jep);
