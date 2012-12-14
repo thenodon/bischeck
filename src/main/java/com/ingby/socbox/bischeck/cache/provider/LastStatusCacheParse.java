@@ -70,8 +70,13 @@ public class LastStatusCacheParse {
 		Matcher mat = pat.matcher (str);
 
 		String arraystr="";
+		/*
 		final Timer timer = Metrics.newTimer(LastStatusCache.class, 
 				str.replaceAll("[^a-zA-Z0-9_\\.-]", "_"), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		*/
+		final Timer timer = Metrics.newTimer(LastStatusCache.class, 
+				"parse", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		
 		final TimerContext context = timer.time();
 
 		StringTokenizer st = null;
