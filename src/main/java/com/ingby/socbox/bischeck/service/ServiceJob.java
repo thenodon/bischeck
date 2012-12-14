@@ -202,7 +202,7 @@ public class ServiceJob implements Job {
             synchronized (service) {
 
             	final Timer timer = Metrics.newTimer(ServiceJob.class, 
-            			fullservicename, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+            			"execute", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
             	final TimerContext context = timer.time();
             	
             	Long executetime = null;
@@ -249,7 +249,7 @@ public class ServiceJob implements Job {
             }
 
             final Timer timer = Metrics.newTimer(Threshold.class, 
-        			fullservicename, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        			"execute", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
         	final TimerContext ctxthreshold = timer.time();
         	
             try {
