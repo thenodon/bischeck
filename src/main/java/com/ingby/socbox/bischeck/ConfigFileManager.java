@@ -22,6 +22,9 @@ package com.ingby.socbox.bischeck;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -46,6 +49,9 @@ import com.ingby.socbox.bischeck.ConfigXMLInf.XMLCONFIG;
 public class ConfigFileManager {
 
 	private final static Logger  LOGGER = Logger.getLogger(ConfigFileManager.class);
+	
+	// A cache of JAXBContext object used so they are not created on every reload
+	private static Map<String,JAXBContext> jccache = Collections.synchronizedMap(new HashMap<String,JAXBContext>());
 
 
 	/**
@@ -132,12 +138,18 @@ public class ConfigFileManager {
 		File configfile = new File(directory,xmlconf.xml());
 		JAXBContext jc;
 
-		try {
-			jc = JAXBContext.newInstance(xmlconf.instance());
-		} catch (JAXBException e) {
-			LOGGER.error("Could not get JAXB context from class");
-			throw new Exception(e.getMessage());
+
+		jc = jccache.get(xmlconf.instance());
+		if (jc == null) {
+			try {
+				jc = JAXBContext.newInstance(xmlconf.instance());
+				jccache.put(xmlconf.instance(),jc);
+			} catch (JAXBException e) {
+				LOGGER.error("Could not get JAXB context from class");
+				throw new Exception(e.getMessage());
+			}
 		}
+		
 		SchemaFactory sf = SchemaFactory.newInstance(
 				javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = null;
@@ -209,12 +221,17 @@ public class ConfigFileManager {
 
 		JAXBContext jc;
 
-		try {
-			jc = JAXBContext.newInstance(xmlconf.instance());
-		} catch (JAXBException e) {
-			LOGGER.error("Could not get JAXB context from class");
-			throw new Exception(e.getMessage());
+		jc = jccache.get(xmlconf.instance());
+		if (jc == null) {
+			try {
+				jc = JAXBContext.newInstance(xmlconf.instance());
+				jccache.put(xmlconf.instance(),jc);
+			} catch (JAXBException e) {
+				LOGGER.error("Could not get JAXB context from class");
+				throw new Exception(e.getMessage());
+			}
 		}
+		
 		SchemaFactory sf = SchemaFactory.newInstance(
 				javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = null;
