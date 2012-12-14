@@ -81,7 +81,7 @@ public class ExecuteJEP {
 		if (LOGGER.isDebugEnabled()) 
 			LOGGER.debug("Parse :" + executeexp);
 		final Timer timer = Metrics.newTimer(ExecuteJEP.class, 
-				"Calulate", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				"calulate", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 		Float value = null;
 		try {
