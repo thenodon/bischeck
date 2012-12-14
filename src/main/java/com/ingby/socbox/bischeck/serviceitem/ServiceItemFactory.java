@@ -24,6 +24,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
 
+import com.ingby.socbox.bischeck.ClassCache;
+
 
 public class ServiceItemFactory {
 
@@ -38,14 +40,10 @@ public class ServiceItemFactory {
         Class<ServiceItem> clazz = null;
 
         try {
-            clazz = (Class<ServiceItem>) Thread.currentThread().
-            getContextClassLoader().
-            loadClass("com.ingby.socbox.bischeck.serviceitem." +clazzname);
+            clazz = (Class<ServiceItem>) ClassCache.getClassByName("com.ingby.socbox.bischeck.serviceitem." +clazzname);
         } catch (ClassNotFoundException e) {
             try {
-                clazz = (Class<ServiceItem>) Thread.currentThread().
-                getContextClassLoader().
-                loadClass(clazzname);
+            	clazz = (Class<ServiceItem>) ClassCache.getClassByName(clazzname);
             }catch (ClassNotFoundException ee) {
                 LOGGER.fatal("ServiceItem class " + clazzname + " not found.");
                 throw ee;
