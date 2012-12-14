@@ -109,7 +109,7 @@ public class BackendStorage {
 		copyFile(dumpfile,new File(lastStatusCacheDumpFile+".bak"));
 		FileWriter filewriter = null;
 		BufferedWriter dumpwriter = null;
-		logger.debug("Start dump cache");
+		logger.info("Start dump cache");
 
 		try {
 			filewriter = new FileWriter(dumpfile);
