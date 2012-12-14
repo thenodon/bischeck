@@ -45,7 +45,7 @@ public interface ExecuteMBean {
     /**
      * Reload/restart bischeck with the configuration in the etc directory 
      */
-    public void reload();
+    public boolean reload();
 
     
     /**
@@ -82,4 +82,8 @@ public interface ExecuteMBean {
      */
     public String getBischeckVersion();
     
+    
+    public int cacheClassHit();
+	public int cacheClassMiss();
+	public int cacheClassSize();
 }

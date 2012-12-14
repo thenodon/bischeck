@@ -76,7 +76,7 @@ public final class Execute implements ExecuteMBean {
     private Boolean reloadRequested = false;
     private Integer reloadcount = 0;
     private Long reloadtime = null;
-    
+    private Boolean allowReload = false;
     
     private static Execute exec = new Execute();
     
@@ -91,9 +91,10 @@ public final class Execute implements ExecuteMBean {
 	private static final long SHUTDOWNSLEEPDEF = 3000; 
     
 	private static long looptimeout = LOOPTIMEOUTDEF;
-	private static long shutdownsleep = SHUTDOWNSLEEPDEF;
-	private static String bischeckversion; 
-    
+	private static long shutdownsleep = SHUTDOWNSLEEPDEF; 
+	private static String bischeckversion;
+	private static Thread mainthread; 
+
 	/*
 	 * The admin jobs are:
 	 * - threshold cache depleted
@@ -101,6 +102,7 @@ public final class Execute implements ExecuteMBean {
 	private static final int NUMOFADMINJOBS = 1;
 	
     private String status = null;
+    
     
     //private ConfigurationManager confMgr = null;
     
@@ -153,7 +155,7 @@ public final class Execute implements ExecuteMBean {
             formatter.printHelp( "Bischeck", options );
             System.exit(OKAY);
         }
-        
+        mainthread = Thread.currentThread();
         int retStat = OKAY;
         do {
         	
@@ -299,7 +301,7 @@ public final class Execute implements ExecuteMBean {
      * each quartz trigger scheduled is printed every LOOPTIMEOUT ms. 
      */
 	private void deamonLoop() {
-		
+		allowReload = true;
 		do {
             try {
                 synchronized(syncObj) {
@@ -324,6 +326,7 @@ public final class Execute implements ExecuteMBean {
             } 
         
         } while (!isShutdownRequested());
+		allowReload = false;
 	}
 
 	
@@ -423,7 +426,16 @@ public final class Execute implements ExecuteMBean {
      * Setup a OS hook to catch a shutdown signal.
      */
     protected void addDaemonShutdownHook(){
-        Runtime.getRuntime().addShutdownHook( new Thread() { public void run() { shutdown(); }});
+    	Runtime.getRuntime().addShutdownHook( 
+    			new Thread() { 
+    				public void run() { 
+    					shutdown(); 
+    					/*try {
+							mainthread.join();
+						} catch (InterruptedException ignore) {}*/
+    				}
+    			}
+    		);
     }
 
     /*
@@ -456,12 +468,18 @@ public final class Execute implements ExecuteMBean {
 
     
     @Override
-    public void reload() {
-    	LOGGER.info("Reload request");
-    	reloadcount++;
-    	reloadtime = System.currentTimeMillis();
-        reloadRequested = true;
-        shutdown();
+    public boolean reload() {
+    	if (allowReload) { 
+    		LOGGER.info("Reload request");
+    		reloadcount++;
+    		reloadtime = System.currentTimeMillis();
+    		reloadRequested = true;
+    		shutdown();
+    		return true;
+    	} else {
+    		LOGGER.warn("Not allowed to reload");
+    		return false;
+    	}
     }
     
     
@@ -495,6 +513,23 @@ public final class Execute implements ExecuteMBean {
     	return bischeckversion;
     }
 
+    
+    @Override 
+    public int cacheClassHit() {
+    	return ClassCache.cacheHit();
+    }
+    
+    
+    @Override 
+	public int cacheClassMiss() {
+		return ClassCache.cacheMiss();
+	}
+	
+    
+    @Override 
+    public int cacheClassSize() {
+		return ClassCache.cacheSize();
+	}
     
     @Override
     public String[] getTriggers() {
