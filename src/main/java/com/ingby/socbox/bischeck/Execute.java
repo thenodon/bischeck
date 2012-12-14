@@ -76,7 +76,7 @@ public final class Execute implements ExecuteMBean {
     private Boolean reloadRequested = false;
     private Integer reloadcount = 0;
     private Long reloadtime = null;
-    
+    private Boolean allowReload = false;
     
     private static Execute exec = new Execute();
     
@@ -92,7 +92,8 @@ public final class Execute implements ExecuteMBean {
     
 	private static long looptimeout = LOOPTIMEOUTDEF;
 	private static long shutdownsleep = SHUTDOWNSLEEPDEF; 
-	private static String bischeckversion; 
+	private static String bischeckversion;
+	private static Thread mainthread; 
 
 	/*
 	 * The admin jobs are:
@@ -101,6 +102,7 @@ public final class Execute implements ExecuteMBean {
 	private static final int NUMOFADMINJOBS = 1;
 	
     private String status = null;
+    
     
     //private ConfigurationManager confMgr = null;
     
@@ -153,7 +155,7 @@ public final class Execute implements ExecuteMBean {
             formatter.printHelp( "Bischeck", options );
             System.exit(OKAY);
         }
-        
+        mainthread = Thread.currentThread();
         int retStat = OKAY;
         do {
         	
@@ -198,10 +200,19 @@ public final class Execute implements ExecuteMBean {
         if (!reloadRequested) {
         	try {
         		deamonInit();
+        		/*
+                 * Reload cache
+                 */
+           	
         	} catch (Exception e) {
         		LOGGER.error("Deamon init failed with: " + e.getMessage());
         		return FAILED;
-        	}	
+        	}
+            try {
+            	LastStatusCache.loaddump();
+            } catch (Exception e) {
+            	LOGGER.warn("Loading cache failed: " + e.getMessage());
+            }
         }
        
         /*
@@ -213,12 +224,13 @@ public final class Execute implements ExecuteMBean {
     	/*
          * Reload cache
          */
+    	/*
         try {
         	LastStatusCache.loaddump();
         } catch (Exception e) {
         	LOGGER.warn("Loading cache failed: " + e.getMessage());
         }
-		
+		*/
                 
         Scheduler sched = null;     
         
@@ -279,7 +291,7 @@ public final class Execute implements ExecuteMBean {
 		} catch (IOException ignore) {}
 		System.out.close();
 		System.err.close();
-
+		
 		bischeckversion = readBischeckVersion();
 		addDaemonShutdownHook();
 	}
@@ -312,7 +324,7 @@ public final class Execute implements ExecuteMBean {
      * each quartz trigger scheduled is printed every LOOPTIMEOUT ms. 
      */
 	private void deamonLoop() {
-		
+		allowReload = true;
 		do {
             try {
                 synchronized(syncObj) {
@@ -337,6 +349,7 @@ public final class Execute implements ExecuteMBean {
             } 
         
         } while (!isShutdownRequested());
+		allowReload = false;
 	}
 
 	
@@ -436,7 +449,16 @@ public final class Execute implements ExecuteMBean {
      * Setup a OS hook to catch a shutdown signal.
      */
     protected void addDaemonShutdownHook(){
-        Runtime.getRuntime().addShutdownHook( new Thread() { public void run() { shutdown(); }});
+    	Runtime.getRuntime().addShutdownHook( 
+    			new Thread() { 
+    				public void run() { 
+    					shutdown(); 
+    					/*try {
+							mainthread.join();
+						} catch (InterruptedException ignore) {}*/
+    				}
+    			}
+    		);
     }
 
     /*
@@ -469,12 +491,18 @@ public final class Execute implements ExecuteMBean {
 
     
     @Override
-    public void reload() {
-    	LOGGER.info("Reload request");
-    	reloadcount++;
-    	reloadtime = System.currentTimeMillis();
-        reloadRequested = true;
-        shutdown();
+    public boolean reload() {
+    	if (allowReload) { 
+    		LOGGER.info("Reload request");
+    		reloadcount++;
+    		reloadtime = System.currentTimeMillis();
+    		reloadRequested = true;
+    		shutdown();
+    		return true;
+    	} else {
+    		LOGGER.warn("Not allowed to reload");
+    		return false;
+    	}
     }
     
     
@@ -507,7 +535,23 @@ public final class Execute implements ExecuteMBean {
     	return bischeckversion;
     }
 
-       
+    
+    @Override 
+    public int cacheClassHit() {
+    	return ClassCache.cacheHit();
+    }
+    
+    
+    @Override 
+	public int cacheClassMiss() {
+		return ClassCache.cacheMiss();
+	}
+	
+    
+    @Override 
+    public int cacheClassSize() {
+		return ClassCache.cacheSize();
+	}
     
     @Override
     public String[] getTriggers() {
