@@ -20,17 +20,21 @@ program=$1
 shift
 arg=$@
 bishome=`pwd`
+#JAVA_HOME=/home/andersh/javaapps/jdk1.6.0_37
+#PATH=$JAVA_HOME/bin:$PATH
 ant compile
 jmxport=-Dcom.sun.management.jmxremote.port=3333 
 jmxssl=-Dcom.sun.management.jmxremote.ssl=false 
 jmxauth=-Dcom.sun.management.jmxremote.authenticate=false 
-jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
-jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
-
+#jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
+#jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+#jvmflags='-XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=30m'
 jmx="$jmxport $jmxssl $jmxauth $jmxpasswd $jmxaccess"
-#jmem="-XX:+TraceClassloading -Xmx30m"
+#quartz="-Dorg.quartz.threadPool.threadCount=20"
+#jmem="-Xmx500M -XX:+TraceClassLoading "
 #debug="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
-java $debug $jmx $jmem -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=etc \
+#GC=-XX:+UseConcMarkSweepGC -- bad
+java -server  $GC $quartz $debug $jmx $jmem $jvmflags -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=etc \
  -classpath $bishome/src/main/resources:$bishome/target/classes:$bishome/lib/*:$bishome/customlib/* \
  com.ingby.socbox.bischeck.$program $arg 
 
