@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -12,6 +13,9 @@ import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 public class CacheEvaluator {
 	private final static Logger  LOGGER = Logger.getLogger(CacheEvaluator.class);
@@ -29,8 +33,18 @@ public class CacheEvaluator {
 	 * @return
 	 */
 	public static String parse(String statement) {
-		CacheEvaluator cacheeval = new CacheEvaluator(statement);
-		cacheeval.parse();
+		final Timer timer = Metrics.newTimer(CacheEvaluator.class, 
+				"parse", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		
+		final TimerContext context = timer.time();
+	
+		CacheEvaluator cacheeval;
+		try {
+			cacheeval = new CacheEvaluator(statement);
+			cacheeval.parse();
+		} finally {
+			context.stop();
+		}
 		return cacheeval.getParsedStatement();
 	}
 
@@ -49,6 +63,7 @@ public class CacheEvaluator {
 	 * @return
 	 */
 	public String getParsedStatement() {
+		
 		return parsedstatement;
 	}
 
@@ -74,7 +89,7 @@ public class CacheEvaluator {
 	/***
 	 * 
 	 */
-	public void parse() {
+	private void parse() {
 		//Pattern pat = null;
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("String to cache parse: " + statement);
@@ -126,6 +141,7 @@ public class CacheEvaluator {
 				LOGGER.debug("Parsed string with cache data: " + sb.toString());
 			parsedstatement = sb.toString();
 		}
+		
 	}
 
 
