@@ -605,16 +605,22 @@ public class LastStatusCache implements LastStatusCacheMBean {
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("Loading cache - " + key.getId());
 			countKeys++;
+			
+			countEntries = 0;
 			for (XMLEntry entry:key.getEntry()) {
-
 				LastStatus ls = new LastStatus(entry);
 				lsc.addLast(ls, key.getId());
+				// Just fill the cache with the entries up to fifosize
+				if (fifosize <  countEntries) {
+					break;
+				}
 				countEntries++;
+				
 			}    	
+			LOGGER.info("Cache loaded " + key.getId() +  " number of entries " + countEntries);
 		}
 
 		long end = System.currentTimeMillis();
-		if (LOGGER.isDebugEnabled())
 			LOGGER.info("Cache loaded " + countKeys + " keys and " +
 				countEntries + " entries in " + (end-start) + " ms");
 	}
