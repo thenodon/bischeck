@@ -1435,7 +1435,7 @@ multNull((x1,x2,x3,...) - Multiply the numbers in the list, but if any of the
 \end_layout
 
 \begin_layout Itemize
-multDiv(x1,x2) - Divide the numbers, but if any of the numbers are null
+divNull(x1,x2) - Divide the numbers, but if any of the numbers are null
  the function will return null.
 \end_layout
 
@@ -5048,9 +5048,10 @@ Release 0.4.2 - 2012-12-21
 \end_layout
 
 \begin_layout Standard
-Except the new features introduced and bugs that has been fixed in 0.4.2,
- there has also been some major work in making bischeck stable and performance
- enhanced when running many host, service and service items configurations.
+Except for the new features introduced and bugs that has been fixed in 0.4.2,
+ there has also been some major work in making bischeck more stable and
+ performance enhanced when running many host, service and service items
+ configurations.
  Our goal has been to secure a stable resource utilization of the Java virtual
  machine (jvm) when running bischeck over a long period of time.
 \end_layout
@@ -5163,7 +5164,7 @@ saveNullOnConnectionError
 \end_layout
 
 \begin_layout Itemize
-More mathematical functions like multNull and multDiv that support null
+More mathematical functions like multNull and divNull that support null
  value as part of the calculation and can be used with functions that take
  a list of numbers to manage calculation where cache data may be null.
  
