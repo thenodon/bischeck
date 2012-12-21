@@ -34,6 +34,8 @@ PATH=$JAVA_HOME/bin:$PATH
 bishome=%BISHOME%
 user=%USERINIT%
 DISTRO=%DISTRO%
+STOPSLEEP=3
+STOPCOUNT=10
 
 processName=com.ingby.socbox.bischeck.Execute
 
@@ -114,13 +116,19 @@ stop() {
     status=`isrunning $processName` 
     if [ ! "x$status" = "x" ] ; then
         kill `cat $pidFile`
-        sleep 5
-        status=`isrunning $processName`
-        if [ "x$status" = "x" ] ; then
-            RETVAL=0
-        else
-            RETVAL=1
-        fi
+        RETVAL=1
+        waitcount=0
+        while [ $RETVAL -eq 1 ] && [ $waitcount -le $STOPCOUNT ] 
+        do         
+            sleep $STOPSLEEP
+            status=`isrunning $processName`
+            if [ "x$status" = "x" ] ; then
+               RETVAL=0
+            else
+               RETVAL=1
+            fi
+            waitcount=`expr $waitcount + 1 `
+        done   
     else
         RETVAL=2
     fi
