@@ -158,4 +158,14 @@ public abstract class Util {
     	strbuf.append(serviceitemname);
     	return strbuf.toString();
     }
+
+
+	public static String fixExponetialFormat(String latestExecuted) {
+		
+		if (latestExecuted.contains("E")) {
+			return BigDecimal.valueOf(new Double(latestExecuted)).toPlainString();
+		}
+		
+		return latestExecuted;
+	}
 }

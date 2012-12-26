@@ -51,7 +51,8 @@ public class NagiosUtil {
 			String method = "NA";;
 
 			Float currentThreshold = Util.roundDecimals(serviceItem.getThreshold().getThreshold());
-			String currentMeasure = serviceItem.getLatestExecuted();
+			String currentMeasure = Util.fixExponetialFormat(serviceItem.getLatestExecuted());
+			
 			if (currentThreshold != null) {
 
 				method = serviceItem.getThreshold().getCalcMethod();
@@ -61,7 +62,7 @@ public class NagiosUtil {
 					critValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float ((1-serviceItem.getThreshold().getCritical())*currentThreshold)).toString().toString());
 					message = message + serviceItem.getServiceItemName() +
 					" = " + 
-					serviceItem.getLatestExecuted() +
+					currentMeasure +
 					" ("+ 
 					new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString()) + " " + method + " " +
 					(warnValue) + " " + method + " +-W " + method + " " +
@@ -73,7 +74,7 @@ public class NagiosUtil {
 					critValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float (serviceItem.getThreshold().getCritical()*currentThreshold)).toString());
 					message = message + serviceItem.getServiceItemName() +
 					" = " + 
-					serviceItem.getLatestExecuted() +
+					currentMeasure +
 					" ("+ 
 					new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString()) + " " + method + " " +
 					(warnValue) + " " + method + " W " + method + " " +
@@ -93,7 +94,7 @@ public class NagiosUtil {
 
 			perfmessage = perfmessage + serviceItem.getServiceItemName() +
 			"=" + 
-			serviceItem.getLatestExecuted() + ";" +
+			currentMeasure + ";" +
 			(warnValue) +";" +
 			(critValue) +";0; " + //;
 
