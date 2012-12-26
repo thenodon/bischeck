@@ -93,7 +93,7 @@ public final class Execute implements ExecuteMBean {
 	private static long looptimeout = LOOPTIMEOUTDEF;
 	private static long shutdownsleep = SHUTDOWNSLEEPDEF; 
 	private static String bischeckversion;
-	private static Thread mainthread; 
+	private static Thread dumpthread; 
 
 	/*
 	 * The admin jobs are:
@@ -155,7 +155,15 @@ public final class Execute implements ExecuteMBean {
             formatter.printHelp( "Bischeck", options );
             System.exit(OKAY);
         }
-        mainthread = Thread.currentThread();
+        
+        dumpthread = new Thread(){
+            public void run(){
+            	CacheFactory.close();
+              }
+            };
+            
+        dumpthread.setName("dumpcache");
+        
         int retStat = OKAY;
         do {
         	
@@ -173,7 +181,8 @@ public final class Execute implements ExecuteMBean {
         	LOGGER.info("Method Execute returned " + retStat);
         } while (retStat == RESTART);
  
-        LogManager.shutdown();
+        //LogManager.shutdown();
+        dumpthread.start();
         System.exit(retStat);
     }
     
@@ -234,7 +243,7 @@ public final class Execute implements ExecuteMBean {
         
         ServerExecutor.getInstance().unregisterAll();
        
-        CacheFactory.close();
+        //CacheFactory.close();
         LOGGER.info("******************* Shutdown ********************");
         
         if (reloadRequested) 
@@ -430,9 +439,9 @@ public final class Execute implements ExecuteMBean {
     			new Thread() { 
     				public void run() { 
     					shutdown(); 
-    					/*try {
-							mainthread.join();
-						} catch (InterruptedException ignore) {}*/
+    					try {
+    						dumpthread.join();
+						} catch (InterruptedException ignore) {}
     				}
     			}
     		);
