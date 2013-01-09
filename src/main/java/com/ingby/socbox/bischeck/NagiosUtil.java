@@ -84,7 +84,7 @@ public class NagiosUtil {
 			} else {
 				message = message + serviceItem.getServiceItemName() +
 				" = " + 
-				serviceItem.getLatestExecuted() +
+				currentMeasure +
 				" (NA) ";
 				currentThreshold=new Float(0); //This is so the perfdata will be correct.
 			}
