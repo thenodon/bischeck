@@ -148,17 +148,9 @@ public final class NSCAServer implements Server {
         
         payload.setLevel(level.toString());
         
-        LOGGER.info("******************** "+ instanceName +" *******************");
-        LOGGER.info("*");
-        LOGGER.info("*    Host: " + service.getHost().getHostname());
-        LOGGER.info("* Service: " + service.getServiceName());
-        LOGGER.info("*   Level: " + level);
-        LOGGER.info("* Message: ");
-        LOGGER.info("* " + payload.getMessage());
-        LOGGER.info("*");
-        LOGGER.info("*********************************************");
-
-
+        if (LOGGER.isInfoEnabled())
+        	LOGGER.info(ServerUtil.LogFormat(instanceName, service, payload.getMessage()));
+        
         Long duration = null;
     	final Timer timer = Metrics.newTimer(NSCAServer.class, 
     			instanceName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);

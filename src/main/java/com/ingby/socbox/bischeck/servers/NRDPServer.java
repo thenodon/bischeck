@@ -180,16 +180,8 @@ public final class NRDPServer implements Server {
 					Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
 		}
 
-		LOGGER.info("******************** "+ instanceName +" *******************");
-		LOGGER.info("*");
-		LOGGER.info("*    Host: " + service.getHost().getHostname());
-		LOGGER.info("* Service: " + service.getServiceName());
-		LOGGER.info("*   Level: " + level);
-		LOGGER.info("* Message: ");
-		LOGGER.info("* " + xml);
-		LOGGER.info("*");
-		LOGGER.info("*********************************************");
-
+		if (LOGGER.isInfoEnabled())
+			LOGGER.info(ServerUtil.LogFormat(instanceName, service, xml));
 
 		Long duration = null;
 		final Timer timer = Metrics.newTimer(NRDPServer.class, 

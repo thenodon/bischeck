@@ -99,16 +99,9 @@ public final class OpenTSDBServer implements Server {
             message = null;
         }
 
-
-        LOGGER.info("******************** "+ instanceName +" *******************");
-        LOGGER.info("*");
-        LOGGER.info("*    Host: " + service.getHost().getHostname());
-        LOGGER.info("* Service: " + service.getServiceName());
-        LOGGER.info("* Message: ");
-        LOGGER.info("* " + message);
-        LOGGER.info("*");
-        LOGGER.info("*********************************************");
-
+        if (LOGGER.isInfoEnabled())
+        	LOGGER.info(ServerUtil.LogFormat(instanceName, service, message));
+        
         long duration = 0;
         try {
         	TimeMeasure tm = new TimeMeasure();
