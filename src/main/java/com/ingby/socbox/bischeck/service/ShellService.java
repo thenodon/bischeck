@@ -21,30 +21,35 @@ package com.ingby.socbox.bischeck.service;
 
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 public class ShellService extends ServiceAbstract implements Service {
 
+	private final static Logger LOGGER = LoggerFactory.getLogger(ShellService.class);
+	
     public ShellService (String serviceName) {
         this.serviceName = serviceName;
     }
 
     
     @Override
-    public void openConnection() throws Exception {   
+    public void openConnection() throws ServiceException { 
         setConnectionEstablished(true);
     }
 
     
     @Override
-    public void closeConnection() throws Exception {
-    }
+    public void closeConnection() throws ServiceException {}
 
     
     @Override 
-    public String executeStmt(String exec) throws Exception  {
+    public String executeStmt(String exec) throws ServiceException  {
     	
     	Runtime run = null;
     	Process pr = null;
@@ -57,6 +62,16 @@ public class ShellService extends ServiceAbstract implements Service {
         	pr.waitFor();
         	buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
     		ret = buf.readLine();
+    	} catch (IOException ioe) {
+    		LOGGER.warn("Executing " + exec + "failed",ioe);
+    		ServiceException se = new ServiceException("ioe");
+    		se.setServiceName(this.serviceName);
+    		throw se;
+    	} catch (InterruptedException ie) {
+    		LOGGER.warn("Executing " + exec + "failed with execption", ie);
+    		ServiceException se = new ServiceException("ioe");
+    		se.setServiceName(this.serviceName);
+    		throw se;
     	} finally {
     		try {
     			buf.close();
@@ -65,12 +80,15 @@ public class ShellService extends ServiceAbstract implements Service {
     		try {
     			pr.getErrorStream().close();
     		}catch (Exception ignore){}
+    		
     		try {
     			pr.getInputStream().close();
     		}catch (Exception ignore){}
+    		
     		try {
     			pr.getOutputStream().close();
     		}catch (Exception ignore){}
+    		
     		try {
     			pr.destroy();
     		}catch (Exception ignore){}

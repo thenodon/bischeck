@@ -27,13 +27,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.dbcp.ManagedBasicDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class JDBCPoolServiceUtil {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(JDBCPoolServiceUtil.class);
+  
     
     private static Map<String,ManagedBasicDataSource> poolmap= Collections.synchronizedMap(new HashMap<String,ManagedBasicDataSource>());
     

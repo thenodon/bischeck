@@ -119,31 +119,32 @@ public interface Service {
     
     /**
      * The open method are responsible to create a connection based on the url
-     * provided. THe connection must remain open until the closeConnection 
+     * provided. The connection must remain open until the closeConnection 
      * method is called.   
-     * @throws Exception
+     * @throws ServiceException if the opening of connection fail
      */
-    public void openConnection() throws Exception;
+    public void openConnection() throws ServiceException;
     
     
     /**
      * The method close the connection and any recourses related to the 
      * connection when the method is called. 
-     * @throws Exception
+     * @throws  ServiceException if the closing of connection failes
      */
-    public void closeConnection() throws Exception ;
+    public void closeConnection() throws ServiceException ;
 
     
     /**
      * The method execute the statement described in the exec parameter 
-     * according to the Service type. As an example is the Service is a 
+     * according to the Service type. As an example if the Service is a 
      * JDBCService the exec parameter is typical a select string. 
      * @param exec The statement string to execute
      * @return the result of the execution of the exec parameter. Only a single 
-     * value is allowed. 
-     * @throws Exception
+     * value is allowed. Null value is only returned if the the executed 
+     * statement returned null. 
+     * @throws ServiceException if the execution of the statement fails
      */
-    String executeStmt(String exec) throws Exception;
+    String executeStmt(String exec) throws ServiceException;
     
     
     /**

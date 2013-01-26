@@ -43,13 +43,13 @@ public class LastCacheService extends ServiceAbstract implements Service {
 
     
     @Override
-    public void openConnection() throws Exception {
+    public void openConnection() throws ServiceException {
         // The use of LastStatusCache do not need a connection
     }
 
 
     @Override
-    public void closeConnection() throws Exception {
+    public void closeConnection() throws ServiceException {
         // The use of LastStatusCache do not need a connection
     }
 
@@ -68,7 +68,7 @@ public class LastCacheService extends ServiceAbstract implements Service {
      * x:y - the indexes from x to y  
      * return is the value of each separated by ,
      */
-    public String executeStmt(String exec) throws Exception {
+    public String executeStmt(String exec) throws ServiceException {
         //return CacheFactory.getInstance().getParametersByString(exec);
     	return CacheEvaluator.parse(exec);
     }

@@ -25,8 +25,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,27 +62,40 @@ public class LivestatusService extends ServiceAbstract implements Service {
 
     
     @Override
-    public void openConnection() throws Exception {
-        URI url = new URI(this.getConnectionUrl());
-        // Create socket that is connected to server on specified port
-        clientSocket = new Socket(url.getHost(), url.getPort());
-        clientSocket.setSoTimeout(querytimeout);
-        setConnectionEstablished(true);
-        LOGGER.debug("Connected");
+    public void openConnection() throws ServiceException {
+    	URI uri;
+    	try {   
+    		uri = new URI(this.getConnectionUrl());
+    		clientSocket = new Socket(uri.getHost(), uri.getPort());
+    		clientSocket.setSoTimeout(querytimeout);
+    	} catch (IOException ioe) {
+    		LOGGER.warn("Open connection failed", ioe);
+    		try {
+    			clientSocket.close();
+    		} catch (Exception ignore) {}
+    		ServiceException se = new ServiceException(ioe);
+    		se.setServiceName(this.serviceName);
+    		throw se;
+    	} catch (URISyntaxException use) {
+    		LOGGER.warn("Uri syntax is faulty",use);
+    		ServiceException se = new ServiceException(use);
+    		se.setServiceName(this.serviceName);
+    		throw se;
+    	}
+    	setConnectionEstablished(true);
+    	LOGGER.debug("Connected to {}", uri.toString());
     }
-
     
     @Override
-    public void closeConnection() {
+    public void closeConnection() throws ServiceException{
         try {
             clientSocket.close();
-            LOGGER.debug("Closed");
         } catch (IOException ignore) {}
     }
 
     
     @Override 
-    public String executeStmt(String exec) throws Exception {
+    public String executeStmt(String exec) throws ServiceException {
         
         /*
          * Replace all \n occurance with real newlines 
@@ -96,20 +109,23 @@ public class LivestatusService extends ServiceAbstract implements Service {
         
         LOGGER.debug("Execute request: " + message);
         
-        dataOut = new DataOutputStream(clientSocket.getOutputStream());
-        dataOut.writeBytes(message);
-        dataOut.flush();
-        
-        bufIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-        String responseLine = null;
         try {
+
+        	dataOut = new DataOutputStream(clientSocket.getOutputStream());
+        	dataOut.writeBytes(message);
+        	dataOut.flush();
+
+        	bufIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+        	String responseLine = null;
             while ((responseLine = bufIn.readLine()) != null) {  
                 responseBuffer.append(responseLine);    
             }  
-        } catch (SocketTimeoutException exptime) {
-            LOGGER.error("Livestatus connection timed-out after " + querytimeout + " ms");
-            return null;
+        } catch (IOException ioe) {
+            LOGGER.error("Connection failed", ioe);
+            ServiceException se = new ServiceException(ioe);
+    		se.setServiceName(this.serviceName);
+    		throw se;
         } finally {    
             try {
                 dataOut.close();
@@ -124,7 +140,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
                 
         String responseMsg = new String(responseBuffer);
         
-        LOGGER.debug("Received response: " + responseMsg);
+        LOGGER.debug("Received response: {}", responseMsg);
         
         return responseMsg;
     }

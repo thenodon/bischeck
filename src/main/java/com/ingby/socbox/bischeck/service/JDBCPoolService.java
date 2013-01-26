@@ -57,43 +57,60 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
 
     
     @Override
-    public void openConnection() throws SQLException {   
-    	this.connection = JDBCPoolServiceUtil.getConnection(this.getConnectionUrl()) ;
+    public void openConnection() throws ServiceException {   
+    	try {
+    		this.connection = JDBCPoolServiceUtil.getConnection(this.getConnectionUrl());
+    	} catch (SQLException sqle) {
+    		LOGGER.warn("Open connection failed",sqle);
+    		ServiceException se = new ServiceException(sqle);
+    		se.setServiceName(this.serviceName);
+    		throw se;
+    	}
     	setConnectionEstablished(true);
     }
-
     
     @Override
-    public void closeConnection() throws SQLException {
-        this.connection.close();
+    public void closeConnection() throws ServiceException {
+    	try {
+    		this.connection.close();
+    	} catch (SQLException sqle) {
+        	LOGGER.warn("Closing connection failed",sqle);
+    		ServiceException se = new ServiceException(sqle);
+    		se.setServiceName(this.serviceName);
+    		throw se;
+        }
     }
 
     
     @Override 
-    public String executeStmt(String exec) throws Exception {
-        Statement statement = null;
-        ResultSet res = null;
-        try {
-            statement = this.connection.createStatement();
-            LOGGER.debug("query timeout " + querytimeout);
-            statement.setQueryTimeout(querytimeout);
-            res = statement.executeQuery(exec);
+    public String executeStmt(String exec) throws ServiceException {
+    	Statement statement = null;
+    	ResultSet res = null;
+    	try {
+    		statement = this.connection.createStatement();
+    		statement.setQueryTimeout(querytimeout);
+    		res = statement.executeQuery(exec);
 
-            if (res.next()) {//Changed from first - not working with as400 jdbc driver
-                return (res.getString(1));
-            }
-        }
-        finally {
-            try {
-                res.close();
-            } catch(Exception ignore) {}    
-            try {
-                statement.close();
-            } catch(Exception ignore) {}    
-        }
+    		if (res.next()) {//Changed from first - not working with as400 jdbc driver
+    			return (res.getString(1));
+    		}
+    	} catch (SQLException sqle) {
+    		LOGGER.warn("Executing " + exec + " statement failed",sqle);
+    		ServiceException se = new ServiceException(sqle);
+    		se.setServiceName(this.serviceName);
+    		throw se;
+    	} finally {
+    		try {
+    			res.close();
+    		} catch(Exception ignore) {}    
+    		try {
+    			statement.close();
+    		} catch(Exception ignore) {}    
+    	}
 
-        return null;
+    	return null;
     }    
+
 }
 
 
