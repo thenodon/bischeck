@@ -41,7 +41,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -58,7 +59,7 @@ import com.yammer.metrics.core.TimerContext;
 
 public final class NRDPServer implements Server {
 
-	private final static Logger LOGGER = Logger.getLogger(NRDPServer.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(NRDPServer.class);
 
 	static Map<String,NRDPServer> servers = new HashMap<String,NRDPServer>();
 

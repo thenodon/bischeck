@@ -23,7 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.Host;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
@@ -43,7 +44,7 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 public abstract class ServiceAbstract {
 
-    private final static Logger  LOGGER = Logger.getLogger(ServiceAbstract.class);
+    private final static Logger  LOGGER = LoggerFactory.getLogger(ServiceAbstract.class);
     
     protected HashMap<String,ServiceItem> servicesItems = new HashMap<String,ServiceItem>();
     protected String serviceName;

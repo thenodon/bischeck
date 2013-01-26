@@ -23,14 +23,10 @@ package com.ingby.socbox.bischeck.service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import org.apache.log4j.Logger;
 
 
 public class ShellService extends ServiceAbstract implements Service {
 
-    private final static Logger LOGGER = Logger.getLogger(ShellService.class);
-    
-    
     public ShellService (String serviceName) {
         this.serviceName = serviceName;
     }

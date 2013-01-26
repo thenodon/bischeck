@@ -26,7 +26,9 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * The QueryDate can parse a date specification in a sql string. The date specification must
@@ -42,7 +44,7 @@ public abstract class QueryDate {
         System.out.println(QueryDate.parse("select val1 from where formdate='%%yyyy-MM-dd%%' and todate='%%yy.MM.dd%%';"));
     }
     
-    private final static Logger  LOOGER = Logger.getLogger(QueryDate.class);
+    private final static Logger  LOOGER = LoggerFactory.getLogger(QueryDate.class);
 
     private final static Pattern DATEMARK = Pattern.compile("%%(.*?)%%");
     private final static Pattern DATEINDICATOR = Pattern.compile("\\[([DMY].*?)\\]");

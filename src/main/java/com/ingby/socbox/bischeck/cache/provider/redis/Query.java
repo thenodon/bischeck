@@ -21,13 +21,14 @@ package com.ingby.socbox.bischeck.cache.provider.redis;
 
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.cache.LastStatus;
 
 public class Query {
 
-	static Logger  logger = Logger.getLogger(Query.class);
+	static Logger  logger = LoggerFactory.getLogger(Query.class);
 
 	
 	/**

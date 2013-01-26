@@ -25,14 +25,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
 
 public final class ServerExecutor {
 
-    private final static Logger LOGGER = Logger.getLogger(ServerExecutor.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ServerExecutor.class);
     
     private static ServerExecutor serverexecutor= null;
     /**

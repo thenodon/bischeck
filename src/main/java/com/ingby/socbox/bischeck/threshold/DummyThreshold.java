@@ -19,13 +19,8 @@
 
 package com.ingby.socbox.bischeck.threshold;
 
-import org.apache.log4j.Logger;
 
 public class DummyThreshold implements Threshold {
-
-    @SuppressWarnings("unused")
-	private final static Logger LOGGER = Logger.getLogger(DummyThreshold.class);
-
     
     private String serviceName;
     private String serviceItemName;

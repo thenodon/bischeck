@@ -20,16 +20,12 @@
 package com.ingby.socbox.bischeck.service;
 
 
-import org.apache.log4j.Logger;
-
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
-import com.ingby.socbox.bischeck.cache.CacheFactory;
 
 
 public class LastCacheService extends ServiceAbstract implements Service {
 
-    private final static Logger LOGGER = Logger.getLogger(LastCacheService.class);
-
+    
     public static void main(String[] args) {
         LastCacheService bis = new LastCacheService("serviceName");
         try {

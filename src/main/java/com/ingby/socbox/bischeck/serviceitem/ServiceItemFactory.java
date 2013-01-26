@@ -22,14 +22,15 @@ package com.ingby.socbox.bischeck.serviceitem;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ClassCache;
 
 
 public class ServiceItemFactory {
 
-    private final static Logger LOGGER = Logger.getLogger(ServiceItemFactory.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ServiceItemFactory.class);
 
     @SuppressWarnings("unchecked")
     public static ServiceItem createServiceItem(String name, String clazzname) 
@@ -45,7 +46,7 @@ public class ServiceItemFactory {
             try {
             	clazz = (Class<ServiceItem>) ClassCache.getClassByName(clazzname);
             }catch (ClassNotFoundException ee) {
-                LOGGER.fatal("ServiceItem class " + clazzname + " not found.");
+                LOGGER.error("ServiceItem class " + clazzname + " not found.");
                 throw ee;
             }
         }

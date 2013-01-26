@@ -30,7 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.TimeMeasure;
@@ -39,7 +40,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public final class OpenTSDBServer implements Server {
 
-    private final static Logger LOGGER = Logger.getLogger(OpenTSDBServer.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(OpenTSDBServer.class);
     static Map<String,OpenTSDBServer> servers = new HashMap<String,OpenTSDBServer>();
     
     

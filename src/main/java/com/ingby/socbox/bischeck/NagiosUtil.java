@@ -22,14 +22,16 @@ package com.ingby.socbox.bischeck;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class NagiosUtil {
 	
-	private final static Logger LOGGER = Logger.getLogger(NagiosUtil.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(NagiosUtil.class);
 	
 	
 	/**

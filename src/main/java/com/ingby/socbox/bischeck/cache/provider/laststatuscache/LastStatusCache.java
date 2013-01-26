@@ -37,7 +37,8 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.xml.bind.JAXBContext;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
@@ -80,7 +81,7 @@ import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
  */
 public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
-	private final static Logger LOGGER = Logger.getLogger(LastStatusCache.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusCache.class);
 
 	private HashMap<String,LinkedList<LastStatus>> cache = null;
 
@@ -124,11 +125,11 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			try {
 				mbs.registerMBean(lsc, mbeanname);
 			} catch (InstanceAlreadyExistsException e) {
-				LOGGER.fatal("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - " + e.getMessage());
 			} catch (MBeanRegistrationException e) {
-				LOGGER.fatal("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - " + e.getMessage());
 			} catch (NotCompliantMBeanException e) {
-				LOGGER.fatal("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - " + e.getMessage());
 			}
 
 			lastStatusCacheDumpFile = 

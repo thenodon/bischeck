@@ -28,14 +28,15 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 
 
 public class LivestatusService extends ServiceAbstract implements Service {
 
-    private final static Logger LOGGER = Logger.getLogger(LivestatusService.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(LivestatusService.class);
     
     static private int querytimeout = 10000; //millisec
     private Socket clientSocket = null;

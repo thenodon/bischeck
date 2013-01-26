@@ -21,7 +21,8 @@ package com.ingby.socbox.bischeck.jepext;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
 
@@ -31,7 +32,7 @@ import com.yammer.metrics.core.TimerContext;
 
 
 public class ExecuteJEP {
-    private final static Logger LOGGER = Logger.getLogger(ExecuteJEP.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ExecuteJEP.class);
 
 	private JEP parser = null;
 

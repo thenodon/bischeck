@@ -41,13 +41,15 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.CronExpression;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
+
+import ch.qos.logback.classic.Level;
 
 import com.ingby.socbox.bischeck.servers.Server;
 import com.ingby.socbox.bischeck.service.RunAfter;
@@ -82,7 +84,7 @@ public final class ConfigurationManager  {
 
 	public static final String INTERVALSCHEDULEPATTERN = "^[0-9]+ *[HMS]{1} *$";
 
-    private final static Logger  LOOGER = Logger.getLogger(ConfigurationManager.class);
+    private final static Logger  LOOGER = LoggerFactory.getLogger(ConfigurationManager.class);
 
     /*
      * The ConfigurationManager 
@@ -126,7 +128,7 @@ public final class ConfigurationManager  {
         ConfigurationManager.initonce();
         ConfigurationManager confMgmr = ConfigurationManager.getInstance();
         
-        LOOGER.setLevel(Level.WARN);
+        ((ch.qos.logback.classic.Logger) LOOGER).setLevel(Level.WARN);
         
         if (line.hasOption("verify")) {
             System.exit(ValidateConfiguration.verify());
@@ -267,10 +269,10 @@ public final class ConfigurationManager  {
         try {
             ThresholdTimer.init(this);
         } catch (SchedulerException e) {
-            LOOGER.fatal("Quartz scheduler failed with - " + e +" - existing!");
+            LOOGER.error("Quartz scheduler failed with - " + e +" - existing!");
             throw e;
         } catch (ParseException e) {
-            LOOGER.fatal("Quartz scheduler failed with - " + e +" - existing!");
+            LOOGER.error("Quartz scheduler failed with - " + e +" - existing!");
             throw e;
         }
     }
@@ -458,7 +460,7 @@ public final class ConfigurationManager  {
     			//loadClass(clazzname);
     			clazz=(Class<Server>) Class.forName(clazzname);
     		}catch (ClassNotFoundException ee) {
-    			LOOGER.fatal("Server class " + clazzname + " not found.");
+    			LOOGER.error("Server class " + clazzname + " not found.");
     			throw ee;
     		}
     	}

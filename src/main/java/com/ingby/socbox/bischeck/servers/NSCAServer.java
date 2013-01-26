@@ -25,7 +25,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.googlecode.jsendnsca.MessagePayload;
 import com.googlecode.jsendnsca.NagiosException;
@@ -49,7 +50,7 @@ import com.yammer.metrics.core.TimerContext;
  */
 public final class NSCAServer implements Server {
 
-    private final static Logger LOGGER = Logger.getLogger(NSCAServer.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(NSCAServer.class);
     /**
      * The server map is used to manage multiple configuration based on the 
      * same NSCAServer class.

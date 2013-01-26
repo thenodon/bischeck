@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -54,7 +55,7 @@ import com.yammer.metrics.core.TimerContext;
 
 public class ServiceJob implements Job {
 
-    private final static Logger LOGGER = Logger.getLogger(ServiceJob.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ServiceJob.class);
 
     static private int runAfterDelay = 10; //in seconds
     static private boolean saveNullOnConnectionError;

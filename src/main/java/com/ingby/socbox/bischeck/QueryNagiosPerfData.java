@@ -23,7 +23,9 @@ package com.ingby.socbox.bischeck;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * The QueryNagiosPerfData can parse a date specification in a Nagios 
@@ -44,7 +46,7 @@ public abstract class QueryNagiosPerfData {
         
     }
     
-    private final static Logger  LOGGER = Logger.getLogger(QueryNagiosPerfData.class);
+    private final static Logger  LOGGER = LoggerFactory.getLogger(QueryNagiosPerfData.class);
 
     //Find label entry from start of line or space until =
     private final static Pattern LABELMATCH = Pattern.compile("(^| )(.*?)=");

@@ -30,9 +30,12 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.nfunk.jep.ParseException;
+
+import ch.qos.logback.classic.Level;
 
 import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.ConfigFileManager;
@@ -52,7 +55,7 @@ import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLWeeks;
 
 public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
-    private final static Logger LOGGER = Logger.getLogger(Twenty4HourThreshold.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(Twenty4HourThreshold.class);
 
 	private static XMLTwenty4Threshold twenty4hourconfig;
 
@@ -113,7 +116,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
             // Set debug level to get logging to indicate what period and hour rule
             // applied
-            LOGGER.setLevel(Level.DEBUG);
+            ((ch.qos.logback.classic.Logger) LOGGER).setLevel(Level.DEBUG);
 
             if (line.hasOption("date")) {
                 Calendar testdate = BisCalendar.getInstance();

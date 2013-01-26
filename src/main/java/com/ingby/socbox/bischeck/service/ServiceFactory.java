@@ -23,7 +23,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ClassCache;
 import com.ingby.socbox.bischeck.ConfigurationManager;
@@ -32,7 +33,7 @@ import com.ingby.socbox.bischeck.Util;
 
 public class ServiceFactory {
 
-    private final static Logger LOGGER = Logger.getLogger(ServiceFactory.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ServiceFactory.class);
     
     @SuppressWarnings("unchecked")
     public static Service createService(String name, String url) throws Exception 
@@ -50,7 +51,7 @@ public class ServiceFactory {
         String clazzname = ConfigurationManager.getInstance().getURL2Service().getProperty(uri.getScheme());
         
         if (clazzname == null) {
-            LOGGER.fatal("Service uri " + Util.obfuscatePassword(uri.toString()) + " is not matched in the urlservice.xml configuration file.");
+            LOGGER.error("Service uri " + Util.obfuscatePassword(uri.toString()) + " is not matched in the urlservice.xml configuration file.");
             throw new Exception("Service uri " + Util.obfuscatePassword(uri.toString()) + " is not matched in the urlservice.xml configuration file.");
         }
         
@@ -62,7 +63,7 @@ public class ServiceFactory {
             try { 
                 clazz = (Class<Service>) ClassCache.getClassByName(clazzname);
             }catch (ClassNotFoundException ee) {
-                LOGGER.fatal("Service class " + clazzname + " not found.");
+                LOGGER.error("Service class " + clazzname + " not found.");
                 throw new Exception(e.getMessage());
             }
         }

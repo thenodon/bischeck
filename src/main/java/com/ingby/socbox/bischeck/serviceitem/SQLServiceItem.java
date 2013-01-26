@@ -19,7 +19,6 @@
 
 package com.ingby.socbox.bischeck.serviceitem;
 
-import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
@@ -31,9 +30,6 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     
-	@SuppressWarnings("unused")
-	private final static Logger LOGGER = Logger.getLogger(SQLServiceItem.class);
-
     public static void main(String[] args) {
     	try {
 			ConfigurationManager.init();

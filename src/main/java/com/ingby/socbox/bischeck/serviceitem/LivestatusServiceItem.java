@@ -23,8 +23,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
-import org.apache.log4j.Logger;
-
 import com.ingby.socbox.bischeck.QueryNagiosPerfData;
 
 /**
@@ -55,10 +53,7 @@ import com.ingby.socbox.bischeck.QueryNagiosPerfData;
  */
 public class LivestatusServiceItem extends ServiceItemAbstract implements ServiceItem {
     
-	@SuppressWarnings("unused")
-	private final static Logger LOGGER = Logger.getLogger(LivestatusServiceItem.class);
-
-    
+	
     public LivestatusServiceItem(String name) {
         this.serviceItemName = name;        
     }

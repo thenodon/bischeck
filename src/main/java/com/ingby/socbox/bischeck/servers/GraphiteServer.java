@@ -30,7 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.TimeMeasure;
@@ -44,7 +45,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  */
 public final class GraphiteServer implements Server {
 
-    private final static Logger LOGGER = Logger.getLogger(GraphiteServer.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(GraphiteServer.class);
     static Map<String,GraphiteServer> servers = new HashMap<String,GraphiteServer>();
     
     

@@ -22,13 +22,15 @@ package com.ingby.socbox.bischeck.cache;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 
 public abstract class CacheUtil {
 
-	private final static Logger  LOGGER = Logger.getLogger(CacheUtil.class);
+	private final static Logger  LOGGER = LoggerFactory.getLogger(CacheUtil.class);
+	
 	//"^[0-9]+ *[HMS]{1} *$" - check for a
 	private final static Pattern PATTERN_FIND_IN_TIME = Pattern.compile(ObjectDefinitions.getFindintimepattern());
 	private final static Pattern PATTERN_FIND_TO_FROM_TIME = Pattern.compile(ObjectDefinitions.getFindtofromtimepattern());

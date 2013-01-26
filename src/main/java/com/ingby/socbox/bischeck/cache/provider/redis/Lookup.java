@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -12,10 +13,10 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class Lookup {
 
-	private final static Logger LOGGER = Logger.getLogger(Lookup.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(Lookup.class);
 
 	private Map<String, String> name2id = new HashMap<String, String>();;
-	private Map<String, String> id2name = new HashMap<String, String>();
+	//private Map<String, String> id2name = new HashMap<String, String>();
 	private Map<String, Optimizer> optimizer = new HashMap<String, Optimizer>();
 	
 	// Lookup lookup = null;
@@ -30,7 +31,7 @@ public class Lookup {
 		try {
 			for (String keyname : jedis.hgetAll(DICTIONARY).keySet()) {
 				name2id.put(keyname, jedis.hget(DICTIONARY, keyname));
-				id2name.put(jedis.hget(DICTIONARY, keyname), keyname);
+				//id2name.put(jedis.hget(DICTIONARY, keyname), keyname);
 				optimizer.put(keyname, new Optimizer(keyname));
 				
 			}
@@ -63,11 +64,11 @@ public class Lookup {
 		
 	}
 
-	
+	/*
 	public Map<String, String> getAllIds() {
 		return id2name;
 	}
-
+*/
 	
 	public Map<String, String> getAllKeys() {
 		return name2id;
@@ -82,7 +83,7 @@ public class Lookup {
 			Jedis jedis = jedispool.getResource();
 			try {
 				name2id.put(keyname, keyid);
-				id2name.put(keyid, keyname);
+//				id2name.put(keyid, keyname);
 				jedis.hset(DICTIONARY, keyname, keyid);
 			} catch (JedisConnectionException je) {
 				LOGGER.error("Redis connection failed: " + je.getMessage());
@@ -99,8 +100,9 @@ public class Lookup {
 	 * @return the name of the id or null if the id do not exists
 	 */
 	public String getNameById(String keyid) {
-		String keyname = id2name.get(keyid);
-		return keyname;
+		//String keyname = id2name.get(keyid);
+		//return keyname;
+		return keyid;
 	}
 	
 	

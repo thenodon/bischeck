@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 
 /**
@@ -31,7 +33,7 @@ import org.apache.log4j.Logger;
  */
 public class ExecuteJEPPool {
 
-	private final static Logger LOGGER = Logger.getLogger(ExecuteJEPPool.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(ExecuteJEPPool.class);
 	private final static int DIECOUNT = 1000;
 
 	private Map<ExecuteJEP,Long> locked;

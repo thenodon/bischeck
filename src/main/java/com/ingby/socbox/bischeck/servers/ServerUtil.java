@@ -1,6 +1,6 @@
 package com.ingby.socbox.bischeck.servers;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import com.ingby.socbox.bischeck.service.Service;
 

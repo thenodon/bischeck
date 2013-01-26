@@ -27,7 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ClassCache;
 import com.ingby.socbox.bischeck.service.Service;
@@ -38,7 +39,7 @@ public class ThresholdFactory {
 	private static Map<String,Threshold> cache = Collections.synchronizedMap(new HashMap<String,Threshold>());
 	private static List<Class<?>> unregistercache = Collections.synchronizedList(new ArrayList<Class<?>>());
 
-	private final static Logger LOGGER = Logger.getLogger(ThresholdFactory.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(ThresholdFactory.class);
 
 	private static final String UNREGISTER = "unregister";
 
@@ -69,7 +70,7 @@ public class ThresholdFactory {
 						try {
 							current = (Threshold) ClassCache.getClassByName(serviceItem.getThresholdClassName()).newInstance();
 						}catch (ClassNotFoundException ee) {
-							LOGGER.fatal("Service class " + serviceItem.getThresholdClassName() + " not found.");
+							LOGGER.error("Service class " + serviceItem.getThresholdClassName() + " not found.");
 							throw ee;
 						}
 					}

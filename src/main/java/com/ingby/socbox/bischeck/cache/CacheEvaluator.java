@@ -9,7 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
@@ -18,7 +19,8 @@ import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
 public class CacheEvaluator {
-	private final static Logger  LOGGER = Logger.getLogger(CacheEvaluator.class);
+	
+	private final static Logger  LOGGER = LoggerFactory.getLogger(CacheEvaluator.class);
 
 	private String statement = null;
 	private String parsedstatement = null;
@@ -63,8 +65,11 @@ public class CacheEvaluator {
 	 * @return
 	 */
 	public String getParsedStatement() {
-		
-		return parsedstatement;
+		/*if (parsedstatement.equals("null"))
+			return null;
+		else
+		*/
+			return parsedstatement;
 	}
 
 

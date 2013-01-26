@@ -22,7 +22,9 @@ package com.ingby.socbox.bischeck;
 import java.text.ParseException;
 
 import java.util.Date;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -39,7 +41,7 @@ import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 
 public class ThresholdTimer implements Job {
 
-    private final static Logger  LOGGER = Logger.getLogger(ThresholdTimer.class);
+    private final static Logger  LOGGER = LoggerFactory.getLogger(ThresholdTimer.class);
 
     private static Scheduler sched;
 

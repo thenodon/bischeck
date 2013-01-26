@@ -24,15 +24,15 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 
 public abstract class Util {
-	private final static Logger LOGGER = Logger.getLogger(Util.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     
@@ -168,4 +168,6 @@ public abstract class Util {
 		
 		return latestExecuted;
 	}
+	
+	
 }

@@ -19,20 +19,14 @@
 
 package com.ingby.socbox.bischeck.serviceitem;
 
-import org.apache.log4j.Logger;
 
-import com.ingby.socbox.bischeck.cache.CacheEvaluator;
-import com.ingby.socbox.bischeck.cache.CacheUtil;
+
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEPPool;
 
 
 public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem {
     
-    @SuppressWarnings("unused")
-	private final static Logger LOGGER = Logger.getLogger(CalculateOnCache.class);
-    
-
     
     public CalculateOnCache(String name) {
         this.serviceItemName = name;    

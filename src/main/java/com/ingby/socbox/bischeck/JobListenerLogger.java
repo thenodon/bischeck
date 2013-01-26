@@ -19,7 +19,9 @@
 
 package com.ingby.socbox.bischeck;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
@@ -28,7 +30,7 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class JobListenerLogger implements JobListener {
 
-    private final static Logger  LOOGER = Logger.getLogger(JobListenerLogger.class);
+    private final static Logger  LOOGER = LoggerFactory.getLogger(JobListenerLogger.class);
     @Override
     public String getName() {
         return JobListenerLogger.class.getName();

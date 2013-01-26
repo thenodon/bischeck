@@ -38,7 +38,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.cache.LastStatus;
@@ -46,7 +47,7 @@ import com.ingby.socbox.bischeck.cache.LastStatus;
 public class BackendStorage {
 
 
-	private final static Logger LOGGER = Logger.getLogger(BackendStorage.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(BackendStorage.class);
 
 	/**
 	 * Reads the cache data from file and loads into the LastStatusCache

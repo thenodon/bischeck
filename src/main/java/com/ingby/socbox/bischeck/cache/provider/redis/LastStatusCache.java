@@ -36,7 +36,8 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -82,7 +83,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  */
 public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
-	private final static Logger LOGGER = Logger.getLogger(LastStatusCache.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusCache.class);
 
 	private HashMap<String,LinkedList<LastStatus>> cache = null;
 
@@ -146,11 +147,11 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			try {
 				mbs.registerMBean(lsc, mbeanname);
 			} catch (InstanceAlreadyExistsException e) {
-				LOGGER.fatal("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - " + e.getMessage());
 			} catch (MBeanRegistrationException e) {
-				LOGGER.fatal("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - " + e.getMessage());
 			} catch (NotCompliantMBeanException e) {
-				LOGGER.fatal("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - " + e.getMessage());
 			}
 
 			lastStatusCacheDumpFile = 
@@ -226,13 +227,11 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private void add(LastStatus ls, String key) {
 		LinkedList<LastStatus> fifo;
 		Jedis jedis = jedispool.getResource();
-		//String id = lu.getIdByName(key);
 		
 		try {
 			if (cache.get(key) == null) {
 				fifo = new LinkedList<LastStatus>();
 				cache.put(key, fifo);
-				//jedis.hset("dictionary", key,""+key.hashCode());
 			} else {
 				fifo = cache.get(key);
 			}
@@ -245,7 +244,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			cache.get(key).addFirst(ls);
 
 			// Add redis
-			jedis.lpush(lu.getIdByName(key), ls.getJson());
+			jedis.lpush(key, ls.getJson());
 		} catch (JedisConnectionException je) {
 			LOGGER.error("Redis connection failed: " + je.getMessage());
 		} finally {
@@ -310,7 +309,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				if (LOGGER.isDebugEnabled() ) {
 					LOGGER.debug("Redis cache used for key " + key +" index " + index);
 				}
-				String redstr = jedis.lindex(lu.getIdByName(key), index);
+				String redstr = jedis.lindex(key, index);
 
 				if (redstr == null)
 					return null;
@@ -353,13 +352,13 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		LastStatus ls = null;
 
 		Jedis jedis = jedispool.getResource();
-		String id = lu.getIdByName(key);
+		//String id = lu.getIdByName(key);
 		
 		try {	
-			if (jedis.llen(id) == 0)
+			if (jedis.llen(key) == 0)
 				return null;
 
-			ls = nearest(stime, id);
+			ls = nearest(stime, key);
 
 		} catch (JedisConnectionException je) {
 			LOGGER.error("Redis connection failed: " + je.getMessage());
@@ -390,14 +389,14 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			LOGGER.debug("Find cache index for " + key +" at time " + new java.util.Date(stime));
 		
 		Jedis jedis = jedispool.getResource();
-		String id = lu.getIdByName(key);
+		//String id = lu.getIdByName(key);
 		Integer index = null;
 
 		try {
-			if (jedis.llen(id) == 0)
+			if (jedis.llen(key) == 0)
 				return null;
 		
-			index = nearestByIndex(stime, id);
+			index = nearestByIndex(stime, key);
 		
 		} finally {
 			jedispool.returnResource(jedis);
@@ -591,12 +590,12 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			countKeys++;
 			Jedis jedis = jedispool.getResource();
 			try {
-				String id = lu.getIdByName(key);
-				long numEntries = smallest(jedis.llen(id),fifosize);
+				//String id = lu.getIdByName(key);
+				long numEntries = smallest(jedis.llen(key),fifosize);
 
 				for (int i = 0; i<numEntries; i++) {
 
-					LastStatus ls = new LastStatus(jedis.lindex(id, numEntries-i));
+					LastStatus ls = new LastStatus(jedis.lindex(key, numEntries-i));
 					
 					LinkedList<LastStatus> fifo = null;
 					if (cache.get(key) == null) {
@@ -695,9 +694,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * @param listtosearch
 	 * @return the LastStatus object closes to the time
 	 */
-	private LastStatus nearestFast(long time, String id) {
+	private LastStatus nearestFast(long time, String key) {
 		
-		LinkedList<LastStatus> listtosearch = cache.get(lu.getNameById(id));
+		LinkedList<LastStatus> listtosearch = cache.get(key);
 		if (time > listtosearch.getFirst().getTimestamp() || 
 			time < listtosearch.getLast().getTimestamp() ) {
 			return null;
@@ -733,24 +732,24 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 
 
-	private LastStatus nearestSlow(long time, String id) {
+	private LastStatus nearestSlow(long time, String key) {
 		// Search the redis cache
 		LastStatus nearest = null;
 		Jedis jedis = jedispool.getResource();
 		try {
-			if (time > new LastStatus(jedis.lindex(id, 0L)).getTimestamp() || 
-					time < new LastStatus(jedis.lindex(id, jedis.llen(id)-1)).getTimestamp() ) {
+			if (time > new LastStatus(jedis.lindex(key, 0L)).getTimestamp() || 
+					time < new LastStatus(jedis.lindex(key, jedis.llen(key)-1)).getTimestamp() ) {
 				return null;
 			}
 
 			long bestDistanceFoundYet = Long.MAX_VALUE;
-			long size = jedis.llen(id);
+			long size = jedis.llen(key);
 
 			for (int i = 0; i < size; i++) {
-				long d1 = Math.abs(time - new LastStatus(jedis.lindex(id, i)).getTimestamp());
+				long d1 = Math.abs(time - new LastStatus(jedis.lindex(key, i)).getTimestamp());
 				long d2;
 				if (i+1 < size)
-					d2 = Math.abs(time - new LastStatus(jedis.lindex(id, i+1)).getTimestamp());
+					d2 = Math.abs(time - new LastStatus(jedis.lindex(key, i+1)).getTimestamp());
 				else 
 					d2 = Long.MAX_VALUE;
 
@@ -758,7 +757,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 					// For the moment, this value is the nearest to the desired number...
 					bestDistanceFoundYet = d1;
-					nearest = new LastStatus(jedis.lindex(id, i));
+					nearest = new LastStatus(jedis.lindex(key, i));
 					if (d1 <= d2) { 
 						if (LOGGER.isDebugEnabled())
 							LOGGER.debug("Break at index " + i);
@@ -780,9 +779,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * @param listtosearch
 	 * @return cache index
 	 */
-	private Integer nearestByIndexFast(long time, String id) {
+	private Integer nearestByIndexFast(long time, String key) {
 		
-		LinkedList<LastStatus> listtosearch =  cache.get(lu.getNameById(id));
+		LinkedList<LastStatus> listtosearch =  cache.get(key);
 		if (time > listtosearch.getFirst().getTimestamp() || 
 			time < listtosearch.getLast().getTimestamp() ) {
 			return null;
@@ -815,24 +814,24 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		return index;
 	}
 
-	private Integer nearestByIndexSlow(long time, String id) {
+	private Integer nearestByIndexSlow(long time, String key) {
 		// Search the redis cache
 		Integer index = null;
 		Jedis jedis = jedispool.getResource();
 		try {	
-			if (time > new LastStatus(jedis.lindex(id, 0L)).getTimestamp() || 
-					time < new LastStatus(jedis.lindex(id, jedis.llen(id)-1)).getTimestamp() ) {
+			if (time > new LastStatus(jedis.lindex(key, 0L)).getTimestamp() || 
+					time < new LastStatus(jedis.lindex(key, jedis.llen(key)-1)).getTimestamp() ) {
 				return null;
 			}
 
 			long bestDistanceFoundYet = Long.MAX_VALUE;
-			long size = jedis.llen(id);
+			long size = jedis.llen(key);
 
 			for (int i = 0; i < size; i++) {
-				long d1 = Math.abs(time - new LastStatus(jedis.lindex(id, i)).getTimestamp());
+				long d1 = Math.abs(time - new LastStatus(jedis.lindex(key, i)).getTimestamp());
 				long d2;
 				if (i+1 < size)
-					d2 = Math.abs(time - new LastStatus(jedis.lindex(id, i+1)).getTimestamp());
+					d2 = Math.abs(time - new LastStatus(jedis.lindex(key, i+1)).getTimestamp());
 				else 
 					d2 = Long.MAX_VALUE;
 
@@ -855,21 +854,21 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	
-	private Integer nearestByIndex(long time, String id) {
+	private Integer nearestByIndex(long time, String key) {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Find value in cache at index " + new java.util.Date(time));
 		
 		Integer index = null;
 		
 		// Search the fast cache first. If a hit is in the fast cache return 
-		index = nearestByIndexFast(time, id);
+		index = nearestByIndexFast(time, key);
 		
 		if (index != null) {
 			incFastCacheCount();
 		}
 		else {
 			// Search slow cache if no hit
-			index = nearestByIndexSlow(time, id);
+			index = nearestByIndexSlow(time, key);
 			incRedisCacheCount();
 		}
 		

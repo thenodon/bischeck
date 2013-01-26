@@ -26,14 +26,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 
 
 public class JDBCService extends ServiceAbstract implements Service {
 
-    private final static Logger LOGGER = Logger.getLogger(JDBCService.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(JDBCService.class);
     
     static private int querytimeout = 10;
     private Connection connection;

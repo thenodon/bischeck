@@ -22,7 +22,6 @@ package com.ingby.socbox.bischeck.serviceitem;
 
 import net.sf.json.JSONObject;
 
-import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.QueryNagiosPerfData;
@@ -35,9 +34,6 @@ import com.ingby.socbox.bischeck.service.ShellService;
  */
 
 public class CheckCommandServiceItem extends ServiceItemAbstract implements ServiceItem {
-
-	@SuppressWarnings("unused")
-	private final static Logger LOGGER = Logger.getLogger(CheckCommandServiceItem.class);
 
 	public static void main(String[] args) {
 		try {

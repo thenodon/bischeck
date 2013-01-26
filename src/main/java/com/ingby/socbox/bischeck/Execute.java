@@ -49,9 +49,8 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobListener;
@@ -70,7 +69,7 @@ import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 
 public final class Execute implements ExecuteMBean {
 
-    private static final Logger LOGGER = Logger.getLogger(Execute.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Execute.class);
     private static Object syncObj = new Object();
     private Boolean shutdownRequested = false;
     private Boolean reloadRequested = false;
@@ -120,11 +119,11 @@ public final class Execute implements ExecuteMBean {
         try {
             mbs.registerMBean(exec, mbeanname);
         } catch (InstanceAlreadyExistsException e) {
-            LOGGER.fatal("Mbean exception - " + e.getMessage());
+            LOGGER.error("Mbean exception - " + e.getMessage());
         } catch (MBeanRegistrationException e) {
-        	LOGGER.fatal("Mbean exception - " + e.getMessage());
+        	LOGGER.error("Mbean exception - " + e.getMessage());
         } catch (NotCompliantMBeanException e) {
-        	LOGGER.fatal("Mbean exception - " + e.getMessage());
+        	LOGGER.error("Mbean exception - " + e.getMessage());
         }
     }
     
@@ -263,7 +262,7 @@ public final class Execute implements ExecuteMBean {
      */
 	private void deamonInit() throws Exception{
 		if (ConfigurationManager.getInstance().getPidFile().exists()) {
-		    LOGGER.fatal("Pid file already exist - check if bischeck" + 
+		    LOGGER.error("Pid file already exist - check if bischeck" + 
 		    " already running");
 		    throw new Exception("Pid file already exist - check if bischeck" + 
 		    " already running"); 
@@ -324,7 +323,7 @@ public final class Execute implements ExecuteMBean {
             	shutdown();
             }
             
-            if (LOGGER.getEffectiveLevel() == Level.DEBUG) {
+            if (LOGGER.isDebugEnabled()) {
                 // Show next fire time for all triggers
                 String[] list = getTriggers();
                 LOGGER.debug("****** Next fire time *********");

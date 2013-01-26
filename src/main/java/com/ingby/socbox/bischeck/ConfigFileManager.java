@@ -36,7 +36,8 @@ import javax.xml.bind.util.ValidationEventCollector;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigXMLInf.XMLCONFIG;
 
@@ -48,7 +49,7 @@ import com.ingby.socbox.bischeck.ConfigXMLInf.XMLCONFIG;
  */
 public class ConfigFileManager {
 
-	private final static Logger  LOGGER = Logger.getLogger(ConfigFileManager.class);
+	private final static Logger  LOGGER = LoggerFactory.getLogger(ConfigFileManager.class);
 	
 	// A cache of JAXBContext object used so they are not created on every reload
 	private static Map<String,JAXBContext> jccache = Collections.synchronizedMap(new HashMap<String,JAXBContext>());
