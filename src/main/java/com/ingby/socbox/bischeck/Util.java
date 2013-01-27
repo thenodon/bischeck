@@ -161,6 +161,9 @@ public abstract class Util {
 
 
 	public static String fixExponetialFormat(String latestExecuted) {
+		if (latestExecuted == null) 
+			return latestExecuted;
+		
 		
 		if (latestExecuted.contains("E")) {
 			return BigDecimal.valueOf(new Double(latestExecuted)).toPlainString();
