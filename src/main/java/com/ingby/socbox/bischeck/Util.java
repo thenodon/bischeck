@@ -23,6 +23,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -37,6 +39,9 @@ public abstract class Util {
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     
 
+    //private final static Pattern FORMAT_HOUR_MINUTE = Pattern.compile("^([01]?[0-9]|2[0-3]):[0-5][0-9]$");
+    private final static Pattern FORMAT_HOUR_MINUTE = Pattern.compile("^([01]?[0-9]|2[0-3]):[0]?[0]$");
+    
 	/**
      * Obfuscate a string including password= until none character or number. 
      * @param url typical a url string
@@ -170,5 +175,20 @@ public abstract class Util {
 		}
 		
 		return latestExecuted;
+	}
+	
+	public static Integer getHourFromHourMinute(String hourAndMinute) throws IllegalArgumentException {
+		Matcher mat = FORMAT_HOUR_MINUTE.matcher(hourAndMinute);
+
+		if( mat.matches()) {
+			//mat.find();
+			String hour_minute = mat.group();
+			String[] arr = hour_minute.split(":");
+			
+			return Integer.parseInt(arr[0]);    
+			
+		} else
+			throw new IllegalArgumentException();
+		
 	}
 }

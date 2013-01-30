@@ -38,10 +38,12 @@ import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.ConfigFileManager;
 import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEPPool;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHoliday;
+import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHourinterval;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHours;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLMonths;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLPeriod;
@@ -433,35 +435,103 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             if (hours.getHoursID() == hoursid) {
             	if (LOGGER.isDebugEnabled())
             		LOGGER.debug("Got the hour id to populate hour : " + hoursid);
-                List<String> hourList = hours.getHour();
-                if (LOGGER.isDebugEnabled())
-                	LOGGER.debug("Size of hour list " + hourList.size());
-                for (int i=0;i<24;i++) { 
-                    
-                    ThresholdContainer tc = new ThresholdContainer();
-                    String curhour = null;
-                    
-                    curhour = hourList.get(i);
-                    if (LOGGER.isDebugEnabled())
-                    	LOGGER.debug("Hour " + i + " got definition " + curhour);
-                    if (isContentNull(curhour)) 
-                        this.thresholdByPeriod[i] = null;
-                    else {
-                        try { 
-                            tc.setFloatThreshold(Float.parseFloat(curhour));
-                            tc.setExpInd(false);
-                        } catch (NumberFormatException ne) {
-                            tc.setExpThreshold(curhour);
-                            tc.setExpInd(true);
-                        }
-                        this.thresholdByPeriod[i] = tc;
-                    }
-                }
-                                
+                if (!hours.getHour().isEmpty())
+                	populateOneHour(hours);
+                else
+                	populateIntervalHour(hours);
+                
                 break;
             }
         }
     }
+    /**
+     * Set the threshold value based on intervals. 
+     * The thresholdByPeriod 24 array are first initialized to null.
+     * The iterate over the list of XMLHourinterval configurations.
+     * Set the &lt;threshold&gt; tag value for the 24 array form fromhour to tohour+1.  
+     * @param hours
+     */
+    private void populateIntervalHour(XMLHours hours) {
+    	List<XMLHourinterval> hourIntList = hours.getHourinterval();
+
+    	/*
+    	 * Init 
+    	 */
+    	for (int i=0;i<24;i++) {
+    		this.thresholdByPeriod[i] = null;
+    	}
+
+    	for (XMLHourinterval hour: hourIntList) { 
+
+    		ThresholdContainer tc = new ThresholdContainer();
+    		String curhour = hour.getThreshold();
+    		int from = Util.getHourFromHourMinute(hour.getHourfrom());
+    		int to = Util.getHourFromHourMinute(hour.getHourto());;
+    				
+    		for(int i = from; i < to + 1; i++) {
+
+    			if (isContentNull(curhour)) 
+    				this.thresholdByPeriod[i] = null;
+    			else {
+    				try { 
+    					tc.setFloatThreshold(Float.parseFloat(curhour));
+    					tc.setExpInd(false);
+    				} catch (NumberFormatException ne) {
+    					tc.setExpThreshold(curhour);
+    					tc.setExpInd(true);
+    				}
+    				this.thresholdByPeriod[i] = tc;
+    			}
+
+    		}
+    	}
+    	
+    	if (LOGGER.isDebugEnabled()) {
+    		for (int i=0;i<24;i++) {
+    			if (this.thresholdByPeriod[i] == null)
+    				LOGGER.debug("Hour " + i + " got definition null");
+    			else if (this.thresholdByPeriod[i].isExpInd())
+    				LOGGER.debug("Hour " + i + " got definition " + this.thresholdByPeriod[i].getExpThreshold());
+    			else 
+    				LOGGER.debug("Hour " + i + " got definition " + this.thresholdByPeriod[i].getFloatThreshold());
+    		}
+    	}
+    }
+
+
+	private void populateOneHour(XMLHours hours) {
+		List<String> hourList = hours.getHour();
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Size of hour list " + hourList.size());
+		for (int i=0;i<24;i++) { 
+		    
+		    ThresholdContainer tc = new ThresholdContainer();
+		    String curhour = null;
+		    
+		    curhour = hourList.get(i);
+		
+		    if (isContentNull(curhour)) 
+		        this.thresholdByPeriod[i] = null;
+		    else {
+		        try { 
+		            tc.setFloatThreshold(Float.parseFloat(curhour));
+		            tc.setExpInd(false);
+		        } catch (NumberFormatException ne) {
+		            tc.setExpThreshold(curhour);
+		            tc.setExpInd(true);
+		        }
+		        this.thresholdByPeriod[i] = tc;
+		    }
+		}
+		if (LOGGER.isDebugEnabled()) {
+    		for (int i=0;i<24;i++) {
+    			if (this.thresholdByPeriod[i].isExpInd())
+    				LOGGER.debug("Hour " + i + " got definition " + this.thresholdByPeriod[i].getExpThreshold());
+    			else 
+    				LOGGER.debug("Hour " + i + " got definition " + this.thresholdByPeriod[i].getFloatThreshold());
+    		}
+    	}
+	}
 
     public static void unregister() {
     	twenty4hourconfig = null;
