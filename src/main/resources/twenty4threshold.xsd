@@ -126,13 +126,47 @@
     
 	<xsd:element name="hours">
 		<xsd:complexType>
+		
+		<xsd:choice>                                
+            <xsd:group ref="onehour"/>
+            <xsd:group ref="intervalhour"/>
+        </xsd:choice>
+		<!--
 			<xsd:sequence>
 				<xsd:element ref="hour" minOccurs="24" maxOccurs="24"/>
 			</xsd:sequence>
+			-->
 			<xsd:attribute name="hoursID" type="xsd:int" use="required"/>
 		</xsd:complexType>
 	</xsd:element>
 	
+	<xsd:group name="onehour">
+	  <xsd:sequence>
+		<xsd:element ref="hour" minOccurs="24" maxOccurs="24"/>
+	  </xsd:sequence>	
+	</xsd:group>
+	
+	<xsd:group name="intervalhour">
+	<xsd:sequence>
+		<xsd:element ref="hourinterval" minOccurs="1" maxOccurs="24"/>
+	  </xsd:sequence>
+	</xsd:group>
+	  
 	<xsd:element name="hour" type="xsd:normalizedString"/>
+
+	<xsd:element name="hourinterval">
+	  <xsd:complexType>
+		<xsd:sequence>
+		   <xsd:element ref="hourfrom"/>
+		   <xsd:element ref="hourto"/>
+		   <xsd:element ref="threshold"/>
+		</xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="hourfrom" type="xsd:normalizedString"/>
+	<xsd:element name="hourto" type="xsd:normalizedString"/>
+	<xsd:element name="threshold" type="xsd:normalizedString"/>
+
 
 </xsd:schema>

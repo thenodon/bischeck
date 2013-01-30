@@ -41,10 +41,12 @@ import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.ConfigFileManager;
 import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEPPool;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHoliday;
+import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHourinterval;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHours;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLMonths;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLPeriod;
@@ -65,7 +67,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     private String serviceItemName;
     private String hostName;
 
-    private NAGIOSSTAT state;
+    //private NAGIOSSTAT state;
     private Float warning;
     private Float critical;
     private ThresholdContainer thresholdByPeriod[] = new ThresholdContainer[24];
@@ -109,11 +111,11 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 line.hasOption("service") &&
                 line.hasOption("item")) {
 
-            Twenty4HourThreshold current = new Twenty4HourThreshold();
-            current.setHostName(line.getOptionValue("host"));    
-            current.setServiceName(line.getOptionValue("service"));
-            current.setServiceItemName(line.getOptionValue("item"));
-
+            Twenty4HourThreshold current = new Twenty4HourThreshold(
+            		line.getOptionValue("host"),
+            		line.getOptionValue("service"),
+            		line.getOptionValue("item"));
+            
             // Set debug level to get logging to indicate what period and hour rule
             // applied
             ((ch.qos.logback.classic.Logger) LOGGER).setLevel(Level.DEBUG);
@@ -135,9 +137,13 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     }
 
     
-    public Twenty4HourThreshold() {
-        //this.jep = new ExecuteJEP();
-        this.state = NAGIOSSTAT.OK;
+    public Twenty4HourThreshold(String hostName, String serviceName, String serviceItemName) {
+        
+    	this.hostName = hostName;
+    	this.serviceName = serviceName;
+    	this.serviceItemName = serviceItemName;
+    	
+        //this.state = NAGIOSSTAT.OK;
 
         Integer stateAsInt = null;
         String stateAsString = null;
@@ -195,366 +201,15 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     
     @Override
-    public void init() throws Exception {
+    public void init() throws ThresholdException {
         Calendar now = BisCalendar.getInstance();
         this.init(now);
     }
     
-    
-    private boolean isHoliday(XMLTwenty4Threshold config, int year, int month, int dayofmonth) {
-        Iterator<XMLHoliday> holiter = config.getHoliday().iterator();
-        boolean isholiday=false;
-        
-        while (holiter.hasNext()) {
-            XMLHoliday holyear = holiter.next();
-            if (holyear.getYear() == year) {
-                Iterator<String> iter = holyear.getDayofyear().iterator();
-                while (iter.hasNext() ) {
-                    if (iter.next().equals(monthAndDay(month,dayofmonth))) {
-                        isholiday = true;
-                        if (LOGGER.isDebugEnabled())
-                        	LOGGER.debug("Found holiday " + year+ "-" + month + "-" + dayofmonth);
-                        break;
-                    }
-                }
-            }
-            if (isholiday)
-                break;
-        }
-        return isholiday;
-    }
-    
-    
-    private List<XMLPeriod> findServicedef(XMLTwenty4Threshold config) {
-        Iterator<XMLServicedef> servicedefIter = config.getServicedef().iterator();
-        List<XMLPeriod> periodList = null;
-        while (servicedefIter.hasNext()) {
-            XMLServicedef servicedef = servicedefIter.next();
-            if (servicedef.getHostname().equals(this.hostName) &&
-                servicedef.getServicename().equals(this.serviceName) &&
-                servicedef.getServiceitemname().equals(this.serviceItemName)) {
-                periodList = servicedef.getPeriod();
-                break;
-            }
-        }
-        return periodList; 
-    }
-    
-    /**
-     * This method is one of the core in this class. Based on all period that 
-     * exists for a serviceitem we need to find if one match the current day. 
-     * Since each period can include multiple months and weeks tags, we need
-     * to iterate both over period and over all months and weeks of that period.
-     * When a match is found a period is returned with a valid hours id which is
-     * used to find the right hour based on the time of the day.
-     * 
-     * @param listPeriod
-     * @param now
-     * @return
-     */
-    private XMLPeriod findPeriod(List<XMLPeriod> listPeriod, Calendar now){
-
-        Integer month=now.get(Calendar.MONTH) + 1;
-        Integer dayofmonth=now.get(Calendar.DAY_OF_MONTH);
-        
-        Integer week=now.get(Calendar.WEEK_OF_YEAR);
-        // See, http://frustratedprogrammer.blogspot.com/2004/08/oracles-todate-v-javas-calendar.html
-        // This algorithm seems to work
-        //Integer week=(now.get( Calendar.DAY_OF_YEAR ) - 1) / 7 + 1;
-        Integer dayofweek=now.get(Calendar.DAY_OF_WEEK);
-        if (LOGGER.isDebugEnabled())
-        	LOGGER.debug("The current date is: month=" + month +
-                " dayofmonth="+ dayofmonth +
-                " week="+ week +
-                " dayofweek="+ dayofweek);
-        /**
-         * 1 - Check for a complete month and day in month
-         */
-        Iterator<XMLPeriod> periodIter = listPeriod.iterator();
-
-        while (periodIter.hasNext()) {
-            XMLPeriod period = periodIter.next();
-
-            Iterator<XMLMonths> monthsIter= period.getMonths().iterator();
-
-            while (monthsIter.hasNext()) {
-                XMLMonths months = monthsIter.next();
-
-                if (months.getMonth() == month &&
-                        months.getDayofmonth() == dayofmonth) {
-                	if (LOGGER.isDebugEnabled())
-                		LOGGER.debug("Rule 1 - month is " + month + " and day is " + dayofmonth + " hourid:"+ period.getHoursIDREF());
-                    assignPeriod(period);
-                    return period;
-                }
-            }
-
-        }
-
-        /**
-         * 2 - Check for a complete week and day in week
-         */
-        periodIter = listPeriod.iterator();
-        while (periodIter.hasNext()) {
-            XMLPeriod period = periodIter.next();
-
-            Iterator<XMLWeeks> weeksIter= period.getWeeks().iterator();
-
-            while (weeksIter.hasNext()) {
-                XMLWeeks weeks = weeksIter.next();
-
-                if (weeks.getWeek() == week &&
-                        weeks.getDayofweek() == dayofweek) {
-                	if (LOGGER.isDebugEnabled())
-                		LOGGER.debug("Rule 2 - week is " + week + "and day is " + dayofweek + " hourid:" + period.getHoursIDREF());
-                    assignPeriod(period);
-                    return period;
-                }
-            }
-        }
-
-        /**
-         * 3 - Check for a day in month
-         */
-        periodIter = listPeriod.iterator();
-        while (periodIter.hasNext()) {
-            XMLPeriod period = periodIter.next();
-
-            Iterator<XMLMonths> monthsIter= period.getMonths().iterator();
-
-            while (monthsIter.hasNext()) {
-                XMLMonths months = monthsIter.next();
-
-                if (isContentNull(months.getMonth()) &&
-                        months.getDayofmonth() == dayofmonth) {
-                	if (LOGGER.isDebugEnabled())
-                		LOGGER.debug("Rule 3 - day of month is " + dayofmonth + " hourid:" + period.getHoursIDREF());
-                    assignPeriod(period);
-                    return period;
-                }
-            }
-        }
-    
-        /**
-         * 4 - Check for a day in week
-         */
-        periodIter = listPeriod.iterator();
-        while (periodIter.hasNext()) {
-            XMLPeriod period = periodIter.next();
-
-            Iterator<XMLWeeks> weeksIter= period.getWeeks().iterator();
-
-            while (weeksIter.hasNext()) {
-                XMLWeeks weeks = weeksIter.next();
-
-                if (isContentNull(weeks.getWeek()) &&
-                        weeks.getDayofweek() == dayofweek) {
-                	if (LOGGER.isDebugEnabled())
-                		LOGGER.debug("Rule 4 - day of week is " + dayofweek + " hourid:"+ period.getHoursIDREF());
-                    assignPeriod(period);
-                    return period;
-                }
-            }
-        }
-        
-        /**
-         * 5 - Check for a month
-         */
-        periodIter = listPeriod.iterator();
-        while (periodIter.hasNext()) {
-            XMLPeriod period = periodIter.next();
-
-            Iterator<XMLMonths> monthsIter= period.getMonths().iterator();
-
-            while (monthsIter.hasNext()) {
-                XMLMonths months = monthsIter.next();
-
-                if (months.getMonth() == month &&
-                        isContentNull(months.getDayofmonth())) {
-                	if (LOGGER.isDebugEnabled())
-                		LOGGER.debug("Rule 5 - month is " + month + " hourid:" + period.getHoursIDREF());
-                    assignPeriod(period);
-                    return period;
-                }
-            }
-        }
-        
-        /**
-         * 6 - Check for a week
-         */
-        periodIter = listPeriod.iterator();
-        while (periodIter.hasNext()) {
-            XMLPeriod period = periodIter.next();
-
-            Iterator<XMLWeeks> weeksIter= period.getWeeks().iterator();
-
-            while (weeksIter.hasNext()) {
-                XMLWeeks weeks = weeksIter.next();
-                if (weeks.getWeek() == week &&
-                        isContentNull(weeks.getDayofweek())) {
-                	if (LOGGER.isDebugEnabled())
-                		LOGGER.debug("Rule 6 - week is "+ week + " - hourid:" + period.getHoursIDREF());
-                    assignPeriod(period);
-                    return period;
-                }
-            }
-        }
-
-        /**
-         * 7 - Check for default
-         */
-        periodIter = listPeriod.iterator();
-        while (periodIter.hasNext()) {
-            XMLPeriod period = periodIter.next();
-            if (period.getMonths().isEmpty() &&
-                    period.getWeeks().isEmpty() ) {
-            	if (LOGGER.isDebugEnabled())
-            		LOGGER.debug("Rule 7 - default - hourid:" + period.getHoursIDREF());
-                assignPeriod(period);
-                return period;
-            }
-
-        }
-    
-        return null;
-    }
-
-    private void assignPeriod(XMLPeriod foundperiod) {
-        
-            this.calcMethod = foundperiod.getCalcmethod();
-            this.warning = 1-new Float(foundperiod.getWarning())/100;
-            this.critical = 1-new Float(foundperiod.getCritical())/100;
-    }
-
-    
-    private void setHourTreshold(XMLTwenty4Threshold config,int hoursid) {
-        Iterator<XMLHours> hourIter = config.getHours().iterator();
-        
-        while (hourIter.hasNext()) {
-            XMLHours hours = hourIter.next();
-            if (hours.getHoursID() == hoursid) {
-            	if (LOGGER.isDebugEnabled())
-            		LOGGER.debug("Got the hour id to populate hour : " + hoursid);
-                List<String> hourList = hours.getHour();
-                if (LOGGER.isDebugEnabled())
-                	LOGGER.debug("Size of hour list " + hourList.size());
-                for (int i=0;i<24;i++) { 
-                    
-                    ThresholdContainer tc = new ThresholdContainer();
-                    String curhour = null;
-                    
-                    curhour = hourList.get(i);
-                    if (LOGGER.isDebugEnabled())
-                    	LOGGER.debug("Hour " + i + " got definition " + curhour);
-                    if (isContentNull(curhour)) 
-                        this.thresholdByPeriod[i] = null;
-                    else {
-                        try { 
-                            tc.setFloatThreshold(Float.parseFloat(curhour));
-                            tc.setExpInd(false);
-                        } catch (NumberFormatException ne) {
-                            tc.setExpThreshold(curhour);
-                            tc.setExpInd(true);
-                        }
-                        this.thresholdByPeriod[i] = tc;
-                    }
-                }
-                                
-                break;
-            }
-        }
-    }
-
-    public static void unregister() {
-    	twenty4hourconfig = null;
-    }
-    
-    
-    private synchronized static XMLTwenty4Threshold configInit() throws Exception {
-    	if (twenty4hourconfig == null) {
-    		ConfigFileManager xmlfilemgr = new ConfigFileManager();
-    		//XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
-    		twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD);
-    	}
-    	return twenty4hourconfig;
-    }
-    
-    
-    private void init(Calendar now) throws Exception  {
-        
-    	XMLTwenty4Threshold twenty4hourconfig = configInit();
-    	
-        int year=now.get(Calendar.YEAR);
-        int month=now.get(Calendar.MONTH) + 1;
-        int dayofmonth=now.get(Calendar.DAY_OF_MONTH);
-        
-
-        // Init to handle the situation with no definition        
-        for (int i=0;i<24;i++) { 
-            this.thresholdByPeriod[i] = null;
-        }    
-        this.calcMethod =null;
-        this.warning=null;
-        this.critical=null;
-
-        
-        if (!isHoliday(twenty4hourconfig, year, month, dayofmonth)) {
-            
-            List<XMLPeriod> listPeriod = findServicedef(twenty4hourconfig);
-            if (listPeriod != null) {
-            	if (LOGGER.isDebugEnabled())
-            		LOGGER.debug("Number of period for service def are " + listPeriod.size());
-                XMLPeriod period = findPeriod(listPeriod, now);
-                
-                if (period != null) {
-                	if (LOGGER.isDebugEnabled())
-                		LOGGER.debug("Found period has hourid = " + period.getHoursIDREF());
-                    setHourTreshold(twenty4hourconfig, period.getHoursIDREF());
-                }
-                else {
-                	if (LOGGER.isDebugEnabled())
-                		LOGGER.debug("No period found");
-                }
-            }                        
-        }
-    }
-        
-    
-    private boolean isContentNull(String str) {
-        if (str.trim().equals("") || str.equalsIgnoreCase("null"))
-            return true;
-        return false;
-    }
-    
-    
-    private boolean isContentNull(Integer value) {
-        if (value == null)
-            return true;
-        return false;
-    }
-
-    
-    private String monthAndDay(int month, int dayofmonth) {
-
-        String monthandday = null;
-
-        if (month<10)
-            monthandday="0"+month;
-        else
-            monthandday=""+month;
-
-        if (dayofmonth <10)
-            monthandday=monthandday+"0"+dayofmonth;
-        else
-            monthandday=monthandday+dayofmonth;
-
-        return monthandday;
-    }
-
-    
     @Override
     public NAGIOSSTAT getState(String value) {
 
+    	
         Float measuredValue = null;
 
         if (value != null) {
@@ -567,7 +222,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         }
         
         /* Reset the state to the default level */
-        this.state=NAGIOSSTAT.OK;
+        NAGIOSSTAT state = NAGIOSSTAT.OK;
         
         /* Only check if this is a hour period that not null  and that the measured value is null
          * Maybe measured value should result in an error - but I think it should be a seperate service control 
@@ -579,27 +234,39 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 " warning level: " + this.getWarning() + 
                 " hour: "+BisCalendar.getInstance().get(Calendar.HOUR_OF_DAY));// + hourThreshold);
 
-        Float calcthreshold = this.getThreshold();
+        state = resolveState(measuredValue);
+
+        return state;
+    }
+
+
+	private NAGIOSSTAT resolveState(Float measuredValue) {
+		NAGIOSSTAT state = NAGIOSSTAT.OK;
+		
+		Float calcthreshold = this.getThreshold();
         
         if (measuredValue == null) {
+        	
         	if (LOGGER.isDebugEnabled())
         		LOGGER.debug("Measured value is null so state is set to " + stateOnNull.toString());
-        	this.state=stateOnNull;
+        	
+        	state=stateOnNull;
         } else if (calcthreshold != null && measuredValue != null) {
-            if (LOGGER.isDebugEnabled())
+            
+        	if (LOGGER.isDebugEnabled())
         		LOGGER.debug("Hour threahold value: " + calcthreshold);
 
             if (calcMethod.equalsIgnoreCase(">")) {
                 if (measuredValue < this.getCritical()*calcthreshold) {
-                    this.state=NAGIOSSTAT.CRITICAL;
+                    state=NAGIOSSTAT.CRITICAL;
                 } else if (measuredValue < this.getWarning()*calcthreshold) {
-                    this.state=NAGIOSSTAT.WARNING;
+                    state=NAGIOSSTAT.WARNING;
                 }
             } else if (calcMethod.equalsIgnoreCase("<")) {
                 if (measuredValue > this.getCritical()*calcthreshold) {
-                    this.state=NAGIOSSTAT.CRITICAL;
+                    state=NAGIOSSTAT.CRITICAL;
                 } else if (measuredValue > this.getWarning()*calcthreshold) {
-                    this.state=NAGIOSSTAT.WARNING;
+                    state=NAGIOSSTAT.WARNING;
                 }
             } else if (calcMethod.equalsIgnoreCase("=")) {
 
@@ -608,17 +275,22 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
                 if (measuredValue > calcthreshold+criticalBound || 
                         measuredValue < calcthreshold-criticalBound) {
-                    this.state=NAGIOSSTAT.CRITICAL;
+                    state=NAGIOSSTAT.CRITICAL;
                 } else if (measuredValue > calcthreshold+warningBound || 
                         measuredValue < calcthreshold-warningBound) {
-                    this.state=NAGIOSSTAT.WARNING;
+                    state=NAGIOSSTAT.WARNING;
                 }
             } else {
-                this.state=NAGIOSSTAT.UNKNOWN;
+                state=NAGIOSSTAT.UNKNOWN;
             }
-        }// Not a null hour
+        }
+        return state;
+	}
 
-        return this.state;
+    
+    @Override
+    public String getHostName() {
+        return hostName;
     }
 
     
@@ -678,11 +350,520 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         return currentthreshold;
     }
     
+
+    private boolean isHoliday(XMLTwenty4Threshold config, int year, int month, int dayofmonth) {
+        Iterator<XMLHoliday> holiter = config.getHoliday().iterator();
+        boolean isholiday=false;
+        
+        while (holiter.hasNext()) {
+            XMLHoliday holyear = holiter.next();
+            if (holyear.getYear() == year) {
+                Iterator<String> iter = holyear.getDayofyear().iterator();
+                while (iter.hasNext() ) {
+                    if (iter.next().equals(monthAndDay(month,dayofmonth))) {
+                        isholiday = true;
+                        if (LOGGER.isDebugEnabled())
+                        	LOGGER.debug("Found holiday " + year+ "-" + month + "-" + dayofmonth);
+                        break;
+                    }
+                }
+            }
+            if (isholiday)
+                break;
+        }
+        return isholiday;
+    }
+    
+    
+    private List<XMLPeriod> findServicedef(XMLTwenty4Threshold config) {
+        Iterator<XMLServicedef> servicedefIter = config.getServicedef().iterator();
+        List<XMLPeriod> periodList = null;
+        while (servicedefIter.hasNext()) {
+            XMLServicedef servicedef = servicedefIter.next();
+            if (servicedef.getHostname().equals(this.hostName) &&
+                servicedef.getServicename().equals(this.serviceName) &&
+                servicedef.getServiceitemname().equals(this.serviceItemName)) {
+                periodList = servicedef.getPeriod();
+                break;
+            }
+        }
+        return periodList; 
+    }    
+    
+
+    /**
+     * This method is one of the core in this class. Based on all period that 
+     * exists for a serviceitem we need to find if one match the current day. 
+     * Since each period can include multiple months and weeks tags, we need
+     * to iterate both over period and over all months and weeks of that period.
+     * When a match is found a period is returned with a valid hours id which is
+     * used to find the right hour based on the time of the day.
+     * 
+     * @param listPeriod
+     * @param date
+     * @return
+     */
+    private XMLPeriod findPeriod(List<XMLPeriod> listPeriod, Calendar date){
+    	
+    	if (LOGGER.isDebugEnabled()) {
+
+    		Integer month=date.get(Calendar.MONTH) + 1;
+    		Integer dayofmonth=date.get(Calendar.DAY_OF_MONTH);
+
+    		Integer week=date.get(Calendar.WEEK_OF_YEAR);
+    		Integer dayofweek=date.get(Calendar.DAY_OF_WEEK);
+
+    		LOGGER.debug("The current date is: month=" + month +
+    				" dayofmonth="+ dayofmonth +
+    				" week="+ week +
+    				" dayofweek="+ dayofweek);
+    	}
+        
+    	
+    	XMLPeriod period = null;
+        /**
+         * 1 - Check for a complete month and day in month
+         */
+        period = checkDayAndMonth(listPeriod,date);
+        if (period != null) { return period; }
+        
+        
+        /**
+         * 2 - Check for a complete week and day in week
+         */
+        period = checkDayAndWeek(listPeriod,date);
+        if (period != null) { return period; }
+        
+        
+        /**
+         * 3 - Check for a day in month
+         */
+        period = checkDayOfMonth(listPeriod, date);
+        if (period != null) { return period; }
+        
+    
+        /**
+         * 4 - Check for a day in week
+         */
+        period = checkDayOfWeek(listPeriod, date);
+        if (period != null) { return period; }
+        
+    
+        /**
+         * 5 - Check for a month
+         */
+        period = checkMonth(listPeriod, date);
+        if (period != null) { return period; }
+        
+        
+        /**
+         * 6 - Check for a week
+         */
+        period = checkWeek(listPeriod, date);
+        if (period != null) { return period; }
+        
+        /**
+         * 7 - Check for default
+         */
+        return checkDefault(listPeriod);
+    }
+
+
+	private XMLPeriod checkDefault(List<XMLPeriod> listPeriod) {
+		
+		Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+        
+		while (periodIter.hasNext()) {
+            XMLPeriod period = periodIter.next();
+            if (period.getMonths().isEmpty() &&
+                    period.getWeeks().isEmpty() ) {
+            	if (LOGGER.isDebugEnabled())
+            		LOGGER.debug("Rule 7 - default - hourid:" + period.getHoursIDREF());
+                assignPeriod(period);
+                return period;
+            }
+        }
+        return null;
+	}
+
+
+	private XMLPeriod checkWeek(List<XMLPeriod> listPeriod, Calendar date) {
+
+		Integer week = date.get(Calendar.WEEK_OF_YEAR);
+		
+		Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+		
+        while (periodIter.hasNext()) {
+            XMLPeriod period = periodIter.next();
+
+            Iterator<XMLWeeks> weeksIter= period.getWeeks().iterator();
+
+            while (weeksIter.hasNext()) {
+                XMLWeeks weeks = weeksIter.next();
+                if (weeks.getWeek().equals(week) &&
+                        isContentNull(weeks.getDayofweek())) {
+                	if (LOGGER.isDebugEnabled())
+                		LOGGER.debug("Rule 6 - week is "+ week + " - hourid:" + period.getHoursIDREF());
+                    assignPeriod(period);
+                    return period;
+                }
+            }
+        }
+        return null;
+	}
+
+
+	private XMLPeriod checkMonth(List<XMLPeriod> listPeriod, Calendar date) {
+		
+		Integer month = date.get(Calendar.MONTH) + 1;
+		
+		Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+        
+		while (periodIter.hasNext()) {
+            XMLPeriod period = periodIter.next();
+
+            Iterator<XMLMonths> monthsIter= period.getMonths().iterator();
+
+            while (monthsIter.hasNext()) {
+                XMLMonths months = monthsIter.next();
+
+                if (months.getMonth().equals(month) &&
+                        isContentNull(months.getDayofmonth())) {
+                	if (LOGGER.isDebugEnabled())
+                		LOGGER.debug("Rule 5 - month is " + month + " hourid:" + period.getHoursIDREF());
+                    assignPeriod(period);
+                    return period;
+                }
+            }
+        }
+		return null;
+	}
+
+
+	private XMLPeriod checkDayOfWeek(List<XMLPeriod> listPeriod, Calendar date) {
+		
+		Integer dayofweek = date.get(Calendar.DAY_OF_WEEK);
+		
+		Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+		
+        while (periodIter.hasNext()) {
+            XMLPeriod period = periodIter.next();
+
+            Iterator<XMLWeeks> weeksIter= period.getWeeks().iterator();
+
+            while (weeksIter.hasNext()) {
+                XMLWeeks weeks = weeksIter.next();
+
+                if (isContentNull(weeks.getWeek()) &&
+                        weeks.getDayofweek().equals(dayofweek)) {
+                	if (LOGGER.isDebugEnabled())
+                		LOGGER.debug("Rule 4 - day of week is " + dayofweek + " hourid:"+ period.getHoursIDREF());
+                    assignPeriod(period);
+                    return period;
+                }
+            }
+        }
+        return null;
+	}
+
+
+	private XMLPeriod checkDayOfMonth(List<XMLPeriod> listPeriod, Calendar date) {
+		
+		Integer dayofmonth = date.get(Calendar.DAY_OF_MONTH);
+		
+		Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+		
+        while (periodIter.hasNext()) {
+            XMLPeriod period = periodIter.next();
+
+            Iterator<XMLMonths> monthsIter= period.getMonths().iterator();
+
+            while (monthsIter.hasNext()) {
+                XMLMonths months = monthsIter.next();
+
+                if (isContentNull(months.getMonth()) &&
+                        months.getDayofmonth().equals(dayofmonth)) {
+                	if (LOGGER.isDebugEnabled())
+                		LOGGER.debug("Rule 3 - day of month is " + dayofmonth + " hourid:" + period.getHoursIDREF());
+                    assignPeriod(period);
+                    return period;
+                }
+            }
+        }
+        return null;
+	}
+
+
+	private XMLPeriod checkDayAndWeek(List<XMLPeriod> listPeriod, Calendar date) {
+		
+		Integer week = date.get(Calendar.WEEK_OF_YEAR);
+        Integer dayofweek = date.get(Calendar.DAY_OF_WEEK);
+        
+        Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+        
+        while (periodIter.hasNext()) {
+            XMLPeriod period = periodIter.next();
+
+            Iterator<XMLWeeks> weeksIter= period.getWeeks().iterator();
+
+            while (weeksIter.hasNext()) {
+                XMLWeeks weeks = weeksIter.next();
+
+                if (weeks.getWeek().equals(week) &&
+                        weeks.getDayofweek().equals(dayofweek)) {
+                	if (LOGGER.isDebugEnabled())
+                		LOGGER.debug("Rule 2 - week is " + week + "and day is " + dayofweek + " hourid:" + period.getHoursIDREF());
+                    assignPeriod(period);
+                    return period;
+                }
+            }
+        }
+        return null;
+	}
+
+	
+	private XMLPeriod checkDayAndMonth(List<XMLPeriod> listPeriod, Calendar date) {
+		
+		Integer month = date.get(Calendar.MONTH) + 1;
+        Integer dayofmonth = date.get(Calendar.DAY_OF_MONTH);
+        
+        Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+
+        while (periodIter.hasNext()) {
+            XMLPeriod period = periodIter.next();
+
+            Iterator<XMLMonths> monthsIter= period.getMonths().iterator();
+
+            while (monthsIter.hasNext()) {
+                XMLMonths months = monthsIter.next();
+
+                if (months.getMonth().equals(month) &&
+                        months.getDayofmonth().equals(dayofmonth)) {
+                	if (LOGGER.isDebugEnabled())
+                		LOGGER.debug("Rule 1 - month is " + month + " and day is " + dayofmonth + " hourid:"+ period.getHoursIDREF());
+                    assignPeriod(period);
+                    return period;
+                }
+            }
+        }
+        return null;
+	}
+
+	
+    private void assignPeriod(XMLPeriod foundperiod) {
+        
+            this.calcMethod = foundperiod.getCalcmethod();
+            this.warning = 1-new Float(foundperiod.getWarning())/100;
+            this.critical = 1-new Float(foundperiod.getCritical())/100;
+    }
+
+    
+    private void setHourTreshold(XMLTwenty4Threshold config,int hoursid) {
+        Iterator<XMLHours> hourIter = config.getHours().iterator();
+        
+        while (hourIter.hasNext()) {
+            XMLHours hours = hourIter.next();
+            if (hours.getHoursID() == hoursid) {
+            	if (LOGGER.isDebugEnabled())
+            		LOGGER.debug("Got the hour id to populate hour : " + hoursid);
+                if (!hours.getHour().isEmpty())
+                	populateOneHour(hours);
+                else
+                	populateIntervalHour(hours);
+                
+                break;
+            }
+        }
+    }
+
+    /**
+     * Set the threshold value based on intervals. 
+     * The thresholdByPeriod 24 array are first initialized to null.
+     * The iterate over the list of XMLHourinterval configurations.
+     * Set the &lt;threshold&gt; tag value for the 24 array form fromhour to tohour+1.  
+     * @param hours
+     */
+    private void populateIntervalHour(XMLHours hours) {
+    	List<XMLHourinterval> hourIntList = hours.getHourinterval();
+
+    	/*
+    	 * Init 
+    	 */
+    	for (int i=0;i<24;i++) {
+    		this.thresholdByPeriod[i] = null;
+    	}
+
+    	for (XMLHourinterval hour: hourIntList) { 
+
+    		ThresholdContainer tc = new ThresholdContainer();
+    		String curhour = hour.getThreshold();
+    		int from = Util.getHourFromHourMinute(hour.getHourfrom());
+    		int to = Util.getHourFromHourMinute(hour.getHourto());;
+    				
+    		for(int i = from; i < to + 1; i++) {
+
+    			if (isContentNull(curhour)) 
+    				this.thresholdByPeriod[i] = null;
+    			else {
+    				try { 
+    					tc.setFloatThreshold(Float.parseFloat(curhour));
+    					tc.setExpInd(false);
+    				} catch (NumberFormatException ne) {
+    					tc.setExpThreshold(curhour);
+    					tc.setExpInd(true);
+    				}
+    				this.thresholdByPeriod[i] = tc;
+    			}
+
+    		}
+    	}
+    	
+    	if (LOGGER.isDebugEnabled()) {
+    		for (int i=0;i<24;i++) {
+    			if (this.thresholdByPeriod[i] == null)
+    				LOGGER.debug("Hour " + i + " got definition null");
+    			else if (this.thresholdByPeriod[i].isExpInd())
+    				LOGGER.debug("Hour " + i + " got definition " + this.thresholdByPeriod[i].getExpThreshold());
+    			else 
+    				LOGGER.debug("Hour " + i + " got definition " + this.thresholdByPeriod[i].getFloatThreshold());
+    		}
+    	}
+    }
+
+
+	private void populateOneHour(XMLHours hours) {
+		List<String> hourList = hours.getHour();
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Size of hour list " + hourList.size());
+		for (int i=0;i<24;i++) { 
+		    
+		    ThresholdContainer tc = new ThresholdContainer();
+		    String curhour = null;
+		    
+		    curhour = hourList.get(i);
+		
+		    if (isContentNull(curhour)) 
+		        this.thresholdByPeriod[i] = null;
+		    else {
+		        try { 
+		            tc.setFloatThreshold(Float.parseFloat(curhour));
+		            tc.setExpInd(false);
+		        } catch (NumberFormatException ne) {
+		            tc.setExpThreshold(curhour);
+		            tc.setExpInd(true);
+		        }
+		        this.thresholdByPeriod[i] = tc;
+		    }
+		}
+		if (LOGGER.isDebugEnabled()) {
+    		for (int i=0;i<24;i++) {
+    			if (this.thresholdByPeriod[i].isExpInd())
+    				LOGGER.debug("Hour " + i + " got definition " + this.thresholdByPeriod[i].getExpThreshold());
+    			else 
+    				LOGGER.debug("Hour " + i + " got definition " + this.thresholdByPeriod[i].getFloatThreshold());
+    		}
+    	}
+	}
+
+    public static void unregister() {
+    	twenty4hourconfig = null;
+    }
+    
+    
+    private synchronized static XMLTwenty4Threshold configInit() throws Exception {
+    	if (twenty4hourconfig == null) {
+    		ConfigFileManager xmlfilemgr = new ConfigFileManager();
+    		//XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
+    		twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD);
+    	}
+    	return twenty4hourconfig;
+    }
+    
+    
+    private void init(Calendar now) throws ThresholdException  {
+        
+    	XMLTwenty4Threshold twenty4hourconfig;
+		try {
+			twenty4hourconfig = configInit();
+		} catch (Exception e) {
+			LOGGER.error("Configuration file missing or corrupted", e);
+			ThresholdException te = new ThresholdException(e);
+			te.setThresholdName(this.getClass().getName());
+			throw te;
+		}
+    	
+        int year=now.get(Calendar.YEAR);
+        int month=now.get(Calendar.MONTH) + 1;
+        int dayofmonth=now.get(Calendar.DAY_OF_MONTH);
+        
+
+        // Init to handle the situation with no definition        
+        for (int i=0;i<24;i++) { 
+            this.thresholdByPeriod[i] = null;
+        }    
+        this.calcMethod =null;
+        this.warning=null;
+        this.critical=null;
+
+        
+        if (!isHoliday(twenty4hourconfig, year, month, dayofmonth)) {
+            
+            List<XMLPeriod> listPeriod = findServicedef(twenty4hourconfig);
+            if (listPeriod != null) {
+            	if (LOGGER.isDebugEnabled())
+            		LOGGER.debug("Number of period for service def are " + listPeriod.size());
+                XMLPeriod period = findPeriod(listPeriod, now);
+                
+                if (period != null) {
+                	if (LOGGER.isDebugEnabled())
+                		LOGGER.debug("Found period has hourid = " + period.getHoursIDREF());
+                    setHourTreshold(twenty4hourconfig, period.getHoursIDREF());
+                }
+                else {
+                	if (LOGGER.isDebugEnabled())
+                		LOGGER.debug("No period found");
+                }
+            }                        
+        }
+    }
+        
+    
+    private boolean isContentNull(String str) {
+        if (str.trim().equals("") || str.equalsIgnoreCase("null"))
+            return true;
+        return false;
+    }
+    
+    
+    private boolean isContentNull(Integer value) {
+        if (value == null)
+            return true;
+        return false;
+    }
+
+    
+    private String monthAndDay(int month, int dayofmonth) {
+
+        StringBuffer monthandday = new StringBuffer();
+
+        if (month<10)
+            monthandday.append("0").append(month);
+        else
+            monthandday.append(month);
+
+        if (dayofmonth <10)
+            monthandday.append("0").append(dayofmonth);
+        else
+            monthandday.append(dayofmonth);
+
+        return monthandday.toString();
+    }
+
+    
+    
     
     private Float calculateForInterval(ThresholdContainer tcont) {
 		
-    	//Float calculatedValue = null;
-
 		if (tcont.isExpInd()) {
 	    	
 			String parsedstr = CacheEvaluator.parse(tcont.getExpThreshold());
@@ -703,40 +884,20 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 	    			ExecuteJEPPool.getInstance().checkIn(jep);
 	    			jep = null;
 	    		}
-				
+		
+	    		if (LOGGER.isDebugEnabled())
+	    			LOGGER.debug("Calculated value = " + value);
+	    		
 	    		if (value == null) 
 	    			return null;
 	    		
-	    		if (LOGGER.isDebugEnabled())
-	    			LOGGER.debug("Calculated value = " + value);
 	    		return value;
-	    		//return Util.roundDecimals(value);
-				
+	    		
 			}
 		}
 		else {
 			return tcont.getFloatThreshold();
 		}
     }
-
-    @Override
-    public void setHostName(String name) {
-        this.hostName = name;
-
-    }
-
-
-    @Override
-    public void setServiceItemName(String name) {
-        this.serviceItemName = name;
-
-    }
-
-
-    @Override
-    public void setServiceName(String name) {
-        this.serviceName = name;
-    }
-
     
 }
