@@ -475,10 +475,12 @@ public class DB2XMLConvert {
             //Start writing to the output stream
             bufferedWriter.write(xmlstr.toString());
         } finally {
-            bufferedWriter.flush();
+        	if (bufferedWriter != null)
+        		bufferedWriter.flush();
             try {
+            	if (bufferedWriter != null)
                 bufferedWriter.close();
-            } catch (Exception ignore) {}
+            } catch (IOException ignore) {}
         }
     }
 
