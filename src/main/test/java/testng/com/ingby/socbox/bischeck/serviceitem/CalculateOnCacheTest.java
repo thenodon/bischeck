@@ -33,6 +33,7 @@ import com.ingby.socbox.bischeck.cache.LastStatus;
 
 import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.serviceitem.CalculateOnCache;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
@@ -141,8 +142,8 @@ public class CalculateOnCacheTest {
 		coc.setExecution("xyz * 0.8");
 		try {
 			coc.execute();
-		} catch (org.nfunk.jep.ParseException pe) {
-			Assert.assertNotNull(pe);
+		} catch (ServiceException se) {
+			Assert.assertNotNull(se);
 		}
     }
     
