@@ -69,10 +69,11 @@ public class LivestatusService extends ServiceAbstract implements Service {
     		clientSocket = new Socket(uri.getHost(), uri.getPort());
     		clientSocket.setSoTimeout(querytimeout);
     	} catch (IOException ioe) {
+    		setConnectionEstablished(false);
     		LOGGER.warn("Open connection failed", ioe);
     		try {
     			clientSocket.close();
-    		} catch (Exception ignore) {}
+    		} catch (IOException ignore) {}
     		ServiceException se = new ServiceException(ioe);
     		se.setServiceName(this.serviceName);
     		throw se;
@@ -128,12 +129,14 @@ public class LivestatusService extends ServiceAbstract implements Service {
     		throw se;
         } finally {    
             try {
-                dataOut.close();
+            	if (dataOut != null)
+            		dataOut.close();
             } catch (IOException ignore) {}  
             dataOut = null;  
 
             try {
-                bufIn.close();
+            	if (bufIn != null)
+            		bufIn.close();
             } catch (IOException ignore) {}  
             bufIn = null; 
         }

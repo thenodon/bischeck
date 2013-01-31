@@ -44,7 +44,8 @@ public class LastCacheService extends ServiceAbstract implements Service {
     
     @Override
     public void openConnection() throws ServiceException {
-        // The use of LastStatusCache do not need a connection
+    	setConnectionEstablished(true);
+    	// The use of LastStatusCache do not need a connection
     }
 
 

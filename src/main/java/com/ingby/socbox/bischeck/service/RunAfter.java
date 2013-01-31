@@ -41,11 +41,14 @@ public class RunAfter {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (this.hostname.equals( ((RunAfter) obj).getHostname()) &&  
-				this.servicename.equals( ((RunAfter) obj).getServicename()) )
-			return true;
-		else
-			return false;
+		if (obj != null) {
+			if (this.hostname.equals( ((RunAfter) obj).getHostname()) &&  
+					this.servicename.equals( ((RunAfter) obj).getServicename()) )
+				return true;
+			else
+				return false;
+		}
+		return false;
 	}
 	
 	@Override 

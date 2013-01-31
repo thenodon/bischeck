@@ -210,7 +210,7 @@ public interface Service {
      * Set the connection status
      * @param connected
      */
-    public void setConnectionEstablished(boolean connected);
+    //public void setConnectionEstablished(boolean connected);
 
     
     /**

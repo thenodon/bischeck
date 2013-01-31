@@ -62,6 +62,7 @@ public class JDBCService extends ServiceAbstract implements Service {
     	try {
     		this.connection = DriverManager.getConnection(this.getConnectionUrl());
     	} catch (SQLException sqle) {
+    		setConnectionEstablished(false);
         	LOGGER.warn("Open connection failed",sqle);
     		ServiceException se = new ServiceException(sqle);
     		se.setServiceName(this.serviceName);
@@ -103,11 +104,13 @@ public class JDBCService extends ServiceAbstract implements Service {
     		throw se;
         } finally {
             try {
-                res.close();
-            } catch(Exception ignore) {}    
+            	if (res != null)
+            		res.close();
+            } catch(SQLException ignore) {}    
             try {
-                statement.close();
-            } catch(Exception ignore) {}    
+            	if (statement != null)
+            		statement.close();
+            } catch(SQLException ignore) {}    
         }
 
         return null;

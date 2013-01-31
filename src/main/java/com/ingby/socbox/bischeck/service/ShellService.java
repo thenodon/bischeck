@@ -64,12 +64,12 @@ public class ShellService extends ServiceAbstract implements Service {
     		ret = buf.readLine();
     	} catch (IOException ioe) {
     		LOGGER.warn("Executing " + exec + "failed",ioe);
-    		ServiceException se = new ServiceException("ioe");
+    		ServiceException se = new ServiceException(ioe);
     		se.setServiceName(this.serviceName);
     		throw se;
     	} catch (InterruptedException ie) {
     		LOGGER.warn("Executing " + exec + "failed with execption", ie);
-    		ServiceException se = new ServiceException("ioe");
+    		ServiceException se = new ServiceException(ie);
     		se.setServiceName(this.serviceName);
     		throw se;
     	} finally {

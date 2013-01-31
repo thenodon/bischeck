@@ -142,7 +142,7 @@ public abstract class ServiceAbstract {
     }
     
     
-    public void setConnectionEstablished(boolean connected){
+    protected void setConnectionEstablished(boolean connected){
         connectionEstablished = connected;
     }
 

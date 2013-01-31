@@ -20,6 +20,7 @@
 package com.ingby.socbox.bischeck.service;
 
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -61,6 +62,7 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
     	try {
     		this.connection = JDBCPoolServiceUtil.getConnection(this.getConnectionUrl());
     	} catch (SQLException sqle) {
+    		setConnectionEstablished(false);
     		LOGGER.warn("Open connection failed",sqle);
     		ServiceException se = new ServiceException(sqle);
     		se.setServiceName(this.serviceName);
@@ -100,12 +102,14 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
     		se.setServiceName(this.serviceName);
     		throw se;
     	} finally {
+    		try {	
+    			if (res != null)
+    				res.close();
+    		} catch(SQLException ignore) {}    
     		try {
-    			res.close();
-    		} catch(Exception ignore) {}    
-    		try {
-    			statement.close();
-    		} catch(Exception ignore) {}    
+    			if (statement != null)
+    				statement.close();
+    		} catch(SQLException ignore) {}    
     	}
 
     	return null;
