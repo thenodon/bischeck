@@ -22,16 +22,19 @@ package com.ingby.socbox.bischeck.threshold;
 
 public class DummyThreshold implements Threshold {
     
+	private String hostName;
     private String serviceName;
     private String serviceItemName;
     private NAGIOSSTAT state;
     
-    Float warning;
-    Float critical;
-    String calcMethod = null;
-
     
-    public DummyThreshold() {
+    
+    public DummyThreshold(String hostName, String serviceName, String serviceItemName) {
+        
+    	this.hostName = hostName;
+    	this.serviceName = serviceName;
+    	this.serviceItemName = serviceItemName;
+    	
         this.state = NAGIOSSTAT.OK;
     }
 
@@ -61,6 +64,12 @@ public class DummyThreshold implements Threshold {
 
     
     @Override
+    public String getHostName() {
+        return hostName;
+    }
+
+    
+    @Override
     public String getServiceName() {
         return serviceName;
     }
@@ -74,7 +83,7 @@ public class DummyThreshold implements Threshold {
 
     @Override
     public String getCalcMethod() {
-        return calcMethod;
+        return null;
     }
         
 
@@ -83,22 +92,4 @@ public class DummyThreshold implements Threshold {
             return null;
     }
     
-
-    @Override
-    public void setHostName(String name) {
-
-    }
-
-
-    @Override
-    public void setServiceItemName(String name) {
-        this.serviceItemName = name;
-
-    }
-
-
-    @Override
-    public void setServiceName(String name) {
-        this.serviceName = name;
-    }
 }

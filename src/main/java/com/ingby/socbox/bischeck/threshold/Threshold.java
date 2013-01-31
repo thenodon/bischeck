@@ -22,8 +22,14 @@ package com.ingby.socbox.bischeck.threshold;
 /**
  * The interface describe all methods need to create a Threshold compatible 
  * class that can be instantiated by ThresholdFactory class. The implemented 
- * class must have a constructor with no parameters. 
- *   
+ * class must have a constructor that implements the following constuctor that
+ * takes 3 parameters and in the following order:<br>
+ * <code>
+ * {@link String} hostName<br>
+ * {@link String} serviceName<br>
+ * {@link String} serviceItemName<br>
+ * </code>
+ * See example {@link Twenty4HourThreshold#Twenty4HourThreshold(String, String,String)}
  * @author Anders Håål
  *
  */
@@ -70,7 +76,7 @@ public interface Threshold {
      * do not exists in the Threshold cache for the combination of 
      * host->service->serviceitem.
      */
-    public void init() throws Exception;
+    public void init() throws ThresholdException;
     
     
     /**
@@ -93,6 +99,13 @@ public interface Threshold {
      * @return the state
      */
     public NAGIOSSTAT getState(String value);
+    
+    
+    /**
+     * Get the host name for the Threshold.
+     * @return host name
+     */
+    public String getHostName();
     
     
     /**
@@ -122,24 +135,4 @@ public interface Threshold {
      */
     public String getCalcMethod();
 
-    
-    /**
-     * Set the service name for the threshold.
-     * @param name Service name
-     */
-    public void setServiceName(String name);
-    
-    
-    /**
-     * Set the service item name for the threshold.
-     * @param name ServiceItem name
-     */
-    public void setServiceItemName(String name);
-    
-    
-    /**
-     * Set the host name for the threshold.
-     * @param name Host name
-     */
-    public void setHostName(String name);
 }
