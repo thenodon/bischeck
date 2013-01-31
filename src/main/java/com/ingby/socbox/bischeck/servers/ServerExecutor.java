@@ -50,7 +50,7 @@ public final class ServerExecutor {
         try {
             serverSet = ConfigurationManager.getInstance().getServerClassMap();
         } catch (ClassNotFoundException e) {
-            LOGGER.error("Class error in servers.xml - not server connection will be available: " + e);
+            LOGGER.error("Class error in servers.xml - not server connection will be available",e);
         }
     }
 
@@ -84,15 +84,15 @@ public final class ServerExecutor {
                 Method method = serverSet.get(name).getMethod(UNREGISTER,String.class);
                 method.invoke(null,name);
             } catch (IllegalArgumentException e) {
-                LOGGER.error(e.toString() + ":" + e.getMessage());
+                LOGGER.error(e.toString(), e);
             } catch (IllegalAccessException e) {
-                LOGGER.error(e.toString() + ":" + e.getMessage());
+                LOGGER.error(e.toString(), e);
             } catch (InvocationTargetException e) {
-                LOGGER.error(e.toString() + ":" + e.getMessage());
+                LOGGER.error(e.toString(), e);
             } catch (SecurityException e) {
-                LOGGER.error(e.toString() + ":" + e.getMessage());
+                LOGGER.error(e.toString(), e);
             } catch (NoSuchMethodException e) {
-                LOGGER.error(e.toString() + ":" + e.getMessage());
+                LOGGER.error(e.toString(), e);
             }
         }
     	serverexecutor = null;
@@ -114,21 +114,22 @@ public final class ServerExecutor {
         while (iter.hasNext()) {    
             String name = iter.next();
             try {    
-                Method method = serverSet.get(name).getMethod(GETINSTANCE,String.class);
+     
+            	Method method = serverSet.get(name).getMethod(GETINSTANCE,String.class);
                 Server server = (Server) method.invoke(null,name);
         
                 server.send(service);
-            
+     
             } catch (IllegalArgumentException e) {
-                LOGGER.error(e.toString() + ":" + e.getMessage());
+            	LOGGER.error(e.toString(), e);
             } catch (IllegalAccessException e) {
-                LOGGER.error(e.toString() + ":" + e.getMessage());
+            	LOGGER.error(e.toString(), e);
             } catch (InvocationTargetException e) {
-                LOGGER.error(e.toString() + ":" + e.getMessage());
+            	LOGGER.error(e.toString(), e);
             } catch (SecurityException e) {
-                LOGGER.error(e.toString() + ":" + e.getMessage());
+            	LOGGER.error(e.toString(), e);
             } catch (NoSuchMethodException e) {
-                LOGGER.error(e.toString() + ":" + e.getMessage());
+            	LOGGER.error(e.toString(), e);
             }
         }
     }
