@@ -55,7 +55,7 @@ public class MatchServiceToSendTest {
     	Assert.assertEquals(msts.isMatch("kalle"), false);
 
     	
-    	msts = new MatchServiceToSend(MatchServiceToSend.ConvertString2List("service#123","#"));
+    	msts = new MatchServiceToSend(MatchServiceToSend.convertString2List("service#123","#"));
     	Assert.assertEquals(msts.isMatch(cachekey1), true);
     	Assert.assertEquals(msts.isMatch(cachekey2), true);
     	Assert.assertEquals(msts.isMatch("kalle"), false);
