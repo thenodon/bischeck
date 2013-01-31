@@ -39,10 +39,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class QueryDate {
 
-    public static void main(String[] args) {
-        System.out.println(QueryDate.parse("select val1 from where formdate='%%yyyy-MM-dd%[M-1]%%' and todate='%%yy.MM.dd%[D2]%%';"));
-        System.out.println(QueryDate.parse("select val1 from where formdate='%%yyyy-MM-dd%%' and todate='%%yy.MM.dd%%';"));
-    }
     
     private final static Logger  LOOGER = LoggerFactory.getLogger(QueryDate.class);
 
@@ -113,11 +109,12 @@ public abstract class QueryDate {
             count++;
         }
         
-        // Replace the original string with the new date values 
+        // Replace the original string with the new date values
+        String parsedString = strtoparse;
         for (int i = 0; i< count; i++) {
-            strtoparse.replaceFirst("%%(.*?)%%", datereplace[i]);
+            parsedString = parsedString.replaceFirst("%%(.*?)%%", datereplace[i]);
         }
         LOOGER.debug("Parsed string - " + strtoparse);
-        return strtoparse;
+        return parsedString;
     }
 }
