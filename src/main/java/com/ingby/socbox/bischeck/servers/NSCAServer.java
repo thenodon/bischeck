@@ -150,7 +150,7 @@ public final class NSCAServer implements Server {
         payload.setLevel(level.toString());
         
         if (LOGGER.isInfoEnabled())
-        	LOGGER.info(ServerUtil.LogFormat(instanceName, service, payload.getMessage()));
+        	LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
         
         Long duration = null;
     	final Timer timer = Metrics.newTimer(NSCAServer.class, 
@@ -160,9 +160,9 @@ public final class NSCAServer implements Server {
         try {
         	sender.send(payload);
         }catch (NagiosException e) {
-        	LOGGER.warn("Nsca server error - " + e);
+        	LOGGER.warn("Nsca server error", e);
         } catch (IOException e) {
-        	LOGGER.error("Network error - check nsca server and that service is started - " + e);
+        	LOGGER.error("Network error - check nsca server and that service is started", e);
         } finally { 
         	duration = context.stop()/1000000;
         	LOGGER.info("Nsca send execute: " + duration + " ms");

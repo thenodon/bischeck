@@ -19,37 +19,17 @@
 
 package com.ingby.socbox.bischeck.servers;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.Socket;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.NagiosUtil;
@@ -160,8 +140,13 @@ public final class LiveStatusServer implements Server {
 		}
 
 		 if (LOGGER.isInfoEnabled())
-	        	LOGGER.info(ServerUtil.LogFormat(instanceName, service, xml));
+	        	LOGGER.info(ServerUtil.logFormat(instanceName, service, xml));
 		
+		connectAndSend(xml);
+	}
+
+
+	private void connectAndSend(String xml) {
 		Long duration = null;
 		final Timer timer = Metrics.newTimer(LiveStatusServer.class, 
 				instanceName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
@@ -177,25 +162,22 @@ public final class LiveStatusServer implements Server {
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
             out.println(xml);
             out.flush();
-            
-			
 
 		} catch (UnknownHostException e) {
-			LOGGER.error("Network error - check livestatus server and that service is started - " + e);
+			LOGGER.error("Network error - don't know about host: " + hostAddress,e);
 		} catch (IOException e) {
 			LOGGER.error("Network error - check livestatus server and that service is started - " + e);
 		} finally { 
-			try {
+			if (out != null)
 				out.close();
-			} catch (Exception ignore) {}
 			try {
-				clientSocket.close();
-			} catch (Exception ignore) {}
-			
+				if (clientSocket != null)
+					clientSocket.close();
+			} catch (IOException ignore) {}
+
 			duration = context.stop()/1000000;
 			LOGGER.info("Livestatus send execute: " + duration + " ms");
 		}
-
 	}
 
 	
@@ -226,5 +208,4 @@ public final class LiveStatusServer implements Server {
 
 		return defaultproperties;
 	}
-
 }

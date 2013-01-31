@@ -33,7 +33,7 @@ public class MatchServiceToSend {
 	 * @param delim a string to seperat the patterns used to match 
 	 * @return the {@link List} of patterns as {@link String}
 	 */
-	public static List<String> ConvertString2List(String strlist, String delim ) {
+	public static List<String> convertString2List(final String strlist, final String delim ) {
 		StringTokenizer st = new StringTokenizer(strlist, delim);
 		List<String> list = new ArrayList<String>();
 		
@@ -48,7 +48,7 @@ public class MatchServiceToSend {
 	 * Create MatchServiceToSend by a pattern string
 	 * @param pattern the string that is a regex to match against
 	 */
-	public MatchServiceToSend(String pattern) {
+	public MatchServiceToSend(final String pattern) {
 		pats.add(Pattern.compile(pattern));
 	}
 	
@@ -57,7 +57,7 @@ public class MatchServiceToSend {
 	 * Create MatchServiceToSend by a list of pattern strings
 	 * @param pattern a list of strings that is a regex to match against
 	 */
-	public MatchServiceToSend(List<String> pattern) {
+	public MatchServiceToSend(final List<String> pattern) {
 		for (String pat: pattern) {
 			pats.add(Pattern.compile(pat));
 		}
@@ -71,7 +71,7 @@ public class MatchServiceToSend {
 	 * @param matchit the string to match againt patterns
 	 * @return true if matched by any pattern or false if not matched
 	 */
-	public boolean isMatch(String matchit) {
+	public boolean isMatch(final String matchit) {
 		Boolean matched = null;
 		if (matchedstr.containsKey(matchit)) {
 			// Check if the message already matched
@@ -80,7 +80,7 @@ public class MatchServiceToSend {
 			// Match message and put status in cache
 			matched = false;
 			for (Pattern pat: pats) {
-				Matcher mat = pat.matcher(matchit);
+				final Matcher mat = pat.matcher(matchit);
 				if (mat.find()) {
 					matched = true;
 					break;
@@ -88,7 +88,6 @@ public class MatchServiceToSend {
 			} 
 			matchedstr.put(matchit, matched);
 		}
-		
 		return matched;
 	}
 	

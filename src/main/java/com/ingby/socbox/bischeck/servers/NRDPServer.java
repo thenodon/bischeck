@@ -28,7 +28,6 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -158,19 +157,19 @@ public final class NRDPServer implements Server {
 		 */
 		String xml = null;
 		if ( service.isConnectionEstablished() ) {
-			try {
+			//try {
 				level = service.getLevel();
 				xml = xmlNRDPFormat(level, 
 						service.getHost().getHostname(),
 						service.getServiceName(),
 						nagutil.createNagiosMessage(service));
-			} catch (Exception e) {
+			/*} catch (Exception e) {
 				level=NAGIOSSTAT.CRITICAL;
 				xml = xmlNRDPFormat(level, 
 						service.getHost().getHostname(),
 						service.getServiceName(),
 						e.getMessage());
-			}
+			}*/
 		} else {
 			// If no connection is established still write a value 
 			//of null value=null;
@@ -182,8 +181,14 @@ public final class NRDPServer implements Server {
 		}
 
 		if (LOGGER.isInfoEnabled())
-			LOGGER.info(ServerUtil.LogFormat(instanceName, service, xml));
+			LOGGER.info(ServerUtil.logFormat(instanceName, service, xml));
 
+		connectAndSend(xml);
+
+	}
+
+
+	private void connectAndSend(String xml) {
 		Long duration = null;
 		final Timer timer = Metrics.newTimer(NRDPServer.class, 
 				instanceName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
@@ -212,17 +217,15 @@ public final class NRDPServer implements Server {
 			try {
 				dBuilder = dbFactory.newDocumentBuilder();
 			} catch (ParserConfigurationException e) {
-				LOGGER.error("Could not get a doc builder: " + e.getMessage());
+				LOGGER.error("Could not get a doc builder", e);
+				return;
 			}
 			
 			/*
 			 * Getting the value for status and message tags
 			 */
-			Document doc = null;
 			try {
-	
 
-				///
 				BufferedReader br
 	        	= new BufferedReader(new InputStreamReader(conn.getInputStream()));
 	 
@@ -233,14 +236,12 @@ public final class NRDPServer implements Server {
 					sb.append(line);
 				} 
 				
-				
-				//InputStream is = new ByteArrayInputStream(htmlstr.getBytes("UTF-8"));
 				InputStream is = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-				//////////////
-				LOGGER.info(sb.toString());
 				
+				Document doc = null;
+
 				doc = dBuilder.parse(is);
-				//				doc = dBuilder.parse(conn.getInputStream());
+
 				doc.getDocumentElement().normalize();
 				String rootNode =  doc.getDocumentElement().getNodeName();  
 	            NodeList responselist = doc.getElementsByTagName(rootNode);  
@@ -252,45 +253,45 @@ public final class NRDPServer implements Server {
 	            	LOGGER.error("nrdp returned message \"" + message + "\" for xml:  " + xml);
 	            }
 			} catch (SAXException e) {
-				LOGGER.error("Could not parse response xml: "+ e.getMessage());
+				LOGGER.error("Could not parse response xml", e);
 			}
 			
-			
-
 		}catch (IOException e) {
-			LOGGER.error("Network error - check nrdp server and that service is started - " + e);
+			LOGGER.error("Network error - check nrdp server and that service is started", e);
 		} finally { 
 			try {
-				wr.close();
-			} catch (Exception ignore) {}
+				if (wr != null)
+					wr.close();
+			} catch (IOException ignore) {}
 			
 			duration = context.stop()/1000000;
 			LOGGER.info("Nrdp send execute: " + duration + " ms");
 		}
-
 	}
 
 	private HttpURLConnection createHTTPConnection(String payload)
-			throws IOException, ProtocolException {
+			throws IOException {
+	
 		HttpURLConnection conn;
 		conn = (HttpURLConnection) url.openConnection();
 
 		conn.setDoOutput(true);
-		// Check if you can set the agent 
+		
 		conn.setRequestMethod("POST");
 
 		conn.setConnectTimeout(connectionTimeout);
 		conn.setRequestProperty("Content-Length", "" + 
 				Integer.toString(payload.getBytes().length));
+		
 		conn.setRequestProperty("User-Agent", "bischeck");
 		conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
 		conn.setRequestProperty("Accept","text/html,application/xhtml+xml,application/xml");//;q=0.9,*/*;q=0.8");
-		//conn.setRequestProperty("Accept-Encoding","gzip,deflate,sdch");
 		conn.setRequestProperty("Accept-Language","en-US,en;q=0.8");
 		conn.setRequestProperty("Accept-Charset","ISO-8859-1,utf-8");//;q=0.7,*;q=0.3");
 		return conn;
 	}
 
+	
 	private String xmlNRDPFormat(NAGIOSSTAT level, String hostname,
 			String servicename, String output) {
 		StringBuffer strbuf = new StringBuffer();
@@ -310,8 +311,7 @@ public final class NRDPServer implements Server {
 		try {
 			utfenc = URLEncoder.encode(strbuf.toString(),"UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Unsupported encoding of xml: " + strbuf.toString(), e);
 		}
 		return utfenc;
 	}

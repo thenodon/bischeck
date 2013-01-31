@@ -90,8 +90,6 @@ public final class OpenTSDBServer implements Server {
     
     @Override
     synchronized public void send(Service service) {
-        Socket opentsdbSocket = null;
-        PrintWriter out = null;
 
         String message;    
         if ( service.isConnectionEstablished()) {
@@ -101,8 +99,17 @@ public final class OpenTSDBServer implements Server {
         }
 
         if (LOGGER.isInfoEnabled())
-        	LOGGER.info(ServerUtil.LogFormat(instanceName, service, message));
-        
+        	LOGGER.info(ServerUtil.logFormat(instanceName, service, message));
+
+        connectAndSend(message);
+
+    }
+
+
+	private void connectAndSend(String message) {
+		Socket opentsdbSocket = null;
+        PrintWriter out = null;
+
         long duration = 0;
         try {
         	TimeMeasure tm = new TimeMeasure();
@@ -121,20 +128,19 @@ public final class OpenTSDBServer implements Server {
             duration = tm.stop();
             LOGGER.info("OpenTSDB send execute: " + duration + " ms");
         } catch (UnknownHostException e) {
-            LOGGER.error("Don't know about host: " + hostAddress);
+            LOGGER.error("Network error - don't know about host: " + hostAddress, e);
         } catch (IOException e) {
-            LOGGER.error("Network error - check OpenTSDB server and that service is started - " + e);
+            LOGGER.error("Network error - check OpenTSDB server and that service is started", e);
         }
         finally {
-            try {
+            if (out != null)
                 out.close();
-            } catch (Exception ignore) {}    
             try {
-                opentsdbSocket.close();
-            } catch (Exception ignore) {}    
+            	if (opentsdbSocket != null)
+            		opentsdbSocket.close();
+            } catch (IOException ignore) {}    
         }
-
-    }
+	}
 
     private String getMessage(Service service) {
 
@@ -181,6 +187,7 @@ public final class OpenTSDBServer implements Server {
         return strbuf.toString();
     }
     
+    
     private String checkNull(String str) {
         if (str == null)
             return "NaN";
@@ -188,12 +195,14 @@ public final class OpenTSDBServer implements Server {
             return str;
     }
 
+    
     private String checkNull(Float number) {
         if (number == null)
             return "NaN";
         else
             return String.valueOf(number);
     }
+    
     
     private String checkNullMultiple(Float number1, Float number2) {
         Float sum;
@@ -204,6 +213,7 @@ public final class OpenTSDBServer implements Server {
         }
         return String.valueOf(sum);
     }
+    
     
     private StringBuffer formatRow(StringBuffer strbuf, 
             long currenttime, 
@@ -231,6 +241,7 @@ public final class OpenTSDBServer implements Server {
         
         return strbuf;
     }
+    
     
     public static Properties getServerProperties() {
 		Properties defaultproperties = new Properties();

@@ -102,9 +102,14 @@ public final class GraphiteServer implements Server {
     }
     
     
+    /**
+     * Check if the service data should be filtered out and not sent
+     * @param service
+     * @return
+     */
 	private boolean doNotSend(Service service) {
 		if (msts == null)
-			msts = new MatchServiceToSend(MatchServiceToSend.ConvertString2List(doNotSendRegex,doNotSendRegexDelim));
+			msts = new MatchServiceToSend(MatchServiceToSend.convertString2List(doNotSendRegex,doNotSendRegexDelim));
 		/*
 		 * Loop through all host, service and serviceitems and check if 
 		 * match regex described doNotSendRegex 
@@ -125,16 +130,14 @@ public final class GraphiteServer implements Server {
 		return false;
 	}
 	
+	
     @Override
     synchronized public void send(Service service) {
-        Socket graphiteSocket = null;
-        PrintWriter out = null;
         String message;    
 
         /*
          * Check if the message should be sent
-         */
-        
+         */        
         if(!doNotSendRegex.isEmpty()) {
         	if (doNotSend(service)) {
         		return;
@@ -149,9 +152,18 @@ public final class GraphiteServer implements Server {
 
         
         if (LOGGER.isInfoEnabled())
-        	LOGGER.info(ServerUtil.LogFormat(instanceName, service, message));
+        	LOGGER.info(ServerUtil.logFormat(instanceName, service, message));
         
-        long duration = 0;
+        connectAndSend(message);
+    }
+
+
+	private void connectAndSend(String message) {
+		long duration = 0;
+        
+        Socket graphiteSocket = null;
+        PrintWriter out = null;
+        
         try {
         	TimeMeasure tm = new TimeMeasure();
             tm.start();
@@ -169,20 +181,21 @@ public final class GraphiteServer implements Server {
             duration = tm.stop();
             LOGGER.info("Graphite send execute: " + duration + " ms");
         } catch (UnknownHostException e) {
-            LOGGER.error("Don't know about host: " + hostAddress);
+            LOGGER.error("Network error - don't know about host: " + hostAddress,e);
         } catch (IOException e) {
-            LOGGER.error("Network error - check Graphite server and that service is started - " + e);
+            LOGGER.error("Network error - check Graphite server and that service is started", e);
         }
         finally {
-            try {
-                out.close();
-            } catch (Exception ignore) {}    
-            try {
-                graphiteSocket.close();
-            } catch (Exception ignore) {}    
+        	if (out != null)
+        		out.close();
+        	try {
+        		if (graphiteSocket != null)
+        			graphiteSocket.close();
+            } catch (IOException ignore) {}    
         }
-    }
+	}
 
+    
     private String getMessage(Service service) {
 
         StringBuffer strbuf = new StringBuffer();
@@ -228,6 +241,7 @@ public final class GraphiteServer implements Server {
         return strbuf.toString();
     }
     
+    
     private String checkNull(String str) {
         if (str == null)
             return "NaN";
@@ -235,12 +249,14 @@ public final class GraphiteServer implements Server {
             return str;
     }
 
+    
     private String checkNull(Float number) {
         if (number == null)
             return "NaN";
         else
             return String.valueOf(number);
     }
+    
     
     private String checkNullMultiple(Float number1, Float number2) {
         Float sum;
@@ -251,6 +267,7 @@ public final class GraphiteServer implements Server {
         }
         return String.valueOf(sum);
     }
+    
     
     private StringBuffer formatRow(StringBuffer strbuf, 
             long currenttime, 
@@ -275,6 +292,7 @@ public final class GraphiteServer implements Server {
         
         return strbuf;
     }
+    
     
     public static Properties getServerProperties() {
 		Properties defaultproperties = new Properties();
