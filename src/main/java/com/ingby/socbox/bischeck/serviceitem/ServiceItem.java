@@ -20,6 +20,7 @@
 package com.ingby.socbox.bischeck.serviceitem;
 
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.threshold.Threshold;
 
 /**
@@ -134,7 +135,7 @@ public interface ServiceItem {
      * Set the execution statement for the ServiceItem.
      * @throws Exception
      */
-    public void execute() throws Exception;
+    public void execute() throws ServiceException, ServiceItemException;
     
     
     /**

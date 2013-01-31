@@ -19,11 +19,15 @@
 
 package com.ingby.socbox.bischeck.serviceitem;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import com.ingby.socbox.bischeck.QueryNagiosPerfData;
+import com.ingby.socbox.bischeck.service.ServiceException;
 
 /**
  * The class LivestatusServiceItem manage a number of predefine json formated 
@@ -53,6 +57,8 @@ import com.ingby.socbox.bischeck.QueryNagiosPerfData;
  */
 public class LivestatusServiceItem extends ServiceItemAbstract implements ServiceItem {
     
+	private final static Logger LOGGER = LoggerFactory.getLogger(LivestatusServiceItem.class);
+	
 	
     public LivestatusServiceItem(String name) {
         this.serviceItemName = name;        
@@ -60,7 +66,7 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
 
     
     @Override
-    public void execute() throws Exception {
+    public void execute() throws ServiceException, ServiceItemException {
         /*
          * Check the operation type - status
          *  
@@ -68,7 +74,10 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
         JSONObject jsonStatement = JSONObject.fromObject(this.getExecution());
         StringBuffer strbuf = new StringBuffer();
         if (!validateExecStatement(jsonStatement)) {
-            throw new Exception("Not a valid livestatus operation " + jsonStatement.toString());
+        	LOGGER.warn("Not a valid livestatus operation {}", jsonStatement.toString());
+    		ServiceItemException si = new ServiceItemException(new IllegalArgumentException("Not a valid livestatus operation " + jsonStatement.toString()));
+    		si.setServiceItemName(this.serviceItemName);
+    		throw si;
         }
 
         // Check if a host or service request
@@ -93,20 +102,14 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
             strbuf.append("Columns: perf_data").append("\n");
         } 
         
-        // If the query is perfdata retrieve label and measured data 
-        if (jsonStatement.getString("query").equalsIgnoreCase("perfdata")){
-            
-        }
         strbuf.append("OutputFormat: json").append("\n").
         append("\n");
-
         
         JSONArray jsonReplyArray =  (JSONArray) JSONSerializer.toJSON(service.executeStmt(strbuf.toString()));
         String firstValue = ((JSONArray) JSONSerializer.toJSON(jsonReplyArray.getString(0))).getString(0);
         if (jsonStatement.containsKey("label")) {
             firstValue = QueryNagiosPerfData.parse(jsonStatement.getString("label"),firstValue) ;
         }
-        
         
         setLatestExecuted(firstValue);    
     }

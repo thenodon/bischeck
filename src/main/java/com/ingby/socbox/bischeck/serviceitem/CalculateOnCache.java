@@ -21,13 +21,19 @@ package com.ingby.socbox.bischeck.serviceitem;
 
 
 
+import org.nfunk.jep.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEPPool;
+import com.ingby.socbox.bischeck.service.ServiceException;
 
 
 public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem {
     
-    
+	private final static Logger LOGGER = LoggerFactory.getLogger(CalculateOnCache.class);
+	
     public CalculateOnCache(String name) {
         this.serviceItemName = name;    
     }
@@ -37,9 +43,8 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
      * The serviceitem 
      */
     @Override
-    public void execute() throws Exception {                
-        
-    	
+    public void execute() throws ServiceException, ServiceItemException {                
+            	
     	String cacheparsedstr = service.executeStmt(getExecution());
     	
     	if (cacheparsedstr == null) {
@@ -51,6 +56,11 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
     		ExecuteJEP jep = ExecuteJEPPool.getInstance().checkOut();
     		try {
     			value = jep.execute(cacheparsedstr);
+    		} catch (ParseException pe) {
+    			LOGGER.warn("Parse exception of {}", cacheparsedstr);
+        		ServiceItemException si = new ServiceItemException(pe);
+        		si.setServiceItemName(this.serviceItemName);
+        		throw si;
     		} finally {
     			ExecuteJEPPool.getInstance().checkIn(jep);
     			jep = null;

@@ -26,6 +26,7 @@ import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.provider.laststatuscache.LastStatusCache;
 import com.ingby.socbox.bischeck.service.JDBCService;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceException;
 
 
 public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
@@ -84,7 +85,7 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
 
     
     @Override
-    public void execute() throws Exception {
+    public void execute() throws ServiceException {
     	
     	String cacheparsedstr = CacheEvaluator.parse(getExecution());
     	

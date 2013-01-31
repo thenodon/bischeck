@@ -20,12 +20,16 @@
 package com.ingby.socbox.bischeck.serviceitem;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.json.JSONObject;
 
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.QueryNagiosPerfData;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.service.ShellService;
 
 /**  
@@ -34,6 +38,8 @@ import com.ingby.socbox.bischeck.service.ShellService;
  */
 
 public class CheckCommandServiceItem extends ServiceItemAbstract implements ServiceItem {
+
+	private final static Logger LOGGER = LoggerFactory.getLogger(CheckCommandServiceItem.class);
 
 	public static void main(String[] args) {
 		try {
@@ -80,7 +86,7 @@ public class CheckCommandServiceItem extends ServiceItemAbstract implements Serv
 
 
 	@Override
-	public void execute() throws Exception {
+	public void execute() throws ServiceException, ServiceItemException {
 		/*
 		 * Check the operation type - status
 		 *  
@@ -88,7 +94,10 @@ public class CheckCommandServiceItem extends ServiceItemAbstract implements Serv
 
 		JSONObject jsonStatement = JSONObject.fromObject(this.getExecution());
 		if (!validateExecStatement(jsonStatement)) {
-			throw new Exception("Not a valid check command operation " + jsonStatement.toString());
+			LOGGER.warn("Not a valid check operation {}", jsonStatement.toString());
+    		ServiceItemException si = new ServiceItemException(new IllegalArgumentException("Not a valid check operation " + jsonStatement.toString()));
+    		si.setServiceItemName(this.serviceItemName);
+    		throw si;
 		}
 
 		String checkcommand = jsonStatement.getString("check");
