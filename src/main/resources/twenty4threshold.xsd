@@ -156,15 +156,15 @@
 	<xsd:element name="hourinterval">
 	  <xsd:complexType>
 		<xsd:sequence>
-		   <xsd:element ref="hourfrom"/>
-		   <xsd:element ref="hourto"/>
+		   <xsd:element ref="from"/>
+		   <xsd:element ref="to"/>
 		   <xsd:element ref="threshold"/>
 		</xsd:sequence>
 	  </xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="hourfrom" type="xsd:normalizedString"/>
-	<xsd:element name="hourto" type="xsd:normalizedString"/>
+	<xsd:element name="from" type="xsd:normalizedString"/>
+	<xsd:element name="to" type="xsd:normalizedString"/>
 	<xsd:element name="threshold" type="xsd:normalizedString"/>
 
 </xsd:schema>

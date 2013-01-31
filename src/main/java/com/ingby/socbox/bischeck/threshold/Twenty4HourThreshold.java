@@ -465,8 +465,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     		ThresholdContainer tc = new ThresholdContainer();
     		String curhour = hour.getThreshold();
-    		int from = Util.getHourFromHourMinute(hour.getHourfrom());
-    		int to = Util.getHourFromHourMinute(hour.getHourto());;
+    		int from = Util.getHourFromHourMinute(hour.getFrom());
+    		int to = Util.getHourFromHourMinute(hour.getTo());;
     				
     		for(int i = from; i < to + 1; i++) {
 
