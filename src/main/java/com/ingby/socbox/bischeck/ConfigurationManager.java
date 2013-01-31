@@ -634,19 +634,31 @@ public final class ConfigurationManager  {
     	String servicename = schedule.substring(index+1, schedule.length());
     	
     	Host hostafter = ConfigurationManager.getInstance().hostsmap.get(hostname);
-    	Service serviceafter = hostafter.getServiceByName(servicename);
     	
-    	if (hostafter != null && serviceafter != null) {
-    		if (!(hostname.equals(hostafter.getHostname()) && 
+    	if (hostafter != null) {
+    		
+    		Service serviceafter = hostafter.getServiceByName(servicename);
+        	
+    		if (serviceafter != null) {
+    		
+    			if (!(hostname.equals(hostafter.getHostname()) && 
     				servicename.equals(serviceafter.getServiceName()))) { 
-    			LOOGER.warn("RunAfter host and/or service do not exists for host " + 
+    				LOOGER.warn("RunAfter host and/or service do not exists for host " + 
+    						hostname + 
+    						"-" +
+    						servicename);
+    				return false;
+    			}
+    		} else {
+    			LOOGER.warn("RunAfter service do not exists for " + 
     					hostname + 
     					"-" +
     					servicename);
     			return false;
     		}
+    			
     	} else {
-    		LOOGER.warn("RunAfter host and/or service do not exists for " + 
+    		LOOGER.warn("RunAfter host do not exists for " + 
 					hostname + 
 					"-" +
 					servicename);
