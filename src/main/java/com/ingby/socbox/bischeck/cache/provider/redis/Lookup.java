@@ -11,7 +11,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-public class Lookup {
+public final class Lookup {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(Lookup.class);
 
