@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @author andersh
  *
  */
-public class ExecuteJEPPool {
+public final class ExecuteJEPPool {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ExecuteJEPPool.class);
 	private final static int DIECOUNT = 1000;
