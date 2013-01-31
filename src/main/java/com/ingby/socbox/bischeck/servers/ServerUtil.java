@@ -6,7 +6,7 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class ServerUtil {
 
-	public static String LogFormat(String instanceName, Service service, String message) {
+	public static String logFormat(String instanceName, Service service, String message) {
 		StringBuffer strbuf = new StringBuffer();
 		strbuf.append(instanceName).
 		append(":").
@@ -21,7 +21,7 @@ public class ServerUtil {
 	}
 
 	
-	public static void LogFormat(String instanceName, Service service, String message,Logger logger) {
+	public static void logFormat(String instanceName, Service service, String message,Logger logger) {
 		logger.info("******************** "+ instanceName +" *******************");
         logger.info("*");
         logger.info("*    Host: " + service.getHost().getHostname());
