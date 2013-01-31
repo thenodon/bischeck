@@ -46,7 +46,9 @@ import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 import com.ingby.socbox.bischeck.threshold.Threshold;
+import com.ingby.socbox.bischeck.threshold.ThresholdException;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
@@ -168,17 +170,11 @@ public class ServiceJob implements Job {
 
 
 	/**
-     * 
+     * The strategy 
      * @param service
      */
     private void executeService(Service service) {
-
-        service.setLevel(NAGIOSSTAT.OK);
-        try {
-            service.setLevel(checkServiceItem(service));
-        } catch (Exception e) {
-            service.setLevel(NAGIOSSTAT.CRITICAL);
-        }
+    	checkServiceItem(service);
     }
     
 
@@ -186,96 +182,126 @@ public class ServiceJob implements Job {
      * 
      * @param service
      * @return
-     * @throws Exception
+     * @throws ServiceItemException 
+     * @throws ServiceException 
      */
-    private NAGIOSSTAT checkServiceItem(Service service) throws Exception {
+    private void checkServiceItem(Service service) {// throws ServiceItemException, ServiceException, ThresholdException {
     	
-        NAGIOSSTAT servicestate= NAGIOSSTAT.OK;
-        
+    	
         for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
             ServiceItem serviceitem = serviceitementry.getValue();
             
-            // Get the threshold class
-            serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
-
             String fullservicename = Util.fullName(service, serviceitem);
             if (LOGGER.isDebugEnabled())
             	LOGGER.debug("Executing ServiceItem: "+ fullservicename);
+            
             synchronized (service) {
-
-            	final Timer timer = Metrics.newTimer(ServiceJob.class, 
-            			"execute", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-            	final TimerContext context = timer.time();
-            	
-            	Long executetime = null;
-            	try {
-            		
-                	try {
-                		service.openConnection();
-                	} catch (Exception e) {
-                   		
-                		if (saveNullOnConnectionError) {
-                			serviceitem.setLatestExecuted("null");
-                			CacheFactory.getInstance().add(service,serviceitem);
-                		}
-         
-                		LOGGER.error("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed with error " + e);
-                		service.setConnectionEstablished(false);
-                		return NAGIOSSTAT.CRITICAL;
-                	}
-
-                	serviceitem.execute();
-
-                	if (service.isConnectionEstablished()) {
-                		try {
-                			service.closeConnection();
-                		} catch (Exception ignore) {}
-                	}
-
-                } catch (Exception e) {
-                	LOGGER.error("Execution prepare and/or query \""+ serviceitem.getExecution() 
-                			+ "\" failed with " + e);
-                	throw new Exception("Execution prepare and/or query \""+ serviceitem.getExecution() 
-                			+ "\" failed. See bischeck log for more info.");
-                } finally {
-                	executetime = context.stop()/1000000;         	
-                }
-                
-                serviceitem.setExecutionTime(executetime);
-            	if (LOGGER.isDebugEnabled())
-            		LOGGER.debug("Time to execute " + 
-            			serviceitem.getExecution() + 
-            			" : " + serviceitem.getExecutionTime() +
-            		" ms");
-            	
-            }
-
-            final Timer timer = Metrics.newTimer(Threshold.class, 
-        			"execute", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        	final TimerContext ctxthreshold = timer.time();
-        	
-            try {	
-                // Always report the state for the worst service item 
-                if(LOGGER.isDebugEnabled())
-                	LOGGER.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
-                NAGIOSSTAT curstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
-                
-                CacheFactory.getInstance().add(service,serviceitem);
-                
-                if (curstate.val() > servicestate.val() ) { 
-                    servicestate = curstate;
-                }
-            } finally {
-            	ctxthreshold.stop();
+            	executeService(service, serviceitem);
             }
             
-
-
+            executeThreshold(service, serviceitem);
+           
         } // for serviceitem
-        return servicestate;
     }
 
+
+    private void executeService(Service service, ServiceItem serviceitem) {
+    	final Timer timer = Metrics.newTimer(ServiceJob.class, 
+    			"execute", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    	final TimerContext context = timer.time();
+
+    	Long executetime = null;
+    	try {
+
+    		try {
+    			service.openConnection();
+    		} catch (ServiceException e) {
+
+    			if (saveNullOnConnectionError) {
+    				serviceitem.setLatestExecuted("null");
+    				CacheFactory.getInstance().add(service,serviceitem);
+    			}
+    			LOGGER.warn("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed.", e);
+    			setLevelOnError(service);
+    		}
+
+    		if (service.isConnectionEstablished()) {
+    			try {
+    				serviceitem.execute();
+    				try {
+    					service.closeConnection();
+    				} catch (ServiceException ignore) {}
+    			} catch (ServiceItemException si) {
+    				LOGGER.warn(si.getServiceItemName() +" execution prepare and/or query \""+ serviceitem.getExecution() 
+    						+ "\" failed", si);
+    				setLevelOnError(service);
+    				return;
+    			} catch (ServiceException se) {
+    				LOGGER.warn(se.getServiceName() + " execution prepare and/or query \""+ serviceitem.getExecution() 
+    						+ "\" failed", se);
+    				setLevelOnError(service);
+    				return;
+    			}
+    		}
+    	}
+    	finally {
+    		executetime = context.stop()/1000000;         	
+    	}
+
+    	serviceitem.setExecutionTime(executetime);
+    	if (LOGGER.isDebugEnabled())
+    		LOGGER.debug("Time to execute " + 
+    				serviceitem.getExecution() + 
+    				" : " + serviceitem.getExecutionTime() +
+    				" ms");
+
+    }
+	
     
-}
+    private void executeThreshold(Service service, ServiceItem serviceitem) {
+		
+		NAGIOSSTAT servicestate= NAGIOSSTAT.OK;
+		
+		// Get the threshold class
+        try {
+        	serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
+        } catch (ThresholdException te) {
+        	setLevelOnError(service);
+        	return;
+        }
+        
+		final Timer timer = Metrics.newTimer(Threshold.class, 
+				"execute", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext ctxthreshold = timer.time();
+		
+		try {	
+		    // Always report the state for the worst service item 
+		    if(LOGGER.isDebugEnabled())
+		    	LOGGER.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
+		    NAGIOSSTAT curstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
+		    
+		    CacheFactory.getInstance().add(service,serviceitem);
+		    
+		    if (curstate.val() > servicestate.val() ) { 
+		        servicestate = curstate;
+		    }
+		} finally {
+			ctxthreshold.stop();
+		}
+		service.setLevel(servicestate);
+	}
+
+	
+    /**
+     * Implements the rule when check can not be executed due to underlying
+     * Service and/or ServiceItem
+     * @param service
+     */
+    private void setLevelOnError(Service service) {
+    	// TODO
+    	service.setLevel(NAGIOSSTAT.CRITICAL);
+    }
+    
+ }
 
 
