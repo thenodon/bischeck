@@ -23,10 +23,11 @@ public interface CacheInf {
 	 */
 	public void add(LastStatus ls, String hostname, String servicename, String serviceitemname);
 
+	
 	/**
-	 * 
+	 * Add a LastStatus object tot the cache.  
 	 * @param ls
-	 * @param key
+	 * @param key the key should be created by method {@link Util.fullName} to get correct quoting on the names
 	 */
 	public void add(LastStatus ls, String key);
 	
