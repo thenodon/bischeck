@@ -41,6 +41,7 @@ public abstract class Util {
 
     //private final static Pattern FORMAT_HOUR_MINUTE = Pattern.compile("^([01]?[0-9]|2[0-3]):[0-5][0-9]$");
     private final static Pattern FORMAT_HOUR_MINUTE = Pattern.compile("^([01]?[0-9]|2[0-3]):[0]?[0]$");
+    private final static Pattern ISNULLIN = Pattern.compile(".*null.*");
     
 	/**
      * Obfuscate a string including password= until none character or number. 
@@ -191,4 +192,14 @@ public abstract class Util {
 			throw new IllegalArgumentException();
 		
 	}
+	
+	public static boolean hasStringNull(String isnullin){
+		Matcher mat = ISNULLIN.matcher(isnullin);
+
+		if( mat.matches()) 	
+			return true;
+		else
+			return false;
+	}
+	
 }
