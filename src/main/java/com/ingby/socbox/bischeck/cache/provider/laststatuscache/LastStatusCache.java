@@ -198,12 +198,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
-	/**
-	 * Add cache element
-	 * @param ls
-	 * @param key
-	 */
-	private void add(LastStatus ls, String key) {
+	@Override
+	public void add(LastStatus ls, String key) {
 		LinkedList<LastStatus> fifo;
 		synchronized (cache) {
 			if (cache.get(key) == null) {

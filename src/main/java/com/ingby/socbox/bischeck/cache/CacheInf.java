@@ -24,6 +24,14 @@ public interface CacheInf {
 	public void add(LastStatus ls, String hostname, String servicename, String serviceitemname);
 
 	/**
+	 * 
+	 * @param ls
+	 * @param key
+	 */
+	public void add(LastStatus ls, String key);
+	
+	
+	/**
 	 * Add a entry to the cache
 	 * @param hostname
 	 * @param serviceName

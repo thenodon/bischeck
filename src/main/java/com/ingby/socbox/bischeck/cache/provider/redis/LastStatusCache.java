@@ -219,12 +219,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
-	/**
-	 * Add cache element
-	 * @param ls
-	 * @param key
-	 */
-	private void add(LastStatus ls, String key) {
+	@Override
+	public void add(LastStatus ls, String key) {
 		LinkedList<LastStatus> fifo;
 		Jedis jedis = jedispool.getResource();
 		
@@ -487,7 +483,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			
 			// If any of the index returned is null it means that there is 
 			// no cache data in the from or to time and then return a single null
-			if (indfrom == null || indto == null) {
+			if (indfrom == null || indto == null || indfrom > indto) {
 				strbuf.append("null" + JEPLISTSEP);
 			} else {
 				for (int i = indfrom; i<indto+1; i++) {
