@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
+import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
 
 import com.yammer.metrics.Metrics;
@@ -102,7 +103,7 @@ public class LastStatusCacheParse {
 		while (st.hasMoreTokens()) {
 			String retvalue = st.nextToken();
 
-			if (notNullSupport && retvalue.matches("(?i).*null*")) {
+			if (notNullSupport && Util.hasStringNull(retvalue)) {
 				notANumber= true;
 				break;
 			}
