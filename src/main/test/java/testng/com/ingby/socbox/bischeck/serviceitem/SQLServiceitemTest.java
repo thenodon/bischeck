@@ -98,7 +98,6 @@ public class SQLServiceitemTest {
 	@Test (groups = { "ServiceItem" })
 	public void verifyService() throws Exception {
 
-		try {
 			LastStatus ls = new LastStatus("1", (float) 1.0);
 			cache.add(ls, Util.fullName("host1", "web", "state"));
 			ls = new LastStatus("2", (float) 1.0);
@@ -106,35 +105,23 @@ public class SQLServiceitemTest {
 			ls = new LastStatus("3", (float) 1.0);
 			cache.add(ls, Util.fullName("host3", "web", "state"));
 
-			try {
-				jdbc.openConnection();
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+
+			jdbc.openConnection();
+
 			sql.setExecution("select sum(value) from test");
 			sql.execute();
 			Assert.assertEquals(sql.getLatestExecuted(),"7000");
-			
+
 			sql.setExecution("select sum(value) from test where createdate = '%%yyyy-MM-dd%%'");
 			sql.execute();
 			Assert.assertEquals(sql.getLatestExecuted(),"4000");
-			
+
 			sql.setExecution("select sum(value) from test where (id = host1-web-state[0] or id = host2-web-state[0]) and createdate = '%%yyyy-MM-dd%%'");
 			sql.execute();
 			Assert.assertEquals(sql.getLatestExecuted(),"2000");
-			
+
 			jdbc.closeConnection();
-
-			//System.out.println("Return value:" + sql.getLatestExecuted());
-
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}    
 
 	}
 
 }
-
-
