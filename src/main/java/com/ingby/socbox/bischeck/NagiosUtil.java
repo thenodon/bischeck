@@ -152,10 +152,6 @@ public class NagiosUtil {
 		}
 		
 		return message.toString() + " | " + perfmessage.toString() +"avg-exec-time=" + ((totalexectime/count)+"ms");
-		/*
-		return " " + message + " | " + 
-		perfmessage +
-		"avg-exec-time=" + ((totalexectime/count)+"ms");*/
 	}
 
 }
