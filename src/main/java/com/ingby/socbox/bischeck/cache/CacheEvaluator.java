@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
+import com.ingby.socbox.bischeck.Util;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -65,11 +66,7 @@ public class CacheEvaluator {
 	 * @return
 	 */
 	public String getParsedStatement() {
-		/*if (parsedstatement.equals("null"))
-			return null;
-		else
-		*/
-			return parsedstatement;
+		return parsedstatement;
 	}
 
 
@@ -122,7 +119,7 @@ public class CacheEvaluator {
 			String retvalue = iter.next();
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug(">>> retvalue " + retvalue);
-			if (notNullSupport  && retvalue.matches("(?i).*null*")) {
+			if (notNullSupport && Util.hasStringNull(retvalue)) {
 				notANumber= true;
 				break;
 			}
