@@ -80,6 +80,8 @@ public class CheckCommandServiceItem extends ServiceItemAbstract implements Serv
 		System.out.println("Return value:" + checkcommand.getLatestExecuted());
 
 	}
+	
+	
 	public CheckCommandServiceItem(String name) {
 		this.serviceItemName = name;        
 	}
