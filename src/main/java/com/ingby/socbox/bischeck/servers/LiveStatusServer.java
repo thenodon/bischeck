@@ -217,6 +217,7 @@ public final class LiveStatusServer implements Server {
 		strbuf.append(hostname).append(";");
 		strbuf.append(servicename).append(";");
 		strbuf.append(level.val()).append(";");
+		strbuf.append(level.toString());
 		strbuf.append(output);
 		
 		return strbuf.toString();
