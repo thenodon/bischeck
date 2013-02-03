@@ -36,6 +36,7 @@ import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.serviceitem.CalculateOnCache;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 
 public class CalculateOnCacheTest {
 	
@@ -138,13 +139,16 @@ public class CalculateOnCacheTest {
 		coc.setExecution("10 * 0.8");
 		coc.execute();
 		Assert.assertEquals(coc.getLatestExecuted(),"8.0");
+    }
 		
-		coc.setExecution("xyz * 0.8");
-		try {
-			coc.execute();
-		} catch (ServiceException se) {
-			Assert.assertNotNull(se);
-		}
+    @Test (groups = { "ServiceItem" }, expectedExceptions = ServiceItemException.class )
+    public void verifyServiceException() throws ServiceException, ServiceItemException{
+    	Service bis = new LastCacheService("servicename");
+		ServiceItem coc = new CalculateOnCache("serviceitemname");
+		coc.setService(bis);
+		
+    	coc.setExecution("xyz * 0.8");
+    	coc.execute();
     }
     
  
