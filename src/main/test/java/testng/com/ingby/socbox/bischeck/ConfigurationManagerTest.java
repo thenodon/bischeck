@@ -28,12 +28,18 @@ import com.ingby.socbox.bischeck.ValidateConfiguration;
 
 public class ConfigurationManagerTest {
 	ConfigurationManager confMgmr;
+	
 	@BeforeTest
     public void beforeTest() throws Exception {
-            //System.setProperty("bishome",".");
-            //ConfigurationManager.initonce();
-    		//confMgmr = ConfigurationManager.getInstance();
-    		
+
+		confMgmr = ConfigurationManager.getInstance();
+
+		if (confMgmr == null) {
+			System.setProperty("bishome", ".");
+			ConfigurationManager.init();
+			confMgmr = ConfigurationManager.getInstance();	
+		}
+		
     }
     
     @Test (groups = { "ConfigurationManager" })
