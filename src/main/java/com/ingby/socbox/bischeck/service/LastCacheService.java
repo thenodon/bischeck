@@ -26,16 +26,6 @@ import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 public class LastCacheService extends ServiceAbstract implements Service {
 
     
-    public static void main(String[] args) {
-        LastCacheService bis = new LastCacheService("serviceName");
-        try {
-            System.out.println("<"+bis.executeStmt(args[0])+">");
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
     
     public LastCacheService (String serviceName) {
         this.serviceName = serviceName;
@@ -70,7 +60,6 @@ public class LastCacheService extends ServiceAbstract implements Service {
      * return is the value of each separated by ,
      */
     public String executeStmt(String exec) throws ServiceException {
-        //return CacheFactory.getInstance().getParametersByString(exec);
     	return CacheEvaluator.parse(exec);
     }
 }
