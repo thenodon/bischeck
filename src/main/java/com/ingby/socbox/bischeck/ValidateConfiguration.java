@@ -19,7 +19,12 @@
 
 package com.ingby.socbox.bischeck;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class ValidateConfiguration {
+
+	private final static Logger  LOOGER = LoggerFactory.getLogger(ValidateConfiguration.class);
 
 	
 	public static int verify() {
@@ -28,9 +33,8 @@ public abstract class ValidateConfiguration {
             try {
               	xmlfilemgr.getXMLConfiguration(xmlconf);
             } catch (Exception e) {
-                System.out.println("Errors was found validating the configuration file " + 
-                        xmlconf.xml());
-                e.printStackTrace();
+                LOOGER.error("Errors was found validating the configuration file " + 
+                        xmlconf.xml(),e);
                 return 1;
             }    
         }
@@ -43,7 +47,9 @@ public abstract class ValidateConfiguration {
 			try {
 				xmlfilemgr.getXMLConfiguration(xmlconf,dir);
 			} catch (Exception e) {
-				throw new Exception(xmlconf.xml()+":" +e.getMessage());
+				LOOGER.error("Errors was found validating the configuration file " + 
+                        xmlconf.xml() + " in directory "+ dir ,e);
+				throw new Exception(xmlconf.xml(), e);
 			}
 		}    
 	}
