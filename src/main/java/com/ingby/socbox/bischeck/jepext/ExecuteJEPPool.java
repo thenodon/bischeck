@@ -62,7 +62,7 @@ public final class ExecuteJEPPool {
 
 	/**
 	 * Check out a ExecuteJEP object. 
-	 * @return 
+	 * @return a pooled {@link ExecuteJEP} object used to execute the JEP expression
 	 */
 	public synchronized ExecuteJEP checkOut() {
 		long count;
