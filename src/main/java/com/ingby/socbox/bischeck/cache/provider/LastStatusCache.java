@@ -179,7 +179,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	 * @param ls
 	 * @param key
 	 */
-	private void add(LastStatus ls, String key) {
+	public void add(LastStatus ls, String key) {
 		LinkedList<LastStatus> fifo;
 		synchronized (cache) {
 			if (cache.get(key) == null) {
@@ -471,7 +471,7 @@ public class LastStatusCache implements LastStatusCacheMBean {
 			
 			// If any of the index returned is null it means that there is 
 			// no cache data in the from or to time and then return a single null
-			if (indfrom == null || indto == null) {
+			if (indfrom == null || indto == null || indfrom > indto) {
 				strbuf.append("null" + JEPLISTSEP);
 			} else { 
 				for (int i = indfrom; i<indto+1; i++) {
@@ -545,10 +545,25 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 
 	private String cleanUpNullInLists(String str) {
+		
+		StringTokenizer st = new StringTokenizer(str,SEP);
+		StringBuffer strbuf = new StringBuffer();		
+		while (st.hasMoreTokens()){
+			String token = (String)st.nextToken();
+			String repstr = token.replaceAll("null,", "");
+			if (repstr.equals(""))
+				strbuf.append("null,;");
+			else
+				strbuf.append(repstr).append(SEP);
+		}
+		
+		return strbuf.toString();
+		/*
 		str = str.replaceAll("null,", "");
 		if (str.equals(SEP))
 			return "null,;";
 		return str;
+		*/
 	}
 
 
