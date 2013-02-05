@@ -78,8 +78,9 @@ public class CacheTest {
 			LastStatusCache.getInstance().add(ls, Util.fullName( hostname, servicename, serviceitemname));
 		}
 		LastStatus ls = new LastStatus("null", (float) 11,  current + 12*300*1000);
-		LastStatusCache.getInstance().add(hostname, servicename, serviceitemname, ls.getValue(), ls.getThreshold());
-
+		System.out.println(CacheTest.class.getName()+">"+(new Date(ls.getTimestamp())).toString() +"> " + 11+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
+		LastStatusCache.getInstance().add(ls,Util.fullName( hostname, servicename, serviceitemname));
+		
 		for (int i = 12; i < 22; i++) {
 			ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
 			System.out.println(CacheTest.class.getName()+">"+(new Date(ls.getTimestamp())).toString() +"> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
@@ -146,7 +147,7 @@ public class CacheTest {
 
 		for (int i = 1; i < count+1; i++) {
 			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
-			//System.out.println(CacheTest.class.getName()+">"+(new Date(ls.getTimestamp())).toString() +"> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
+			System.out.println(CacheTest.class.getName()+">"+(new Date(ls.getTimestamp())).toString() +"> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
 			LastStatusCache.getInstance().add(ls, Util.fullName( hostname, servicename, serviceitemname));
 		}
 
@@ -173,14 +174,10 @@ public class CacheTest {
 		long start = System.currentTimeMillis();
 		for (int i = 1; i < count; i++) {
 			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
-			//System.out.println(">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
-			LastStatusCache.getInstance().add(hostname, servicename, serviceitemname, ls.getValue(), ls.getThreshold());
-
+			LastStatusCache.getInstance().add(ls, Util.fullName( hostname, servicename, serviceitemname));
 		}
+		
 		long exec = System.currentTimeMillis() - start;
-
-
-
 		System.out.println("Insert " + count + " " + (exec*1000/count) + " us Total time " + (exec) + " msec");
 
 	}
