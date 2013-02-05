@@ -25,11 +25,29 @@ import java.io.IOException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.DocManager;
 
 public class DocManagerTest {
+	
+	ConfigurationManager confMgmr = null;
+	
+	@BeforeTest
+	public void beforeTest() throws Exception {
+		confMgmr = ConfigurationManager.getInstance();
+	
+		if (confMgmr == null) {
+			System.setProperty("bishome", ".");
+			ConfigurationManager.init();
+			confMgmr = ConfigurationManager.getInstance();
+			
+		}
+		
+	}	
+	
     
     @Test (groups = { "DocManager" })
     public void gen_doc_defaultdir() 
