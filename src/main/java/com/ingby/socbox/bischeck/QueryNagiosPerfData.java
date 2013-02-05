@@ -36,14 +36,6 @@ import org.apache.log4j.Logger;
  */
 public abstract class QueryNagiosPerfData {
 
-    public static void main(String[] args) {
-        System.out.println(QueryNagiosPerfData.parse("load5","load1=0.160;15.000;30.000;0; load5=0.090;10.000;25.000;0; load15=0.020;5.000;20.000;0;"));
-        System.out.println(QueryNagiosPerfData.parse("rta","'rta'=0.251ms;100.000;500.000;0; 'pl'=0%;20;60;;"));
-        System.out.println(QueryNagiosPerfData.parse("size","time=0.009737s;;;0.000000 size=481B;;;0"));
-        System.out.println(QueryNagiosPerfData.parse("dns","'dns'=10ms 'pl'=0%;20;60;;"));
-        
-    }
-    
     static Logger  logger = Logger.getLogger(QueryNagiosPerfData.class);
 
     //Find label entry from start of line or space until =
