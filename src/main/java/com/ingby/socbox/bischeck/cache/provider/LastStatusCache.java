@@ -158,23 +158,6 @@ public class LastStatusCache implements LastStatusCacheMBean {
 
 
 	/**
-     * Add a entry to the cache
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @param measuredValue
-     * @param thresholdValue
-     */
-	public  void add(String hostname, String serviceName,
-			String serviceItemName, String measuredValue,
-			Float thresholdValue) {
-		
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		add(new LastStatus(measuredValue,thresholdValue), key);
-	}
-
-
-	/**
 	 * Add cache element
 	 * @param ls
 	 * @param key
@@ -558,12 +541,6 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		}
 		
 		return strbuf.toString();
-		/*
-		str = str.replaceAll("null,", "");
-		if (str.equals(SEP))
-			return "null,;";
-		return str;
-		*/
 	}
 
 
