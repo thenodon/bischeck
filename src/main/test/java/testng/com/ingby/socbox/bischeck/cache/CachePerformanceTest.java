@@ -44,7 +44,7 @@ public class CachePerformanceTest {
 	String servicename = "service@first";
 	String serviceitemname = "_service.item_123";
 	String cachekey = Util.fullName(qhostname, servicename, serviceitemname);
-	private int fastcache;
+	private int fastcacheSize;
 	
 	@BeforeTest
     public void beforeTest() throws Exception {
@@ -57,9 +57,9 @@ public class CachePerformanceTest {
 			confMgmr = ConfigurationManager.getInstance();	
 		}
 			
+		CacheFactory.init();
 		cache = CacheFactory.getInstance();
-		
-		fastcache = Integer.parseInt(ConfigurationManager.getInstance().getProperties().getProperty("lastStatusCacheSize","500"));
+		fastcacheSize = Integer.parseInt(ConfigurationManager.getInstance().getProperties().getProperty("lastStatusCacheSize","500"));
 	
 	}
 
@@ -112,12 +112,12 @@ public class CachePerformanceTest {
 		System.out.println("Insert " + count + " " + (exec*1000/count) + " us Total time " + (exec) + " msec");
 
 		start = System.currentTimeMillis();
-		CacheEvaluator.parse(cachekey + "[0:"+(fastcache-1)+"]");
+		CacheEvaluator.parse(cachekey + "[0:"+(fastcacheSize-1)+"]");
 		exec = System.currentTimeMillis() - start;
 		System.out.println("Get fast "+ (exec) + " msec");
 
 		start = System.currentTimeMillis();
-		int getfromslow = 10000+fastcache-1;
+		int getfromslow = 10000+fastcacheSize-1;
 		CacheEvaluator.parse(cachekey + "[10000:"+getfromslow+"]");
 		exec = System.currentTimeMillis() - start;
 		System.out.println("Get slow "+ (exec) + " msec");

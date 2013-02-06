@@ -79,6 +79,7 @@ public class CalculateOnCacheTest {
 			supportNull=true;
 
 
+		CacheFactory.init();
 		cache = CacheFactory.getInstance();		
 		
 		cache.clear();

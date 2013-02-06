@@ -64,6 +64,7 @@ public class CacheTest {
 				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
 			supportNull = true;
 
+		CacheFactory.init();
 
 	}
 
