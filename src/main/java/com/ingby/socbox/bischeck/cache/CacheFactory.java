@@ -1,10 +1,15 @@
 package com.ingby.socbox.bischeck.cache;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-import com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache;
+import com.ingby.socbox.bischeck.ClassCache;
+import com.ingby.socbox.bischeck.ConfigurationManager;
+//import com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache;
+//import com.ingby.socbox.bischeck.service.Service;
 
 
 
@@ -13,27 +18,20 @@ public class CacheFactory {
 	private final static Logger LOGGER = LoggerFactory.getLogger(CacheFactory.class);
 
 	static CacheInf cache = null;
-	
+
 	/**
 	 * Create a cache used by bischeck
 	 * @return
 	 */
-	public synchronized static CacheInf getInstance(){
-	
+	public static CacheInf getInstance(){
+
 		if (cache == null) {
-			// Selector to define which one to use
-			try {
-				//cache = LastStatusCache.getInstance();
-				cache = LastStatusCache.getInstance();
-			} catch (Exception e) {
-				LOGGER.error("Cache factory instance failed with: " + e.toString()); 
-			}
+			LOGGER.error("Cache factory has not been opened"); 
 		}
-		
 		return cache;
 	}
-	
-	
+
+
 	/**
 	 * Close the cache depending on cache used
 	 * @throws Exception
@@ -42,6 +40,36 @@ public class CacheFactory {
 		if (cache != null) {
 			cache.close();
 			cache = null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public synchronized static void init()  throws CacheException {
+		if (cache == null) {
+			// Selector to define which one to use
+			String className = ConfigurationManager.getInstance().getProperties().
+					getProperty("cacheProvider","com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
+
+			Class<CacheInf> clazz;
+			try {
+				clazz = (Class<CacheInf>) ClassCache.getClassByName(className);
+				(clazz.getMethod("init")).invoke(null);
+				cache = (CacheInf) (clazz.getMethod("getInstance")).invoke(null);
+			} catch (ClassNotFoundException e) {
+				throw new CacheException(e);
+			}catch (IllegalArgumentException e) {
+				throw new CacheException(e);
+			} catch (SecurityException e) {
+				throw new CacheException(e);
+			} catch (IllegalAccessException e) {
+				throw new CacheException(e);
+			} catch (InvocationTargetException e) {
+				throw new CacheException(e);
+			} catch (NoSuchMethodException e) {
+				throw new CacheException(e);
+			}
+
+			LOGGER.info("Cache provider selected is - " + className);
 		}
 	}
 }

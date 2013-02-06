@@ -119,14 +119,14 @@ public class BackendStorage {
 		return dumpfile.delete();
 	}
 
-	
-	public static void dump2file(HashMap<String,LinkedList<LastStatus>> cache, String dumpfilename) {
+	public static void dump2file(HashMap<String,LinkedList<LastStatus>> cache, File dumpfile) {
 
 		long start = System.currentTimeMillis();
 		long countEntries = 0;
 		long countKeys = 0;
-		File dumpfile = new File(dumpfilename);
-		copyFile(dumpfile,new File(dumpfilename+".bak"));
+		
+
+		copyFile(dumpfile,new File(dumpfile.getAbsolutePath()+".bak"));
 		FileWriter filewriter = null;
 		BufferedWriter dumpwriter = null;
 		LOGGER.debug("Start dump cache");

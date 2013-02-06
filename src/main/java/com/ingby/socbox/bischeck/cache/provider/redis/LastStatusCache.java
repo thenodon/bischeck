@@ -47,6 +47,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
@@ -96,8 +97,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private static final String JEPLISTSEP = ",";
 	private static ObjectName   mbeanname = null;
 
-	private static String lastStatusCacheDumpFile;
-
+	
 	private static String redisserver;
 	private static int redisport;
 	private JedisPool jedispool = null;
@@ -117,7 +117,13 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * Return the cache reference
 	 * @return
 	 */
-	public static synchronized LastStatusCache getInstance() {
+	public static LastStatusCache getInstance() {
+		if (lsc == null)
+			LOGGER.error("Cache impl has not been initilized");
+		return lsc;
+	}
+	
+	public static synchronized void init() throws CacheException {
 		if (lsc == null) {
 			
 			redisserver = ConfigurationManager.getInstance().getProperties().
@@ -132,6 +138,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			}
 
 			lsc = new LastStatusCache();
+			lsc.testConnection();
 			
 			mbs = ManagementFactory.getPlatformMBeanServer();
 
@@ -154,11 +161,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				LOGGER.error("Mbean exception - " + e.getMessage());
 			}
 
-			lastStatusCacheDumpFile = 
-				ConfigurationManager.getInstance().getProperties().
-				getProperty("lastStatusCacheDumpDir","/var/tmp/") + "lastStatusCacheDump";
-
-			
+						
 			try {
 				fifosize = Integer.parseInt(
 						ConfigurationManager.getInstance().getProperties().
@@ -172,14 +175,14 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				notFullListParse=true;
 			
 			
-			
-			
 		}
 		
-		return lsc;
 	}
 
-
+	private void testConnection() {
+		jedispool.getResource();
+	}
+	
 	/**
 	 * Add value form the serviceitem
 	 * @param service
@@ -201,23 +204,6 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 	
 	
-	/**
-     * Add a entry to the cache
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @param measuredValue
-     * @param thresholdValue
-     * @deprecated
-     */
-	public  void add(String hostname, String serviceName,
-			String serviceItemName, String measuredValue,
-			Float thresholdValue) {
-		
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		add(new LastStatus(measuredValue,thresholdValue), key);
-	}
-
 
 	@Override
 	public void add(LastStatus ls, String key) {
@@ -249,28 +235,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	
-	/**
-	 * Add cache element in the end of the list. Used by loaddump()
-	 * @param ls
-	 * @param key
-	 */
-	private void addLast(LastStatus ls, String key) {
-		LinkedList<LastStatus> fifo;
-		synchronized (cache) {
-			if (cache.get(key) == null) {
-				fifo = new LinkedList<LastStatus>();
-				cache.put(key, fifo);
-			} else {
-				fifo = cache.get(key);
-			}
 
-			if (fifo.size() >= fifosize) {
-				fifo.removeLast();
-			}
-
-			cache.get(key).addLast(ls);
-		}
-	}
 
 	
 	/**
@@ -575,55 +540,6 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
-	private void load() {
-		int countKeys=0;
-		int countEntries=0;
-		
-		long start = System.currentTimeMillis();
-		for (String key: lu.getAllKeys().keySet()) {
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Loading cache - " + key);
-			countKeys++;
-			Jedis jedis = jedispool.getResource();
-			try {
-				//String id = lu.getIdByName(key);
-				long numEntries = smallest(jedis.llen(key),fifosize);
-
-				for (int i = 0; i<numEntries; i++) {
-
-					LastStatus ls = new LastStatus(jedis.lindex(key, numEntries-i));
-					
-					LinkedList<LastStatus> fifo = null;
-					if (cache.get(key) == null) {
-						fifo = new LinkedList<LastStatus>();
-						cache.put(key, fifo);
-						//jedis.hset("dictionary", key,""+key.hashCode());
-					} else {
-						fifo = cache.get(key);
-					}
-					cache.get(key).addFirst(ls);
-					
-					countEntries++;
-				}    	
-			} catch (JedisConnectionException je) {
-				LOGGER.error("Redis connection failed: " + je.getMessage());
-			} finally {
-				jedispool.returnResource(jedis);
-			}
-		}
-
-		long end = System.currentTimeMillis();
-		LOGGER.info("Cache loaded " + countKeys + " keys and " +
-				countEntries + " entries in " + (end-start) + " ms");
-	}
-
-	
-	private long smallest(long l1, long l2) {
-		if (l1 <= l2)
-			return l1;
-		else 
-			return l2;
-	}
 
 
 	public void close() {
@@ -879,19 +795,6 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
-	/*
-	@Override
-	public Integer exp(File expfile) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Integer imp(File impfile) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	*/
 
 	public void setFullListDef(boolean notFullListParse) {
 		LastStatusCache.notFullListParse = notFullListParse;

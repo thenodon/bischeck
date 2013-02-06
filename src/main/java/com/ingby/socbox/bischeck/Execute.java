@@ -61,6 +61,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 
+import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.service.ServiceJob;
@@ -205,9 +206,15 @@ public final class Execute implements ExecuteMBean {
         	try {
         		deamonInit();
         	} catch (Exception e) {
-        		LOGGER.error("Deamon init failed with: " + e.getMessage());
+        		LOGGER.error("Deamon init failed - exit",e);
         		return FAILED;
         	}	
+        	try {
+            	CacheFactory.init();
+            } catch (CacheException ce) {
+            	LOGGER.error("Cache factory init failed - exit",ce);
+            	return FAILED;
+            }
         }
        
         /*
@@ -223,7 +230,7 @@ public final class Execute implements ExecuteMBean {
         	sched = initScheduler();
 			initTriggers(sched); 
         } catch (SchedulerException e) {
-        	LOGGER.error("Scheduler init failed with: " + e.getMessage());
+        	LOGGER.error("Scheduler init failed",e);
         	return FAILED;
 		}
         
@@ -260,7 +267,7 @@ public final class Execute implements ExecuteMBean {
      * Add shutdown hooks for OS signals to get controlled process exit.
      * @throws Exception if the pid file already exist.
      */
-	private void deamonInit() throws Exception{
+	private void deamonInit() throws Exception {
 		if (ConfigurationManager.getInstance().getPidFile().exists()) {
 		    LOGGER.error("Pid file already exist - check if bischeck" + 
 		    " already running");

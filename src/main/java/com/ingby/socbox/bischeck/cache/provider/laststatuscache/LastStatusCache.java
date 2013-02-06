@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
@@ -94,7 +95,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private static final String JEPLISTSEP = ",";
 	private static ObjectName   mbeanname = null;
 
-	private static String lastStatusCacheDumpFile;
+	private final static String lastStatusCacheDumpFile = "lastStatusCacheDump";
+
+	private static String lastStatusCacheDumpDir;
+	
 	private LastStatusCache() {
 		cache = new HashMap<String,LinkedList<LastStatus>>();
 		
@@ -104,7 +108,13 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * Return the cache reference
 	 * @return
 	 */
-	public static synchronized LastStatusCache getInstance() {
+	public static LastStatusCache getInstance() {
+		if (lsc == null)
+			LOGGER.error("Cache impl has not been initilized");
+		return lsc;
+	}
+	
+	public static synchronized void init() throws CacheException {
 		if (lsc == null) {
 			
 			lsc = new LastStatusCache();
@@ -132,14 +142,13 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				LOGGER.error("Mbean exception - " + e.getMessage());
 			}
 
-			lastStatusCacheDumpFile = 
-				ConfigurationManager.getInstance().getProperties().
-				getProperty("lastStatusCacheDumpDir","/var/tmp/") + "lastStatusCacheDump";
-
+			lastStatusCacheDumpDir = ConfigurationManager.getInstance().getProperties().
+					getProperty("lastStatusCacheDumpDir","/var/tmp/");
 			try {
 				lsc.load();
 			} catch (Exception e1) {
-				LOGGER.warn("Cache load failed with exceptin " + e1.toString());
+				LOGGER.warn("Cache load failed",e1);
+				throw new CacheException(e1);
 			}
 			
 			try {
@@ -155,7 +164,6 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				notFullListParse=true;
 			
 		}
-		return lsc;
 	}
 
 
@@ -189,6 +197,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
      * @param thresholdValue
      * @deprecated
      */
+	/*
 	public  void add(String hostname, String serviceName,
 			String serviceItemName, String measuredValue,
 			Float thresholdValue) {
@@ -196,7 +205,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		String key = Util.fullName( hostname, serviceName, serviceItemName);
 		add(new LastStatus(measuredValue,thresholdValue), key);
 	}
-
+*/
 
 	@Override
 	public void add(LastStatus ls, String key) {
@@ -521,43 +530,67 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	private void load() throws Exception{
 		Object xmlobj = null;
-		File dumpFile = new File(lastStatusCacheDumpFile);
+		File dumpdir = new File(lastStatusCacheDumpDir);
+		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile);
 		
-		long countEntries = 0;
-		long countKeys = 0;
+		if (!dumpdir.isDirectory()) {
+			LOGGER.debug("Dump cache directory property " + dumpdir.getAbsolutePath() + " is not a directory");
+			throw new Exception("Dump cache directory property " + dumpdir.getAbsolutePath() + " is not a directory");
+		}
 		
-		long start = System.currentTimeMillis();
-		
-		xmlobj = BackendStorage.getXMLFromBackend(xmlobj, dumpFile);
-
-		
-
-		XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
-		for (XMLKey key:cache.getKey()) {
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Loading cache - " + key.getId());
-			countKeys++;
-			for (XMLEntry entry:key.getEntry()) {
-
-				LastStatus ls = new LastStatus(entry);
-				lsc.addLast(ls, key.getId());
-				countEntries++;
-			}    	
+		if (!dumpdir.canWrite()) {
+			LOGGER.debug("No permission to write to cache dir " + dumpdir.getAbsolutePath());
+			throw new Exception("No permission to write to cache dir " + dumpdir.getAbsolutePath());
 		}
 
-		long end = System.currentTimeMillis();
-		LOGGER.info("Cache loaded " + countKeys + " keys and " +
-				countEntries + " entries in " + (end-start) + " ms");
-	}
+		if (dumpfile.exists() && !dumpfile.canWrite()) {
+			LOGGER.debug("No permission to write to cache file " + dumpfile.getAbsolutePath());
+			throw new Exception("No permission to write to cache file " + dumpfile.getAbsolutePath());
+		}
 
+		if (dumpfile.exists()) {
+
+
+			long countEntries = 0;
+			long countKeys = 0;
+
+			long start = System.currentTimeMillis();
+
+			xmlobj = BackendStorage.getXMLFromBackend(xmlobj, dumpfile);
+
+
+
+			XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
+			for (XMLKey key:cache.getKey()) {
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("Loading cache - " + key.getId());
+				countKeys++;
+				for (XMLEntry entry:key.getEntry()) {
+
+					LastStatus ls = new LastStatus(entry);
+					lsc.addLast(ls, key.getId());
+					countEntries++;
+				}    	
+			}
+
+			long end = System.currentTimeMillis();
+			LOGGER.info("Cache loaded " + countKeys + " keys and " +
+					countEntries + " entries in " + (end-start) + " ms");
+		} else {
+			LOGGER.info("Cache file do not exists - will be created on next shutdown");
+		}
+		
+	}
 	
 	public void close() {
-		BackendStorage.dump2file(cache,lastStatusCacheDumpFile);
+		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile); 
+		BackendStorage.dump2file(cache,dumpfile);
 	}
 	
 	@Override
 	public void dump2file() {
-		BackendStorage.dump2file(cache,lastStatusCacheDumpFile);
+		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile);
+		BackendStorage.dump2file(cache,dumpfile);
 	}
 
 
