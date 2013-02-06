@@ -42,28 +42,6 @@ public class BpiOnCache extends ServiceItemAbstract implements ServiceItem {
     private final static Logger LOGGER = Logger.getLogger(BpiOnCache.class);
 
     
-    public static void main(String[] args) {
-        Service bis = new LastCacheService("serviceName");
-        ServiceItem coc = new BpiOnCache("serviceItemName");
-        coc.setService(bis);
-        
-
-        try {
-            
-            LastStatusCache.getInstance().add("host1", "web", "state", "1",null);
-            LastStatusCache.getInstance().add("host2", "web", "state", "1",null);
-            LastStatusCache.getInstance().add("host3", "web", "state", "0",null);
-            
-            coc.setExecution("if ((host1-web-state[0] == 0) &&  (host2-web-state[0] == 0) , 0, 1)");
-            coc.setExecution("if ((host1-web-state[0] + host2-web-state[0] + host3-web-state[0]) > 2 , , 0)");
-            coc.execute();
-            System.out.println("test boolean " + coc.getLatestExecuted());
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }    
-    
-    }
 
     
     public BpiOnCache(String name) {
