@@ -24,6 +24,8 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
@@ -58,26 +60,48 @@ public class CalculateOnCacheTest {
 		ServiceItem coc = new CalculateOnCache("serviceItemName");
 		coc.setService(bis);
 		
-			
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "1.0",null);
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "2.0",null);
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "3.0",null);
-
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "4.0",null);
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "5.0",null);
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "6.0",null);
-
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "7.0",null);
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "8.0",null);
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "9.0",null);
-
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "10.0",null);
-
-		LastStatusCache.getInstance().add("host2", "service2", "serviceitem2", "100.0",null);
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "11.0",null);
-		LastStatusCache.getInstance().add("host1", "service1", "serviceitem1", "12.0",null);
-
-		//Assert.assertEquals(LastStatusCache.getInstance().size(),2);
+		String key1 = Util.fullName("host1", "service1", "serviceitem1");
+		String key2 = Util.fullName("host2", "service2", "serviceitem2");
+		
+		LastStatus ls = new LastStatus("1.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("2.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("3.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("4.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("5.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("6.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("7.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("8.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("9.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("10.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("100.0",null);
+		LastStatusCache.getInstance().add(ls,key2);
+		
+		ls = new LastStatus("11.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("12.0",null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
 		Assert.assertEquals(LastStatusCache.getInstance().sizeLru("host1", "service1", "serviceitem1"),12);
 
 		coc.setExecution("if ((host1-service1-serviceitem1[1] - host1-service1-serviceitem1[0]) < 0, host1-service1-serviceitem1[1] - host1-service1-serviceitem1[0], 0)");
@@ -101,11 +125,17 @@ public class CalculateOnCacheTest {
 		coc = new CalculateOnCache("serviceItemName");
 		coc.setService(bis);
 
-
-		LastStatusCache.getInstance().add("host1", "web", "state", "1",null);
-		LastStatusCache.getInstance().add("host2", "web", "state", "1",null);
-		LastStatusCache.getInstance().add("host3", "web", "state", "0",null);
-
+		String web1 = Util.fullName("host1", "web", "state");
+		String web2 = Util.fullName("host2", "web", "state");
+		String web3 = Util.fullName("host3", "web", "state");
+		ls = new LastStatus("1",null);
+		LastStatusCache.getInstance().add(ls,web1);
+		ls = new LastStatus("1",null);
+		LastStatusCache.getInstance().add(ls,web2);
+		ls = new LastStatus("0",null);
+		LastStatusCache.getInstance().add(ls,web3);
+		
+		
 		coc.setExecution("if ((host1-web-state[0] == 0) &&  (host2-web-state[0] == 0) , 0, 1)");
 		coc.execute();
 		Assert.assertEquals(coc.getLatestExecuted(),"1.0");
@@ -128,28 +158,55 @@ public class CalculateOnCacheTest {
 		String host1 = "host1_score.ingby.com";
 		String service1 ="service-dash@";
 		String serviceitem1 = "service_item@0. space";
+		String key1 = Util.fullName( host1, service1, serviceitem1);
 		String hsi1 = host1+"-"+"service\\-dash@"+"-"+serviceitem1;
+		
 		String host2 = "host2_score.ingby.com";
 		String service2 ="service-dash@";
 		String serviceitem2 = ".service_item0. space";
+		String key2 = Util.fullName( host2, service2, serviceitem2);
 		String hsi2 = host2+"-"+"service\\-dash@"+"-"+serviceitem2;
 		
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "1.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "2.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "3.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "4.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "5.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "6.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "7.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "8.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "9.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "10.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "11.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "12.0",null);
+		LastStatus ls = new LastStatus("1.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("2.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("3.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("4.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("5.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("6.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("7.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("8.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("9.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("10.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("11.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("12.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
 
-		LastStatusCache.getInstance().add(host2, service2, serviceitem2, "100.0",null);
-
-		//Assert.assertEquals(LastStatusCache.getInstance().size(),2);
+		ls = new LastStatus("100.0", null);
+		LastStatusCache.getInstance().add(ls,key2);
+		
 		
 		coc.setExecution("if (("+hsi1+"[11] - " + hsi1 +"[0]) < 0, " + hsi1 +"[11] - " + hsi1 +"[0], 0)");
 		coc.execute();
@@ -191,29 +248,55 @@ public class CalculateOnCacheTest {
 		String host1 = "host1null";
 		String service1 ="service1null";
 		String serviceitem1 = "service_item1null";
+		String key1 = Util.fullName( host1, service1, serviceitem1);
+		
 		String hsi1 = host1+"-"+service1+"-"+serviceitem1;
 		String host2 = "host2null";
 		String service2 ="service2null";
 		String serviceitem2 = ".service_item2null";
+		String key2 = Util.fullName( host2, service2, serviceitem2);
 		String hsi2 = host2+"-"+service2+"-"+serviceitem2;
-		
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "1.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "2.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "3.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "4.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "5.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "6.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "7.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "8.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "9.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "10.0",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "null",null);
-		LastStatusCache.getInstance().add(host1, service1, serviceitem1, "12.0",null);
 
-		LastStatusCache.getInstance().add(host2, service2, serviceitem2, "100.0",null);
-
-		//Assert.assertEquals(LastStatusCache.getInstance().size(),2);
+		LastStatus ls = new LastStatus("1.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
 		
+		ls = new LastStatus("2.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("3.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("4.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("5.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("6.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("7.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("8.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("9.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("10.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus(null, null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+		ls = new LastStatus("12.0", null);
+		LastStatusCache.getInstance().add(ls,key1);
+		
+
+		ls = new LastStatus("100.0", null);
+		LastStatusCache.getInstance().add(ls,key2);
+	
 		coc.setExecution("avg("+hsi1+"[0]," +hsi2 +"[0])");
 		coc.execute();
 		Assert.assertEquals(coc.getLatestExecuted(),"56.0");
