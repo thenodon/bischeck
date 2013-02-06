@@ -32,19 +32,6 @@ public interface CacheInf {
 	public void add(LastStatus ls, String key);
 	
 	
-	/**
-	 * Add a entry to the cache
-	 * @param hostname
-	 * @param serviceName
-	 * @param serviceItemName
-	 * @param measuredValue
-	 * @param thresholdValue
-	 * @deprecated
-	 */
-	public  void add(String hostname, String serviceName,
-			String serviceItemName, String measuredValue,
-			Float thresholdValue);
-
 	
 	/**
      * The size for the specific host, service, service item entry.
@@ -78,10 +65,5 @@ public interface CacheInf {
      * Close the cache and make sure all data is saved
      */
     public void close();
-    
-    /*
-    public Integer exp(File expfile);
-    
-    public Integer imp(File impfile);
-    */
+
 }
