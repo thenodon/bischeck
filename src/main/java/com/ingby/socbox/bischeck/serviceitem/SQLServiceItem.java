@@ -21,12 +21,7 @@ package com.ingby.socbox.bischeck.serviceitem;
 
 import org.apache.log4j.Logger;
 
-import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.Util;
-import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCacheParse;
-import com.ingby.socbox.bischeck.service.JDBCService;
-import com.ingby.socbox.bischeck.service.Service;
 
 
 public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
@@ -34,53 +29,6 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
 	@SuppressWarnings("unused")
 	private final static Logger LOGGER = Logger.getLogger(SQLServiceItem.class);
 
-    public static void main(String[] args) {
-    	try {
-			ConfigurationManager.init();
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-    	Service jdbc = new JDBCService("serviceName");
-        jdbc.setConnectionUrl("jdbc:mysql://localhost/bischecktest?user=bischeck&password=bischeck");
-        jdbc.setDriverClassName("com.mysql.jdbc.Driver");
-        
-        ServiceItem sql = new SQLServiceItem("serviceItemName");
-        sql.setService(jdbc);
-        
-        
-        try {
-            
-            LastStatusCache.getInstance().add("host1", "web", "state", "5",null);
-            LastStatusCache.getInstance().add("host2", "web", "state", "6",null);
-            LastStatusCache.getInstance().add("host3", "web", "state", "1",null);
-            
-            try {
-    			jdbc.openConnection();
-    		} catch (Exception e1) {
-    			// TODO Auto-generated catch block
-    			e1.printStackTrace();
-    		}
-    		sql.setExecution("select sum(value) from test");
-    		sql.execute();
-    		System.out.println("Return value:" + sql.getLatestExecuted());
-            sql.setExecution("select value from test where createdate = '%%yyyy-MM-dd%%'");
-            sql.execute();
-    		System.out.println("Return value:" + sql.getLatestExecuted());
-            sql.setExecution("select sum(value) from test where (id = host1-web-state[0] or id = host2-web-state[0]) and createdate = '%%yyyy-MM-dd%%'");
-            sql.execute();
-            System.out.println("Return value:" + sql.getLatestExecuted());
-            
-    		jdbc.closeConnection();
-            
-            //System.out.println("Return value:" + sql.getLatestExecuted());
-            
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }    
-    
-    }
     
     public SQLServiceItem(String name) {
         this.serviceItemName = name;        
