@@ -42,18 +42,22 @@ import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.cache.LastStatus;
+import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
+import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLKey;
+import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
 
 public class BackendStorage {
 
+	
+	private final static Logger  LOGGER = Logger.getLogger(BackendStorage.class);
 
-	static Logger  logger = Logger.getLogger(BackendStorage.class);
-
+	
 	public static Object getXMLFromBackend(Object xmlobj, File configfile, JAXBContext jc)
 	throws Exception {
 		try {
 			jc = JAXBContext.newInstance("com.ingby.socbox.bischeck.xsd.laststatuscache");
 		} catch (JAXBException e) {
-			logger.error("Could not get JAXB context from class");
+			LOGGER.error("Could not get JAXB context from class");
 			throw new Exception(e.getMessage());
 		}
 		SchemaFactory sf = SchemaFactory.newInstance(
@@ -62,7 +66,7 @@ public class BackendStorage {
 
 		URL xsdUrl = ConfigurationManager.class.getClassLoader().getResource("laststatuscache.xsd");
 		if (xsdUrl == null) {
-			logger.error("Could not find xsd file " +
+			LOGGER.error("Could not find xsd file " +
 					"laststatuscache.xsd"+ " in classpath");
 			throw new Exception("Could not find xsd file " +
 					"laststatuscache.xsd" + " in classpath");
@@ -71,7 +75,7 @@ public class BackendStorage {
 		try {
 			schema = sf.newSchema(new File(xsdUrl.getFile()));
 		} catch (Exception e) {
-			logger.error("Could not vaildate xml file " + 
+			LOGGER.error("Could not vaildate xml file " + 
 					configfile.getAbsolutePath() + 
 					" with xsd file " +
 					"laststatuscache.xsd" + ": " + 
@@ -83,7 +87,7 @@ public class BackendStorage {
 		try {
 			u = jc.createUnmarshaller();
 		} catch (JAXBException e) {
-			logger.error("Could not create an unmarshaller for for context");
+			LOGGER.error("Could not create an unmarshaller for for context");
 			throw new Exception(e);
 		}
 		u.setSchema(schema);
@@ -91,10 +95,10 @@ public class BackendStorage {
 		try {
 			xmlobj =  u.unmarshal(configfile);
 		} catch (JAXBException e) {
-			logger.error("Could not unmarshall the file " +  configfile.getAbsolutePath() +":" + e);
+			LOGGER.error("Could not unmarshall the file " +  configfile.getAbsolutePath() +":" + e);
 			throw new Exception(e);
 		}
-		logger.debug("Create new object for xml file " +  configfile.getAbsolutePath());
+		LOGGER.debug("Create new object for xml file " +  configfile.getAbsolutePath());
 		return xmlobj;
 	}
 
@@ -109,7 +113,7 @@ public class BackendStorage {
 		copyFile(dumpfile,new File(lastStatusCacheDumpFile+".bak"));
 		FileWriter filewriter = null;
 		BufferedWriter dumpwriter = null;
-		logger.info("Start dump cache");
+		LOGGER.info("Start dump cache");
 
 		try {
 			filewriter = new FileWriter(dumpfile);
@@ -156,7 +160,7 @@ public class BackendStorage {
 						PrintWriter pw = new PrintWriter(sw);
 						ne.printStackTrace(pw);
 						sw.toString();
-						logger.warn("Dump entry failed: "+ sw.toString());
+						LOGGER.warn("Dump entry failed: "+ sw.toString());
 					}
 				}
 
@@ -171,7 +175,7 @@ public class BackendStorage {
 			dumpwriter.flush();
 			filewriter.flush();
 		} catch (IOException e) {
-			logger.warn("Failed to write to cache dump with exception: " + e.getMessage());
+			LOGGER.warn("Failed to write to cache dump with exception: " + e.getMessage());
 		}finally {
 			try {
 				dumpwriter.close();
@@ -183,7 +187,7 @@ public class BackendStorage {
 
 		long end = System.currentTimeMillis();
 
-		logger.info("Cache dumped " + countKeys + " keys and " +
+		LOGGER.info("Cache dumped " + countKeys + " keys and " +
 				countEntries + " entries in " + (end-start) + " ms");
 	}
 
@@ -194,7 +198,7 @@ public class BackendStorage {
 			try {
 				destFile.createNewFile();
 			} catch (IOException e) {
-				logger.error("Can not create destination file " + 
+				LOGGER.error("Can not create destination file " + 
 						destFile.getAbsolutePath() + 
 						" with exception: " + 
 						e.getMessage());
@@ -209,7 +213,7 @@ public class BackendStorage {
 			destination.transferFrom(source, 0, source.size());
 		}
 		catch (IOException ioe) {
-			logger.error("Can not copy file: " + ioe.getMessage());
+			LOGGER.error("Can not copy file: " + ioe.getMessage());
 		}
 		finally {
 			if(source != null) {
