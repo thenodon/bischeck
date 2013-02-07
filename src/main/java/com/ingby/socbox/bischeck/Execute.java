@@ -184,7 +184,8 @@ public final class Execute implements ExecuteMBean {
         // New location
         
         //LastStatusCache.getInstance().dump2file();
-        dumpthread.start();
+        if (retStat == OKAY)
+        	dumpthread.start();
         //LogManager.shutdown();
         System.exit(retStat);
     }
@@ -220,6 +221,7 @@ public final class Execute implements ExecuteMBean {
             	LastStatusCache.loaddump();
             } catch (Exception e) {
             	LOGGER.warn("Loading cache failed: " + e.getMessage());
+            	return FAILED;
             }
         }
        

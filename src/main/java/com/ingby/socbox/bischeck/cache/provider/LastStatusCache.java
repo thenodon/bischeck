@@ -90,7 +90,9 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	private static final String JEPLISTSEP = ",";
 	private static ObjectName   mbeanname = null;
 
-	private static String lastStatusCacheDumpFile;
+	private final static String lastStatusCacheDumpFile = "lastStatusCacheDump";
+
+	private static String lastStatusCacheDumpDir;
 
 	
 	static {
@@ -115,10 +117,9 @@ public class LastStatusCache implements LastStatusCacheMBean {
 			LOGGER.fatal("Mbean exception - " + e.getMessage());
 		}
 
-		lastStatusCacheDumpFile = 
-			ConfigurationManager.getInstance().getProperties().
-			getProperty("lastStatusCacheDumpDir","/var/tmp/") + "lastStatusCacheDump";
-
+		lastStatusCacheDumpDir = ConfigurationManager.getInstance().getProperties().
+				getProperty("lastStatusCacheDumpDir","/var/tmp/");
+		
 		try {
 			fifosize = Integer.parseInt(
 					ConfigurationManager.getInstance().getProperties().
@@ -580,47 +581,70 @@ public class LastStatusCache implements LastStatusCacheMBean {
 	 */
 	public static void loaddump() throws Exception{
 		Object xmlobj = null;
-		File configfile = new File(lastStatusCacheDumpFile);
-		JAXBContext jc = null;
 		
-		long countEntries = 0;
-		long countKeys = 0;
+		File dumpdir = new File(lastStatusCacheDumpDir);
+		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile);
 		
-		long start = System.currentTimeMillis();
+		if (!dumpdir.isDirectory()) {
+			LOGGER.debug("Dump cache directory property " + dumpdir.getAbsolutePath() + " is not a directory");
+			throw new Exception("Dump cache directory property " + dumpdir.getAbsolutePath() + " is not a directory");
+		}
 		
-		xmlobj = BackendStorage.getXMLFromBackend(xmlobj, configfile, jc);
-
-		LastStatusCache lsc = LastStatusCache.getInstance();
-
-		XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
-		for (XMLKey key:cache.getKey()) {
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Loading cache - " + key.getId());
-			countKeys++;
-			
-			countEntries = 0;
-			for (XMLEntry entry:key.getEntry()) {
-				LastStatus ls = new LastStatus(entry);
-				lsc.addLast(ls, key.getId());
-				// Just fill the cache with the entries up to fifosize
-				if (fifosize <  countEntries) {
-					break;
-				}
-				countEntries++;
-				
-			}    	
-			LOGGER.info("Cache loaded " + key.getId() +  " number of entries " + countEntries);
+		if (!dumpdir.canWrite()) {
+			LOGGER.debug("No permission to write to cache dir " + dumpdir.getAbsolutePath());
+			throw new Exception("No permission to write to cache dir " + dumpdir.getAbsolutePath());
 		}
 
-		long end = System.currentTimeMillis();
-			LOGGER.info("Cache loaded " + countKeys + " keys and " +
-				countEntries + " entries in " + (end-start) + " ms");
-	}
+		if (dumpfile.exists() && !dumpfile.canWrite()) {
+			LOGGER.debug("No permission to write to cache file " + dumpfile.getAbsolutePath());
+			throw new Exception("No permission to write to cache file " + dumpfile.getAbsolutePath());
+		}
 
+		if (dumpfile.exists()) {
+			JAXBContext jc = null;
+
+			long countEntries = 0;
+			long countKeys = 0;
+
+			long start = System.currentTimeMillis();
+
+			xmlobj = BackendStorage.getXMLFromBackend(xmlobj, dumpfile, jc);
+
+			LastStatusCache lsc = LastStatusCache.getInstance();
+
+			XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
+			for (XMLKey key:cache.getKey()) {
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("Loading cache - " + key.getId());
+				countKeys++;
+
+				countEntries = 0;
+				for (XMLEntry entry:key.getEntry()) {
+					LastStatus ls = new LastStatus(entry);
+					lsc.addLast(ls, key.getId());
+					// Just fill the cache with the entries up to fifosize
+					if (fifosize <  countEntries) {
+						break;
+					}
+					countEntries++;
+
+				}    	
+				LOGGER.info("Cache loaded " + key.getId() +  " number of entries " + countEntries);
+			}
+
+			long end = System.currentTimeMillis();
+			LOGGER.info("Cache loaded " + countKeys + " keys and " +
+					countEntries + " entries in " + (end-start) + " ms");
+		} else {
+			LOGGER.info("Cache file do not exists - will be created on next shutdown");
+		}
+		
+	}
 	
 	@Override
 	public void dump2file() {
-		BackendStorage.dump2file(cache,lastStatusCacheDumpFile);
+		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile); 
+		BackendStorage.dump2file(cache,dumpfile);
 	}
 
 
