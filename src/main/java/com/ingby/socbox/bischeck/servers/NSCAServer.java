@@ -48,7 +48,7 @@ import com.yammer.metrics.core.TimerContext;
  * @author andersh
  *
  */
-public final class NSCAServer implements Server {
+public final class NSCAServer implements Server, ServerInternal {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NSCAServer.class);
     /**
@@ -120,6 +120,24 @@ public final class NSCAServer implements Server {
         .create();
     }
     
+    
+    @Override
+    synchronized public void sendInternal(String host, String service, NAGIOSSTAT level, String message) {
+    	MessagePayload payload = new MessagePayloadBuilder()
+        .withHostname(host)
+        .withServiceName(service)
+        .create();
+    	 payload.setMessage(level +"|"+ message);
+    	 payload.setLevel(level.toString());
+    	 try {
+			sender.send(payload);
+		} catch (NagiosException e) {
+        	LOGGER.warn("Nsca server error", e);
+        } catch (IOException e) {
+        	LOGGER.error("Network error - check nsca server and that service is started", e);
+        }	    
+    }
+        
     @Override
     synchronized public void send(Service service) {
         NAGIOSSTAT level;

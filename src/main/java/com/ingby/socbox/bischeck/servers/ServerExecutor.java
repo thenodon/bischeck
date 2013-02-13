@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 public final class ServerExecutor {
 
@@ -119,6 +120,33 @@ public final class ServerExecutor {
                 Server server = (Server) method.invoke(null,name);
         
                 server.send(service);
+     
+            } catch (IllegalArgumentException e) {
+            	LOGGER.error(e.toString(), e);
+            } catch (IllegalAccessException e) {
+            	LOGGER.error(e.toString(), e);
+            } catch (InvocationTargetException e) {
+            	LOGGER.error(e.toString(), e);
+            } catch (SecurityException e) {
+            	LOGGER.error(e.toString(), e);
+            } catch (NoSuchMethodException e) {
+            	LOGGER.error(e.toString(), e);
+            }
+        }
+    }
+    
+    synchronized public void executeInternal(String host, String service, NAGIOSSTAT level, String message) {
+
+        Iterator<String> iter = serverSet.keySet().iterator();
+        
+        while (iter.hasNext()) {    
+            String name = iter.next();
+            try {    
+     
+            	Method method = serverSet.get(name).getMethod(GETINSTANCE,String.class);
+                ServerInternal server = (ServerInternal) method.invoke(null,name);
+        
+                server.sendInternal(host, service, level, message);
      
             } catch (IllegalArgumentException e) {
             	LOGGER.error(e.toString(), e);

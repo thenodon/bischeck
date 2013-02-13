@@ -63,6 +63,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
+import com.ingby.socbox.bischeck.internal.InternalSurveillance;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
@@ -204,6 +205,7 @@ public final class Execute implements ExecuteMBean {
     	 */
         if (!reloadRequested) {
         	try {
+        		InternalSurveillance.init();
         		deamonInit();
         	} catch (Exception e) {
         		LOGGER.error("Deamon init failed - exit",e);
