@@ -4,17 +4,10 @@ import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.math.BigDecimal;
-import java.text.DateFormat;
+
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
 import java.util.SortedMap;
-import java.util.TimeZone;
 import java.util.Map.Entry;
 
 import org.quartz.CronExpression;
@@ -32,17 +25,13 @@ import org.slf4j.LoggerFactory;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
-import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricPredicate;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.reporting.MetricDispatcher;
 
 
 public class InternalSurveillance implements Job {
@@ -56,7 +45,7 @@ public class InternalSurveillance implements Job {
 	public static void init() throws SchedulerException, ParseException {
 
 		bischeckHostName = ConfigurationManager.getInstance().getProperties().getProperty("bischeckHostName","bischeck");
-		boolean sendInternal= Boolean.getBoolean(ConfigurationManager.getInstance().getProperties().getProperty("sendInternal,false"));
+		boolean sendInternal= Boolean.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("sendInternal","false"));
 		String sendInternalInterval= ConfigurationManager.getInstance().getProperties().getProperty("sendInternalInterval","0 */10 * * * ? *");
 		if (!CronExpression.isValidExpression(sendInternalInterval)){
 			sendInternalInterval= "0 */10 * * * ? *";
@@ -76,7 +65,7 @@ public class InternalSurveillance implements Job {
 			// Every day at 10 sec past midnight
 			CronTrigger trigger = newTrigger()
 					.withIdentity("InternalTrigger", "Internal")
-					.withSchedule(cronSchedule("0 */1 * * * ? *"))
+					.withSchedule(cronSchedule(sendInternalInterval))
 					.forJob("Internal", "Internal")
 					.build();
 
@@ -175,6 +164,14 @@ public class InternalSurveillance implements Job {
 		return strbuf.toString();
 	}
 
+	/*
+	public String jvm() {
+		final OperatingSystemMXBean myOsBean = ManagementFactory.getOperatingSystemMXBean();
+	
+		String loadAvg =(new BigDecimal(myOsBean.getSystemLoadAverage())).toString();		
+		
+	}
+	*/
 	
 	private String trim(String key) {
 		int lastdot = key.lastIndexOf('.');
