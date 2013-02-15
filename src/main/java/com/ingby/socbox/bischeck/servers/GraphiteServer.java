@@ -73,6 +73,9 @@ public final class GraphiteServer implements Server {
         doNotSendRegexDelim = prop.getProperty("doNotSendRegexDelim",
         		defaultproperties.getProperty("doNotSendRegexDelim"));
         instanceName = name;
+        
+		msts = new MatchServiceToSend(MatchServiceToSend.convertString2List(doNotSendRegex,doNotSendRegexDelim));
+
     }
     
     
@@ -107,13 +110,14 @@ public final class GraphiteServer implements Server {
      * @param service
      * @return
      */
-	private boolean doNotSend(Service service) {
+	/*
+    private boolean doNotSend(Service service) {
 		if (msts == null)
 			msts = new MatchServiceToSend(MatchServiceToSend.convertString2List(doNotSendRegex,doNotSendRegexDelim));
-		/*
+		*
 		 * Loop through all host, service and serviceitems and check if 
 		 * match regex described doNotSendRegex 
-		 */
+		 *
 		for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) { 
 			ServiceItem serviceItem = serviceItementry.getValue();
 
@@ -129,7 +133,7 @@ public final class GraphiteServer implements Server {
 		}
 		return false;
 	}
-	
+	*/
 	
     @Override
     synchronized public void send(Service service) {
@@ -139,7 +143,7 @@ public final class GraphiteServer implements Server {
          * Check if the message should be sent
          */        
         if(!doNotSendRegex.isEmpty()) {
-        	if (doNotSend(service)) {
+        	if (msts.doNotSend(service)) {
         		return;
         	}
         }
