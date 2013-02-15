@@ -144,9 +144,10 @@ public final class ServerExecutor {
             try {    
      
             	Method method = serverSet.get(name).getMethod(GETINSTANCE,String.class);
-                ServerInternal server = (ServerInternal) method.invoke(null,name);
-        
-                server.sendInternal(host, service, level, message);
+                
+            	Object serverobj = method.invoke(null,name);
+                if (serverobj instanceof ServerInternal)
+                	((ServerInternal) serverobj).sendInternal(host, service, level, message);
      
             } catch (IllegalArgumentException e) {
             	LOGGER.error(e.toString(), e);
