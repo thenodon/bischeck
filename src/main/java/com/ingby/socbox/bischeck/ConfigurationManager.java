@@ -128,8 +128,7 @@ public final class ConfigurationManager  {
         //LOOGER.setLevel(Level.WARN);
         
         if (line.hasOption("verify")) {
-        	System.out.println("Failed to verify configuration - please check bischeck log file");
-            System.exit(ValidateConfiguration.verify());
+        	System.exit(ValidateConfiguration.verify());
         }
 
         try {
