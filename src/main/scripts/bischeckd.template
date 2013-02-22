@@ -39,7 +39,6 @@ STOPCOUNT=10
 
 processName=com.ingby.socbox.bischeck.Execute
 
-pidFile=$(su $user -c "$bishome/bin/bischeck ConfigurationManager -p" | grep PidFile | cut -d: -f2)
 
 isrunning() {
     ps -fu $user | grep $1 | grep java| tr -s " "| cut -f2 -d" " 
@@ -85,24 +84,36 @@ retstatus() {
 }
 
 start() {
-    echo -n "bischeckd startup"
+    echo -n "bischeckd startup "
     status=`isrunning $processName` 
     if [ "x$status" = "x" ] ; then
-        rm -f $pidFile
+        su $user -c "$bishome/bin/bischeck ConfigurationManager -v" 
+        if [ $? -ne 0 ] ; then 
+           RETVAL=2
+	else 
+            su $user -c "$bishome/bin/bischeck ConfigurationManager"
+            if [ $? -ne 0 ] ; then 
+                RETVAL=2
+            else 
+            pidFile=$(su $user -c "$bishome/bin/bischeck ConfigurationManager -p" | grep PidFile | cut -d: -f2)
+            
+            rm -f $pidFile
         
-        su $user -c "$bishome/bin/bischeck Execute -d > /dev/null 2>&1" &
+            su $user -c "$bishome/bin/bischeck Execute -d > /dev/null 2>&1" &
         
-        sleep 5
-        status=`isrunning $processName`
+            sleep 5
+            status=`isrunning $processName`
         
-        echo $status > $pidFile
-        chown $user:`id -gn $user` $pidFile
+            echo $status > $pidFile
+            chown $user:`id -gn $user` $pidFile
         
-        status=`isrunning $processName`
-        if [ ! "x$status" = "x" ] ; then
-            RETVAL=0
-        else
-            RETVAL=1
+            status=`isrunning $processName`
+            if [ ! "x$status" = "x" ] ; then
+                RETVAL=0
+            else
+                RETVAL=1
+            fi
+            fi
         fi
     else
        RETVAL=2
@@ -112,9 +123,10 @@ start() {
 }
 
 stop() {
-    echo -n "bischeck stopping"
+    echo -n "bischeck stopping "
     status=`isrunning $processName` 
     if [ ! "x$status" = "x" ] ; then
+        pidFile=$(su $user -c "$bishome/bin/bischeck ConfigurationManager -p" | grep PidFile | cut -d: -f2)
         kill `cat $pidFile`
         RETVAL=1
         waitcount=0
@@ -159,6 +171,16 @@ case "$1" in
     status)
         status 
         ;;
+    verify)
+        su $user -c "$bishome/bin/bischeck ConfigurationManager -v"
+	    verifystatus=$?
+        if [ $verifystatus -eq 0 ] ; then 
+	    echo "Bischeck configuration - OK"    
+        else
+            echo "Bischeck configuration - Failed, please see bischeck log file"
+        fi
+        exit $verifystatus
+        ;;
     pidstatus)
         status=`isrunning $processName` 
         if [  ! "x$status" = "x" ] ; then
@@ -172,7 +194,7 @@ case "$1" in
         start
         ;;
     *)
-        echo $"Usage: $0 {start|stop|status|pidstatus|restart}"
+        echo $"Usage: $0 {start|stop|status|pidstatus|restart|verify}"
         exit 1
 esac
 
