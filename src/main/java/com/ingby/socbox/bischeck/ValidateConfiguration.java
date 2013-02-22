@@ -30,7 +30,6 @@ public abstract class ValidateConfiguration {
             } catch (Exception e) {
                 System.out.println("Errors was found validating the configuration file " + 
                         xmlconf.xml());
-                e.printStackTrace();
                 return 1;
             }    
         }
