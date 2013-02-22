@@ -100,7 +100,7 @@ public final class ConfigurationManager  {
     
     private Map<RunAfter,List<Service>> runafter = null;
 	
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         CommandLineParser parser = new GnuParser();
         CommandLine line = null;
         // create the Options
@@ -124,12 +124,19 @@ public final class ConfigurationManager  {
             System.exit(0);
         }
 
-        ConfigurationManager.initonce();
+        
+        try {
+			ConfigurationManager.initonce();
+		} catch (Exception e) {
+			System.out.println("Failed to configure bischeck - please check bischeck log file");
+			System.exit(1);
+		}
         ConfigurationManager confMgmr = ConfigurationManager.getInstance();
         
         LOOGER.setLevel(Level.WARN);
         
         if (line.hasOption("verify")) {
+        	System.out.println("Failed to verify configuration - please check bischeck log file");
             System.exit(ValidateConfiguration.verify());
         }
 
@@ -139,7 +146,11 @@ public final class ConfigurationManager  {
         
         
         /* Since this is running from command line stop all existing schedulers */
-        StdSchedulerFactory.getDefaultScheduler().shutdown();
+        try {
+			StdSchedulerFactory.getDefaultScheduler().shutdown();
+		} catch (SchedulerException e) {
+			System.exit(3);
+		}
         
     }
 
