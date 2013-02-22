@@ -125,21 +125,23 @@ public final class ConfigurationManager  {
         }
 
         
-        try {
-			ConfigurationManager.initonce();
-		} catch (Exception e) {
-			System.out.println("Failed to configure bischeck - please check bischeck log file");
-			System.exit(1);
-		}
-        ConfigurationManager confMgmr = ConfigurationManager.getInstance();
-        
-        LOOGER.setLevel(Level.WARN);
+        //LOOGER.setLevel(Level.WARN);
         
         if (line.hasOption("verify")) {
         	System.out.println("Failed to verify configuration - please check bischeck log file");
             System.exit(ValidateConfiguration.verify());
         }
 
+        try {
+			ConfigurationManager.initonce();
+		} catch (Exception e) {
+			System.out.println("Failed to configure bischeck - please check bischeck log file");
+			System.exit(1);
+		}
+        
+        ConfigurationManager confMgmr = ConfigurationManager.getInstance();
+        
+        
         if (line.hasOption("pidfile")) {
             System.out.println("PidFile:"+confMgmr.getPidFile().getPath());    
         }
