@@ -23,8 +23,7 @@ import java.io.Serializable;
 
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
-import net.sf.json.util.JSONBuilder;
-import net.sf.json.util.JSONStringer;
+
 
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
@@ -77,13 +76,18 @@ public class LastStatus implements Serializable, Cloneable {
 	}
 
 	public LastStatus(String jsonstr) {
-		//JSONObject json = new JSONObject();
 		JSONObject json = (JSONObject) JSONSerializer.toJSON(jsonstr);
 		this.value = json.getString("value");
 		if (json.getString("threshold").equalsIgnoreCase("null"))
 			this.threshold = null;
 		else
 			this.threshold = Float.parseFloat(json.getString("threshold"));
+		
+		if (json.getString("calcmethod").equalsIgnoreCase("null"))
+			this.calcmethod = null;
+		else
+			this.calcmethod = json.getString("calcmethod");
+		
 		this.timestamp = json.getLong("timestamp");
 	}
 	
@@ -124,7 +128,12 @@ public class LastStatus implements Serializable, Cloneable {
 			json.put("threshold", "null");
 		else
 			json.put("threshold", this.threshold);
-				
+		
+		if (calcmethod == null)
+			json.put("calcmethod", "null");
+		else
+			json.put("calcmethod", this.calcmethod);
+		
 		return json.toString();
 	}
 	
