@@ -353,13 +353,13 @@ public final class ConfigurationManager  {
             XMLService serviceconfig = iterservice.next();
             Service service = ServiceFactory.createService(
                     serviceconfig.getName(),
-                    serviceconfig.getUrl());
+                    serviceconfig.getUrl().trim());
 
             //Check for null - not supported logger.error
             service.setHost(host);
             service.setDecscription(serviceconfig.getDesc());
             service.setSchedules(serviceconfig.getSchedule());
-            service.setConnectionUrl(serviceconfig.getUrl());
+            service.setConnectionUrl(serviceconfig.getUrl().trim());
             service.setDriverClassName(serviceconfig.getDriver());
             if (serviceconfig.isSendserver() != null) {
                 service.setSendServiceData(serviceconfig.isSendserver());
@@ -371,7 +371,7 @@ public final class ConfigurationManager  {
             	if (service.getDriverClassName().trim().length() != 0) {
             		LOOGER.debug("Driver name: " + service.getDriverClassName().trim());
             		try {
-            			Class.forName(service.getDriverClassName()).newInstance();
+            			Class.forName(service.getDriverClassName().trim()).newInstance();
             		} catch ( ClassNotFoundException e) {
             			LOOGER.error("Could not find the driver class - " + service.getDriverClassName() + 
             					" " + e.toString());
@@ -400,6 +400,7 @@ public final class ConfigurationManager  {
                     serviceitemconfig.getServiceitemclass().trim());
 
             serviceitem.setService(service);
+            serviceitem.setClassName(serviceitemconfig.getServiceitemclass().trim());
             serviceitem.setDecscription(serviceitemconfig.getDesc());
             serviceitem.setExecution(serviceitemconfig.getExecstatement());
             

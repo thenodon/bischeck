@@ -157,4 +157,8 @@ public interface ServiceItem {
      * @param service Service object that the ServiceItem belongs to
      */
     public void setService(Service service);
+    
+    public void setClassName(String classname);
+
+    public String getClassName();
 }

@@ -44,6 +44,7 @@ public abstract class ServiceItemAbstract {
     protected String     latestValue = null;
     protected Long         exectime;
     protected Threshold threshold;
+	private String classname;
 
     
     public void setService(Service service) {
@@ -125,4 +126,13 @@ public abstract class ServiceItemAbstract {
     public void setThreshold(Threshold threshold) {
         this.threshold = threshold;
     }
+
+    public void setClassName(String classname){
+    	this.classname = classname;
+    }
+
+    public String getClassName() {
+    	return this.classname;
+    }
+
 }
