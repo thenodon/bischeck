@@ -8,11 +8,13 @@ public class ObjectDefinitions {
 	
 	private static final String ILLEGAL_OBJECT_NAME_CHARS = "`+~!$%^&*|'\"<>?,()=";
 
-	private static final String OBJECT_HOSTNAME ="[a-zA-Z0-9]{1}[a-zA-Z0-9_.\\\\-]*[a-zA-Z0-9]{1}";
-	private static final String OBJECT_REGEXP = "[a-zA-Z0-9_.@]{1}[a-zA-Z0-9 _.@\\\\-]*[a-zA-Z0-9_.@]{1}";
-	private static final String HOST_SERVICE_ITEM_REGEXP = OBJECT_HOSTNAME +"-" +
-		OBJECT_REGEXP + "-" +
-		OBJECT_REGEXP +
+	public static final String VALID_HOSTNAME_REGEXP ="[a-zA-Z0-9]{1}[a-zA-Z0-9_.\\\\-]*[a-zA-Z0-9]{1}";
+	public static final String VALID_SERVICE_REGEXP = "[a-zA-Z0-9_.@]{1}[a-zA-Z0-9 _.@\\\\-]*[a-zA-Z0-9_.@]{1}";
+	public static final String VALID_SERVICEITEM_REGEXP = "[a-zA-Z0-9_.@]{1}[a-zA-Z0-9 _.@\\\\-]*[a-zA-Z0-9_.@]{1}";
+	
+	private static final String HOST_SERVICE_ITEM_REGEXP = VALID_HOSTNAME_REGEXP +"-" +
+		VALID_SERVICE_REGEXP + "-" +
+		VALID_SERVICEITEM_REGEXP +
 		"\\[.*?\\]";
 	
 	
@@ -61,7 +63,7 @@ public class ObjectDefinitions {
 		Pattern pat = null;
 	        
 		try {
-            pat = Pattern.compile ("^"+OBJECT_HOSTNAME+"$");        
+            pat = Pattern.compile ("^"+VALID_HOSTNAME_REGEXP+"$");        
         } catch (PatternSyntaxException e) {
            
         }
@@ -76,7 +78,7 @@ public class ObjectDefinitions {
 		Pattern pat = null;
 	        
 		try {
-            pat = Pattern.compile ("^"+OBJECT_REGEXP+"$");        
+            pat = Pattern.compile ("^"+VALID_SERVICE_REGEXP+"$");        
         } catch (PatternSyntaxException e) {
            
         }
