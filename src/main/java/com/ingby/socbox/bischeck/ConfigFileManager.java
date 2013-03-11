@@ -49,6 +49,8 @@ import com.ingby.socbox.bischeck.ConfigXMLInf.XMLCONFIG;
 public class ConfigFileManager {
 
 	private final static Logger  LOGGER = Logger.getLogger(ConfigFileManager.class);
+
+	public static final String DEFAULT_CONFIGDIR = "etc";
 	
 	// A cache of JAXBContext object used so they are not created on every reload
 	private static Map<String,JAXBContext> jccache = Collections.synchronizedMap(new HashMap<String,JAXBContext>());
@@ -79,7 +81,7 @@ public class ConfigFileManager {
 		}
 
 		if (System.getProperty("xmlconfigdir") == null) {
-			xmldir="etc";
+			xmldir=DEFAULT_CONFIGDIR;
 		}else {
 			xmldir=System.getProperty("xmlconfigdir");
 		}
