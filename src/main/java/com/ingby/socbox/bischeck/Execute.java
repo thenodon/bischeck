@@ -50,7 +50,6 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -101,11 +100,7 @@ public final class Execute implements ExecuteMBean {
 	 */
 	private static final int NUMOFADMINJOBS = 1;
 	
-    private String status = null;
-    
-    
-    //private ConfigurationManager confMgr = null;
-    
+
     static {
         mbs = ManagementFactory.getPlatformMBeanServer();
 
@@ -476,11 +471,6 @@ public final class Execute implements ExecuteMBean {
      * JMX methods
      * 
      */
-
-    @Override
-    public String getLastStatus() {
-        return status;
-    }
     
 
     @Override
@@ -537,7 +527,10 @@ public final class Execute implements ExecuteMBean {
     
     @Override
     public String getXmlConfigDir() {
-    	return System.getProperty("xmlconfigdir");   
+    	if (System.getProperty("xmlconfigdir") == null)
+    		return ConfigFileManager.DEFAULT_CONFIGDIR;
+    	else
+    		return System.getProperty("xmlconfigdir");   
     }
     
     @Override 
@@ -557,12 +550,7 @@ public final class Execute implements ExecuteMBean {
 		return ClassCache.cacheMiss();
 	}
 	
-    
-    @Override 
-    public int cacheClassSize() {
-		return ClassCache.cacheSize();
-	}
-    
+   
     @Override
     public String[] getTriggers() {
         List<String> triggerList = new ArrayList<String>();

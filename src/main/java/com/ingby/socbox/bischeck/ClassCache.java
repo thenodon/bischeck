@@ -6,8 +6,8 @@ import java.util.Map;
 
 
 /**
- * The ClassCache is used to store load bischeck classes like Service, Serviceitem 
- * and Threshold that is loaded dynamically so they are not reloaded every time 
+ * The ClassCache is used to store loaded bischeck classes like Service, Serviceitem 
+ * and Threshold that is loaded dynamically so they are not class reloaded every time 
  * bischeck is reloaded. 
  * @author andersh
  *
@@ -44,9 +44,4 @@ public class ClassCache {
 		return cachemiss;
 	}
 	
-	
-	public static int cacheSize() {
-		return cache.size();
-	}
-
 }
