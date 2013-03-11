@@ -110,6 +110,10 @@
             <xsl:for-each select="//twenty4threshold/hours[@hoursID=$myid]" >
                 <xsl:apply-templates select="hour"/> 
             </xsl:for-each>
+            
+            <xsl:for-each select="//twenty4threshold/hours[@hoursID=$myid]" >
+                <xsl:apply-templates select="hourinterval"/> 
+            </xsl:for-each>
                 
         </table>
         
@@ -144,5 +148,18 @@
     <td><xsl:value-of select="." /> </td>
 </tr>
 </xsl:template>
+
+<xsl:template match="hourinterval">
+<tr>
+    <td>
+    <xsl:value-of select="from" /> - <xsl:value-of select="to" />
+    </td>
+    <td>
+    <xsl:value-of select="threshold" />
+    </td>
+</tr>
+</xsl:template>
+
+
 
 </xsl:stylesheet>

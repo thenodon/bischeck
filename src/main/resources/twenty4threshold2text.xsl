@@ -30,12 +30,15 @@
     <!-- Loop through each section -->
     <xsl:for-each select="twenty4threshold/servicedef">
         <xsl:call-template name="Newline" />
+        
+        <xsl:text>---- </xsl:text>
          
         <xsl:text><xsl:value-of select="hostname"/></xsl:text>
         <xsl:text>-</xsl:text>
         <xsl:text><xsl:value-of select="servicename"/></xsl:text>
         <xsl:text>-</xsl:text>
         <xsl:text><xsl:value-of select="serviceitemname"/></xsl:text>
+        <xsl:text> ----</xsl:text>
         
         <xsl:call-template name="Newline" />
     
@@ -50,14 +53,17 @@
             <xsl:call-template name="Newline" />
         
             <!-- Check for default -->
+            
             <xsl:choose>
                 <xsl:when test="not(weeks or months)">
+                    <xsl:text>    </xsl:text>
                     <xsl:text>Default</xsl:text>
                     <xsl:call-template name="Newline" />
                 </xsl:when>
                 <xsl:otherwise>
                 <!-- Check for months -->
                     <xsl:for-each select="months">
+                        <xsl:text>    </xsl:text>
                         <xsl:choose>
                             <xsl:when test="not(month)">
                                 <xsl:text>Month: *</xsl:text>
@@ -80,6 +86,7 @@
         
                     <!-- Check for weeks -->
                     <xsl:for-each select="weeks">
+                        <xsl:text>    </xsl:text>
                         <xsl:choose>
                             <xsl:when test="not(week)">
                                 <xsl:text>Week: *</xsl:text>
@@ -111,6 +118,11 @@
             <xsl:for-each select="//twenty4threshold/hours[@hoursID=$myid]" >
                 <xsl:apply-templates select="hour"/> 
             </xsl:for-each>
+            
+            <xsl:for-each select="//twenty4threshold/hours[@hoursID=$myid]" >
+                <xsl:apply-templates select="hourinterval"/> 
+            </xsl:for-each>
+            
             <xsl:call-template name="Newline" />
         </xsl:for-each>
     </xsl:for-each>
@@ -132,6 +144,15 @@
     <xsl:text> : </xsl:text>
     <xsl:text><xsl:value-of select="." /></xsl:text>
     <xsl:call-template name="Newline" />
+</xsl:template>
+
+<xsl:template match="hourinterval">
+
+    <xsl:value-of select="from" /> - <xsl:value-of select="to" />
+    <xsl:text> : </xsl:text>
+    <xsl:value-of select="threshold" />
+    <xsl:call-template name="Newline" />
+
 </xsl:template>
 
 </xsl:stylesheet>
