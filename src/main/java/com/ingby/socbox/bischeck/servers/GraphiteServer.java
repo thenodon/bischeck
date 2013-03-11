@@ -29,6 +29,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -36,6 +37,9 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.TimeMeasure;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 /**
  * This class is responsible to send bischeck data to a graphite server
@@ -156,11 +160,14 @@ public final class GraphiteServer implements Server {
         LOGGER.info("*");
         LOGGER.info("*********************************************");
 
-        long duration = 0;
+        final String timerName = instanceName+"_execute";
+
+        final Timer timer = Metrics.newTimer(GraphiteServer.class, 
+        		timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final TimerContext context = timer.time();
+
         try {
-        	TimeMeasure tm = new TimeMeasure();
-            tm.start();
-            InetAddress addr = InetAddress.getByName(hostAddress);
+        	InetAddress addr = InetAddress.getByName(hostAddress);
             SocketAddress sockaddr = new InetSocketAddress(addr, port);
 
             graphiteSocket = new Socket();
@@ -171,8 +178,7 @@ public final class GraphiteServer implements Server {
             out.println(message);
             out.flush();
             
-            duration = tm.stop();
-            LOGGER.info("Graphite send execute: " + duration + " ms");
+            
         } catch (UnknownHostException e) {
             LOGGER.error("Don't know about host: " + hostAddress);
         } catch (IOException e) {
@@ -185,6 +191,10 @@ public final class GraphiteServer implements Server {
             try {
                 graphiteSocket.close();
             } catch (Exception ignore) {}    
+        
+            Long duration = context.stop()/1000000;
+            if (LOGGER.isDebugEnabled())
+            	LOGGER.debug("Graphite send execute: " + duration + " ms");
         }
     }
 

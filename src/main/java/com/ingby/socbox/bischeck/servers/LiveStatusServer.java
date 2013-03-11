@@ -168,10 +168,10 @@ public final class LiveStatusServer implements Server {
 		LOGGER.info("*");
 		LOGGER.info("*********************************************");
 
+		final String timerName = instanceName+"_execute";
 
-		Long duration = null;
 		final Timer timer = Metrics.newTimer(LiveStatusServer.class, 
-				instanceName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 
         Socket clientSocket = null; 
@@ -199,8 +199,9 @@ public final class LiveStatusServer implements Server {
 				clientSocket.close();
 			} catch (Exception ignore) {}
 			
-			duration = context.stop()/1000000;
-			LOGGER.info("Livestatus send execute: " + duration + " ms");
+			Long duration = context.stop()/1000000;
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Livestatus send execute: " + duration + " ms");
 		}
 
 	}

@@ -189,18 +189,17 @@ public final class NRDPServer implements Server {
 		LOGGER.info("* " + xml);
 		LOGGER.info("*");
 		LOGGER.info("*********************************************");
+		
+		final String timerName = instanceName+"_execute";
 
-
-		Long duration = null;
 		final Timer timer = Metrics.newTimer(NRDPServer.class, 
-				instanceName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 
 		HttpURLConnection conn = null;
 		OutputStreamWriter wr = null;
 	
 		try {
-			LOGGER.debug(urlstr);
 			String payload = cmd+xml;
 			conn = createHTTPConnection(payload);
 			
@@ -227,11 +226,8 @@ public final class NRDPServer implements Server {
 			 */
 			Document doc = null;
 			try {
-	
-
-				///
 				BufferedReader br
-	        	= new BufferedReader(new InputStreamReader(conn.getInputStream()));
+					= new BufferedReader(new InputStreamReader(conn.getInputStream()));
 	 
 				StringBuilder sb = new StringBuilder();
 	 
@@ -240,17 +236,14 @@ public final class NRDPServer implements Server {
 					sb.append(line);
 				} 
 				
-				
-				//InputStream is = new ByteArrayInputStream(htmlstr.getBytes("UTF-8"));
 				InputStream is = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-				//////////////
-				LOGGER.info(sb.toString());
 				
 				doc = dBuilder.parse(is);
-				//				doc = dBuilder.parse(conn.getInputStream());
 				doc.getDocumentElement().normalize();
+				
 				String rootNode =  doc.getDocumentElement().getNodeName();  
 	            NodeList responselist = doc.getElementsByTagName(rootNode);  
+	            
 	            String result = (String) ((Element) responselist.item(0)).getElementsByTagName("status").  
 	            	item(0).getChildNodes().item(0).getNodeValue().trim();  
 	            if (!result.equals("0")) {  
@@ -271,8 +264,9 @@ public final class NRDPServer implements Server {
 				wr.close();
 			} catch (Exception ignore) {}
 			
-			duration = context.stop()/1000000;
-			LOGGER.info("Nrdp send execute: " + duration + " ms");
+			long duration = context.stop()/1000000;
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Nrdp send execute: " + duration + " ms");
 		}
 
 	}
