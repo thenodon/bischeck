@@ -25,20 +25,28 @@ program=$1
 shift
 arg=$@
 bishome=%BISHOME%
-sqlite=/usr/lib/javasqlite/sqlite.jar
 
+port=%JMXPORT%
+serverip=%JMXSERVERIP%
+auth=%JMXAUTH% 
+    
 #JMX settings
-jmxport=-Dcom.sun.management.jmxremote.port=3333 
-jmxssl=-Dcom.sun.management.jmxremote.ssl=false 
-jmxauth=-Dcom.sun.management.jmxremote.authenticate=false 
-jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
-jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+if [ "x$port" != "x" -a "x$serverip" != "x" -a "x$auth" != "x" ]  ; then
+    jmxport=-Dcom.sun.management.jmxremote.port=$port
+    jmxrmiserver=-Djava.rmi.server.hostname=$serverip
+    jmxauth=-Dcom.sun.management.jmxremote.authenticate=$auth 
+    jmxssl=-Dcom.sun.management.jmxremote.ssl=false 
+    jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
+    jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+    
+    jmx="$jmxport $jmxrmiserver $jmxssl $jmxauth $jmxpasswd $jmxaccess"
+fi
 
 # resources must be before the bischeck-x.x.x.jar in the classpath
-classpath=$bishome/resources:$bishome:$bishome/lib/*:$bishome/customlib/*:$sqlite
+classpath=$bishome/resources:$bishome:$bishome/lib/*:$bishome/customlib/*
 
 if [ "x$program" = "xExecute" -a "x$arg" = "x-d" ] ; then
-  java $jmxport $jmxssl $jmxauth $jmxpasswd $jmxaccess -Dbishome=$bishome -classpath $classpath com.ingby.socbox.bischeck.$program $arg
+  java $jmx -Dbishome=$bishome -classpath $classpath com.ingby.socbox.bischeck.$program $arg
 else
   java -Dbishome=$bishome -classpath $classpath com.ingby.socbox.bischeck.$program $arg
 fi

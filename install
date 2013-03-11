@@ -133,15 +133,18 @@ fi
 
 
 function usage {
-  echo "Usage: $0: -U user -I directory -J java_home "
-  echo "-u show usage"
-  echo "-U the user name to install bischeck as and run the daemon as - default nagios"
-  echo "-J java home directory - default is none"
-  echo "-I installation directory for bischeck - default /opt/socbox/addons/bischeck"
-  echo "-R unistall - permanently remove the installation" 
-  echo "-X upgrade from current version - if possible"
+  echo "Usage for the bischeck installer"
+  echo "-u show usage."
+  echo "-U the user name to install bischeck as and run the daemon as - default nagios."
+  echo "-J java home directory, no default value."
+  echo "-I installation directory for bischeck - default /opt/socbox/addons/bischeck."
+  echo "-R uninstall - permanently remove the installation." 
+  echo "-X upgrade from current version - if possible."
   echo "-d set the linux distribution name if the installer can not detected. Supported are"
   echo "   rh, rhel, redhatenterpriseserver, centos, debian and ubuntu" 
+  echo "-p the port number for the JMX RMI server, for example 3333. No default value."
+  echo "-i the IP address where the RMI port should run, for example 127.0.0.1. No default value."
+  echo "-a if authentication should be used applied on JMX connection. Default is false."
 }
 
 
@@ -167,17 +170,18 @@ unistall=false
 upgrade=false
 DISTRO=""
 DISTROVERS=""
+JMXAUTH=false
 
 VERSION=$(basename `pwd` | sed -e "s/^.*-//")
 
 
 echo "Welcome to bischeck $VERSION installer"
 echo "===================================="
-echo "Copyright Anders Håål, Ingenjörsbyn AB 2011"
+echo "Copyright Anders Håål, Ingenjörsbyn AB 2011-2013"
 echo "Licensed under GPL version 2"
 echo 
 
-while getopts U:I:J:uRXd: name
+while getopts U:I:J:uRXd:p:i:a name
 do
   case $name in
     U)  USERINIT="$OPTARG";;
@@ -186,6 +190,9 @@ do
     X)  upgrade=true;;
     R)  uninstall=true;;
     d)  DISTRO="$OPTARG";;
+    p)  JMXPORT="$OPTARG";;
+    i)  JMXSERVERIP="$OPTARG";;
+    a)  JMXAUTH=true;;
     u)  usage; exit 0;;
   esac
 done
@@ -263,6 +270,8 @@ fi
 #########################
 ## Pre install 
 #########################
+
+# Check that BISHOME directory do not exist
 if [ "$upgrade" = "false" ] ; then
   if [ -d $BISHOME ] ; then
     errormsg "Directory $BISHOME already exists"
@@ -272,6 +281,7 @@ if [ "$upgrade" = "false" ] ; then
   fi
 fi
 
+# Check JAVA is installed and correct version
 if [ "x$JAVA_HOME" = "x" ] ; then
   which java > /dev/null 2>&1
   if [ $? != 0 ] ; then
@@ -290,7 +300,22 @@ else
     initerror=true
   fi
 fi
+
+# Check if any JMX setting is defined, then all must be set   
+if [ "x$JMXPORT" != "x" -o  "x$JMXSERVERIP" != "x" ] ; then
   
+  if [ "x$JMXPORT" = "x" ] ; then
+    errormsg "The JMX server port must be set, like -p 3333"
+    initerror=true
+  fi  
+  
+  if [ "x$JMXSERVERIP" = "x" ] ; then
+    errormsg "The JMX server IP must be set, -i 127.0.0.1"
+    initerror=true
+  fi  
+
+fi
+
 
 #########################
 ## Upgrade check
@@ -370,7 +395,11 @@ if [ ! -d $BISHOME ] ; then
         -e "s#%VERSION%#$VERSION#g" \
         -e "s#%USERINIT%#$USERINIT#g" \
         -e "s#%JAVA_HOME%#$JAVA_HOME#g" \
-        -e "s#%DISTRO%#$DISTRO#g" > $BISHOME/bin/`basename ${i%\.template}`
+        -e "s#%DISTRO%#$DISTRO#g" \
+        -e "s#%JMXPORT%#$JMXPORT#g" \
+        -e "s#%JMXSERVERIP%#$JMXSERVERIP#g" \
+        -e "s#%JMXAUTH%#$JMXAUTH#g" \
+        > $BISHOME/bin/`basename ${i%\.template}`
     done
     chmod 750 $BISHOME/bin/* 
 
@@ -405,7 +434,7 @@ fi
 if [ "$upgrade" = "true" ] ; then
   headline "Upgrade of bischeck $newversion with $oldversion"
   echo "Copy customlib jars"
-  cp -a $upgradedir/customlib/* $BISHOME/customlib/
+  cp -a $upgradedir/customlib/* $BISHOME/customlib/  2>/dev/null
   echo "Running migrations scripts"    
   sh ./migscripts/$migscript $BISHOME $upgradedir
 fi
