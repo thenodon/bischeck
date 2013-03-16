@@ -1,139 +1,85 @@
 <?xml version='1.0' encoding='UTF-8'?>
-
 <twenty4threshold xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <servicedef>
-    <hostname>testhost</hostname>
-    <servicename>testservice</servicename>
-    <serviceitemname>testitem</serviceitemname>
+    <hostname>localhost</hostname>
+    <servicename>sshport</servicename>
+    <serviceitemname>response</serviceitemname>
 
-    <!-- If week 1 of the year and day is Friday -->
     <period>
+      <!-- Period use when the day is Monday and the first day of month -->
+      <months>
+        <dayofmonth>1</dayofmonth>
+      </months>
       <weeks>
-        <week>1</week>
-        <dayofweek>6</dayofweek>
-     </weeks>
-      <calcmethod>&gt;</calcmethod>
+        <dayofweek>2</dayofweek>
+      </weeks>
+
+      <calcmethod>&lt;</calcmethod>
       <warning>10</warning>
       <critical>30</critical>
       <hoursIDREF>1</hoursIDREF>
-    </period>
+    </period>    
 
+    <period>
+      <!-- Period use when the day is Wednesday and Friday --> 
+      
+      <weeks>
+        <dayofweek>4</dayofweek>
+      </weeks>
+      
+      <weeks>
+        <dayofweek>6</dayofweek>
+      </weeks>
+      
+      <calcmethod>&lt;</calcmethod>
+      <warning>10</warning>
+      <critical>30</critical>
+      <hoursIDREF>2</hoursIDREF>
+    </period>    
 
     <!-- The default period -->
     <period>
-      <calcmethod>&gt;</calcmethod>
+      <calcmethod>&lt;</calcmethod>
       <warning>5</warning>
       <critical>20</critical>
-      <hoursIDREF>2</hoursIDREF>
+      <hoursIDREF>1</hoursIDREF>
     </period>
+  
 
   </servicedef>
 
   <hours hoursID="1">  
-    <!-- 00:00 -->
-    <hour>0</hour>
-    <!-- 01:00 -->
-    <hour>1000</hour>
-    <!-- 02:00 -->
-    <hour>2000</hour>
-    <!-- 03:00 -->
-    <hour>3000</hour>
-    <!-- 04:00 -->
-    <hour>4000</hour>
-    <!-- 05:00 -->
-    <hour>5000</hour>
-    <!-- 06:00 -->
-    <hour>6000</hour>
-    <!-- 07:00 -->
-    <hour>7000</hour>
-    <!-- 08:00 -->
-    <hour>8000</hour>
-    <!-- 09:00 -->
-    <hour>9000</hour>
-    <!-- 10:00 -->
-    <hour>10000</hour>
-    <!-- 11:00 -->
-    <hour>11000</hour>
-    <!-- 12:00 -->
-    <hour>12000</hour>
-    <!-- 13:00 -->
-    <hour>13000</hour>
-    <!-- 14:00 -->
-    <hour>14000</hour>
-    <!-- 15:00 -->
-    <hour>15000</hour>
-    <!-- 16:00 -->
-    <hour>16000</hour>
-    <!-- 17:00 -->
-    <hour>17000</hour>
-    <!-- 18:00 -->
-    <hour>18000</hour>
-    <!-- 19:00 -->
-    <hour>19000</hour>
-    <!-- 20:00 -->
-    <hour>20000</hour>
-    <!-- 21:00 -->
-    <hour>21000</hour>
-    <!-- 22:00 -->
-    <hour>22000</hour>
-    <!-- 23:00 -->
-    <hour>23000</hour>
+    <!-- From 08:00 to 18:00 -->  
+    <hourinterval>
+        <from>08:00</from>
+        <to>18:00</to>
+        <!-- the average of data point 1 and 2, remember that data point 0 is always the last collected data point --> 
+        <threshold>avg(localhost-sshport-response[1],localhost-sshport-response[2])</threshold>
+    </hourinterval>
   </hours>
 
-  <hours hoursID="2">
-    <!-- 00:00 -->
-    <hour>null</hour>
-    <!-- 01:00 -->
-    <hour>null</hour>
-    <!-- 02:00 -->
-    <hour>null</hour>
-    <!-- 03:00 -->
-    <hour>null</hour>
-    <!-- 04:00 -->
-    <hour>null</hour>
-    <!-- 05:00 -->
-    <hour>null</hour>
-    <!-- 06:00 -->
-    <hour>null</hour>
-    <!-- 07:00 -->
-    <hour>null</hour>
-    <!-- 08:00 -->
-    <hour>null</hour>
-    <!-- 09:00 -->
-    <hour>null</hour>
-    <!-- 10:00 -->
-    <hour>5000</hour>
-    <!-- 11:00 -->
-    <hour>6000</hour>
-    <!-- 12:00 -->
-    <hour>7000</hour>
-    <!-- 13:00 -->
-    <hour>8000</hour>
-    <!-- 14:00 -->
-    <hour>9000</hour>
-    <!-- 15:00 -->
-    <hour>10000</hour>
-    <!-- 16:00 -->
-    <hour>11000</hour>
-    <!-- 17:00 -->
-    <hour>12000</hour>
-    <!-- 18:00 -->
-    <hour>13000</hour>
-    <!-- 19:00 -->
-    <hour>14000</hour>
-    <!-- 20:00 -->
-    <hour>15000</hour>
-    <!-- 21:00 -->
-    <hour>16000</hour>
-    <!-- 22:00 -->
-    <hour>17000</hour>
-    <!-- 23:00 -->
-    <hour>18000</hour>
-  </hours>
+  <hours hoursID="2">  
+    <!-- From 08:00 to 13:00 -->
+    <hourinterval>
+        <from>08:00</from>
+        <to>13:00</to>
+        <!-- the sum of data point 1 and 2 and divided by 2 - this is also average but its an example -->
+        <threshold>sum(localhost-sshport-response[1],localhost-sshport-response[2])/2</threshold>
+    </hourinterval>
+ 
+    <!-- From 15:00 to 17:00 -->
+    <hourinterval>
+        <from>15:00</from>
+        <to>17:00</to>
+        <!-- the average of the last 10 data points --> 
+        <threshold>avg(localhost-sshport-response[0:9])</threshold>
+    </hourinterval>
+ 
+ </hours>
 
   <!-- Swedish holidays -->
-  <holiday year="2011">
+  <holiday year="2013">
     <dayofyear>0101</dayofyear>
     <dayofyear>0106</dayofyear>
     <dayofyear>0422</dayofyear>
@@ -148,5 +94,5 @@
     <dayofyear>1225</dayofyear>
     <dayofyear>1226</dayofyear>
   </holiday>
-
 </twenty4threshold>
+
