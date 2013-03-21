@@ -112,7 +112,7 @@ public class ThresholdFactory {
 
 	public static void clearCache() {
 
-		LOGGER.info("Clear threshold cache");
+		LOGGER.info("Clear threshold class cache");
 		cache.clear();
 		for (Class<?> clazz: unregistercache) {
 			Method method = null;
