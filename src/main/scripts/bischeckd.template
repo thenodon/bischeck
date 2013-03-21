@@ -87,11 +87,11 @@ start() {
     echo -n "bischeckd startup "
     status=`isrunning $processName` 
     if [ "x$status" = "x" ] ; then
-        su $user -c "$bishome/bin/bischeck ConfigurationManager -v" 
+        su $user -c "$bishome/bin/bischeck ConfigurationManager -v  > /dev/null 2>&1" 
         if [ $? -ne 0 ] ; then 
            RETVAL=2
 	else 
-            su $user -c "$bishome/bin/bischeck ConfigurationManager"
+            su $user -c "$bishome/bin/bischeck ConfigurationManager  > /dev/null 2>&1"
             if [ $? -ne 0 ] ; then 
                 RETVAL=2
             else 
