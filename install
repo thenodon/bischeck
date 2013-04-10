@@ -293,7 +293,7 @@ elif [ ! -f $JAVA_HOME/bin/java ] ; then
   initerror=true
 else 
   jver=$(java -version 2>&1 | awk '/version/ {print $3}' | awk -F . '{print $2}')
-  if [ $jver -qe 6 ] ; then 
+  if [ $jver -eq 6 ] ; then 
     echo "Java runtime exists"
   else
     errormsg "Java version is must be 6 or higher."
