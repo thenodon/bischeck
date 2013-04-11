@@ -3841,7 +3841,7 @@ status open
 
 \begin_layout Plain Layout
 
-			<threshold>erpserver-orders-ediorders[0]*0.8</hour> 
+			<threshold>erpserver-orders-ediorders[0]*0.8</threshold> 
 \end_layout
 
 \begin_layout Plain Layout
@@ -3871,7 +3871,7 @@ status open
 
 \begin_layout Plain Layout
 
-			<threshold>erpserver-orders-ediorders[0]*0.4</hour> 
+			<threshold>erpserver-orders-ediorders[0]*0.4</threshold>
 \end_layout
 
 \begin_layout Plain Layout
@@ -3901,7 +3901,7 @@ status open
 
 \begin_layout Plain Layout
 
-			<threshold>erpserver-orders-ediorders[0]*0.2</hour> 
+			<threshold>erpserver-orders-ediorders[0]*0.2</threshold>
 \end_layout
 
 \begin_layout Plain Layout
@@ -3931,7 +3931,7 @@ status open
 
 \begin_layout Plain Layout
 
-			<threshold>10000</hour> 
+			<threshold>10000</threshold>
 \end_layout
 
 \begin_layout Plain Layout
