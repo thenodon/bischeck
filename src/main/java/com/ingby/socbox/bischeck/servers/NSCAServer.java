@@ -170,9 +170,10 @@ public final class NSCAServer implements Server, ServerInternal {
         if (LOGGER.isInfoEnabled())
         	LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
         
-        Long duration = null;
+        final String timerName = instanceName+"_execute";
+
     	final Timer timer = Metrics.newTimer(NSCAServer.class, 
-    			instanceName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    			timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
     	final TimerContext context = timer.time();
 
         try {
@@ -182,8 +183,9 @@ public final class NSCAServer implements Server, ServerInternal {
         } catch (IOException e) {
         	LOGGER.error("Network error - check nsca server and that service is started", e);
         } finally { 
-        	duration = context.stop()/1000000;
-        	LOGGER.info("Nsca send execute: " + duration + " ms");
+        	long duration = context.stop()/1000000;
+			if (LOGGER.isDebugEnabled())
+            	LOGGER.debug("Nsca send execute: " + duration + " ms");
         }	    
     }
     

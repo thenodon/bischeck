@@ -147,9 +147,11 @@ public final class LiveStatusServer implements Server {
 
 
 	private void connectAndSend(String xml) {
-		Long duration = null;
+		
+		final String timerName = instanceName+"_execute";
+        
 		final Timer timer = Metrics.newTimer(LiveStatusServer.class, 
-				instanceName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 
         Socket clientSocket = null; 
@@ -175,8 +177,10 @@ public final class LiveStatusServer implements Server {
 					clientSocket.close();
 			} catch (IOException ignore) {}
 
-			duration = context.stop()/1000000;
-			LOGGER.info("Livestatus send execute: " + duration + " ms");
+			long duration = context.stop()/1000000;
+			
+			if (LOGGER.isDebugEnabled())
+            	LOGGER.debug("Livestatus send execute: " + duration + " ms");
 		}
 	}
 

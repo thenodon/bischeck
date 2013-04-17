@@ -29,14 +29,18 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.TimeMeasure;
+
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 public final class OpenTSDBServer implements Server {
 
@@ -109,11 +113,15 @@ public final class OpenTSDBServer implements Server {
 	private void connectAndSend(String message) {
 		Socket opentsdbSocket = null;
         PrintWriter out = null;
+        
+        final String timerName = instanceName+"_execute";
 
-        long duration = 0;
+    	final Timer timer = Metrics.newTimer(OpenTSDBServer.class, 
+    			timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    	final TimerContext context = timer.time();
+
         try {
-        	TimeMeasure tm = new TimeMeasure();
-            tm.start();
+        	
             InetAddress addr = InetAddress.getByName(hostAddress);
             SocketAddress sockaddr = new InetSocketAddress(addr, port);
 
@@ -125,8 +133,6 @@ public final class OpenTSDBServer implements Server {
             out.println(message);
             out.flush();
             
-            duration = tm.stop();
-            LOGGER.info("OpenTSDB send execute: " + duration + " ms");
         } catch (UnknownHostException e) {
             LOGGER.error("Network error - don't know about host: " + hostAddress, e);
         } catch (IOException e) {
@@ -139,6 +145,11 @@ public final class OpenTSDBServer implements Server {
             	if (opentsdbSocket != null)
             		opentsdbSocket.close();
             } catch (IOException ignore) {}    
+            
+            long duration = context.stop()/1000000;
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("OpenTSDB send execute: " + duration + " ms");
+            
         }
 	}
 
