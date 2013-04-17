@@ -25,11 +25,7 @@ public interface ExecuteMBean {
 	
 	public static final String BEANNAME = "com.ingby.socbox.bischeck:name=Execute";
 	
-	/**
-     * Get the last status of the sending the nsca message to the Nagios server.
-     * @return status information
-     */
-    public String getLastStatus();
+	
     
     /**
      * List the triggers to schedule
@@ -49,16 +45,17 @@ public interface ExecuteMBean {
 
     
     /**
-     * The time in milliseconds when a reload occurred
+     * The time in milliseconds when the last reload occurred
      * @return the time when last reload occurred in milliseconds
      */
-    public Long getReloadTime();
+    public long getReloadTime();
+    
     
     /**
      * The number of times reload has been done since bischeck was started
      * @return number of reloads done
      */
-    public Integer getReloadCount();
+    public int getReloadCount();
     
     
     /**
@@ -83,7 +80,17 @@ public interface ExecuteMBean {
     public String getBischeckVersion();
     
     
+    /**
+     * The number of bischeck classes found in the class cache 
+     * @return
+     */
     public int cacheClassHit();
-	public int cacheClassMiss();
-	public int cacheClassSize();
+	
+    /**
+     * The total number of bischeck related classes that is loaded and was
+     * not in the class cache 
+     * @return
+     */
+    public int cacheClassMiss();
+	
 }

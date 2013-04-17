@@ -101,8 +101,6 @@ public final class Execute implements ExecuteMBean {
 	 * - threshold cache depleted
 	 */
 	private static final int NUMOFADMINJOBS = 1;
-	
-    private String status = null;
     
     
     //private ConfigurationManager confMgr = null;
@@ -218,6 +216,7 @@ public final class Execute implements ExecuteMBean {
             	return FAILED;
             }
         }
+        
        
         /*
          * Reset the shutdown and reload flags
@@ -461,11 +460,6 @@ public final class Execute implements ExecuteMBean {
      * 
      */
 
-    @Override
-    public String getLastStatus() {
-        return status;
-    }
-    
 
     @Override
     public void shutdown() {
@@ -503,13 +497,13 @@ public final class Execute implements ExecuteMBean {
     
     
     @Override
-    public Long getReloadTime() {
+    public long getReloadTime() {
     	return reloadtime;
     }
 
     
     @Override
-    public Integer getReloadCount() {
+    public int getReloadCount() {
     	return reloadcount;
     }
 
@@ -522,8 +516,12 @@ public final class Execute implements ExecuteMBean {
     
     @Override
     public String getXmlConfigDir() {
-    	return System.getProperty("xmlconfigdir");   
+    	if (System.getProperty("xmlconfigdir") == null)
+    		return ConfigFileManager.DEFAULT_CONFIGDIR;
+    	else
+    		return System.getProperty("xmlconfigdir");   
     }
+    
     
     @Override 
     public String getBischeckVersion() {
@@ -543,11 +541,7 @@ public final class Execute implements ExecuteMBean {
 	}
 	
     
-    @Override 
-    public int cacheClassSize() {
-		return ClassCache.cacheSize();
-	}
-    
+  
     @Override
     public String[] getTriggers() {
         List<String> triggerList = new ArrayList<String>();

@@ -43,10 +43,5 @@ public class ClassCache {
 	public static int cacheMiss() {
 		return cachemiss;
 	}
-	
-	
-	public static int cacheSize() {
-		return cache.size();
-	}
 
 }
