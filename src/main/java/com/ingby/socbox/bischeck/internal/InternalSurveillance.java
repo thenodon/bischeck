@@ -106,9 +106,7 @@ public class InternalSurveillance implements Job {
 					strbuf.append(trim(entry.getKey()));
 					strbuf.append("_");      
 					strbuf.append(subEntry.getKey().getName());
-					//strbuf.append("_time=");    
 					strbuf.append("=");    
-
 					strbuf.append(Util.roundDecimals((float)timer.getMean()));
 					strbuf.append("ms;;;; ");
 
