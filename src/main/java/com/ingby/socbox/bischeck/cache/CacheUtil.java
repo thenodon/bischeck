@@ -19,6 +19,7 @@
 package com.ingby.socbox.bischeck.cache;
 
 
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,5 +85,136 @@ public abstract class CacheUtil {
     	}
     }
 
-    
+    /**
+     * Parse the indexstr that contain the index expression and find the 
+     * right way to retrieve the cache elements. 
+     * @param strbuf
+     * @param indexstr
+     * @param host
+     * @param service
+     * @param serviceitem
+     */
+	public static String parseIndexString( CacheInf cache, String indexstr,
+			String host, String service, String serviceitem) {
+		
+		StringBuffer strbuf = new StringBuffer();
+		
+		if (indexstr.contains(CacheInf.JEPLISTSEP)) {
+			// Check the format of the index
+			/*
+			 * Format x[Y,Z,--]
+			 * A list of elements 
+			 */
+			StringTokenizer ind = new StringTokenizer(indexstr,CacheInf.JEPLISTSEP);
+			while (ind.hasMoreTokens()) {
+				strbuf.append(
+						cache.getIndex( 
+								host,
+								service, 
+								serviceitem,
+								Integer.parseInt((String)ind.nextToken())) + CacheInf.JEPLISTSEP);
+			}
+			
+			strbuf.delete(strbuf.length()-1, strbuf.length());
+		//	strbuf.append(SEP);
+			
+		} else if (CacheUtil.isByFromToTime(indexstr)) {
+			/*
+			 * Format x[-Tc:-Tc]
+			 * The element closest to time T at time granularity based on c 
+			 * that is S, M or H. 
+			 */ 
+			StringTokenizer ind = new StringTokenizer(indexstr,":");
+			String indfromTime = ind.nextToken();
+			Integer indfrom = cache.getByTimeIndex( 
+					host,
+					service, 
+					serviceitem,
+					System.currentTimeMillis() + CacheUtil.calculateByTime(indfromTime)*1000);
+			
+			String indtoTime = ind.nextToken();
+			Integer indto;
+			if (indtoTime.equals(CacheInf.ENDMARK)) {
+				indto = (int) cache.getLastIndex(host, service, serviceitem);
+			} else {
+				indto = cache.getByTimeIndex( 
+					host,
+					service, 
+					serviceitem,
+					System.currentTimeMillis() + CacheUtil.calculateByTime(indtoTime)*1000);
+			}
+			
+			// If any of the index returned is null it means that there is 
+			// no cache data in the from or to time and then return a single null
+			if (indfrom == null || indto == null || indfrom > indto) {
+				strbuf.append("null" + CacheInf.JEPLISTSEP);
+			} else {
+				for (int i = indfrom; i<indto+1; i++) {
+					strbuf.append(
+							cache.getIndex( 
+									host,
+									service, 
+									serviceitem,
+									i) + CacheInf.JEPLISTSEP);
+
+				}
+			}
+			strbuf.delete(strbuf.length()-1, strbuf.length());
+			//strbuf.append(SEP);
+		}
+		else if (indexstr.contains(":")) {
+			/*
+			 * Format x[Y:Z]
+			 * Elements from index to index
+			 */
+			StringTokenizer ind = new StringTokenizer(indexstr,":");
+			
+			int indstart = Integer.parseInt((String) ind.nextToken());
+			
+			int indend;
+			String indendStr = ind.nextToken();
+			
+			if (indendStr.equals(CacheInf.ENDMARK) ) {
+				indend = (int) cache.getLastIndex(host, service, serviceitem);
+			} else {
+				indend = Integer.parseInt(indendStr);
+			}
+			
+
+			for (int i = indstart; i<indend+1; i++) {
+				strbuf.append(
+						cache.getIndex( 
+								host,
+								service, 
+								serviceitem,
+								i) + CacheInf.JEPLISTSEP);
+
+			}
+			strbuf.delete(strbuf.length()-1, strbuf.length());
+			//strbuf.append(SEP);
+			
+		} else if (CacheUtil.isByTime(indexstr)){
+			/*
+			 * Format x[-Tc]
+			 * The element closest to time T at time granularity based on c 
+			 * that is S, M or H. 
+			 */ 
+			strbuf.append(
+					cache.getByTime( 
+							host,
+							service, 
+							serviceitem,
+							System.currentTimeMillis() + CacheUtil.calculateByTime(indexstr)*1000));
+		} else {
+			strbuf.append(
+					cache.getIndex( 
+							host,
+							service, 
+							serviceitem,
+							Integer.parseInt(indexstr)));
+		}
+		
+		return strbuf.toString();
+	}
+
 }

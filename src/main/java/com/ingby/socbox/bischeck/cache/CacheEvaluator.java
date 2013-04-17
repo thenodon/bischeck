@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +30,9 @@ public class CacheEvaluator {
 	private List<String> cacheEntriesValue = null;
 	private static final Pattern PATTERN_HOST_SERVICE_SERVICEITEM = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());
 
-	static boolean notNullSupport = ConfigurationManager.getInstance().getProperties().getProperty("notFullListParse","false").equalsIgnoreCase("false");
+	//private static boolean notFullListParse = false;
+	
+	static  boolean notNullSupport = ConfigurationManager.getInstance().getProperties().getProperty("notFullListParse","false").equalsIgnoreCase("false");
 	/**
 	 * 
 	 * @param statement
@@ -106,7 +109,7 @@ public class CacheEvaluator {
 			parsedstatement = statement;
 
 		// If cache entries in the string parse and replace
-		cacheEntriesValue = CacheFactory.getInstance().getValues(cacheEntriesName);
+		cacheEntriesValue = getValues(cacheEntriesName);
 
 		// Indicator to see if any parameters are null since then no calc will be done
 		boolean notANumber = false;
@@ -167,6 +170,53 @@ public class CacheEvaluator {
 
 		}	    
 		return cacheNameList;
+	}
+
+	private List<String> getValues(List<String> listofenties) {
+		List<String> valueList = new ArrayList<String>();
+		
+		Iterator<String> iter = listofenties.iterator();
+		while (iter.hasNext()){
+			String token = iter.next();
+
+			int indexstart=token.indexOf("[");
+			int indexend=token.indexOf("]");
+
+			String indexstr = token.substring(indexstart+1, indexend);
+
+			String parameter1 = token.substring(0, indexstart);
+			String parameter2 = parameter1.replaceAll(ObjectDefinitions.getCacheQuoteString(), ObjectDefinitions.getQuoteConversionString());
+			StringTokenizer parameter = new StringTokenizer(parameter2,ObjectDefinitions.getCacheKeySep());
+						
+			String host = ((String) parameter.nextToken()).
+				replaceAll(ObjectDefinitions.getQuoteConversionString(), ObjectDefinitions.getCacheKeySep());
+			String service = (String) parameter.nextToken().
+				replaceAll(ObjectDefinitions.getQuoteConversionString(), ObjectDefinitions.getCacheKeySep());
+			String serviceitem = (String) parameter.nextToken().
+				replaceAll(ObjectDefinitions.getQuoteConversionString(), ObjectDefinitions.getCacheKeySep());        
+
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Get from the LastStatusCahce " + 
+					host + "-" +
+					service + "-"+
+					serviceitem + "[" +
+					indexstr+"]");
+
+			
+			valueList.add(CacheUtil.parseIndexString(CacheFactory.getInstance(), indexstr, host, service, serviceitem));
+		}    
+
+		if (!notNullSupport) {
+			for(int i=0;i<valueList.size();i++) {
+				String trimNull = valueList.get(i).replaceAll("null,", "").replaceAll(",null","");
+				if (trimNull.length()==0)					
+					valueList.set(i,"null");
+				else
+					valueList.set(i,trimNull);	
+			}
+		}
+	
+		return valueList;
 	}
 
 }
