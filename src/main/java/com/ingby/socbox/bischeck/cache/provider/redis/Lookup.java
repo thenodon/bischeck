@@ -1,7 +1,6 @@
 package com.ingby.socbox.bischeck.cache.provider.redis;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.slf4j.Logger;
