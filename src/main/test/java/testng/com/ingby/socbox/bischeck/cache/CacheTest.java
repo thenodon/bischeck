@@ -63,7 +63,7 @@ public class CacheTest {
 		if (ConfigurationManager.getInstance().getProperties().
 				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
 			supportNull = true;
-
+		
 		CacheFactory.init();
 
 	}
@@ -115,6 +115,10 @@ public class CacheTest {
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[6:12]"),"15,14,13,12,10,9");
 			// Test all keys outside range return "null"
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[25:30]"),"null");
+			// Test using ENDMARK
+			System.out.println("ENDMARK");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
+			
 			//Combo 1
 			Assert.assertEquals(CacheEvaluator.parse("avg(" + cachekey + "[0]," + cachekey + "[6:12])"),"avg(21,15,14,13,12,10,9)");
 			//Combo 2
@@ -126,6 +130,7 @@ public class CacheTest {
 			
 			// Test that a time range with no data in the cache returns "null"
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M:-15M]"),"19,18,17");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M:END]"),"19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
 			// Test that a if the end time range with no data in the cache returns "null"
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M:-120M]"),"null");
 
@@ -142,11 +147,15 @@ public class CacheTest {
 			// Test all keys outside range return "null"
 			System.out.println("CacheEvaluator.parse(cachekey + \"[25:30]\") " + CacheEvaluator.parse(cachekey + "[25:30]"));
 			Assert.assertNull(CacheEvaluator.parse(cachekey + "[25:30]"));
+			// Test using ENDMARK
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[15:END]"),"6,5,4,3,2,1");
+						
 			// Test that a time range with no data in the cache returns "null"
 			// Test that a time range with no data in the cache returns "null"
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M:-15M]"),"19,18,17");
 			// Test that a if the end time range with no data in the cache returns "null"
 			Assert.assertNull(CacheEvaluator.parse(cachekey + "[-5M:-120M]"));
+			Assert.assertNull(CacheEvaluator.parse(cachekey + "[-5M:END]"));
 
 		}
 	}
