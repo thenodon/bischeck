@@ -53,28 +53,31 @@ import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
 
 
 /**
+ * <p>
  * The LastStatusCache cache all monitored bischeck data. The cache is built as
  * Map that has the host->service->serviceitem as key and the map value is a
  * List of the LastStatus elements in an fifo where the First element is the
  * latest stored. When the fifo size is occupied the oldest element is removed 
  * from the end (last).
- * --------------------
- * | h-s-i | h-s-i| ..........
- * --------------------
- *     |     |
- *     |      
- *     ^		
- *    -----
- *   | ls1 | <- newest
- *   | ls2 |
- *   | ls3 |
- *   | ls4 |
- *   |  .  |
- *   |  .  |
- *   | lsX | <- oldest (max size) 
- *    -----
+ * </p>
+ * <code>
+ * --------------------</br>
+ * | h-s-i | h-s-i| ..........</br>
+ * --------------------</br>
+ * &nbsp;&nbsp;|     </br>
+ * &nbsp;&nbsp;|      </br>
+ * &nbsp;&nbsp;^		</br>
+ *    -----</br>
+ *   | ls1 | <- newest</br>
+ *   | ls2 |</br>
+ *   | ls3 |</br>
+ *   | ls4 |</br>
+ *   |&nbsp;&nbsp;. &nbsp;|</br>
+ *   |&nbsp;&nbsp;. &nbsp;|</br>
+ *   | lsX | <- oldest (max size)</br> 
+ *    -----</br>
  *      
- *    
+ * </code>   
  * @author andersh
  *
  */
@@ -111,6 +114,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		return lsc;
 	}
 	
+	/**
+	 * Initialize the cache before usage - factory method  
+	 * @throws CacheException - if the cache can not be loaded
+	 */
 	public static synchronized void init() throws CacheException {
 		if (lsc == null) {
 			
@@ -156,19 +163,28 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				fifosize = 500;
 			}
 			
-		/*	if (ConfigurationManager.getInstance().getProperties().
-					getProperty("notFullListParse","false").equalsIgnoreCase("true"))
-				notFullListParse=true;
-		*/	
 		}
 	}
 
 
-	/**
-	 * Add value form the serviceitem
-	 * @param service
-	 * @param serviceitem
+		
+	/*
+	 ***********************************************
+	 ***********************************************
+	 * Implement CacheInf
+	 ***********************************************
+	 ***********************************************
 	 */
+	
+	
+	
+	/*
+	 ***********************************************
+	 * Add methods
+	 ***********************************************
+	 */
+
+	@Override
 	public  void add(Service service, ServiceItem serviceitem) {
 
 		String key = Util.fullName(service, serviceitem);
@@ -177,33 +193,16 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 
 	@Override
-	public void add(LastStatus ls, String hostname, String servicename,
-			String serviceitemname) {
-		String key = Util.fullName(hostname, servicename, serviceitemname); 
+	public void add(LastStatus ls, 
+			String hostName, 
+			String serviceName,
+			String serviceItemName) {
+		String key = Util.fullName(hostName, serviceName, serviceItemName); 
 		add(ls,key);
 		
 	}
 	
 	
-	/**
-     * Add a entry to the cache
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @param measuredValue
-     * @param thresholdValue
-     * @deprecated
-     */
-	/*
-	public  void add(String hostname, String serviceName,
-			String serviceItemName, String measuredValue,
-			Float thresholdValue) {
-		
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		add(new LastStatus(measuredValue,thresholdValue), key);
-	}
-*/
-
 	@Override
 	public void add(LastStatus ls, String key) {
 		LinkedList<LastStatus> fifo;
@@ -223,68 +222,52 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		}
 	}
 
-	
-	/**
-	 * Add cache element in the end of the list. Used by loaddump()
-	 * @param ls
-	 * @param key
+
+    /*
+     ***********************************************
+	 * Get data methods - LastStatus
+	 ***********************************************
 	 */
-	private void addLast(LastStatus ls, String key) {
-		LinkedList<LastStatus> fifo;
-		synchronized (cache) {
-			if (cache.get(key) == null) {
-				fifo = new LinkedList<LastStatus>();
-				cache.put(key, fifo);
-			} else {
-				fifo = cache.get(key);
-			}
-
-			if (fifo.size() >= fifosize) {
-				fifo.removeLast();
-			}
-
-			cache.get(key).addLast(ls);
-		}
-	}
-
 	
-	@Override
-	public String getIndex(String hostname, String serviceName,
-			String serviceItemName, int index) {
 
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
+	@Override
+	public LastStatus getLastStatusByTime(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long timestamp) {
+		String key = Util.fullName( hostName, serviceName, serviceItemName);
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Find cache data for " + key + " at time " + new java.util.Date(timestamp));
+		
 		LastStatus ls = null;
 
 		synchronized (cache) {
-			try {
-				ls = cache.get(key).get(index);
-			} catch (NullPointerException ne) {
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("No objects in the cache for " + key);
+			LinkedList<LastStatus> list = cache.get(key); 
+			// list has no size
+			if (list == null || list.size() == 0) 
 				return null;
-			}    
-			catch (IndexOutOfBoundsException ie) {
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("No object on index in the cache for " + key + "["+index+"]");
-				return null;
-			}
+
+			ls = nearest(timestamp, list);
+
 		}
-		if (ls == null)
+		if (ls == null) 
 			return null;
 		else
-			return ls.getValue();
+			return ls;    
 	}
 
-	
-	private LastStatus getLastStatusByIndex(String hostname, String serviceName,
-			String serviceItemName, int index) {
+	@Override
+	public LastStatus getLastStatusByIndex(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long index) {
 
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
+		String key = Util.fullName( hostName, serviceName, serviceItemName);
 		LastStatus ls = null;
 
 		synchronized (cache) {
 			try {
-				ls = cache.get(key).get(index);
+				ls = cache.get(key).get((int)index);
 			} catch (NullPointerException ne) {
 				if (LOGGER.isDebugEnabled())
 					LOGGER.debug("No objects in the cache for " + key);
@@ -299,44 +282,176 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		return ls;
 	}
 
-	
+
 	@Override
-	public String getByTime(String hostname, String serviceName,
-			String serviceItemName, long stime) {
+	public List<LastStatus> getLastStatusListByTime(String hostName, 
+			String serviceName, 
+			String serviceItemName, 
+			long from, long to) {
+		Long indfrom = this.getIndexByTime( 
+				hostName,
+				serviceName, 
+				serviceItemName,from);
+		Long indto = this.getIndexByTime( 
+				hostName,
+				serviceName, 
+				serviceItemName,to);
 		
-
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Find cache data for " + key + " at time " + new java.util.Date(stime));
+		List<LastStatus> lslist = new ArrayList<LastStatus>();
 		
-		LastStatus ls = null;
-
-		synchronized (cache) {
-			LinkedList<LastStatus> list = cache.get(key); 
-			// list has no size
-			if (list == null || list.size() == 0) 
-				return null;
-
-			ls = nearest(stime, list);
-
+		for (long index = indfrom; index <= indto; index++) {
+			LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
+			lslist.add(ls);
 		}
+		
+		return lslist;
+	}
+	
+
+	@Override
+	public List<LastStatus> getLastStatusListByIndex(String hostName,
+			String serviceName, 
+			String serviceItemName,
+			long fromIndex, long toIndex) {
+		
+				
+		List<LastStatus> lslist = new ArrayList<LastStatus>();
+		
+		for (long index = fromIndex; index <= toIndex; index++) {
+			LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
+			if (ls == null)
+				break;
+			lslist.add(ls);
+		}
+		
+		return lslist;
+	}
+
+
+	@Override
+	public List<LastStatus> getLastStatusListAll(String hostName, 
+			String serviceName, 
+			String serviceItemName) {
+		
+		long fromIndex = 0;
+		
+		long toIndex = getLastIndex(hostName, serviceName, serviceItemName); 
+				
+		List<LastStatus> lslist = getLastStatusListByIndex(hostName,
+				serviceName, 
+				serviceItemName,
+				fromIndex, toIndex);
+		return lslist;
+	}
+	
+
+	/*
+     ***********************************************
+	 * Get data methods - String
+	 ***********************************************
+	 */
+
+	@Override
+	public String getByIndex(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long index) {
+
+		LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
 		if (ls == null) 
 			return null;
 		else
-			return ls.getValue();    
+			return ls.getValue();
 	}
 
 	@Override
-	public long getLastIndex(String hostname, String serviceName,
-			String serviceItemName) {
+	public String getByTime(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long timestamp) {
 		
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		int size = cache.get(key).size();
-		return size - 1 ;
+		return getLastStatusByTime(hostName, serviceName, serviceItemName, timestamp).getValue();
 	}
+
+	@Override
+	public String getByIndex(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long fromIndex, long toIndex,
+			String separator) {
+		
+		List<LastStatus> lslist = getLastStatusListByIndex(hostName, serviceName, serviceItemName, fromIndex, toIndex);
+			
+		if (lslist.isEmpty())
+			return null;
+		
+		StringBuffer strbuf = new StringBuffer();
+		for (LastStatus ls : lslist) {
+			strbuf.append(ls.getValue()).append(separator);
+		}
+		String str = strbuf.toString();
+		return str.substring(0, str.lastIndexOf(separator));
+	}
+
 	
 	@Override
-	public Integer getByTimeIndex(String hostname, String serviceName,
+	public String getByTime(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long from, long to, 
+			String separator) {
+
+		List<LastStatus> lslist = getLastStatusListByTime(hostName, serviceName, serviceItemName, from, to);
+		
+		if (lslist.isEmpty())
+			return null;
+		
+		StringBuffer strbuf = new StringBuffer();
+		for (LastStatus ls : lslist) {
+			strbuf.append(ls.getValue()).append(separator);
+		}
+		String str = strbuf.toString();
+
+		return str.substring(0, str.lastIndexOf(separator));
+
+	}
+
+	@Override
+	public String getAll(String hostName, 
+			String serviceName,
+			String serviceItemName,
+			String separator) {
+
+		List<LastStatus> lslist = getLastStatusListAll(hostName, serviceName, serviceItemName);
+		
+		if (lslist.isEmpty())
+			return null;
+		
+		StringBuffer strbuf = new StringBuffer();
+		for (LastStatus ls : lslist) {
+			strbuf.append(ls.getValue()).append(separator);
+		}
+		String str = strbuf.toString();
+
+		return str.substring(0, str.lastIndexOf(separator));
+	}
+
+	/*
+     ***********************************************
+	 * Position and size methods
+	 ***********************************************
+	 */
+	
+	@Override
+	public Long size(String hostname, String serviceName,
+			String serviceItemName) {
+
+    	String key = Util.fullName( hostname, serviceName, serviceItemName);
+		return (long) cache.get(key).size();
+	}
+
+	@Override
+	public Long getIndexByTime(String hostname, String serviceName,
 			String serviceItemName, long stime) {
 		
 		String key = Util.fullName( hostname, serviceName, serviceItemName);
@@ -357,61 +472,75 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		if (index == null) 
 			return null;
 		else
-			return index;    
+			return (long) index;    
 	}
-	
-	
-	/**
-     * Get the size of the cache entries, the number of unique host, service 
-     * and service item entries. 
-     * @return size of the cache index
-     */
-	
-	private  int size() {
-		return cache.size();
-	}
-	 
-	/**
-     * The size for the specific host, service, service item entry.
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @return size of cached values for a specific host-service-serviceitem
-     */
-    public int sizeLru(String hostname, String serviceName,
-			String serviceItemName) {
-
-    	String key = Util.fullName( hostname, serviceName, serviceItemName);
-		return cache.get(key).size();
-	}
-	
-	
 	
 	@Override
-	public List<LastStatus> getLastStatusList(String host, 
-			String service, 
-			String serviceitem, 
-			long from, long to) {
-		Integer indfrom = this.getByTimeIndex( 
-				host,
-				service, 
-				serviceitem,from);
-		Integer indto = this.getByTimeIndex( 
-				host,
-				service, 
-				serviceitem,to);
+	public long getLastIndex(String hostname, String serviceName,
+			String serviceItemName) {
 		
-		List<LastStatus> lslist = new ArrayList<LastStatus>();
-		
-		for (int index = indfrom; index <= indto; index++) {
-			LastStatus ls = getLastStatusByIndex(host, service, serviceitem, index);
-			lslist.add(ls);
-		}
-		
-		return lslist;
+		String key = Util.fullName( hostname, serviceName, serviceItemName);
+		int size = cache.get(key).size();
+		return size - 1 ;
+	}
+
+	public long getLastTime(String hostName, 
+			String serviceName, 
+			String serviceItemName) {
+		long index = getLastIndex(hostName, serviceName, serviceItemName);
+		return getLastStatusByIndex(hostName, serviceName, serviceItemName, index).getTimestamp();
 	}
 	
+	/*
+     ***********************************************
+	 * Clear methods
+	 ***********************************************
+	 */
+
+
+	@Override
+	public void clear() {
+		synchronized (cache) {
+			Iterator<String> iter = cache.keySet().iterator();
+			while (iter.hasNext()) {
+				String key = iter.next();
+				cache.get(key).clear(); 
+				iter.remove();
+			}
+		}
+	}
+
+	@Override
+	public void clear(String hostName, String serviceName, String serviceItemName) {
+		String key = Util.fullName( hostName, serviceName, serviceItemName);
+		
+		synchronized (cache) {
+			if (cache.containsKey(key))
+			cache.get(key).clear();
+		}
+	}
+
 	
+	/*
+	 ***********************************************
+	 * Close methods
+	 ***********************************************
+	 */
+	@Override
+	public void close() {
+		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile); 
+		BackendStorage.dump2file(cache,dumpfile);
+	}
+	
+
+	/*
+	 ***********************************************
+	 ***********************************************
+	 * Implement LastStatusMBean
+	 ***********************************************
+	 ***********************************************
+	 */
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getLastStatusCacheCount()
@@ -442,6 +571,63 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
+	@Override
+	public void dump2file() {
+		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile);
+		BackendStorage.dump2file(cache,dumpfile);
+	}
+
+
+	@Override
+	public void clearCache() {
+		clear();
+	}
+
+
+	/*
+	 ***********************************************
+	 ***********************************************
+	 * Private methods
+	 ***********************************************
+	 ***********************************************
+	 */
+	
+	/**
+	 * Add cache element in the end of the list. Used by loaddump()
+	 * @param ls
+	 * @param key
+	 */
+	private void addLast(LastStatus ls, String key) {
+		LinkedList<LastStatus> fifo;
+		synchronized (cache) {
+			if (cache.get(key) == null) {
+				fifo = new LinkedList<LastStatus>();
+				cache.put(key, fifo);
+			} else {
+				fifo = cache.get(key);
+			}
+
+			if (fifo.size() >= fifosize) {
+				fifo.removeLast();
+			}
+
+			cache.get(key).addLast(ls);
+		}
+	}
+
+	
+	
+	/**
+     * Get the size of the cache entries, the number of unique host, service 
+     * and service item entries. 
+     * @return size of the cache index
+     */
+	
+	private  int size() {
+		return cache.size();
+	}
+	 
+		
 	private void load() throws Exception{
 		Object xmlobj = null;
 		File dumpdir = new File(lastStatusCacheDumpDir);
@@ -496,30 +682,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		
 	}
 	
-	public void close() {
-		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile); 
-		BackendStorage.dump2file(cache,dumpfile);
-	}
 	
-	@Override
-	public void dump2file() {
-		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile);
-		BackendStorage.dump2file(cache,dumpfile);
-	}
-
-
-	@Override
-	public void clearCache() {
-		synchronized (cache) {
-			Iterator<String> iter = cache.keySet().iterator();
-			while (iter.hasNext()) {
-				String key = iter.next();
-				cache.get(key).clear(); 
-				iter.remove();
-			}
-		}
-	}
-
 	/**
 	 * The method search for the LastStatus object stored in the cache that has 
 	 * a timestamp closest to the time parameter.
@@ -605,29 +768,5 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		
 		return index;
 	}
-
-	@Override
-	public void clear() {
-		clearCache();
-	}
-
-
-	/*
-	@Override
-	public Integer exp(File expfile) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Integer imp(File impfile) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	*/
-/*
-	public void setFullListDef(boolean notFullListParse) {
-		LastStatusCache.notFullListParse = notFullListParse;
-	}
-*/
+	
 }

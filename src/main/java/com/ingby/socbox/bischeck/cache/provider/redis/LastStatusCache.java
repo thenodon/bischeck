@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -56,6 +57,7 @@ import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.provider.redis.Lookup;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.sun.org.apache.bcel.internal.generic.LOOKUPSWITCH;
 
 
 /**
@@ -172,11 +174,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			} catch (NumberFormatException ne) {
 				fifosize = 500;
 			}
-	/*		
-			if (ConfigurationManager.getInstance().getProperties().
-					getProperty("notFullListParse","false").equalsIgnoreCase("true"))
-				notFullListParse=true;
-		*/	
+
 			lsc.updateRuntimeMetaData();
 		}
 		
@@ -185,6 +183,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	public void updateRuntimeMetaData() {
 		Map<String, Host> hostsmap = ConfigurationManager.getInstance().getHostConfig();
 		Jedis jedis = jedispool.getResource();
+		deleteAllMetaData(jedis);
 		try {
 
 			for (Map.Entry<String, Host> hostentry : hostsmap.entrySet()) {
@@ -194,21 +193,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 					Service service = serviceentry.getValue();
 
 					for (Map.Entry<String, ServiceItem> serviceItemEntry : service.getServicesItems().entrySet()) {
-						ServiceItem serviceItem = serviceItemEntry.getValue();
-						String key = "config/"+Util.fullName(host.getHostname(),service.getServiceName(), serviceItem.getServiceItemName());
-						jedis.hset(key,"hostDesc",checkNull(host.getDecscription()));
-						jedis.hset(key,"serviceDesc",checkNull(service.getDecscription()));
-						jedis.hset(key,"serviceConnectionUrl",service.getConnectionUrl());
-						jedis.hset(key,"serviceDriverClass",checkNull(service.getDriverClassName()));
-						int i = 0;
-						for (String schedule:service.getSchedules()){
-							jedis.hset(key,"serviceSchedule-"+i ,checkNull(schedule));
-							i++;
-						}
-						jedis.hset(key,"serviceItemDesc",checkNull(serviceItem.getDecscription()));
-						jedis.hset(key,"serviceItemExecuteStatement",checkNull(serviceItem.getExecutionStat()));
-						jedis.hset(key,"serviceItemClassName",checkNull(serviceItem.getClassName()));
-						jedis.hset(key,"serviceItemThresholdClass",checkNull(serviceItem.getThresholdClassName()));
+						updateMetaData(jedis, host, service, serviceItemEntry);
 					}
 				}
 			}
@@ -220,21 +205,23 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	}
 
-	private String checkNull(String str) {
-		if (str == null)
-			return "";
-		return str;
-	}
 
-	private void testConnection() {
-		jedispool.getResource();
-	}
-	
-	/**
-	 * Add value form the serviceitem
-	 * @param service
-	 * @param serviceitem
+
+	/*
+	 ***********************************************
+	 ***********************************************
+	 * Implement CacheInf
+	 ***********************************************
+	 ***********************************************
 	 */
+	
+	/*
+	 ***********************************************
+	 * Add methods
+	 ***********************************************
+	 */
+	
+	@Override
 	public  void add(Service service, ServiceItem serviceitem) {
 
 		String key = Util.fullName(service, serviceitem);
@@ -243,15 +230,16 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 
 	@Override
-	public void add(LastStatus ls, String hostname, String servicename,
-			String serviceitemname) {
-		String key = Util.fullName(hostname, servicename, serviceitemname); 
+	public void add(LastStatus ls, 
+			String hostName, 
+			String serviceName,
+			String serviceItemName) {
+		String key = Util.fullName(hostName, serviceName, serviceItemName); 
 		add(ls,key);
 		
 	}
 	
 	
-
 	@Override
 	public void add(LastStatus ls, String key) {
 		LinkedList<LastStatus> fifo;
@@ -282,87 +270,53 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	
-
+	
+	/*
+     ***********************************************
+	 * Get data methods - LastStatus
+	 ***********************************************
+	 */
 
 	@Override
-	public String getIndex(String hostname, String serviceName,
-			String serviceItemName, int index) {
+	public LastStatus getLastStatusByTime(String host, String service,
+			String serviceitem, long timestamp) {
+		String key = Util.fullName( host, service, serviceitem);
 		
-		Jedis jedis = jedispool.getResource();
-		
-		
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		
-		lu.setOptimizIndex(key,index);
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Find cache data for " + key + " at time " + new java.util.Date(timestamp));
 		
 		LastStatus ls = null;
-		try {
-			if (cache.get(key) != null && index < cache.get(key).size()-1) {
-				if (LOGGER.isDebugEnabled() ) {
-					LOGGER.debug("Fast cache used for key " + key +" index " + index);
-				}
-				incFastCacheCount();
-				ls = cache.get(key).get(index);
-			}
-			else {
-				if (LOGGER.isDebugEnabled() ) {
-					LOGGER.debug("Redis cache used for key " + key +" index " + index);
-				}
-				String redstr = jedis.lindex(key, index);
 
-				if (redstr == null)
-					return null;
-				else {
-					incRedisCacheCount();	
-					ls = new LastStatus(redstr);
-				}
-			}
+		Jedis jedis = jedispool.getResource();
+		//String id = lu.getIdByName(key);
+		
+		try {	
+			if (jedis.llen(key) == 0)
+				return null;
+
+			ls = nearest(timestamp, key);
+
 		} catch (JedisConnectionException je) {
 			LOGGER.error("Redis connection failed: " + je.getMessage());
 		} finally {
 			jedispool.returnResource(jedis);
 		}
-		
-		if (ls == null)
+		if (ls == null) 
 			return null;
 		else
-			return ls.getValue();
+			return ls;    
 	}
 
-
-	private List<LastStatus> getLastStatusByIndexStartEnd(String hostname, String serviceName,
-			String serviceItemName, int fromindex, int toindex) {
+	@Override
+	public LastStatus getLastStatusByIndex(String hostName, String serviceName,
+			String serviceItemName, long index) {
 		
 		Jedis jedis = jedispool.getResource();
 		
 		
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		List<String> lsstr = null;
-		try {
-			lsstr = jedis.lrange(key, toindex, fromindex);
-		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
-		} finally {
-			jedispool.returnResource(jedis);
-		}	
+		String key = Util.fullName( hostName, serviceName, serviceItemName);
 		
-		List<LastStatus> lslist = new  ArrayList<LastStatus>();
-		for (String redstr: lsstr) {
-			LastStatus ls = new LastStatus(redstr);
-			lslist.add(ls);
-		}
-		return lslist;
-	}
-	
-	private LastStatus getLastStatusByIndex(String hostname, String serviceName,
-			String serviceItemName, int index) {
-		
-		Jedis jedis = jedispool.getResource();
-		
-		
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		
-		lu.setOptimizIndex(key,index);
+		lu.setOptimizIndex(key, index);
 		
 		LastStatus ls = null;
 		try {
@@ -371,7 +325,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 					LOGGER.debug("Fast cache used for key " + key +" index " + index);
 				}
 				incFastCacheCount();
-				ls = cache.get(key).get(index);
+				ls = cache.get(key).get((int)index);
 			}
 			else {
 				if (LOGGER.isDebugEnabled() ) {
@@ -395,53 +349,193 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		return ls;
 	}
 
+	@Override
+	public List<LastStatus> getLastStatusListByTime(String host, 
+			String service, 
+			String serviceitem, 
+			long from, long to) {
+		Long indfrom = this.getIndexByTime( 
+				host,
+				service, 
+				serviceitem,from);
+		if (indfrom == null) {
+			LOGGER.debug("No data for from timestamp "+ from);
+			return null;
+		}
+		LOGGER.info("Index from " + indfrom);
+		Long indto = this.getIndexByTime( 
+				host,
+				service, 
+				serviceitem,to);
+		if (indto == null) {
+			LOGGER.debug("No data for from timestamp "+ to);
+			return null;
+		}
+		LOGGER.info("Index from " + indto);
+		
+		List<LastStatus> lslist = new ArrayList<LastStatus>();
+		
+		lslist = getLastStatusListByIndex(host, service, serviceitem, indfrom,indto);
+		
+		return lslist;
+	}
+
+	@Override
+	public List<LastStatus> getLastStatusListByIndex(String hostName, String serviceName,
+			String serviceItemName, long fromIndex, long toIndex) {
+		
+		
+		long numberOfindex = toIndex-fromIndex;
+		if (numberOfindex > Integer.MAX_VALUE){
+			toIndex = Integer.MAX_VALUE;
+		}
 	
-	/**
-     * Get the value in the cache for the host, service and service item that  
-     * is closed in time to a cache data. 
-     * The method do the search by a number splitting and then search.
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @param time
-     * @return the value
-     */
-	public String getByTime(String hostname, String serviceName,
-			String serviceItemName, long stime) {
 		
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Find cache data for " + key + " at time " + new java.util.Date(stime));
-		
-		LastStatus ls = null;
 
 		Jedis jedis = jedispool.getResource();
-		//String id = lu.getIdByName(key);
 		
-		try {	
-			if (jedis.llen(key) == 0)
-				return null;
+		String key = Util.fullName( hostName, serviceName, serviceItemName);
 
-			ls = nearest(stime, key);
-
+		List<String> lsstr = null;
+		try {
+			lsstr = jedis.lrange(key, fromIndex, toIndex);
 		} catch (JedisConnectionException je) {
 			LOGGER.error("Redis connection failed: " + je.getMessage());
 		} finally {
 			jedispool.returnResource(jedis);
+		}	
+		
+		List<LastStatus> lslist = new  ArrayList<LastStatus>();
+		for (String redstr: lsstr) {
+			LastStatus ls = new LastStatus(redstr);
+			lslist.add(ls);
 		}
+		return lslist;
+
+	}
+
+
+	@Override
+	public List<LastStatus> getLastStatusListAll(String hostName,
+			String serviceName, 
+			String serviceItemName) {
+		
+		List<LastStatus> lslist = new ArrayList<LastStatus>();
+		
+		lslist = getLastStatusListByIndex(hostName, serviceName, serviceItemName, 0L, getLastIndex(hostName, serviceName, serviceItemName));
+		
+		return lslist;
+	}
+	
+    /*
+     ***********************************************
+	 * Get data methods - String
+	 ***********************************************
+	 */
+
+	@Override
+	public String getByIndex(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long index) {
+		
+		LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
 		if (ls == null) 
 			return null;
 		else
-			return ls.getValue();    
+			return ls.getValue();
+		
 	}
 
-	
+
 	@Override
-	public long getLastIndex(String hostname, String serviceName,
-			String serviceItemName) {
+	public String getByIndex(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long fromIndex, long toIndex,
+			String separator) {
+		List<LastStatus> lslist = getLastStatusListByIndex(hostName, serviceName, serviceItemName, fromIndex, toIndex);
 		
-		String key = Util.fullName( hostname, serviceName, serviceItemName);
+		if (lslist == null)
+			return null;
+		
+		if (lslist.isEmpty())
+			return null;
+		
+		StringBuffer strbuf = new StringBuffer();
+		for (LastStatus ls : lslist) {
+			strbuf.append(ls.getValue()).append(separator);
+		}
+		String str = strbuf.toString();
+		return str.substring(0, str.lastIndexOf(separator));
+	}
+
+	@Override
+	public String getByTime(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long timestamp) {
+		
+		LastStatus ls = getLastStatusByTime(hostName, serviceName, serviceItemName, timestamp);
+		if (ls == null) 
+			return null;
+		else
+			return ls.getValue();
+	}	
+
+	@Override
+	public String getByTime(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long from, long to, 
+			String separator) {
+		
+		List<LastStatus> lslist = getLastStatusListByTime(hostName, serviceName, serviceItemName, from, to);
+		
+		if (lslist == null)
+			return null;
+		
+		StringBuffer strbuf = new StringBuffer();
+		for (LastStatus ls : lslist) {
+			strbuf.append(ls.getValue()).append(separator);
+		}
+		String str = strbuf.toString();
+
+		return str.substring(0, str.lastIndexOf(separator));
+	}
+
+
+	@Override
+	public String getAll(String hostName, 
+			String serviceName,
+			String serviceItemName,
+			String separator) {
+
+
+		List<LastStatus> lslist = getLastStatusListAll(hostName, serviceName, serviceItemName);
+		
+		if (lslist.isEmpty())
+			return null;
+		
+		StringBuffer strbuf = new StringBuffer();
+		for (LastStatus ls : lslist) {
+			strbuf.append(ls.getValue()).append(separator);
+		}
+		String str = strbuf.toString();
+
+		return str.substring(0, str.lastIndexOf(separator));
+	}
+
+    /*
+     ***********************************************
+	 * Position and size methods
+	 ***********************************************
+	 */
+	@Override
+    public Long size(String hostName, String serviceName,
+			String serviceItemName) {
+
+    	String key = Util.fullName( hostName, serviceName, serviceItemName);
 		
 		Jedis jedis = jedispool.getResource();
 		Long size = 0L;
@@ -452,12 +546,12 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		} finally {
 			jedispool.returnResource(jedis);
 		}
-		return size-1;
+		return size;
 	}
 
 
 	@Override
-	public Integer getByTimeIndex(String hostname, String serviceName,
+	public Long getIndexByTime(String hostname, String serviceName,
 			String serviceItemName, long stime) {
 		
 		String key = Util.fullName( hostname, serviceName, serviceItemName);
@@ -466,7 +560,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		
 		Jedis jedis = jedispool.getResource();
 		//String id = lu.getIdByName(key);
-		Integer index = null;
+		Long index = null;
 
 		try {
 			if (jedis.llen(key) == 0)
@@ -484,73 +578,135 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 	
 	
-	/**
-     * Get the size of the cache entries, the number of unique host, service 
-     * and service item entries. 
-     * @return size of the cache index
-     */
-	
-	private  int size() {
-		return cache.size();
-	}
-	 
-	/**
-     * The size for the specific host, service, service item entry.
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @return size of cached values for a specific host-service-serviceitem
-     */
-    public int sizeLru(String hostname, String serviceName,
-			String serviceItemName) {
-
-    	String key = Util.fullName( hostname, serviceName, serviceItemName);
-		return cache.get(key).size();
-	}
-	
-	
 
 	@Override
-	public List<LastStatus> getLastStatusList(String host, 
-			String service, 
-			String serviceitem, 
-			long from, long to) throws CacheException {
-		Integer indfrom = this.getByTimeIndex( 
-				host,
-				service, 
-				serviceitem,from);
-		if (indfrom == null) {
-			throw new CacheException("No data for from timestamp "+ from);
-		}
-		Integer indto = this.getByTimeIndex( 
-				host,
-				service, 
-				serviceitem,to);
-		if (indto == null) {
-			throw new CacheException("No data for to timestamp "+ to);
-		}
-		
-		List<LastStatus> lslist = new ArrayList<LastStatus>();
-		LOGGER.debug("From index " + indfrom);
-		LOGGER.debug("To index " + indto);
-		
-		lslist = getLastStatusByIndexStartEnd(host, service, serviceitem, indfrom,indto);
-		/*
-		for (int index = indto; index <= indfrom; index++) {
-			LastStatus ls = getLastStatusByIndex(host, service, serviceitem, index);
-			lslist.add(ls);
-		}
-		*/
-		return lslist;
+	public long getLastIndex(String hostName, String serviceName,
+			String serviceItemName) {
+		return size(hostName, serviceName, serviceItemName) - 1;
 	}
 	
+	@Override
+	public long getLastTime(String hostName, 
+			String serviceName, 
+			String serviceItemName) {
+		long lastindex = getLastIndex(hostName, serviceName, serviceItemName);
+		long lasttimestamp = getLastStatusByIndex(hostName, serviceName, serviceItemName, lastindex).getTimestamp();
+		LOGGER.debug("Last index is" + lastindex + " and have timestamp " + lasttimestamp);
+		return lasttimestamp;
+	}
+
+	
+	
+	/*
+     ***********************************************
+	 * Clear methods
+	 ***********************************************
+	 */
+	@Override
+	public void clear() {
+		Jedis jedis = jedispool.getResource();
+		try {
+			clearFastCache();
+			jedis.flushDB();
+		} catch (JedisConnectionException je) {
+			LOGGER.error("Redis connection failed: " + je.getMessage());
+		} finally {
+			jedispool.returnResource(jedis);
+		}
+	}
+
+	@Override
+	public void clear(String hostName, String serviceName,
+			String serviceItemName) {
+		Jedis jedis = jedispool.getResource();
+		
+		String key = Util.fullName( hostName, serviceName, serviceItemName);
+		
+		try {
+			jedis.del(key);
+		} catch (JedisConnectionException je) {
+			LOGGER.error("Redis connection failed: " + je.getMessage());
+		} finally {
+			jedispool.returnResource(jedis);
+		}	
+	}
+
+
+    /*
+     ***********************************************
+	 * Close methods
+	 ***********************************************
+	 */
+	
+	@Override
+	public void close() {
+		
+	}
+
+	/*
+	 ***********************************************
+	 ***********************************************
+	 * Implement LastStatusMBean
+	 ***********************************************
+	 ***********************************************
+	 */
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getFastCacheCount()
+	 */
+	@Override
+	public long getFastCacheCount() {
+		return fastcachehitcount;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getRedisCacheCount()
+	 */
+	@Override
+	public long getRedisCacheCount() {
+		return rediscachehitcount;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getCacheRatio()
+	 */
+	@Override
+	public int getCacheRatio() {
+		if(rediscachehitcount == 0L)
+			return 100;
+		else
+			return (int) (fastcachehitcount*100/(rediscachehitcount+fastcachehitcount));
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#dump2file()
+	 */	
+	@Override
+	public void dump2file() {
+		//BackendStorage.dump2file(cache,lastStatusCacheDumpFile);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#clearCache()
+	 */
+	@Override
+	public void clearCache() {
+		clear();
+		
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getLastStatusCacheCount()
 	 */
 	@Override
 	public int getLastStatusCacheCount() {
-		return this.size();
+		return cache.size();
 	}
 
 
@@ -574,32 +730,53 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
+	/*
+	 ***********************************************
+	 ***********************************************
+	 * Private methods
+	 ***********************************************
+	 ***********************************************
+	 */
 
-
-	public void close() {
-		//BackendStorage.dump2file(cache,lastStatusCacheDumpFile);
-	}
-	
-	
-	@Override
-	public void dump2file() {
-		//BackendStorage.dump2file(cache,lastStatusCacheDumpFile);
-	}
-
-
-	@Override
-	public void clearCache() {
-		Jedis jedis = jedispool.getResource();
-		try {
-			clearFastCache();
-			jedis.flushDB();
-		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
-		} finally {
-			jedispool.returnResource(jedis);
+	private void deleteAllMetaData(Jedis jedis) {
+		Set<String> runtimeEntries = jedis.keys("config/*");
+		for (String entry: runtimeEntries) {
+			jedis.del(entry);
 		}
-		
 	}
+
+	private void updateMetaData(Jedis jedis, Host host, Service service,
+			Map.Entry<String, ServiceItem> serviceItemEntry) {
+		ServiceItem serviceItem = serviceItemEntry.getValue();
+		String key = "config/"+Util.fullName(host.getHostname(),service.getServiceName(), serviceItem.getServiceItemName());
+		jedis.hset(key,"hostDesc",checkNull(host.getDecscription()));
+		jedis.hset(key,"serviceDesc",checkNull(service.getDecscription()));
+		jedis.hset(key,"serviceConnectionUrl",service.getConnectionUrl());
+		jedis.hset(key,"serviceDriverClass",checkNull(service.getDriverClassName()));
+		int i = 0;
+		for (String schedule:service.getSchedules()){
+			jedis.hset(key,"serviceSchedule-"+i ,checkNull(schedule));
+			i++;
+		}
+		jedis.hset(key,"serviceItemDesc",checkNull(serviceItem.getDecscription()));
+		jedis.hset(key,"serviceItemExecuteStatement",checkNull(serviceItem.getExecutionStat()));
+		jedis.hset(key,"serviceItemClassName",checkNull(serviceItem.getClassName()));
+		jedis.hset(key,"serviceItemThresholdClass",checkNull(serviceItem.getThresholdClassName()));
+	}
+
+	private String checkNull(String str) {
+		if (str == null)
+			return "";
+		return str;
+	}
+
+	private void testConnection() {
+		jedispool.getResource();
+	}
+	
+	
+
+
 
 	private void clearFastCache() {
 		Iterator<String> iter = cache.keySet().iterator();
@@ -728,7 +905,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * @param listtosearch
 	 * @return cache index
 	 */
-	private Integer nearestByIndexFast(long time, String key) {
+	private Long nearestByIndexFast(long time, String key) {
 		
 		LinkedList<LastStatus> listtosearch =  cache.get(key);
 		if (listtosearch == null)
@@ -738,14 +915,14 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			return null;
 		}
 		
-		Integer index = null;
+		Long index = null;
 		long bestDistanceFoundYet = Long.MAX_VALUE;
 		
-		for (int i = 0; i < listtosearch.size(); i++) {
-			long d1 = Math.abs(time - listtosearch.get(i).getTimestamp());
+		for (long i = 0; i < listtosearch.size(); i++) {
+			long d1 = Math.abs(time - listtosearch.get((int) i).getTimestamp());
 			long d2;
 			if (i+1 < listtosearch.size())
-				d2 = Math.abs(time - listtosearch.get(i+1).getTimestamp());
+				d2 = Math.abs(time - listtosearch.get((int) i+1).getTimestamp());
 			else 
 				d2 = Long.MAX_VALUE;
 
@@ -765,9 +942,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		return index;
 	}
 
-	private Integer nearestByIndexSlow(long time, String key) {
+	private Long nearestByIndexSlow(long time, String key) {
 		// Search the redis cache
-		Integer index = null;
+		Long index = null;
 		Jedis jedis = jedispool.getResource();
 		try {	
 			if (time > new LastStatus(jedis.lindex(key, 0L)).getTimestamp() || 
@@ -781,7 +958,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			long bestDistanceFoundYet = Long.MAX_VALUE;
 			long size = jedis.llen(key);
 
-			for (int i = 0; i < size; i++) {
+			for (long i = 0; i < size; i++) {
 				long d1 = Math.abs(time - new LastStatus(jedis.lindex(key, i)).getTimestamp());
 				long d2;
 				if (i+1 < size)
@@ -808,11 +985,11 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	
-	private Integer nearestByIndex(long time, String key) {
+	private Long nearestByIndex(long time, String key) {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Find value in cache at index " + new java.util.Date(time));
 		
-		Integer index = null;
+		Long index = null;
 		
 		// Search the fast cache first. If a hit is in the fast cache return 
 		index = nearestByIndexFast(time, key);
@@ -830,20 +1007,6 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	
-	
-	@Override
-	public void clear() {
-		clearCache();
-	}
-
-
-/*
-	public void setFullListDef(boolean notFullListParse) {
-		LastStatusCache.notFullListParse = notFullListParse;
-	}
-*/
-
-	
 	private synchronized void incFastCacheCount(){
 		fastcachehitcount++;
 		if (fastcachehitcount == Long.MAX_VALUE)
@@ -857,24 +1020,5 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			rediscachehitcount = 0L;
 	}
 
-	
-	@Override
-	public long getFastCacheCount() {
-		return fastcachehitcount;
-	}
 
-	
-	@Override
-	public long getRedisCacheCount() {
-		return rediscachehitcount;
-	}
-
-	
-	@Override
-	public int getCacheRatio() {
-		if(rediscachehitcount == 0L)
-			return 100;
-		else
-			return (int) (fastcachehitcount*100/(rediscachehitcount+fastcachehitcount));
-	}
 }

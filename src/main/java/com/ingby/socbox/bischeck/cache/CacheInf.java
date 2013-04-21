@@ -24,14 +24,24 @@ import java.util.List;
 
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
-
+/**
+ * 
+ * @author andersh
+ *
+ */
 public interface CacheInf {
 
 	public static final String ENDMARK = "END";
 	public static final String JEPLISTSEP = ",";
 
+	/*
+	 ***********************************************
+	 * Add methods
+	 ***********************************************
+	 */
+	
 	/**
-	 * Add value from the service and serviceitem
+	 * Add value from the service and its serviceitem at index 0.
 	 * @param service
 	 * @param serviceitem
 	 */
@@ -39,22 +49,180 @@ public interface CacheInf {
 
 
 	/**
-	 * Add value from a LastStatus object
-	 * @param service
-	 * @param serviceitem
+	 * Add value from a LastStatus object. The value is added as index 0.
+	 * @param ls
+	 * @param hostName
+	 * @param serviceName
+	 * @param serviceItemName
 	 */
-	public void add(LastStatus ls, String hostname, String servicename, String serviceitemname);
+	public void add(LastStatus ls, 
+			String hostName, 
+			String serviceName, 
+			String serviceItemName);
 
 	
 	/**
-	 * Add a LastStatus object tot the cache.  
+	 * Add a LastStatus object to the cache at index 0.  
 	 * @param ls
 	 * @param key the key should be created by method {@link Util.fullName} to get correct quoting on the names
 	 */
 	public void add(LastStatus ls, String key);
 	
 	
+    /*
+     ***********************************************
+	 * Get data methods - LastStatus
+	 ***********************************************
+	 */
+	/**
+	 * Get a the LastStatus object closest to the time defined byt the timestamp
+	 * @param hostName
+	 * @param serviceName
+	 * @param serviceItemName
+	 * @param timestamp
+	 * @return LastStatus object closest to the timestamp or null if the 
+	 * timestamp are outside the range of existing data
+	 */
+    public LastStatus getLastStatusByTime(String hostName, 
+    		String serviceName, 
+    		String serviceItemName,
+			long timestamp);
+    
+    /**
+     * Get a the LastStatus object at the index. 
+     * @param hostName
+     * @param serviceName
+     * @param serviceItemName
+     * @param index
+     * @return LastStatus object at index. If the index is out of range null is 
+     * returned
+     */
+    public LastStatus getLastStatusByIndex(String hostName, 
+    		String serviceName, 
+    		String serviceItemName,
+    		long index);
+
+    /**
+     * Get a List of LastStatus objects from the from timestamp to the to 
+     * timestamp. The max number returned can never be more then the maximum 
+     * size of the List.
+     * @param hostName
+     * @param serviceName
+     * @param serviceItemName
+     * @param from
+     * @param to
+     * @return a List of Laststatus objects. If the from or to are out of cache 
+     * range null will be returned 
+     */
+    public List<LastStatus> getLastStatusListByTime(String hostName, 
+			String serviceName, 
+			String serviceItemName, 
+			long from, long to);
+    
+    
+    /**
+     * Get a List of LastStatus objects from indexfrom to indexto. The max 
+     * number returned can never be more then the maximum size of the List.
+     * @param hostName
+     * @param serviceName
+     * @param serviceitemName
+     * @param fromIndex
+     * @param toIndex
+     * @return
+     */
+    public List<LastStatus> getLastStatusListByIndex(String hostName, 
+			String serviceName, 
+			String serviceitemName, 
+			long fromIndex, long toIndex);
+    
+
+    /**
+     * Get all data in the cache, but never more then then max size of a List.
+     * @param hostName
+     * @param serviceName
+     * @param serviceitemName
+     * @return
+     */
+	public List<LastStatus> getLastStatusListAll(String hostName,
+			String serviceName, 
+			String serviceItemName);
+
+
+    /*
+     ***********************************************
+	 * Get data methods - String
+	 ***********************************************
+	 */
 	
+	/**
+	 * Get the value in the cache for the host, service and service item at 
+	 * cache location according to index, where index 0 is the last inserted. 
+	 * @param hostName
+	 * @param serviceName
+	 * @param serviceItemName
+	 * @param index
+	 * @return the cache value at index. If the index is out of range null is 
+	 * returned
+	 */
+	public String getByIndex(String hostName, 
+			String serviceName, 
+			String serviceItemName,
+			long index);
+
+	/**
+	 * Return the cache values separated with the separator string.
+	 * @param hostName
+	 * @param serviceName
+	 * @param serviceItemName
+	 * @param fromIndex
+	 * @param toIndex
+	 * @param separator
+	 * @return the values in a String separated by the separator string. If both 
+	 * from and to index are out of range null is returned. If only to index is 
+	 * out of range to index will be the same as the current size of cached 
+	 * elements.
+	 */
+	public String getByIndex(String hostName, 
+			String serviceName, 
+			String serviceItemName,
+			long fromIndex, long toIndex, 
+			String separator);
+
+	
+	/**
+     * Get the value in the cache for the host, service and service item that  
+     * is closed in time to a cache data. 
+     * The method do the search by a number splitting and then search.
+     * @param hostName
+	 * @param serviceName
+	 * @param serviceItemName
+	 * @param timestamp
+	 * @return
+	 */
+	public String getByTime(String hostName, 
+			String serviceName, 
+			String serviceItemName,
+			long timestamp);
+
+
+	public String getByTime(String hostName, 
+			String serviceName, 
+			String serviceItemName,
+			long from, long to, 
+			String separator);
+    
+
+	public String getAll(String hostName,
+			String serviceName, 
+			String serviceItemName,
+			String separator);
+
+    /*
+     ***********************************************
+	 * Position and size methods
+	 ***********************************************
+	 */
+	 
 	/**
      * The size for the specific host, service, service item entry.
      * @param hostname
@@ -62,85 +230,72 @@ public interface CacheInf {
      * @param serviceItemName
      * @return size of cached values for a specific host-service-serviceitem
      */
-    public int sizeLru(String hostname, String serviceName,
+    public Long size(String hostname, String serviceName,
 			String serviceItemName);
 
-	
-	
-    /**
-     * 
-     * @param host
-     * @param service
-     * @param serviceitem
-     * @param from
-     * @param to
+	/**
+	 * Get cache index for element closest to the timestamp, where timestamp is the time
+	 * in milliseconds "back" in time.
+	 * @param hostName
+     * @param serviceName
+     * @param serviceItemName
+     * @param timestamp
      * @return
-     * @throws CacheException if the from and to timestamps do not have any data
      */
-    public List<LastStatus> getLastStatusList(String host, 
-			String service, 
-			String serviceitem, 
-			long from, long to) throws CacheException;
-    /**
+	public Long getIndexByTime(String hostName, 
+			String serviceName,
+			String serviceItemName, 
+			long timestamp);
+
+	/**
+	 * Get the last index in the cache for the host, service and serviceitem 
+	 * @param hostName
+	 * @param serviceName
+	 * @param serviceItemName
+	 * @return
+	 */
+	public long getLastIndex(String hostName, 
+			String serviceName, 
+			String serviceItemName);
+
+	public long getLastTime(String hostName, 
+			String serviceName, 
+			String serviceItemName);
+
+	/*
+     ***********************************************
+	 * Clear methods
+	 ***********************************************
+	 */
+
+	/**
      * Clear everything in the cache
      * @return
      */
     public void clear();
     
+    /**
+     * Delete the cache data for a specific entry
+     * @param hostName
+     * @param serviceName
+     * @param serviceItemName
+     */
+    public void clear(String hostName, 
+    		String serviceName, 
+    		String serviceItemName);
+
     
+    /*
+     ***********************************************
+	 * Close methods
+	 ***********************************************
+	 */
+
     /**
      * Close the cache and make sure all data is saved
      */
     public void close();
 
 
-
-	/**
-	 * Get the value in the cache for the host, service and service item at 
-	 * cache location according to index, where index 0 is the last inserted. 
-	 * @param hostname
-	 * @param serviceName
-	 * @param serviceItemName
-	 * @param index
-	 * @return the value
-	 */
-	public String getIndex(String host, String service, String serviceitem,
-			int index);
-
-
-	/**
-	 * Get cache index for element closest to the timestamp, where timestamp is the time
-	 * in milliseconds "back" in time.
-	 * @param hostname
-	 * @param serviceName
-	 * @param serviceItemName
-	 * @param timestamp
-	 * @return
-	 */
-	public Integer getByTimeIndex(String host, String service,
-			String serviceitem, long timestamp);
-
-	/**
-	 * Get the last index in the cache for the host, service and serviceitem 
-	 * @param host
-	 * @param service
-	 * @param serviceitem
-	 * @return
-	 */
-	public long getLastIndex(String host, String service, String serviceitem);
-
-
-	/**
-     * Get the value in the cache for the host, service and service item that  
-     * is closed in time to a cache data. 
-     * The method do the search by a number splitting and then search.
-     * @param hostname
-     * @param serviceName
-     * @param serviceItemName
-     * @param timestamp
-     * @return the value
-     */
-	public String getByTime(String host, String service, String serviceitem,
-			long timestamp);
 
 }
