@@ -30,6 +30,7 @@ import java.util.List;
 
 
 import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -530,6 +531,15 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	public void close() {
 		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile); 
 		BackendStorage.dump2file(cache,dumpfile);
+	
+		try {
+			mbs.unregisterMBean(mbeanname);
+		} catch (MBeanRegistrationException e) {
+			LOGGER.warn("Mbean " + mbeanname +" could not be unregistered",e);
+		} catch (InstanceNotFoundException e) {
+			LOGGER.warn("Mbean " + mbeanname +" instance could not be found",e);
+		}
+		
 	}
 	
 

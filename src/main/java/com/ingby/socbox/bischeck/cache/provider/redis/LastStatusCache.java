@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -362,7 +363,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			LOGGER.debug("No data for from timestamp "+ from);
 			return null;
 		}
-		LOGGER.info("Index from " + indfrom);
+		LOGGER.debug("Index from " + indfrom);
 		Long indto = this.getIndexByTime( 
 				host,
 				service, 
@@ -371,7 +372,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			LOGGER.debug("No data for from timestamp "+ to);
 			return null;
 		}
-		LOGGER.info("Index from " + indto);
+		LOGGER.debug("Index from " + indto);
 		
 		List<LastStatus> lslist = new ArrayList<LastStatus>();
 		
@@ -640,7 +641,17 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	
 	@Override
 	public void close() {
+		jedispool.destroy();
+
+		try {
+			mbs.unregisterMBean(mbeanname);
+		} catch (MBeanRegistrationException e) {
+			LOGGER.warn("Mbean " + mbeanname +" could not be unregistered",e);
+		} catch (InstanceNotFoundException e) {
+			LOGGER.warn("Mbean " + mbeanname +" instance could not be found",e);
+		}
 		
+
 	}
 
 	/*
