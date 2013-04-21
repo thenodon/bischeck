@@ -3,7 +3,7 @@ package com.ingby.socbox.bischeck.cache.provider.redis;
 public class Optimizer {
 
 	String key = null;
-	int highindex = 0;
+	long highindex = 0;
 	
 	public Optimizer(String key) {
 		this.key = key;
@@ -13,12 +13,12 @@ public class Optimizer {
 		return key;
 	}
 	
-	public void setIndex(int index) {
+	public void setIndex(long index) {
 		if (index > highindex)
 			highindex = index;
 	}
 	
-	public int getHighIndex() {
+	public long getHighIndex() {
 		return highindex;
 	}
 	

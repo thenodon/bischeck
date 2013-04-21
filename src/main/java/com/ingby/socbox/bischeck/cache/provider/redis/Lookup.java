@@ -105,7 +105,7 @@ public final class Lookup {
 	}
 	
 	
-	public void setOptimizIndex(String keyname, int index){
+	public void setOptimizIndex(String keyname, long index){
 		Optimizer opti = optimizer.get(keyname);
 		if (opti == null) {
 			optimizer.put(keyname, new Optimizer(keyname));
