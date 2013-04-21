@@ -22,6 +22,8 @@ package testng.com.ingby.socbox.bischeck.cache;
 
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.testng.Assert;
 
@@ -32,6 +34,7 @@ import org.testng.annotations.Test;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
+import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
@@ -47,7 +50,8 @@ public class CacheInfTest {
 	String serviceItemName = "_service.item_123";
 	String cachekey = Util.fullName(hostName, serviceName, serviceItemName);
 
-
+	Map<String,CacheInf> caches = new HashMap<String,CacheInf>();
+	
 	@BeforeTest
 	public void beforeTest() throws Exception {
 
@@ -59,25 +63,36 @@ public class CacheInfTest {
 			confMgmr = ConfigurationManager.getInstance();	
 		}
 		
-		CacheFactory.init();
+		//caches.put("LastStatusCache", new com.ingby.socbox.bischeck.cache.provider.laststatuscache.)
+		
 	}
 
-	
-	@AfterTest
-	public void afterTest() throws Exception {
-		CacheInf cache = CacheFactory.getInstance();
-		cache.clear(hostName, serviceName, serviceItemName);
-	}
 	
 	
 	@Test (groups = { "Cache" })
-	public void verifyCache() {
+	public void verifyCache() throws CacheException {
 
+		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.laststatuscache.LastStatusCache");
 		CacheInf cache = CacheFactory.getInstance();
+		cache.clear(hostName, serviceName, serviceItemName);
+		verifyCacheImp(cache);
+		cache.clear(hostName, serviceName, serviceItemName);
+		CacheFactory.close();
 		
+		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
+		cache = CacheFactory.getInstance();
+		cache.clear(hostName, serviceName, serviceItemName);
+		verifyCacheImp(cache);
+		cache.clear(hostName, serviceName, serviceItemName);
+		CacheFactory.close();
+		
+		
+	}
+
+
+	private void verifyCacheImp(CacheInf cache) {
 		long current = System.currentTimeMillis() - 22*300*1000;
 
-		cache.clear(hostName, serviceName, serviceItemName);
 		
 		for (int i = 1; i < 11; i++) {
 			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
@@ -113,8 +128,6 @@ public class CacheInfTest {
 				"19,18,17,16,15,14,13,12,null,10,9,8,7,6,5,4,3,2,1");
 		Assert.assertEquals(cache.getByTime(hostName, serviceName, serviceItemName, System.currentTimeMillis()-13*60*1000, 
 				cache.getLastTime(hostName, serviceName, serviceItemName), ","),"19,18,17,16,15,14,13,12,null,10,9,8,7,6,5,4,3,2,1");
-		
-		
 	}
 
 }
