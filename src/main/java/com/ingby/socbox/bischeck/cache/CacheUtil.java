@@ -108,7 +108,7 @@ public abstract class CacheUtil {
 			StringTokenizer ind = new StringTokenizer(indexstr,CacheInf.JEPLISTSEP);
 			while (ind.hasMoreTokens()) {
 				strbuf.append(
-						cache.getIndex( 
+						cache.getByIndex( 
 								host,
 								service, 
 								serviceitem,
@@ -124,20 +124,22 @@ public abstract class CacheUtil {
 			 * The element closest to time T at time granularity based on c 
 			 * that is S, M or H. 
 			 */ 
+			
 			StringTokenizer ind = new StringTokenizer(indexstr,":");
 			String indfromTime = ind.nextToken();
-			Integer indfrom = cache.getByTimeIndex( 
+			
+			Long indfrom = cache.getIndexByTime( 
 					host,
 					service, 
 					serviceitem,
 					System.currentTimeMillis() + CacheUtil.calculateByTime(indfromTime)*1000);
 			
 			String indtoTime = ind.nextToken();
-			Integer indto;
+			Long indto;
 			if (indtoTime.equals(CacheInf.ENDMARK)) {
-				indto = (int) cache.getLastIndex(host, service, serviceitem);
+				indto = cache.getLastIndex(host, service, serviceitem);
 			} else {
-				indto = cache.getByTimeIndex( 
+				indto = cache.getIndexByTime( 
 					host,
 					service, 
 					serviceitem,
@@ -147,20 +149,11 @@ public abstract class CacheUtil {
 			// If any of the index returned is null it means that there is 
 			// no cache data in the from or to time and then return a single null
 			if (indfrom == null || indto == null || indfrom > indto) {
-				strbuf.append("null" + CacheInf.JEPLISTSEP);
+				//strbuf.append("null" + CacheInf.JEPLISTSEP);
+				strbuf.append("null");
 			} else {
-				for (int i = indfrom; i<indto+1; i++) {
-					strbuf.append(
-							cache.getIndex( 
-									host,
-									service, 
-									serviceitem,
-									i) + CacheInf.JEPLISTSEP);
-
-				}
+				strbuf.append(cache.getByIndex(host, service, serviceitem, indfrom, indto, CacheInf.JEPLISTSEP));
 			}
-			strbuf.delete(strbuf.length()-1, strbuf.length());
-			//strbuf.append(SEP);
 		}
 		else if (indexstr.contains(":")) {
 			/*
@@ -180,19 +173,8 @@ public abstract class CacheUtil {
 				indend = Integer.parseInt(indendStr);
 			}
 			
-
-			for (int i = indstart; i<indend+1; i++) {
-				strbuf.append(
-						cache.getIndex( 
-								host,
-								service, 
-								serviceitem,
-								i) + CacheInf.JEPLISTSEP);
-
-			}
-			strbuf.delete(strbuf.length()-1, strbuf.length());
-			//strbuf.append(SEP);
-			
+			strbuf.append(cache.getByIndex(host, service, serviceitem, indstart, indend, CacheInf.JEPLISTSEP));
+						
 		} else if (CacheUtil.isByTime(indexstr)){
 			/*
 			 * Format x[-Tc]
@@ -207,7 +189,7 @@ public abstract class CacheUtil {
 							System.currentTimeMillis() + CacheUtil.calculateByTime(indexstr)*1000));
 		} else {
 			strbuf.append(
-					cache.getIndex( 
+					cache.getByIndex( 
 							host,
 							service, 
 							serviceitem,
