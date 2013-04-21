@@ -81,7 +81,7 @@ public class CacheTest {
 
 		CacheInf cache = CacheFactory.getInstance();
 		
-		long current = System.currentTimeMillis() - 20*300*1000;
+		long current = System.currentTimeMillis() - 22*300*1000;
 
 		cache.clear();
 		
@@ -92,7 +92,7 @@ public class CacheTest {
 			cache.add(ls, Util.fullName( hostname, servicename, serviceitemname));
 		}
 		
-		LastStatus ls = new LastStatus("null", (float) 11,  current + 12*300*1000);
+		LastStatus ls = new LastStatus("null", (float) 11,  current + 11*300*1000);
 		System.out.println(CacheTest.class.getName()+">"+(new Date(ls.getTimestamp())).toString() +"> " + 11+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
 		cache.add(ls,Util.fullName( hostname, servicename, serviceitemname));
 		
@@ -101,7 +101,7 @@ public class CacheTest {
 			System.out.println(CacheTest.class.getName()+">"+(new Date(ls.getTimestamp())).toString() +"> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
 			cache.add(ls, Util.fullName( hostname, servicename, serviceitemname));
 		}
-
+		System.out.println("Start test - " + (new Date(ls.getTimestamp())).toString());
 		if (supportNull) {
 			System.out.println("SUPPORT NULL");
 
@@ -115,6 +115,7 @@ public class CacheTest {
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[6:12]"),"15,14,13,12,10,9");
 			// Test all keys outside range return "null"
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[25:30]"),"null");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[15:3000]"),"6,5,4,3,2,1");
 			// Test using ENDMARK
 			System.out.println("ENDMARK");
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
@@ -129,8 +130,12 @@ public class CacheTest {
 			Assert.assertEquals(CacheEvaluator.parse("avg(" + cachekey + "[-5M:-120M]," + cachekey + "[6:12])"),"avg(null,15,14,13,12,10,9)");
 			
 			// Test that a time range with no data in the cache returns "null"
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M:-15M]"),"19,18,17");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M:END]"),"19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-13M:-20M]"),"19,18");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-6M:-20M]"),"21,20,19,18");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M:END]"),"20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M:-105M]"),"20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M:-106M]"),"null");
+			
 			// Test that a if the end time range with no data in the cache returns "null"
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M:-120M]"),"null");
 
@@ -152,7 +157,7 @@ public class CacheTest {
 						
 			// Test that a time range with no data in the cache returns "null"
 			// Test that a time range with no data in the cache returns "null"
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M:-15M]"),"19,18,17");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-13M:-20M]"),"19,18");
 			// Test that a if the end time range with no data in the cache returns "null"
 			Assert.assertNull(CacheEvaluator.parse(cachekey + "[-5M:-120M]"));
 			Assert.assertNull(CacheEvaluator.parse(cachekey + "[-5M:END]"));
