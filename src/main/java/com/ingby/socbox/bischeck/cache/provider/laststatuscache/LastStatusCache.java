@@ -167,6 +167,17 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		}
 	}
 
+	public static synchronized void destroy() {
+
+		try {
+			mbs.unregisterMBean(mbeanname);
+		} catch (MBeanRegistrationException e) {
+			LOGGER.warn("Mbean " + mbeanname +" could not be unregistered",e);
+		} catch (InstanceNotFoundException e) {
+			LOGGER.warn("Mbean " + mbeanname +" instance could not be found",e);
+		}
+	}
+	
 
 		
 	/*
@@ -280,7 +291,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				return null;
 			}
 		}
-		return ls;
+		return ls.copy();
 	}
 
 
@@ -298,13 +309,15 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				serviceName, 
 				serviceItemName,to);
 		
-		List<LastStatus> lslist = new ArrayList<LastStatus>();
+		List<LastStatus> lslist = null;
 		
+		lslist = getLastStatusListByIndex(hostName, serviceName, serviceItemName, indfrom, indto);
+		/*
 		for (long index = indfrom; index <= indto; index++) {
 			LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
 			lslist.add(ls);
 		}
-		
+		*/
 		return lslist;
 	}
 	
@@ -322,7 +335,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
 			if (ls == null)
 				break;
-			lslist.add(ls);
+			lslist.add(ls.copy());
 		}
 		
 		return lslist;
@@ -531,14 +544,6 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	public void close() {
 		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile); 
 		BackendStorage.dump2file(cache,dumpfile);
-	
-		try {
-			mbs.unregisterMBean(mbeanname);
-		} catch (MBeanRegistrationException e) {
-			LOGGER.warn("Mbean " + mbeanname +" could not be unregistered",e);
-		} catch (InstanceNotFoundException e) {
-			LOGGER.warn("Mbean " + mbeanname +" instance could not be found",e);
-		}
 		
 	}
 	
@@ -732,7 +737,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			}
 		}
 		
-		return nearest;
+		return nearest.copy();
 
 	}
 

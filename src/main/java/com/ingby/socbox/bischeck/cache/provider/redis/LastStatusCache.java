@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -49,39 +48,16 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Host;
-import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheInf;
-import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.provider.redis.Lookup;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
-import com.sun.org.apache.bcel.internal.generic.LOOKUPSWITCH;
 
 
 /**
- * The LastStatusCache cache all monitored bischeck data. The cache is built as
- * Map that has the host->service->serviceitem as key and the map value is a
- * List of the LastStatus elements in an fifo where the First element is the
- * latest stored. When the fifo size is occupied the oldest element is removed 
- * from the end (last).
- * --------------------
- * | h-s-i | h-s-i| ..........
- * --------------------
- *     |     |
- *     |      
- *     ^		
- *    -----
- *   | ls1 | <- newest
- *   | ls2 |
- *   | ls3 |
- *   | ls4 |
- *   |  .  |
- *   |  .  |
- *   | lsX | <- oldest (max size) 
- *    -----
  *      
  *    
  * @author andersh
@@ -91,7 +67,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusCache.class);
 
-	private HashMap<String,LinkedList<LastStatus>> cache = null;
+	private HashMap<String,LinkedList<LastStatus>> fastCache = null;
 
 	private static int fifosize = 500;
 	//private static boolean notFullListParse = false;
@@ -112,9 +88,11 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	private long fastcachehitcount = 0L;
 	private long rediscachehitcount = 0L;
+
+	private boolean fastCacheEnable = true;
 	
 	private LastStatusCache() {
-		cache = new HashMap<String,LinkedList<LastStatus>>();
+		fastCache = new HashMap<String,LinkedList<LastStatus>>();
 		jedispool = new JedisPool(new JedisPoolConfig(),redisserver,redisport);	
 		lu  = Lookup.init(jedispool);
 	}
@@ -181,6 +159,31 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		
 	}
 
+	public static synchronized void destroy() {
+		lsc.jedispool.destroy();
+
+		try {
+			mbs.unregisterMBean(mbeanname);
+		} catch (MBeanRegistrationException e) {
+			LOGGER.warn("Mbean " + mbeanname +" could not be unregistered",e);
+		} catch (InstanceNotFoundException e) {
+			LOGGER.warn("Mbean " + mbeanname +" instance could not be found",e);
+		}
+		lsc = null;
+	}
+	
+	/*
+	 ***********************************************
+	 ***********************************************
+	 * Public methods
+	 ***********************************************
+	 ***********************************************
+	 */
+	
+	public void disableFastCache() {
+		fastCacheEnable  = false;
+	}
+	
 	public void updateRuntimeMetaData() {
 		Map<String, Host> hostsmap = ConfigurationManager.getInstance().getHostConfig();
 		Jedis jedis = jedispool.getResource();
@@ -247,11 +250,11 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		Jedis jedis = jedispool.getResource();
 		
 		try {
-			if (cache.get(key) == null) {
+			if (fastCache.get(key) == null) {
 				fifo = new LinkedList<LastStatus>();
-				cache.put(key, fifo);
+				fastCache.put(key, fifo);
 			} else {
-				fifo = cache.get(key);
+				fifo = fastCache.get(key);
 			}
 
 			if (fifo.size() >= fifosize) {
@@ -259,7 +262,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			}
 
 			// Add local cache
-			cache.get(key).addFirst(ls);
+			fastCache.get(key).addFirst(ls);
 
 			// Add redis
 			jedis.lpush(key, ls.getJson());
@@ -321,13 +324,14 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		
 		LastStatus ls = null;
 		try {
-			if (cache.get(key) != null && index < cache.get(key).size()-1) {
+			if (fastCacheEnable && fastCache.get(key) != null && index < fastCache.get(key).size()-1) {
 				if (LOGGER.isDebugEnabled() ) {
 					LOGGER.debug("Fast cache used for key " + key +" index " + index);
 				}
 				incFastCacheCount();
-				ls = cache.get(key).get((int)index);
+				ls = fastCache.get(key).get((int)index).copy();
 			}
+		
 			else {
 				if (LOGGER.isDebugEnabled() ) {
 					LOGGER.debug("Redis cache used for key " + key +" index " + index);
@@ -385,19 +389,40 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	public List<LastStatus> getLastStatusListByIndex(String hostName, String serviceName,
 			String serviceItemName, long fromIndex, long toIndex) {
 		
-		
 		long numberOfindex = toIndex-fromIndex;
 		if (numberOfindex > Integer.MAX_VALUE){
 			toIndex = Integer.MAX_VALUE;
 		}
-	
-		
 
 		Jedis jedis = jedispool.getResource();
 		
 		String key = Util.fullName( hostName, serviceName, serviceItemName);
 
+		lu.setOptimizIndex(key, toIndex);
+		
+		
+		List<LastStatus> lslist = new  ArrayList<LastStatus>();
 		List<String> lsstr = null;
+		
+	
+		if (fastCacheEnable && fastCache.get(key) != null && toIndex < fastCache.get(key).size()-1) {
+			if (LOGGER.isDebugEnabled() ) {
+				LOGGER.debug("Fast cache used for key " + key +" index " + toIndex);
+			}
+			incFastCacheCount(toIndex-fromIndex);
+			
+			
+			for (long index = fromIndex; index <= toIndex; index++) {
+				LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
+				if (ls == null)
+					break;
+				lslist.add(ls.copy());
+			}
+			
+			return lslist;
+
+		}
+		
 		try {
 			lsstr = jedis.lrange(key, fromIndex, toIndex);
 		} catch (JedisConnectionException je) {
@@ -406,7 +431,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			jedispool.returnResource(jedis);
 		}	
 		
-		List<LastStatus> lslist = new  ArrayList<LastStatus>();
+		incRedisCacheCount(fromIndex-toIndex);	
+		
+		
 		for (String redstr: lsstr) {
 			LastStatus ls = new LastStatus(redstr);
 			lslist.add(ls);
@@ -641,17 +668,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	
 	@Override
 	public void close() {
-		jedispool.destroy();
-
-		try {
-			mbs.unregisterMBean(mbeanname);
-		} catch (MBeanRegistrationException e) {
-			LOGGER.warn("Mbean " + mbeanname +" could not be unregistered",e);
-		} catch (InstanceNotFoundException e) {
-			LOGGER.warn("Mbean " + mbeanname +" instance could not be found",e);
-		}
 		
-
 	}
 
 	/*
@@ -717,7 +734,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 */
 	@Override
 	public int getLastStatusCacheCount() {
-		return cache.size();
+		return fastCache.size();
 	}
 
 
@@ -727,20 +744,20 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 */
 	@Override
 	public String[] getCacheKeys() {
-		String[] key = new String[cache.size()];
+		String[] key = new String[fastCache.size()];
 
-		Iterator<String> itr = cache.keySet().iterator();
+		Iterator<String> itr = fastCache.keySet().iterator();
 
 		int ind = 0;
 		while(itr.hasNext()){
 			String entry=itr.next();
-			int size = cache.get(entry).size();
+			int size = fastCache.get(entry).size();
 			key[ind++]=entry+":"+size;
 		}    
 		return key; 
 	}
 
-
+	
 	/*
 	 ***********************************************
 	 ***********************************************
@@ -790,10 +807,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 
 	private void clearFastCache() {
-		Iterator<String> iter = cache.keySet().iterator();
+		Iterator<String> iter = fastCache.keySet().iterator();
 		while (iter.hasNext()) {
 			String key = iter.next();
-			cache.get(key).clear(); 
+			fastCache.get(key).clear(); 
 			iter.remove();
 		}
 	}
@@ -829,8 +846,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * @return the LastStatus object closes to the time
 	 */
 	private LastStatus nearestFast(long time, String key) {
+		if (!fastCacheEnable)
+			return null;
 		
-		LinkedList<LastStatus> listtosearch = cache.get(key);
+		LinkedList<LastStatus> listtosearch = fastCache.get(key);
 		if (listtosearch == null)
 			return null;
 		
@@ -863,7 +882,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			}
 		}
 		
-		return nearest;
+		return nearest.copy();
 
 	}
 
@@ -917,8 +936,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * @return cache index
 	 */
 	private Long nearestByIndexFast(long time, String key) {
+		if (!fastCacheEnable)
+			return null;
 		
-		LinkedList<LastStatus> listtosearch =  cache.get(key);
+		LinkedList<LastStatus> listtosearch =  fastCache.get(key);
 		if (listtosearch == null)
 			return null;
 		if (time > listtosearch.getFirst().getTimestamp() || 
@@ -1017,19 +1038,31 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		return index;
 	}
 
-	
-	private synchronized void incFastCacheCount(){
-		fastcachehitcount++;
-		if (fastcachehitcount == Long.MAX_VALUE)
+	private synchronized void incFastCacheCount(long inc){
+		fastcachehitcount =+ inc;
+		if (fastcachehitcount == Long.MAX_VALUE) {
 			fastcachehitcount = 0L;
+			rediscachehitcount = 0L;
+		}
+	}
+	
+	private void incFastCacheCount(){
+		incFastCacheCount(1);
 	}
 	
 	
-	private synchronized void incRedisCacheCount(){
-		rediscachehitcount++;
-		if (rediscachehitcount == Long.MAX_VALUE)
+	private synchronized void incRedisCacheCount(long inc){
+		rediscachehitcount =+ inc;
+		if (rediscachehitcount == Long.MAX_VALUE) {
 			rediscachehitcount = 0L;
+			fastcachehitcount = 0L;
+		}
 	}
 
+	private  void incRedisCacheCount(){
+		incRedisCacheCount(1);
+	}
+	
+		
 
 }
