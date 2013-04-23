@@ -24,8 +24,12 @@ import java.util.List;
 
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+
 /**
- * 
+ * The interface describe the basic methods for adding and retrieving data 
+ * from the cache. Any data retrieved should be copies of the underlying data 
+ * stored in the cache. This means that the cache implementation must guarantee 
+ * an immutable cache implementation.     
  * @author andersh
  *
  */
