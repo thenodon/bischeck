@@ -31,6 +31,7 @@ public class ThresholdContainer {
     
     public void setFloatThreshold(Float floatThreshold) {
         this.floatThreshold = floatThreshold;
+        this.expInd = false;
     }
     
     
@@ -41,6 +42,7 @@ public class ThresholdContainer {
     
     public void setExpThreshold(String expThreshold) {
         this.expThreshold = expThreshold;
+        this.expInd = true;
     }
     
     
@@ -48,8 +50,8 @@ public class ThresholdContainer {
         return expInd;
     }
     
-    
+    /*
     public void setExpInd(boolean expInd) {
         this.expInd = expInd;
-    }
+    }*/
 }
