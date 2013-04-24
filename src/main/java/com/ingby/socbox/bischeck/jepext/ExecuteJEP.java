@@ -19,12 +19,22 @@
 
 package com.ingby.socbox.bischeck.jepext;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import java.net.URL;
+import java.util.InvalidPropertiesFormatException;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
+import org.nfunk.jep.function.PostfixMathCommandI;
 
+import com.ingby.socbox.bischeck.ClassCache;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -35,7 +45,7 @@ public class ExecuteJEP {
 
 	private JEP parser = null;
 
-	
+	private static final String RESOURCEFILENAME = "jepextfunctions.xml";
 	
 	public ExecuteJEP() {
 		
@@ -43,8 +53,58 @@ public class ExecuteJEP {
         parser.addStandardFunctions();
         parser.addStandardConstants();
         Object MyNULL = new Null(); // create a null value
+
         parser.addConstant("null",MyNULL);
-        /*
+		parser.addFunction("avg", new com.ingby.socbox.bischeck.jepext.Average());
+        parser.addFunction("avgNull", new com.ingby.socbox.bischeck.jepext.Average(true));
+        parser.addFunction("max", new com.ingby.socbox.bischeck.jepext.Max());
+		parser.addFunction("min", new com.ingby.socbox.bischeck.jepext.Min());
+		parser.removeFunction("sum");
+		parser.addFunction("sum", new com.ingby.socbox.bischeck.jepext.Sum());
+        parser.addFunction("sumNull", new com.ingby.socbox.bischeck.jepext.Sum(true));
+        parser.addFunction("multNull", new com.ingby.socbox.bischeck.jepext.NullableMultiply());
+        parser.addFunction("divNull", new com.ingby.socbox.bischeck.jepext.NullableDivide());
+        parser.addFunction("ols", new com.ingby.socbox.bischeck.jepext.OrdinaryLeastSquares());
+
+        // Add additional functions if available
+        URL Url = ExecuteJEP.class.getClassLoader().getResource(RESOURCEFILENAME);
+             
+		FileInputStream fileInput = null;
+		try {
+			fileInput = new FileInputStream(new File(Url.getFile()));
+		} catch (FileNotFoundException e) {
+			LOGGER.warn("The additonal function describtion file "+ RESOURCEFILENAME +" is not available in classpath",e);
+		}
+		
+		Properties properties = null;
+		if (fileInput != null) {
+			properties = new Properties();
+			try {
+				properties.loadFromXML(fileInput);
+			} catch (InvalidPropertiesFormatException e) {
+				LOGGER.warn("The property file, "+ RESOURCEFILENAME +", format is not valied", e);
+			} catch (IOException e) {
+				LOGGER.warn("The property file, "+ RESOURCEFILENAME +", could not be read", e);
+			}
+		}
+		
+		for(String jepFunctionName : properties.stringPropertyNames()) {
+			String className = properties.getProperty(jepFunctionName);
+			try {
+				parser.removeFunction(jepFunctionName);
+				parser.addFunction(jepFunctionName, (PostfixMathCommandI) ClassCache.getClassByName(className).newInstance());
+				LOGGER.debug("Jep extended function "+ jepFunctionName +" loaded with classname " + className);
+			} catch (ClassNotFoundException e) {
+				LOGGER.warn("Class "+ className + " could not be found", e);
+			} catch (InstantiationException e) {
+				LOGGER.warn("Class "+ className + " can not be instantiated", e);
+			} catch (IllegalAccessException e) {
+				LOGGER.warn("Class "+ className + " could not be instantiated", e);
+			}
+
+
+		}
+		/*
         String func1 = "avg";
         String func1class = "com.ingby.socbox.bischeck.jepext.Average";
         
@@ -64,17 +124,7 @@ public class ExecuteJEP {
 		
 		}
         */
-        parser.addFunction("avg", new com.ingby.socbox.bischeck.jepext.Average());
-        parser.addFunction("avgNull", new com.ingby.socbox.bischeck.jepext.Average(true));
-        parser.addFunction("max", new com.ingby.socbox.bischeck.jepext.Max());
-		parser.addFunction("min", new com.ingby.socbox.bischeck.jepext.Min());
-		parser.removeFunction("sum");
-		parser.addFunction("sum", new com.ingby.socbox.bischeck.jepext.Sum());
-        parser.addFunction("sumNull", new com.ingby.socbox.bischeck.jepext.Sum(true));
-        parser.addFunction("multNull", new com.ingby.socbox.bischeck.jepext.NullableMultiply());
-        parser.addFunction("divNull", new com.ingby.socbox.bischeck.jepext.NullableDivide());
-            
-		
+              
 	}
 
 	public Float execute(String executeexp) throws ParseException {
@@ -105,4 +155,5 @@ public class ExecuteJEP {
 		
 		return value;
 	}
+
 }
