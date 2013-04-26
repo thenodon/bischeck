@@ -27,7 +27,7 @@ public class OrdinaryLeastSquares extends PostfixMathCommand
      	resolution
      	forecast
 		 */        
-    	numberOfParameters = 6;
+    	numberOfParameters = 7;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -35,8 +35,7 @@ public class OrdinaryLeastSquares extends PostfixMathCommand
 		throws ParseException 
 	{
 		checkStack(inStack); // check the stack
-		
-		
+		Object timeOffset = inStack.pop();
 		Object forecast = inStack.pop();
 		Object resolution =  inStack.pop();
 		Object resolutionMethod =  inStack.pop();
@@ -52,7 +51,8 @@ public class OrdinaryLeastSquares extends PostfixMathCommand
 				(String) serviceItemName, 
 				(String) resolutionMethod, 
 				(String) resolution, 
-				forecastInt);
+				forecastInt,
+				(String) timeOffset);
 	
 		Double forecastValue = ols.getPredictiveValue();
 		

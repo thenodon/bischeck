@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.log4j.Logger;
 
+import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.provider.LastStatusCache;
 import com.ingby.socbox.bischeck.jepext.perdictive.PredictArray;
@@ -41,12 +42,10 @@ public class CalculateOLS {
 	private String serviceItemName;
 	private Integer bucketSize = null;
     private int forecast;
-
-	
+	private String timeOffSet = "END";
 	private RESMETHOD resolutionMethod ;
-	
 
-    
+	    
     public CalculateOLS(String hostName,
     		String serviceName, 
     		String serviceItemName, 
@@ -59,12 +58,28 @@ public class CalculateOLS {
     	this.serviceItemName = serviceItemName;
     	this.resolutionMethod = getResolutioMethod(resolutionMethod);
     	this.forecast = forecast;
-    	
+    	this.timeOffSet = "END";
+    		
 		bucketSize = bucketSize(resolution); 
 				
-		
-		
-		
+	}
+    
+    public CalculateOLS(String hostName,
+    		String serviceName, 
+    		String serviceItemName, 
+    		String resolutionMethod,
+    		String resolution,
+    		Integer forecast,
+    		String timeOffSet) 
+    {
+    	this.hostName = hostName;
+    	this.serviceName = serviceName;
+    	this.serviceItemName = serviceItemName;
+    	this.resolutionMethod = getResolutioMethod(resolutionMethod);
+    	this.forecast = forecast;
+    	this.timeOffSet = timeOffSet;
+		bucketSize = bucketSize(resolution); 
+				
 	}
 
 	private RESMETHOD getResolutioMethod(String resolutionmethod) {
@@ -95,36 +110,45 @@ public class CalculateOLS {
 	
 	
 	public Double getPredictiveValue() {
-		// The input value do not have any meaning -maybe we
 		LastStatusCache cache = LastStatusCache.getInstance();
-		// Get all the data for the servicedef to predict on
 		
-		List<LastStatus> ls = cache.getLastStatusListAll(hostName, 
-				serviceName, 
-				serviceItemName);
-		// Calculate time difference and bucketsize
+		List<LastStatus> lslist = null;
 		
+		if (timeOffSet.equalsIgnoreCase("END")) {
+			 lslist = cache.getLastStatusListAll(hostName, 
+					serviceName, 
+					serviceItemName);
+		} else {
+			
+			 LastStatus ls = cache.getLastStatusByIndex(hostName, serviceName, serviceItemName, 0);
+			 if (ls == null) {
+				 return null;
+			 }
+			 long from = ls.getTimestamp();
+			 long to = from + CacheUtil.calculateByTime(timeOffSet)*1000;
+			 lslist = cache.getLastStatusListByTime(hostName, 
+					 serviceName, 
+					 serviceItemName, from, to);
+		}
+
 		
-		PredictArray pa = new PredictArray(ls.get(0).getTimestamp(),ls.get(ls.size()-1).getTimestamp(),bucketSize);
-		pa.addArray(ls);
+		PredictArray pa = new PredictArray(lslist.get(0).getTimestamp(),lslist.get(lslist.size()-1).getTimestamp(),bucketSize);
+		pa.addArray(lslist);
 		
 		SimpleRegression regression = new SimpleRegression();
 		for (int i=0; i<pa.getSize(); i++) {
 			
 			switch (resolutionMethod) {
 			case AVG: 
-				if (pa.getAverage(i) != null)
-					LOGGER.debug("Avg> "+i+":"+pa.getAverage(i));
+				if (pa.getAverage(i) != null) 
 					regression.addData(i, pa.getAverage(i));
 				break;
 			case MAX:
 				if (pa.getMax(i) != null)
-					LOGGER.debug("Max> "+i+":"+pa.getMax(i));
 					regression.addData(i, pa.getMax(i));
 				break;
 			case MIN:
 				if (pa.getMin(i) != null)
-					LOGGER.debug("Min> "+i+":"+pa.getMin(i));
 					regression.addData(i, pa.getMin(i));
 				break;	
 			default:
