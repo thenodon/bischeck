@@ -40,7 +40,7 @@ public abstract class CacheUtil {
 	 * @return
 	 */
     public static int calculateByTime(String schedule) {
-        //"^[0-9]+ *[HMS]{1} *$" - check for a
+        
         Pattern pattern = Pattern.compile(FINDINTIMEPATTERN);
 
         // Determine if there is an exact match
