@@ -17,6 +17,7 @@
 #
  */
 
+
 package com.ingby.socbox.bischeck.jepext;
 
 import java.util.*;
@@ -29,19 +30,12 @@ import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLS;
 public class OrdinaryLeastSquares extends PostfixMathCommand
 {
 	public OrdinaryLeastSquares()
-	{
-		/*
-		hostname
-        servicename
-        serviceitemname
-     	resolutionmethod
-     	resolution
-     	forecast
-		 */        
+	{       
     	numberOfParameters = 7;
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Override
 	public void run(@SuppressWarnings("rawtypes") Stack inStack)
 		throws ParseException 
 	{
