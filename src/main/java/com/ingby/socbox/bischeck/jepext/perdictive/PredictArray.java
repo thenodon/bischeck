@@ -49,11 +49,16 @@ public class PredictArray {
 		
 		Long diffMs =  startTimeStamp - endTimeStamp;
 		this.bucketSize = bucketSize;
-		predictSize = (int) (diffMs/bucketSize);
+		double dou = new Double(diffMs)/new Double(bucketSize);
+		predictSize = (int) Math.ceil(dou);
 		
 		LOGGER.debug("predictsize "+ predictSize);
 		
-		cal = getCalendarStartOfDay(endTimeStamp);
+		// Check if the bucket size are hour
+		if (bucketSize == 1*60*60*1000)
+			cal = getCalendarStartOfDayAndHour(endTimeStamp);
+		else
+			cal = getCalendarStartOfDay(endTimeStamp);
 
 		startTime = cal.getTimeInMillis();
 		LOGGER.debug(("First found date " + new Date(startTime).toString()));
@@ -74,6 +79,17 @@ public class PredictArray {
 			bucketArray[i] = 0.0;
 			bucketCountArray[i] = 0;
 		}
+	}
+
+	private Calendar getCalendarStartOfDayAndHour(Long endTimeStamp) {
+		Calendar cal = Calendar.getInstance();
+
+		cal.setTimeInMillis(endTimeStamp);
+		//cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal;
 	}
 
 	
