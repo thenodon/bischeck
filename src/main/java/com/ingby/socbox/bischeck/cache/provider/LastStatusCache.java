@@ -22,9 +22,11 @@ package com.ingby.socbox.bischeck.cache.provider;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -47,6 +49,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLKey;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
+
 
 
 /**
@@ -660,4 +663,105 @@ public class LastStatusCache implements LastStatusCacheMBean {
 		}
 	}
 
+	public List<LastStatus> getLastStatusListAll(String host, 
+			String service, 
+			String serviceitem) {
+		
+		String key = Util.fullName( host, service, serviceitem);
+		
+		Integer indfrom = 0;
+		
+		Integer indto = size(key) - 1; 
+		
+				
+		List<LastStatus> lslist = new ArrayList<LastStatus>();
+		
+		for (int index = indfrom; index <= indto; index++) {
+			LastStatus ls = getLastStatusByIndex(host, service, serviceitem, index);
+			lslist.add(ls);
+		}
+		
+		return lslist;
+	}
+
+
+	
+	public List<LastStatus> getLastStatusListByIndex(String host, 
+			String service, 
+			String serviceitem, 
+			int fromIndex, int toIndex) {
+		
+		String key = Util.fullName( host, service, serviceitem);
+		if (fromIndex > (size(key)-1) || toIndex > (size(key)-1))  {
+			return null;
+		}
+		
+		List<LastStatus> lslist = new ArrayList<LastStatus>();
+		
+		for (int index = (int) fromIndex; index <= (int) toIndex; index++) {
+			LastStatus ls = getLastStatusByIndex(host, service, serviceitem, index);
+			lslist.add(ls);
+		}
+		
+		return lslist;
+	}
+
+	public List<LastStatus> getLastStatusListByTime(String host, 
+			String service, 
+			String serviceitem, 
+			long from, long to) {
+		Integer indfrom = this.getByTimeIndex( 
+				host,
+				service, 
+				serviceitem,from);
+		Integer indto = this.getByTimeIndex( 
+				host,
+				service, 
+				serviceitem,to);
+		
+		String key = Util.fullName( host, service, serviceitem);
+		
+		if (indfrom > (size(key)-1) || indto > (size(key)-1))  {
+			return null;
+		}
+		
+		List<LastStatus> lslist = new ArrayList<LastStatus>();
+		
+		for (int index = indfrom; index <= indto; index++) {
+			LastStatus ls = getLastStatusByIndex(host, service, serviceitem, index);
+			lslist.add(ls);
+		}
+		
+		return lslist;
+	}
+
+	private int size(String key) {
+		if (cache.get(key) == null) 
+			return 0;
+		
+		return cache.get(key).size();
+	}
+
+	public LastStatus getLastStatusByIndex(String hostname, String serviceName,
+			String serviceItemName, int index) {
+
+		String key = Util.fullName( hostname, serviceName, serviceItemName);
+		LastStatus ls = null;
+
+		synchronized (cache) {
+			try {
+				ls = cache.get(key).get(index);
+			} catch (NullPointerException ne) {
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("No objects in the cache for " + key);
+				return null;
+			}    
+			catch (IndexOutOfBoundsException ie) {
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("No object on index in the cache for " + key + "["+index+"]");
+				return null;
+			}
+		}
+		return ls;
+	}
 }
