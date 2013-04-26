@@ -153,6 +153,16 @@ public class PredictiveTest {
 		System.out.println(expr + " -> " + value);				
 		Assert.assertNotNull((double) value);
 		
+		expr = "olss(" + 
+				"\""+ hostname +"\"," + 
+				"\""+ servicename+"\"," +
+				"\""+ serviceitemname+"\"," +
+				"\"AVG\",\"D\",\"END\")";
+				
+		
+		value = (float) parser.execute(expr);
+		System.out.println(expr + " -> " + value);
+	
 	}
 
 	

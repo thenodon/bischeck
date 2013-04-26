@@ -82,7 +82,24 @@ public class CalculateOLS {
 				
 	}
 
-	private RESMETHOD getResolutioMethod(String resolutionmethod) {
+    public CalculateOLS(String hostName,
+    		String serviceName, 
+    		String serviceItemName, 
+    		String resolutionMethod,
+    		String resolution,
+    		String timeOffSet) 
+    {
+    	this.hostName = hostName;
+    	this.serviceName = serviceName;
+    	this.serviceItemName = serviceItemName;
+    	this.resolutionMethod = getResolutioMethod(resolutionMethod);
+    	this.forecast = 0;
+    	this.timeOffSet = timeOffSet;
+		bucketSize = bucketSize(resolution); 
+				
+	}
+
+    private RESMETHOD getResolutioMethod(String resolutionmethod) {
 		RESMETHOD resmeth = RESMETHOD.AVG;
 		if (resolutionmethod.equalsIgnoreCase(RESMETHOD.AVG.toString()))
 			resmeth = RESMETHOD.AVG;
@@ -110,6 +127,33 @@ public class CalculateOLS {
 	
 	
 	public Double getPredictiveValue() {
+		
+		PredictArray pa = createPredictionArray();
+		if (pa == null)
+			return null;
+		
+		SimpleRegression regression = createRegression(pa);
+		
+		Double state =  regression.predict(pa.getSize()+forecast);
+
+		return state;
+	}
+
+	
+	public Double getPredictiveSlope() {
+		
+		PredictArray pa = createPredictionArray();
+		if (pa == null)
+			return null;
+		
+		SimpleRegression regression = createRegression(pa);
+		
+		Double state =  regression.getSlope();
+
+		return state;
+	}
+
+	private PredictArray createPredictionArray() {
 		LastStatusCache cache = LastStatusCache.getInstance();
 		
 		List<LastStatus> lslist = null;
@@ -134,7 +178,10 @@ public class CalculateOLS {
 		
 		PredictArray pa = new PredictArray(lslist.get(0).getTimestamp(),lslist.get(lslist.size()-1).getTimestamp(),bucketSize);
 		pa.addArray(lslist);
-		
+		return pa;
+	}
+
+	private SimpleRegression createRegression(PredictArray pa) {
 		SimpleRegression regression = new SimpleRegression();
 		for (int i=0; i<pa.getSize(); i++) {
 			
@@ -158,12 +205,7 @@ public class CalculateOLS {
 
 			}
 		}
-		
-		LOGGER.debug(regression.predict(pa.getSize()+forecast));
-		
-		Double state =  regression.predict(pa.getSize()+forecast);
-
-		return state;
+		return regression;
 	}
 
 	
