@@ -3,6 +3,7 @@
 <properties> 
     <comment>JEP extended functions to load</comment>
     <entry key="ols">com.ingby.socbox.bischeck.jepext.OrdinaryLeastSquares</entry>
+    <entry key="olss">com.ingby.socbox.bischeck.jepext.OrdinaryLeastSquaresSlope</entry>
 </properties>
 
 
