@@ -47,12 +47,43 @@ public abstract class QueryNagiosPerfData {
     //Find data from = to ; or space or end of line
     private final static Pattern DATAMATCH = Pattern.compile("=(.*?)(;|$)");
     
-    public static String parse(String label, String strtoparse) {
+    /**
+     * Take the full return string including the performance data from a Nagios 
+     * check command and return the performance data value for the for the 
+     * specific label from the format:<br>
+     * <code>
+     * 'label'=value[UOM];[warn];[crit];[min];[max]
+     * </code>
+     * <br>
+     * @param label the label in the performance data string -  'label'=value[UOM];[warn];[crit];[min];[max]
+     * @param stdoutString the Nagios check command STDOUT string - xxx |'label'=value[UOM];[warn];[crit];[min];[max]
+     * @return the value from the performance data string - 'label'=value[UOM];[warn];[crit];[min];[max].
+     * If the label do not exist null is returned.
+     */
+    public static String parseByLabel(String label, String stdoutString) {
+    	String perfdata = getPerfdata(stdoutString);
+    	return parse(label, perfdata);
+    }
+    
+    /**
+     * Take the full return string including the performance data from a Nagios 
+     * check command and return the performance data value for the for the 
+     * specific label from the format:<br>
+     * <code>
+     * 'label'=value[UOM];[warn];[crit];[min];[max]
+     * </code>
+     * <br>
+     * @param label the label in the performance data string -  'label'=value[UOM];[warn];[crit];[min];[max]
+     * @param performanceData the value of the performance string - 'label'=value[UOM];[warn];[crit];[min];[max]
+     * @return the value from the performance data string - 'label'=value[UOM];[warn];[crit];[min];[max]. 
+     * If the label do not exist null is returned.
+     */
+    public static String parse(String label, String performanceData) {
         if (LOGGER.isDebugEnabled())
-        	LOGGER.debug("Perf data to parse - " + strtoparse);
+        	LOGGER.debug("Perf data to parse - " + performanceData);
         
 
-        Matcher mat = LABELMATCH.matcher(strtoparse);
+        Matcher mat = LABELMATCH.matcher(performanceData);
 
         String perflabel = null;
         boolean labelfound = false;
@@ -67,11 +98,12 @@ public abstract class QueryNagiosPerfData {
         }//while
         
         // Not hits
-        if (!labelfound) return null;
+        if (!labelfound) 
+        	return null;
         
         Pattern perfMatch = Pattern.compile(perflabel+"(.*?)( |$)");
         
-        mat = perfMatch.matcher(strtoparse);
+        mat = perfMatch.matcher(performanceData);
 
         String perfdata = null;
         while (mat.find()) {
@@ -81,24 +113,24 @@ public abstract class QueryNagiosPerfData {
         }
         
         mat = DATAMATCH.matcher(perfdata);
-        String data = null;
+        String value = null;
         while (mat.find()) {
-            data = removeUOM(mat.group().replaceAll("=","").replaceAll(";", ""));
+            value = removeUOM(mat.group().replaceAll("=","").replaceAll(";", ""));
             if (LOGGER.isDebugEnabled())
-            	LOGGER.debug("<>"+data+"<>");        
+            	LOGGER.debug("Performance data value "+value);        
         }
         
-        return data;
+        return value;
     }
     
     
     /**
-     * Return the performance portion of the Nagios check output
-     * @param checkres
-     * @return
+     * Return the performance portion of the Nagios check command data output
+     * @param stdoutString
+     * @return the performance data string, the right side of the | sign
      */
-    public static String getPerfdata(String checkres) {
-		return  checkres.substring(checkres.indexOf('|')+1);
+    public static String getPerfdata(String stdoutString) {
+		return  stdoutString.substring(stdoutString.indexOf('|')+1);
 	}
     
     

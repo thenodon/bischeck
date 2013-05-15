@@ -106,11 +106,8 @@ public class CheckCommandServiceItem extends ServiceItemAbstract implements Serv
 
 		// Execute the check_command
 		String checkres =  service.executeStmt(checkcommand);
-		// Error handling
 
-		String perfres = QueryNagiosPerfData.getPerfdata(checkres);
-		String checkvalue = QueryNagiosPerfData.parse(jsonStatement.getString("label"),perfres);
-
+		String checkvalue = QueryNagiosPerfData.parseByLabel(jsonStatement.getString("label"), checkres);
 		setLatestExecuted(checkvalue);    
 	}
 
