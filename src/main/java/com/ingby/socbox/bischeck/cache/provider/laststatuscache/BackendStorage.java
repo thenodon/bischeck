@@ -194,10 +194,12 @@ public class BackendStorage {
 			LOGGER.warn("Failed to write to cache dump with exception: " + e.getMessage());
 		}finally {
 			try {
-				dumpwriter.close();
+				if (dumpwriter != null)
+					dumpwriter.close();
 			} catch (IOException ignore){}
 			try{
-				filewriter.close();
+				if (filewriter != null)
+					filewriter.close();
 			} catch (IOException ignore){}
 		}
 
