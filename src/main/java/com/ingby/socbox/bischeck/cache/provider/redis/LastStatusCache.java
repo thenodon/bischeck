@@ -431,14 +431,16 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			jedispool.returnResource(jedis);
 		}	
 		
-		incRedisCacheCount(fromIndex-toIndex);	
-		
-		
-		for (String redstr: lsstr) {
-			LastStatus ls = new LastStatus(redstr);
-			lslist.add(ls);
+		if (lsstr != null) {
+			incRedisCacheCount(fromIndex-toIndex);	
+
+			for (String redstr: lsstr) {
+				LastStatus ls = new LastStatus(redstr);
+				lslist.add(ls);
+			}
 		}
 		return lslist;
+		
 
 	}
 
