@@ -23,6 +23,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,9 +40,9 @@ public abstract class Util {
 
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     
-    //private final static Pattern FORMAT_HOUR_MINUTE = Pattern.compile("^([01]?[0-9]|2[0-3]):[0-5][0-9]$");
     private final static Pattern FORMAT_HOUR_MINUTE = Pattern.compile("^([01]?[0-9]|2[0-3]):[0]?[0]$");
     private final static Pattern ISNULLIN = Pattern.compile(".*null.*");
+    private static Map<String,DecimalFormat> decFormatMapCache = new HashMap<String, DecimalFormat>();
     
 	/**
      * Obfuscate a string including password= until none character or number. 
@@ -74,23 +76,29 @@ public abstract class Util {
         return sdf.format(cal.getTime());
     }
     
+    
     /**
-     * Round a float to decimal
-     * @param d1  
-     * @return rounded to one decimal
+     * Round the float d1 to the to the format of the string d2 
+     * @param d1 
+     * @param d2
+     * @return the parameter d1 with the decimal in the string d1
      */
     public static Float roundByOtherString(String d1, Float d2) {
-    	LOGGER.debug("String to format from:"+d1+" value:"+d2);
-        if (d1 != null) {
-        	int nrdec = getNumberOfDecimalPlace(d1);
-            
-        	StringBuffer strbuf = new StringBuffer();
-        	strbuf.append("#.");
-            for (int i = 0; i< nrdec;i++) strbuf.append("#");
-            DecimalFormat decformatter = new DecimalFormat(strbuf.toString());
-        	return Float.valueOf(decformatter.format(d2));
-        }
-        return d2;
+    	if (d1 != null) {
+    		int nrdec = getNumberOfDecimalPlace(d1);
+
+    		StringBuffer strbuf = new StringBuffer();
+    		strbuf.append("#.");
+    		for (int i = 0; i< nrdec;i++) 
+    			strbuf.append("#");
+    		DecimalFormat decformatter = decFormatMapCache.get(strbuf.toString());
+    		if (decformatter == null) {
+    			decformatter = new DecimalFormat(strbuf.toString());
+    			decFormatMapCache.put(strbuf.toString(), decformatter);
+    		}
+    		return Float.valueOf(decformatter.format(d2));
+    	}
+    	return d2;
     }
 
     
@@ -121,16 +129,15 @@ public abstract class Util {
         if (index < 0) {
             return 0;
         }
-        //LOGGER.info(value + " number by double " + (s.length() - 1 - index));
         return s.length() - 1 - index;
     }
+    
     
     private static int getNumberOfDecimalPlace(String value) {
         final int index = value.indexOf('.');
         if (index < 0) {
             return 0;
         }
-        //LOGGER.info(value + " number by string " + (value.length() - 1 - index));
         return value.length() - 1 - index;
     }
     
@@ -164,7 +171,12 @@ public abstract class Util {
     	return strbuf.toString();
     }
 
-
+    
+    /**
+     * 
+     * @param latestExecuted
+     * @return
+     */
 	public static String fixExponetialFormat(String latestExecuted) {
 		if (latestExecuted == null) 
 			return latestExecuted;
@@ -176,6 +188,13 @@ public abstract class Util {
 		return latestExecuted;
 	}
 	
+	
+	/**
+	 * 
+	 * @param hourAndMinute
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
 	public static Integer getHourFromHourMinute(String hourAndMinute) throws IllegalArgumentException {
 		Matcher mat = FORMAT_HOUR_MINUTE.matcher(hourAndMinute);
 
@@ -191,6 +210,12 @@ public abstract class Util {
 		
 	}
 	
+	
+	/**
+	 * 
+	 * @param isnullin
+	 * @return
+	 */
 	public static boolean hasStringNull(String isnullin){
 		Matcher mat = ISNULLIN.matcher(isnullin);
 
