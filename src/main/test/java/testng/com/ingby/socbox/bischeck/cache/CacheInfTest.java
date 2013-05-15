@@ -27,13 +27,12 @@ import java.util.Map;
 
 import org.testng.Assert;
 
-import org.testng.annotations.AfterTest;
+
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
-import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
@@ -78,6 +77,7 @@ public class CacheInfTest {
 		verifyCacheImp(cache);
 		cache.clear(hostName, serviceName, serviceItemName);
 		CacheFactory.close();
+		CacheFactory.destroy();
 		
 		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
 		cache = CacheFactory.getInstance();
@@ -85,8 +85,16 @@ public class CacheInfTest {
 		verifyCacheImp(cache);
 		cache.clear(hostName, serviceName, serviceItemName);
 		CacheFactory.close();
+		CacheFactory.destroy();
 		
-		
+		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
+		cache = CacheFactory.getInstance();
+		cache.clear(hostName, serviceName, serviceItemName);
+		((com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache) cache).disableFastCache();
+		verifyCacheImp(cache);
+		cache.clear(hostName, serviceName, serviceItemName);
+		CacheFactory.close();
+		CacheFactory.destroy();
 	}
 
 
