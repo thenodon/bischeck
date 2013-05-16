@@ -707,10 +707,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     			else {
     				try { 
     					tc.setFloatThreshold(Float.parseFloat(curhour));
-    					tc.setExpInd(false);
     				} catch (NumberFormatException ne) {
     					tc.setExpThreshold(curhour);
-    					tc.setExpInd(true);
     				}
     				this.thresholdByPeriod[i] = tc;
     			}
@@ -747,10 +745,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 		    else {
 		        try { 
 		            tc.setFloatThreshold(Float.parseFloat(curhour));
-		            tc.setExpInd(false);
 		        } catch (NumberFormatException ne) {
 		            tc.setExpThreshold(curhour);
-		            tc.setExpInd(true);
 		        }
 		        this.thresholdByPeriod[i] = tc;
 		    }
