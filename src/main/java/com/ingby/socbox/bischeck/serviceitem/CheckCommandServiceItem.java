@@ -40,46 +40,6 @@ import com.ingby.socbox.bischeck.service.ShellService;
 public class CheckCommandServiceItem extends ServiceItemAbstract implements ServiceItem {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(CheckCommandServiceItem.class);
-
-	public static void main(String[] args) {
-		try {
-			ConfigurationManager.init();
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		Service shell = new ShellService("serviceName");
-
-		ServiceItem checkcommand = new CheckCommandServiceItem("serviceItemName");
-		checkcommand.setService(shell);
-
-		checkcommand.setExecution("{\"check\":"+
-				"\"/usr/lib/nagios/plugins/check_ping -H localhost -w 100.0,80% -c 200.0,90%\","+
-				"\"label\":"+ 
-		"\"rta\"}");
-
-		try {
-			checkcommand.execute();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Return value:" + checkcommand.getLatestExecuted());
-
-		checkcommand.setExecution("{\"check\":"+
-				"\"/usr/lib/nagios/plugins/check_tcp -H localhost -p 22\","+
-				"\"label\":"+ 
-		"\"time\"}");
-
-		try {
-			checkcommand.execute();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Return value:" + checkcommand.getLatestExecuted());
-
-	}
 	
 	
 	public CheckCommandServiceItem(String name) {
