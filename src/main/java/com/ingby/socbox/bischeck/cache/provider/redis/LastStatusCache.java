@@ -247,8 +247,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	@Override
 	public void add(LastStatus ls, String key) {
 		LinkedList<LastStatus> fifo;
-		Jedis jedis = jedispool.getResource();
 		
+		Jedis jedis = jedispool.getResource();
 		try {
 			if (fastCache.get(key) == null) {
 				fifo = new LinkedList<LastStatus>();
@@ -291,9 +291,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		
 		LastStatus ls = null;
 
-		Jedis jedis = jedispool.getResource();
 		//String id = lu.getIdByName(key);
-		
+		Jedis jedis = jedispool.getResource();
 		try {	
 			if (jedis.llen(key) == 0)
 				return null;
@@ -305,6 +304,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		} finally {
 			jedispool.returnResource(jedis);
 		}
+		
 		if (ls == null) 
 			return null;
 		else
@@ -315,7 +315,6 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	public LastStatus getLastStatusByIndex(String hostName, String serviceName,
 			String serviceItemName, long index) {
 		
-		Jedis jedis = jedispool.getResource();
 		
 		
 		String key = Util.fullName( hostName, serviceName, serviceItemName);
@@ -323,6 +322,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		lu.setOptimizIndex(key, index);
 		
 		LastStatus ls = null;
+		
+		Jedis jedis = jedispool.getResource();
 		try {
 			if (fastCacheEnable && fastCache.get(key) != null && index < fastCache.get(key).size()-1) {
 				if (LOGGER.isDebugEnabled() ) {
@@ -364,19 +365,23 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				service, 
 				serviceitem,from);
 		if (indfrom == null) {
-			LOGGER.debug("No data for from timestamp "+ from);
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("No data for from timestamp "+ from);
 			return null;
 		}
-		LOGGER.debug("Index from " + indfrom);
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Index from " + indfrom);
 		Long indto = this.getIndexByTime( 
 				host,
 				service, 
 				serviceitem,to);
 		if (indto == null) {
-			LOGGER.debug("No data for from timestamp "+ to);
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("No data for from timestamp "+ to);
 			return null;
 		}
-		LOGGER.debug("Index from " + indto);
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Index from " + indto);
 		
 		List<LastStatus> lslist = new ArrayList<LastStatus>();
 		
@@ -424,7 +429,6 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		}
 		
 		Jedis jedis = jedispool.getResource();
-		
 		try {
 			lsstr = jedis.lrange(key, fromIndex, toIndex);
 		} catch (JedisConnectionException je) {
@@ -441,9 +445,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 				lslist.add(ls);
 			}
 		}
-		return lslist;
 		
-
+		return lslist;
 	}
 
 
@@ -569,8 +572,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
     	String key = Util.fullName( hostName, serviceName, serviceItemName);
 		
+    	Long size = 0L;
 		Jedis jedis = jedispool.getResource();
-		Long size = 0L;
 		try {	
 			size = jedis.llen(key);
 		} catch (JedisConnectionException je) {
@@ -590,10 +593,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Find cache index for " + key +" at time " + new java.util.Date(stime));
 		
-		Jedis jedis = jedispool.getResource();
 		//String id = lu.getIdByName(key);
 		Long index = null;
-
+		Jedis jedis = jedispool.getResource();
 		try {
 			if (jedis.llen(key) == 0)
 				return null;
@@ -623,7 +625,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			String serviceItemName) {
 		long lastindex = getLastIndex(hostName, serviceName, serviceItemName);
 		long lasttimestamp = getLastStatusByIndex(hostName, serviceName, serviceItemName, lastindex).getTimestamp();
-		LOGGER.debug("Last index is" + lastindex + " and have timestamp " + lasttimestamp);
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Last index is" + lastindex + " and have timestamp " + lasttimestamp);
 		return lasttimestamp;
 	}
 
@@ -650,10 +653,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	@Override
 	public void clear(String hostName, String serviceName,
 			String serviceItemName) {
-		Jedis jedis = jedispool.getResource();
 		
 		String key = Util.fullName( hostName, serviceName, serviceItemName);
 		
+		Jedis jedis = jedispool.getResource();
 		try {
 			jedis.del(key);
 		} catch (JedisConnectionException je) {
@@ -986,7 +989,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			if (time > new LastStatus(jedis.lindex(key, 0L)).getTimestamp() || 
 					time < new LastStatus(jedis.lindex(key, jedis.llen(key)-1)).getTimestamp() ) {
 				
-				LOGGER.debug("Out of bounds");
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("Out of bounds");
 						
 				return null;
 			}
@@ -1067,6 +1071,4 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		incRedisCacheCount(1);
 	}
 	
-		
-
 }
