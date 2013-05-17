@@ -394,7 +394,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			toIndex = Integer.MAX_VALUE;
 		}
 
-		Jedis jedis = jedispool.getResource();
+		
 		
 		String key = Util.fullName( hostName, serviceName, serviceItemName);
 
@@ -422,6 +422,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			return lslist;
 
 		}
+		
+		Jedis jedis = jedispool.getResource();
 		
 		try {
 			lsstr = jedis.lrange(key, fromIndex, toIndex);
