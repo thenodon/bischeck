@@ -22,7 +22,7 @@ package testng.com.ingby.socbox.bischeck.serviceitem;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
-import java.util.ArrayList;
+
 
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
@@ -35,15 +35,9 @@ import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
-import com.ingby.socbox.bischeck.cache.provider.laststatuscache.LastStatusCache;
 
 import com.ingby.socbox.bischeck.service.JDBCService;
-import com.ingby.socbox.bischeck.service.LastCacheService;
-import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.service.ServiceException;
-import com.ingby.socbox.bischeck.serviceitem.CalculateOnCache;
 import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
-import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class SQLServiceitemTest {
 
@@ -85,6 +79,8 @@ public class SQLServiceitemTest {
 		stat.execute("insert into test (id, value, createdate) values (4,3000,'2010-12-31')");
 		con.commit();
 
+		CacheFactory.init();
+		
 		cache = CacheFactory.getInstance();		
 
 		cache.clear();
