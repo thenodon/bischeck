@@ -168,7 +168,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	public static synchronized void destroy() {
-
+		lsc.close();
 		try {
 			mbs.unregisterMBean(mbeanname);
 		} catch (MBeanRegistrationException e) {
@@ -176,6 +176,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		} catch (InstanceNotFoundException e) {
 			LOGGER.warn("Mbean " + mbeanname +" instance could not be found",e);
 		}
+		lsc = null;
 	}
 	
 
@@ -540,8 +541,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * Close methods
 	 ***********************************************
 	 */
-	@Override
-	public void close() {
+
+	private void close() {
 		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile); 
 		BackendStorage.dump2file(cache,dumpfile);
 		

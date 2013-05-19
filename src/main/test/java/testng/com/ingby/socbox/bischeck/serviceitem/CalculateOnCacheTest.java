@@ -20,13 +20,16 @@
 package testng.com.ingby.socbox.bischeck.serviceitem;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
@@ -35,6 +38,7 @@ import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.serviceitem.CalculateOnCache;
+import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 
@@ -61,10 +65,10 @@ public class CalculateOnCacheTest {
 	private boolean supportNull = false;
 	
 	
-	@BeforeTest
+	@BeforeClass
     public void beforeTest() throws Exception {
 	
-		
+		System.out.println("======== BeforeClass " + CalculateOnCacheTest.class.getName());
 		
 		confMgmr = ConfigurationManager.getInstance();
 		
@@ -85,9 +89,12 @@ public class CalculateOnCacheTest {
 		cache.clear();
 	}
 	
-	@AfterTest
-	public void afterTest() {
-		cache.close();
+	@AfterClass
+	public void afterTest() throws CacheException {
+		System.out.println("======== AfterClass " + CalculateOnCacheTest.class.getName());
+		
+		//cache.close();
+		CacheFactory.destroy();
 	}
 
     @Test (groups = { "ServiceItem" })

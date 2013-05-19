@@ -28,6 +28,7 @@ import java.util.Map;
 import org.testng.Assert;
 
 
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -51,7 +52,7 @@ public class CacheInfTest {
 
 	Map<String,CacheInf> caches = new HashMap<String,CacheInf>();
 	
-	@BeforeTest
+	@BeforeClass
 	public void beforeTest() throws Exception {
 
 		confMgmr = ConfigurationManager.getInstance();
@@ -68,7 +69,7 @@ public class CacheInfTest {
 
 	
 	
-	@Test (groups = { "Cache" })
+	@Test (groups = { "Cache" } )
 	public void verifyCache() throws CacheException {
 
 		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.laststatuscache.LastStatusCache");
@@ -76,7 +77,6 @@ public class CacheInfTest {
 		cache.clear(hostName, serviceName, serviceItemName);
 		verifyCacheImp(cache);
 		cache.clear(hostName, serviceName, serviceItemName);
-		CacheFactory.close();
 		CacheFactory.destroy();
 		
 		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
@@ -84,7 +84,6 @@ public class CacheInfTest {
 		cache.clear(hostName, serviceName, serviceItemName);
 		verifyCacheImp(cache);
 		cache.clear(hostName, serviceName, serviceItemName);
-		CacheFactory.close();
 		CacheFactory.destroy();
 		
 		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
@@ -93,7 +92,6 @@ public class CacheInfTest {
 		((com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache) cache).disableFastCache();
 		verifyCacheImp(cache);
 		cache.clear(hostName, serviceName, serviceItemName);
-		CacheFactory.close();
 		CacheFactory.destroy();
 	}
 

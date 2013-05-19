@@ -289,17 +289,6 @@ public interface CacheInf {
     		String serviceItemName);
 
     
-    /*
-     ***********************************************
-	 * Close methods
-	 ***********************************************
-	 */
-
-    /**
-     * Close the cache and make sure all data is saved
-     */
-    public void close();
-
 
 
 }

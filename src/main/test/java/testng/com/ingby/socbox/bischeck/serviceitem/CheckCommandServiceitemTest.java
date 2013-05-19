@@ -20,18 +20,22 @@
 package testng.com.ingby.socbox.bischeck.serviceitem;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ShellService;
 import com.ingby.socbox.bischeck.serviceitem.CheckCommandServiceItem;
+import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class CheckCommandServiceitemTest {
@@ -41,10 +45,10 @@ public class CheckCommandServiceitemTest {
 	private ConfigurationManager confMgmr;
 	private CacheInf cache;
 	private Service shell;
-	@BeforeTest
+	@BeforeClass
 	public void beforeTest() throws Exception {
 
-
+		System.out.println("======== BeforeClass " + CheckCommandServiceitemTest.class.getName());
 		confMgmr = ConfigurationManager.getInstance();
 
 		if (confMgmr == null) {
@@ -62,9 +66,12 @@ public class CheckCommandServiceitemTest {
 		cache.clear();
 	}
 
-	@AfterTest
-	public void afterTest() {
-		cache.close();
+	@AfterClass
+	public void afterTest() throws CacheException {
+		System.out.println("======== AfterClass " + CheckCommandServiceitemTest.class.getName());
+
+		//cache.close();
+		CacheFactory.destroy();
 	}
 
 	@Test (groups = { "ServiceItem" })

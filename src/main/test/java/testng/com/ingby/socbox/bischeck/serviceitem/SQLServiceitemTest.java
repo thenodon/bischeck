@@ -25,13 +25,16 @@ import java.sql.Statement;
 
 
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
@@ -48,10 +51,10 @@ public class SQLServiceitemTest {
 	private JDBCService jdbc;
 	private SQLServiceItem sql;
 
-	@BeforeTest
+	@BeforeClass
 	public void beforeTest() throws Exception {
 
-
+		System.out.println("======== BeforeClass " + SQLServiceitemTest.class.getName());
 		confMgmr = ConfigurationManager.getInstance();
 
 		if (confMgmr == null) {
@@ -86,9 +89,10 @@ public class SQLServiceitemTest {
 		cache.clear();
 	}
 
-	@AfterTest
-	public void afterTest() {
-		cache.close();
+	@AfterClass
+	public void afterTest() throws CacheException {
+		//cache.close();
+		CacheFactory.destroy();
 	}
 
 	@Test (groups = { "ServiceItem" })

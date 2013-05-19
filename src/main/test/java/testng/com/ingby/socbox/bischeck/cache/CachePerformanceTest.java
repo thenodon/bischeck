@@ -23,13 +23,16 @@ package testng.com.ingby.socbox.bischeck.cache;
 
 
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
+import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
@@ -46,7 +49,7 @@ public class CachePerformanceTest {
 	String cachekey = Util.fullName(qhostname, servicename, serviceitemname);
 	private int fastcacheSize;
 	
-	@BeforeTest
+	@BeforeClass
     public void beforeTest() throws Exception {
 	
 		confMgmr = ConfigurationManager.getInstance();
@@ -57,15 +60,16 @@ public class CachePerformanceTest {
 			confMgmr = ConfigurationManager.getInstance();	
 		}
 			
-		CacheFactory.init();
+		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
 		cache = CacheFactory.getInstance();
+		cache.clear();
 		fastcacheSize = Integer.parseInt(ConfigurationManager.getInstance().getProperties().getProperty("lastStatusCacheSize","500"));
 	
 	}
 
-	@AfterTest
-	public void afterTest() {
-		cache.close();
+	@AfterClass
+	public void afterTest() throws CacheException {
+		CacheFactory.destroy();
 	}
 
 

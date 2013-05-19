@@ -170,6 +170,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			LOGGER.warn("Mbean " + mbeanname +" instance could not be found",e);
 		}
 		lsc = null;
+		
 	}
 	
 	/*
@@ -667,17 +668,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 
-    /*
-     ***********************************************
-	 * Close methods
-	 ***********************************************
-	 */
-	
-	@Override
-	public void close() {
-		
-	}
-
+    
 	/*
 	 ***********************************************
 	 ***********************************************

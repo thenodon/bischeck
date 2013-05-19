@@ -8,9 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ClassCache;
 import com.ingby.socbox.bischeck.ConfigurationManager;
-//import com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache;
-//import com.ingby.socbox.bischeck.service.Service;
-
 
 
 public class CacheFactory {
@@ -22,8 +19,9 @@ public class CacheFactory {
 	private static String classCacheName;
 
 	/**
-	 * Create a cache used by bischeck
-	 * @return
+	 * Get the cache instance 
+	 * @return the cache object. If the cache has not been initialized return 
+	 * null.
 	 */
 	public static CacheInf getInstance(){
 
@@ -35,31 +33,29 @@ public class CacheFactory {
 
 
 	/**
-	 * Close the cache depending on cache used
-	 * @throws Exception
+	 * Initialize the default cache defined by the property cacheProvider.
+	 * If the property cacheProvider is not set the default implementation is 
+	 * {@link com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache} 
+	 * The init method must be called before the cache is used. 
+	 * @throws CacheException
 	 */
-	public synchronized static void close() {
-		if (cache != null) {
-			cache.close();
-			cache = null;
-		}
-	}
-
 	public synchronized static void init()  throws CacheException {
 		String className = ConfigurationManager.getInstance().getProperties().
 				getProperty("cacheProvider","com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
 		init(className);
 	}
 	
+	
+	/**
+	 * Initialize a specific named implementation.
+	 * @param className name of the cache class to use.
+	 * @throws CacheException if the the class name do not exist or can not be
+	 * Instantiated.
+	 */
 	@SuppressWarnings("unchecked")
 	public synchronized static void init(String className)  throws CacheException {
 		classCacheName = className;
 		if (cache == null) {
-			// Selector to define which one to use
-			/*
-			String className = ConfigurationManager.getInstance().getProperties().
-					getProperty("cacheProvider","com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
-			*/
 			Class<CacheInf> clazz;
 			try {
 				clazz = (Class<CacheInf>) ClassCache.getClassByName(className);
@@ -83,6 +79,10 @@ public class CacheFactory {
 		}
 	}
 
+	/**
+	 * 
+	 * @throws CacheException
+	 */
 	@SuppressWarnings("unchecked")
 	public synchronized static void destroy()  throws CacheException {
 		Class<CacheInf> clazz;
@@ -102,8 +102,13 @@ public class CacheFactory {
 		} catch (NoSuchMethodException e) {
 			throw new CacheException(e);
 		}
-
+	
+		if (cache != null) {
+			cache = null;
+		}
+	
 		LOGGER.info("Cache provider destroyed - " + classCacheName);
 	}
+	
 }
 
