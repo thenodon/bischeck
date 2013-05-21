@@ -48,7 +48,7 @@ import com.yammer.metrics.core.TimerContext;
  * @author andersh
  *
  */
-public final class NSCAServer implements Server, ServerInternal {
+public final class NSCAServer implements Server, ServerInternal, MessageServerInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NSCAServer.class);
     /**
@@ -167,7 +167,7 @@ public final class NSCAServer implements Server, ServerInternal {
         
         payload.setLevel(level.toString());
         
-        if (LOGGER.isInfoEnabled())
+        //if (LOGGER.isInfoEnabled())
         	LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
         
         final String timerName = instanceName+"_execute";
@@ -200,6 +200,12 @@ public final class NSCAServer implements Server, ServerInternal {
     	defaultproperties.setProperty("connectionTimeout","5000");
 		
 		return defaultproperties;
+	}
+
+
+	@Override
+	public void onMessage(Service message) {
+		send(message);
 	}
 
 }

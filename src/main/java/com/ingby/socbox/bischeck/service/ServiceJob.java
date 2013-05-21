@@ -46,6 +46,7 @@ import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
+import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 import com.ingby.socbox.bischeck.threshold.Threshold;
@@ -107,7 +108,11 @@ public class ServiceJob implements Job {
 			checkRunImmediate(runafter);
 
 			if (service.isSendServiceData()) {
-				ServerExecutor.getInstance().execute(service);
+				//ServerExecutor.getInstance().execute(service);
+				ServerMessageExecutor.getInstance().execute(service);
+				
+				// TODO pubsub
+				/* In a pub sub this would be the place to publish the data */ 
 			}
 		} finally {
 			long executetime = timercontext.stop()/1000000;         	

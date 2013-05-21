@@ -46,7 +46,7 @@ import com.yammer.metrics.core.TimerContext;
  * @author andersh
  *
  */
-public final class MetricsLibratoServer implements Server {
+public final class MetricsLibratoServer implements Server, MessageServerInf {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(MetricsLibratoServer.class);
 
@@ -250,4 +250,8 @@ public final class MetricsLibratoServer implements Server {
 		return defaultproperties;
 	}
 
+	@Override
+	public void onMessage(Service message) {
+		send(message);
+	}
 }

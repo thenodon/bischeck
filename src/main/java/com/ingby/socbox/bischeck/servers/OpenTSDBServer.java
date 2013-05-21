@@ -42,7 +42,7 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
-public final class OpenTSDBServer implements Server {
+public final class OpenTSDBServer implements Server,  MessageServerInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OpenTSDBServer.class);
     static Map<String,OpenTSDBServer> servers = new HashMap<String,OpenTSDBServer>();
@@ -262,5 +262,10 @@ public final class OpenTSDBServer implements Server {
     	defaultproperties.setProperty("connectionTimeout","5000");
 	
 		return defaultproperties;
+	}
+    
+    @Override
+	public void onMessage(Service message) {
+		send(message);
 	}
 }

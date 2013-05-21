@@ -46,7 +46,7 @@ import com.yammer.metrics.core.TimerContext;
  * @author andersh
  *
  */
-public final class GraphiteServer implements Server {
+public final class GraphiteServer implements Server, MessageServerInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GraphiteServer.class);
     static Map<String,GraphiteServer> servers = new HashMap<String,GraphiteServer>();
@@ -107,37 +107,7 @@ public final class GraphiteServer implements Server {
     	servers.remove(name);
     }
     
-    
-    /**
-     * Check if the service data should be filtered out and not sent
-     * @param service
-     * @return
-     */
-	/*
-    private boolean doNotSend(Service service) {
-		if (msts == null)
-			msts = new MatchServiceToSend(MatchServiceToSend.convertString2List(doNotSendRegex,doNotSendRegexDelim));
-		*
-		 * Loop through all host, service and serviceitems and check if 
-		 * match regex described doNotSendRegex 
-		 *
-		for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) { 
-			ServiceItem serviceItem = serviceItementry.getValue();
-
-			StringBuffer st = new StringBuffer().
-			append(service.getHost().getHostname()).append("-").
-			append(service.getServiceName()).append("-").
-			append(serviceItem.getServiceItemName());
-			if (msts.isMatch(st.toString())) {
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("Matching regex - will not send " + st.toString());	
-				return true;
-			}
-		}
-		return false;
-	}
-	*/
-	
+    	
     @Override
     synchronized public void send(Service service) {
         String message;    
@@ -314,5 +284,11 @@ public final class GraphiteServer implements Server {
     	defaultproperties.setProperty("doNotSendRegex","");
     	defaultproperties.setProperty("doNotSendRegexDelim","%");
 		return defaultproperties;
+	}
+
+    
+    @Override
+	public void onMessage(Service message) {
+		send(message);
 	}
 }

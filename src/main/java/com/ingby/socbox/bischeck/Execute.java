@@ -65,6 +65,7 @@ import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.internal.InternalSurveillance;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
+import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 
@@ -157,7 +158,11 @@ public final class Execute implements ExecuteMBean {
         
         dumpthread = new Thread(){
             public void run(){
-            	CacheFactory.close();
+            	try {
+					CacheFactory.destroy();
+				} catch (CacheException e) {
+					LOGGER.warn("Cache was not destoryed", e);
+				}
               }
             };
             
@@ -248,7 +253,7 @@ public final class Execute implements ExecuteMBean {
             LOGGER.warn("Stopping Quartz scheduler failed with - " + e);
         }
         
-        ServerExecutor.getInstance().unregisterAll();
+        ServerMessageExecutor.getInstance().unregisterAll();
        
         //CacheFactory.close();
         LOGGER.info("******************* Shutdown ********************");

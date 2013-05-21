@@ -40,7 +40,7 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
-public final class LiveStatusServer implements Server {
+public final class LiveStatusServer implements Server, MessageServerInf {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(LiveStatusServer.class);
 
@@ -212,5 +212,10 @@ public final class LiveStatusServer implements Server {
 		defaultproperties.setProperty("connectionTimeout","5000");
 
 		return defaultproperties;
+	}
+
+	@Override
+	public void onMessage(Service message) {
+		send(message);
 	}
 }

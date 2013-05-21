@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.servers.ServerExecutor;
+import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Metric;
@@ -187,8 +188,8 @@ public class InternalSurveillance implements Job {
 
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
-		ServerExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-timers", NAGIOSSTAT.OK, this.executeTimers());
-		ServerExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-tps", NAGIOSSTAT.OK, this.tpsTimers());
+		ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-timers", NAGIOSSTAT.OK, this.executeTimers());
+		ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-tps", NAGIOSSTAT.OK, this.tpsTimers());
 	}
 
 }
