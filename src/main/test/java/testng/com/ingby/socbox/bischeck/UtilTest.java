@@ -20,7 +20,7 @@
 package testng.com.ingby.socbox.bischeck;
 
 
-import org.apache.derby.iapi.jdbc.JDBCBoot;
+
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -28,7 +28,6 @@ import org.testng.annotations.Test;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Host;
 import com.ingby.socbox.bischeck.Util;
-import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.service.JDBCService;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
