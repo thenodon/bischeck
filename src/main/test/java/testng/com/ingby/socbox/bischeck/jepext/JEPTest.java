@@ -28,7 +28,8 @@ import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 
 public class JEPTest {
 
-	static ExecuteJEP parser = null;
+	private ExecuteJEP parser = null;
+	
 	@BeforeTest
     public void beforeTest()  {
 		parser = new ExecuteJEP();        // Create a new parser	
@@ -75,7 +76,7 @@ public class JEPTest {
     	Assert.assertEquals(calc(expr),new Float(-1));
     }
     
-    public static Float calc(String expr) {
+    private Float calc(String expr) {
 		Float value = null;
 		try {
 		value = parser.execute(expr);                 // Parse the expression

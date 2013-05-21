@@ -21,9 +21,7 @@ package testng.com.ingby.socbox.bischeck.serviceitem;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 
@@ -35,7 +33,6 @@ import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ShellService;
 import com.ingby.socbox.bischeck.serviceitem.CheckCommandServiceItem;
-import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class CheckCommandServiceitemTest {

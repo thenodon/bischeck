@@ -26,9 +26,7 @@ import java.sql.Statement;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 
@@ -91,7 +89,6 @@ public class SQLServiceitemTest {
 
 	@AfterClass
 	public void afterTest() throws CacheException {
-		//cache.close();
 		CacheFactory.destroy();
 	}
 
