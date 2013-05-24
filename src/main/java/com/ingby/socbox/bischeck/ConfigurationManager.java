@@ -160,32 +160,8 @@ public final class ConfigurationManager  {
     }
     
     
-    synchronized public static void initonce() throws Exception{
-        if (configMgr == null ) 
-            configMgr = new ConfigurationManager();
-        
-        configMgr.allocateDataStructs();
-        
-        LOOGER.debug("Init");
-        try {
-        	// Initialize all data structures. 
-        	configMgr.initProperties();
-        	configMgr.initURL2Service();
-        	configMgr.initServers();
-        	configMgr.initBischeckServices(true);
-        	configMgr.initScheduler();
-
-        	ThresholdFactory.clearCache();
-        	
-        	// Verify if the pid file is writable
-        	if (!configMgr.checkPidFile()) {
-        		throw new Exception("Can not write to pid file " + configMgr.getPidFile());
-        	}
-        	configMgr.getServerClassMap();
-        } catch (Exception e) {
-        	LOOGER.error("Configuration Manager initzialization failed with " + e);
-        	throw e;
-        }
+    synchronized public static void initonce() throws  ConfigurationException {
+    	initConfiguration(true);
     }
     
     
@@ -195,35 +171,40 @@ public final class ConfigurationManager  {
      * This method should be called before any getInstance() calls are done. 
      * @throws Exception
      */
-    synchronized public static void init() throws Exception{
-        if (configMgr == null ) 
+    synchronized public static void init() throws ConfigurationException {
+    	initConfiguration(false);
+    }
+
+    
+    private static void initConfiguration(boolean runOnce) throws ConfigurationException {
+    	if (configMgr == null ) 
             configMgr = new ConfigurationManager();
         
         configMgr.allocateDataStructs();
         
-        LOOGER.debug("Init");
         try {
         	// Init all data structures. 
         	configMgr.initProperties();
         	configMgr.initURL2Service();
         	configMgr.initServers();
-        	configMgr.initBischeckServices(false);
+        	configMgr.initBischeckServices(runOnce);
         	configMgr.initScheduler();
 
         	ThresholdFactory.clearCache();
         	
         	// Verify if the pid file is writable
         	if (!configMgr.checkPidFile()) {
-        		throw new Exception("Can not write to pid file " + configMgr.getPidFile());
+        		LOOGER.error("Can not write to pid file " + configMgr.getPidFile());
+        		throw new ConfigurationException("Can not write to pid file " + configMgr.getPidFile());
         	}
         	configMgr.getServerClassMap();
         } catch (Exception e) {
         	LOOGER.error("Configuration Manager initzialization failed with " + e);
-        	throw e;
+        	throw new ConfigurationException("Configuration Manager initzialization failed",e);
         }
-
+    	
     }
-
+    
     
     /**
      * Get the ConfigurationManager object that is shared among all. Make sure 
