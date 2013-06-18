@@ -363,7 +363,7 @@ public final class ConfigurationManager  {
             // If a template is detected
             if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) { 
             	XMLServicetemplate template = serviceTemplateMap.get(serviceconfig.getTemplate());
-            	LOOGER.debug("Found template " + template.getTemplatename());
+            	LOOGER.debug("Found Service template " + template.getTemplatename());
             	service = ServiceFactory.createService(
             			template.getName(),
             			template.getUrl().trim());
@@ -441,28 +441,58 @@ public final class ConfigurationManager  {
         }
         
         while (iterserviceitem.hasNext()) {
-            XMLServiceitem serviceitemconfig = iterserviceitem.next();
-            
-            ServiceItem serviceitem = ServiceItemFactory.createServiceItem(
-                    serviceitemconfig.getName(),
-                    serviceitemconfig.getServiceitemclass().trim());
+        	ServiceItem serviceitem = null;
+        	
+                        // If a normal service configuration is detected
+        	XMLServiceitem serviceitemconfig = iterserviceitem.next();
 
-            serviceitem.setService(service);
-            serviceitem.setClassName(serviceitemconfig.getServiceitemclass().trim());
-            serviceitem.setAlias(serviceitemconfig.getAlias());
-            serviceitem.setDecscription(serviceitemconfig.getDesc());
-            serviceitem.setExecution(serviceitemconfig.getExecstatement());
-            
-            /*
-             * Set default threshold class if not set in bischeck.xml
-             */
-            if (serviceitemconfig.getThresholdclass() == null || 
-            		serviceitemconfig.getThresholdclass().trim().length() == 0 ) {
-            	serviceitem.setThresholdClassName(DEFAULT_TRESHOLD);
-            } else {
-            	serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
+        	if (serviceItemTemplateMap.containsKey(serviceitemconfig.getTemplate())){
+        		XMLServiceitemtemplate template = serviceItemTemplateMap.get(serviceitemconfig.getTemplate());
+            	LOOGER.debug("Found ServiceItem template " + template.getTemplatename());
+            	serviceitem = ServiceItemFactory.createServiceItem(
+            			template.getName(),
+            			template.getServiceitemclass().trim());
+            	serviceitem.setService(service);
+            	serviceitem.setClassName(template.getServiceitemclass().trim());
+            	serviceitem.setAlias(template.getAlias());
+            	serviceitem.setDecscription(template.getDesc());
+            	serviceitem.setExecution(template.getExecstatement());
+
+            	/*
+            	 * Set default threshold class if not set in bischeck.xml
+            	 */
+            	if (template.getThresholdclass() == null || 
+            			template.getThresholdclass().trim().length() == 0 ) {
+            		serviceitem.setThresholdClassName(DEFAULT_TRESHOLD);
+            	} else {
+            		serviceitem.setThresholdClassName(template.getThresholdclass().trim());
+            	}
+
             }
-            
+        	else {
+
+            	//XMLServiceitem serviceitemconfig = iterserviceitem.next();
+
+            	serviceitem = ServiceItemFactory.createServiceItem(
+            			serviceitemconfig.getName(),
+            			serviceitemconfig.getServiceitemclass().trim());
+
+            	serviceitem.setService(service);
+            	serviceitem.setClassName(serviceitemconfig.getServiceitemclass().trim());
+            	serviceitem.setAlias(serviceitemconfig.getAlias());
+            	serviceitem.setDecscription(serviceitemconfig.getDesc());
+            	serviceitem.setExecution(serviceitemconfig.getExecstatement());
+
+            	/*
+            	 * Set default threshold class if not set in bischeck.xml
+            	 */
+            	if (serviceitemconfig.getThresholdclass() == null || 
+            			serviceitemconfig.getThresholdclass().trim().length() == 0 ) {
+            		serviceitem.setThresholdClassName(DEFAULT_TRESHOLD);
+            	} else {
+            		serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
+            	}
+            }
             service.addServiceItem(serviceitem);
 
         }
