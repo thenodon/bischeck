@@ -63,6 +63,8 @@ import com.ingby.socbox.bischeck.xsd.bischeck.XMLBischeck;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLHost;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLService;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLServiceitem;
+import com.ingby.socbox.bischeck.xsd.bischeck.XMLServiceitemtemplate;
+import com.ingby.socbox.bischeck.xsd.bischeck.XMLServicetemplate;
 import com.ingby.socbox.bischeck.xsd.properties.XMLProperties;
 import com.ingby.socbox.bischeck.xsd.properties.XMLProperty;
 import com.ingby.socbox.bischeck.xsd.servers.XMLServer;
@@ -101,6 +103,9 @@ public final class ConfigurationManager  {
     
     private Map<RunAfter,List<Service>> runafter = null;
 	
+    private Map<String,XMLServicetemplate> serviceTemplateMap = null;
+    private Map<String,XMLServiceitemtemplate> serviceItemTemplateMap = null;
+    
     public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
         CommandLine line = null;
@@ -157,6 +162,8 @@ public final class ConfigurationManager  {
     	servermap = new HashMap<String,Properties>();
     	serversclass = new HashMap<String,Class<?>>();
     	runafter = new HashMap<RunAfter,List<Service>>();
+    	serviceTemplateMap = new HashMap<String, XMLServicetemplate>();
+    	serviceItemTemplateMap = new HashMap<String, XMLServiceitemtemplate>();
     }
     
     
@@ -189,7 +196,7 @@ public final class ConfigurationManager  {
         	configMgr.initServers();
         	configMgr.initBischeckServices(runOnce);
         	configMgr.initScheduler();
-
+        	
         	ThresholdFactory.clearCache();
         	
         	// Verify if the pid file is writable
@@ -263,6 +270,16 @@ public final class ConfigurationManager  {
         XMLBischeck bischeckconfig  =
                 (XMLBischeck) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.BISCHECK);
 
+        // Init template 
+        for (XMLServicetemplate serviceTemplate: bischeckconfig.getServicetemplate()) {
+        	serviceTemplateMap.put(serviceTemplate.getTemplatename(),serviceTemplate);
+        }
+        
+        for (XMLServiceitemtemplate serviceItemTemplate: bischeckconfig.getServiceitemtemplate()) {
+        	serviceItemTemplateMap.put(serviceItemTemplate.getTemplatename(),serviceItemTemplate);
+        }
+        
+        //
         setupHost(bischeckconfig);
         
         // Create the quartz schedule triggers and store in a List
@@ -317,9 +334,17 @@ public final class ConfigurationManager  {
                 hostsmap.put(hostconfig.getName(),host);
             }
             
+            host.setAlias(hostconfig.getAlias());
             host.setDecscription(hostconfig.getDesc());
 
             setupService(hostconfig, host);
+
+            // Set the macro values
+            ConfigMacroUtil.replaceMacros(host);
+            if (LOOGER.isDebugEnabled()) {
+            	StringBuffer strbuf = ConfigMacroUtil.dump(host);
+            	LOOGER.debug(strbuf.toString());
+            }
         }
     }
 
@@ -332,36 +357,68 @@ public final class ConfigurationManager  {
         
         while (iterservice.hasNext()) {
             XMLService serviceconfig = iterservice.next();
-            Service service = ServiceFactory.createService(
-                    serviceconfig.getName(),
-                    serviceconfig.getUrl().trim());
-
-            //Check for null - not supported logger.error
-            service.setHost(host);
-            service.setDecscription(serviceconfig.getDesc());
-            service.setSchedules(serviceconfig.getSchedule());
-            service.setConnectionUrl(serviceconfig.getUrl().trim());
-            service.setDriverClassName(serviceconfig.getDriver());
-            if (serviceconfig.isSendserver() != null) {
-                service.setSendServiceData(serviceconfig.isSendserver());
-            } else {
-                service.setSendServiceData(true);
-            }
-                
-            if (service.getDriverClassName() != null) {
-            	if (service.getDriverClassName().trim().length() != 0) {
-            		LOOGER.debug("Driver name: " + service.getDriverClassName().trim());
-            		try {
-            			Class.forName(service.getDriverClassName().trim()).newInstance();
-            		} catch ( ClassNotFoundException e) {
-            			LOOGER.error("Could not find the driver class - " + service.getDriverClassName() + 
-            					" " + e.toString());
-            			throw new Exception(e.getMessage());
-            		}
-            	}
-            }
             
+            Service service = null;
+            
+            // If a template is detected
+            if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) { 
+            	XMLServicetemplate template = serviceTemplateMap.get(serviceconfig.getTemplate());
+            	LOOGER.debug("Found template " + template.getTemplatename());
+            	service = ServiceFactory.createService(
+            			template.getName(),
+            			template.getUrl().trim());
+
+            	service.setHost(host);
+            	service.setAlias(template.getAlias());
+            	service.setDecscription(template.getDesc());
+            	service.setSchedules(template.getSchedule());
+            	service.setConnectionUrl(template.getUrl().trim());
+            	service.setDriverClassName(template.getDriver());
+            	if (template.isSendserver() != null) {
+            		service.setSendServiceData(template.isSendserver());
+            	} else {
+            		service.setSendServiceData(true);
+            	}
+
+            }
+            // If a normal service configuration is detected
+            else {
+
+            	service = ServiceFactory.createService(
+            			serviceconfig.getName(),
+            			serviceconfig.getUrl().trim());
+
+            	//Check for null - not supported logger.error
+            	service.setHost(host);
+            	service.setAlias(serviceconfig.getAlias());
+            	service.setDecscription(serviceconfig.getDesc());
+            	service.setSchedules(serviceconfig.getSchedule());
+            	service.setConnectionUrl(serviceconfig.getUrl().trim());
+            	service.setDriverClassName(serviceconfig.getDriver());
+            	if (serviceconfig.isSendserver() != null) {
+            		service.setSendServiceData(serviceconfig.isSendserver());
+            	} else {
+            		service.setSendServiceData(true);
+            	}
+
+            }
+
+            // Common actions
+            if (service.getDriverClassName() != null) {
+        		if (service.getDriverClassName().trim().length() != 0) {
+        			LOOGER.debug("Driver name: " + service.getDriverClassName().trim());
+        			try {
+        				Class.forName(service.getDriverClassName().trim()).newInstance();
+        			} catch ( ClassNotFoundException e) {
+        				LOOGER.error("Could not find the driver class - " + service.getDriverClassName() + 
+        						" " + e.toString());
+        				throw new Exception(e.getMessage());
+        			}
+        		}
+        	}
+
             setupServiceItem(serviceconfig, service);
+            
             host.addService(service);    
         }
     }
@@ -371,7 +428,17 @@ public final class ConfigurationManager  {
             throws NoSuchMethodException, InstantiationException,
             IllegalAccessException, InvocationTargetException,
             ClassNotFoundException {
-        Iterator<XMLServiceitem> iterserviceitem = serviceconfig.getServiceitem().iterator();
+        
+    	Iterator<XMLServiceitem> iterserviceitem = null; 
+    	
+        // If the service was a template - search in the template
+        if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) { 
+        	XMLServicetemplate template = serviceTemplateMap.get(serviceconfig.getTemplate());
+        	 iterserviceitem = template.getServiceitem().iterator();
+        }
+        else {
+        	iterserviceitem = serviceconfig.getServiceitem().iterator();
+        }
         
         while (iterserviceitem.hasNext()) {
             XMLServiceitem serviceitemconfig = iterserviceitem.next();
@@ -382,6 +449,7 @@ public final class ConfigurationManager  {
 
             serviceitem.setService(service);
             serviceitem.setClassName(serviceitemconfig.getServiceitemclass().trim());
+            serviceitem.setAlias(serviceitemconfig.getAlias());
             serviceitem.setDecscription(serviceitemconfig.getDesc());
             serviceitem.setExecution(serviceitemconfig.getExecstatement());
             

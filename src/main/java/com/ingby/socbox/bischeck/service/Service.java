@@ -227,4 +227,10 @@ public interface Service {
      */
     public void setSendServiceData(Boolean sendServiceData);
 
+    
+    
+    public String getAlias();
+
+
+	public void setAlias(String alias);
 }

@@ -44,6 +44,7 @@ public abstract class ServiceAbstract {
     protected HashMap<String,ServiceItem> servicesItems = new HashMap<String,ServiceItem>();
     protected String serviceName;
     protected String decscription;
+    protected String alias;
     protected String connectionUrl;
     protected String driverClassName;
     protected Host host;
@@ -156,4 +157,13 @@ public abstract class ServiceAbstract {
         this.sendServiceData = sendServiceData;
     }
 
+
+    public String getAlias() {
+		return alias;
+	}
+
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
 }

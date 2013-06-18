@@ -36,13 +36,14 @@ import com.ingby.socbox.bischeck.threshold.Threshold;
 
 public abstract class ServiceItemAbstract {
 
-    protected String     serviceItemName;
-    protected String     decscription;
-    protected String     execution;
-    protected Service     service;
-    protected String     thresholdclassname;
-    protected String     latestValue = null;
-    protected Long         exectime;
+    protected String serviceItemName;
+    protected String decscription;
+    protected String alias;
+    protected String execution;
+    protected Service service;
+    protected String thresholdclassname;
+    protected String latestValue = null;
+    protected Long exectime;
     protected Threshold threshold;
 	private String classname;
 
@@ -134,5 +135,15 @@ public abstract class ServiceItemAbstract {
     public String getClassName() {
     	return this.classname;
     }
+
+
+    public String getAlias() {
+		return alias;
+	}
+
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
 
 }

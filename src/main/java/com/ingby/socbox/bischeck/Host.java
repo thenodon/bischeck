@@ -33,8 +33,10 @@ public class Host {
     private String hostname;
     private HashMap<String,Service> services = new HashMap<String,Service>();
     private String description;
+    private String alias;
 
-    public Host (String hostname) {
+
+	public Host (String hostname) {
         this.hostname = hostname;
     }
 
@@ -73,4 +75,13 @@ public class Host {
     public void setDecscription(String decscription) {
         this.description = decscription;
     }
+    
+    public String getAlias() {
+		return alias;
+	}
+
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
 }

@@ -161,4 +161,11 @@ public interface ServiceItem {
     public void setClassName(String classname);
 
     public String getClassName();
+
+    
+    public String getAlias();
+
+
+	public void setAlias(String alias);
+
 }
