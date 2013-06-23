@@ -23,9 +23,9 @@ public abstract class ObjectDefinitions {
 
 	private static final String CACHE_QUOTE_STRING = "\\\\" + CACHE_KEY_SEP;
 	
-	private static final String FINDTOFROMTIMEPATTERN = "(^-[0-9]+ *[HMS]{1}:-[0-9]+ *[HMS]{1} *$)|(^-[0-9]+ *[HMS]{1}:"+CacheInf.ENDMARK+")";
+	private static final String FINDTOFROMTIMEPATTERN = "(^-[0-9]+ *[HMSD]{1}:-[0-9]+ *[HMSD]{1} *$)|(^-[0-9]+ *[HMSD]{1}:"+CacheInf.ENDMARK+")";
 		
-	private static final String FINDINTIMEPATTERN = "^-[0-9]+ *[HMS]{1} *$";
+	private static final String FINDINTIMEPATTERN = "^-[0-9]+ *[HMSD]{1} *$";
 	
 	private static final Pattern PATTERN_HOST_SERVICE_SERVICEITEM = Pattern.compile ("^"+HOST_SERVICE_ITEM_REGEXP+"$");        
 

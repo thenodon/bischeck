@@ -55,6 +55,7 @@ public abstract class CacheUtil {
             case 'S' : return (Integer.parseInt(value)); 
             case 'M' : return (Integer.parseInt(value)*60); 
             case 'H' : return (Integer.parseInt(value)*60*60);
+            case 'D' : return (Integer.parseInt(value)*60*60*24);
             }
         }
         LOGGER.warn("Cache calculate by time do not parse string " + schedule + " correctly");
