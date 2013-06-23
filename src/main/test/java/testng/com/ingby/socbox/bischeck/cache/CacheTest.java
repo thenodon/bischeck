@@ -119,36 +119,6 @@ public class CacheTest {
 			// Test using ENDMARK
 			System.out.println("ENDMARK");
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
 			
 			//Combo 1
 			Assert.assertEquals(CacheEvaluator.parse("avg(" + cachekey + "[0]," + cachekey + "[6:12])"),"avg(21,15,14,13,12,10,9)");
