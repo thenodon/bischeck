@@ -50,12 +50,12 @@ public abstract class CacheUtil {
             String withoutSpace=schedule.replaceAll(" ","");
             char time = withoutSpace.charAt(withoutSpace.length()-1);
             String value = withoutSpace.substring(0, withoutSpace.length()-1);
-            LOGGER.debug("Time selected "+ time + " : " + value);
+            
             switch (time) {
-            case 'S' : return (Integer.parseInt(value)); 
-            case 'M' : return (Integer.parseInt(value)*60); 
-            case 'H' : return (Integer.parseInt(value)*60*60);
-            case 'D' : return (Integer.parseInt(value)*60*60*24);
+            	case 'S' : return (Integer.parseInt(value)); 
+            	case 'M' : return (Integer.parseInt(value)*60); 
+            	case 'H' : return (Integer.parseInt(value)*60*60);
+            	case 'D' : return (Integer.parseInt(value)*60*60*24);
             }
         }
         LOGGER.warn("Cache calculate by time do not parse string " + schedule + " correctly");
@@ -117,7 +117,6 @@ public abstract class CacheUtil {
 			}
 			
 			strbuf.delete(strbuf.length()-1, strbuf.length());
-		//	strbuf.append(SEP);
 			
 		} else if (CacheUtil.isByFromToTime(indexstr)) {
 			/*
@@ -133,7 +132,7 @@ public abstract class CacheUtil {
 					host,
 					service, 
 					serviceitem,
-					System.currentTimeMillis() + CacheUtil.calculateByTime(indfromTime)*1000);
+					System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(indfromTime))*1000);
 			
 			String indtoTime = ind.nextToken();
 			Long indto;
@@ -144,13 +143,12 @@ public abstract class CacheUtil {
 					host,
 					service, 
 					serviceitem,
-					System.currentTimeMillis() + CacheUtil.calculateByTime(indtoTime)*1000);
+					System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(indtoTime))*1000);
 			}
 			
 			// If any of the index returned is null it means that there is 
 			// no cache data in the from or to time and then return a single null
 			if (indfrom == null || indto == null || indfrom > indto) {
-				//strbuf.append("null" + CacheInf.JEPLISTSEP);
 				strbuf.append("null");
 			} else {
 				strbuf.append(cache.getByIndex(host, service, serviceitem, indfrom, indto, CacheInf.JEPLISTSEP));
