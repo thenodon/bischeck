@@ -96,7 +96,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	private static ObjectName   mbeanname = null;
 
-	private final static String lastStatusCacheDumpFile = "lastStatusCacheDump";
+	private final static String LASTSTATUSCACHE_DUMP_FILE = "lastStatusCacheDump";
 
 	private static String lastStatusCacheDumpDir;
 	
@@ -543,7 +543,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 */
 
 	private void close() {
-		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile); 
+		File dumpfile = new File(lastStatusCacheDumpDir,LASTSTATUSCACHE_DUMP_FILE); 
 		BackendStorage.dump2file(cache,dumpfile);
 		
 	}
@@ -589,7 +589,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	@Override
 	public void dump2file() {
-		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile);
+		File dumpfile = new File(lastStatusCacheDumpDir,LASTSTATUSCACHE_DUMP_FILE);
 		BackendStorage.dump2file(cache,dumpfile);
 	}
 
@@ -647,7 +647,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private void load() throws Exception{
 		Object xmlobj = null;
 		File dumpdir = new File(lastStatusCacheDumpDir);
-		File dumpfile = new File(lastStatusCacheDumpDir,lastStatusCacheDumpFile);
+		File dumpfile = new File(lastStatusCacheDumpDir,LASTSTATUSCACHE_DUMP_FILE);
 		
 		if (!dumpdir.isDirectory()) {
 			LOGGER.debug("Dump cache directory property " + dumpdir.getAbsolutePath() + " is not a directory");
