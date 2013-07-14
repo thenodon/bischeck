@@ -50,8 +50,7 @@ import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
 
 public class MoveCache2Redis {
 
-	//private static final String DEFAULTSCHEDULE = "0 0/5 * * * ?";
-
+	
 	public static void main(String[] args) throws Exception {
 		CommandLineParser parser = new GnuParser();
 		CommandLine line = null;
