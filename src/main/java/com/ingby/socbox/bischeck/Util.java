@@ -199,8 +199,7 @@ public abstract class Util {
 		Matcher mat = FORMAT_HOUR_MINUTE.matcher(hourAndMinute);
 
 		if( mat.matches()) {
-			//mat.find();
-			String hour_minute = mat.group();
+			final String hour_minute = mat.group();
 			String[] arr = hour_minute.split(":");
 			
 			return Integer.parseInt(arr[0]);    
