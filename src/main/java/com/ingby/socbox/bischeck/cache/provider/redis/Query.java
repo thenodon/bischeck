@@ -28,7 +28,7 @@ import com.ingby.socbox.bischeck.cache.LastStatus;
 
 public class Query {
 
-	static Logger  logger = LoggerFactory.getLogger(Query.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(Query.class);
 
 	
 	/**
@@ -40,7 +40,7 @@ public class Query {
 	 */
 	public static LastStatus nearest(long time, LinkedList<LastStatus> listtosearch) {
 		
-		logger.debug("Find value in cache at " + new java.util.Date(time));
+		LOGGER.debug("Find value in cache at " + new java.util.Date(time));
         
 		if (time > listtosearch.getFirst().getTimestamp() || 
 			time < listtosearch.getLast().getTimestamp() ) {
@@ -63,7 +63,7 @@ public class Query {
 				bestDistanceFoundYet = d1;
 				nearest = listtosearch.get(i);
 				if (d1 <= d2) { 
-					logger.debug("Break at index " + i);
+					LOGGER.debug("Break at index " + i);
 					break;
 				}
 			}
@@ -81,7 +81,7 @@ public class Query {
 	 */
 	public static Integer nearestByIndex(long time, LinkedList<LastStatus> listtosearch) {
 		
-		logger.debug("Find value in cache at " + new java.util.Date(time));
+		LOGGER.debug("Find value in cache at " + new java.util.Date(time));
         
 		if (time > listtosearch.getFirst().getTimestamp() || 
 			time < listtosearch.getLast().getTimestamp() ) {
@@ -105,7 +105,7 @@ public class Query {
 				bestDistanceFoundYet = d1;
 				index=i;
 				if (d1 <= d2) { 
-					logger.debug("Break at index " + i);
+					LOGGER.debug("Break at index " + i);
 					break;
 				}
 			}
@@ -151,7 +151,7 @@ public class Query {
 		if (fromindex == null)
 			fromindex = Query.nearestByIndex(fromtime, listtosearch);
 		
-		logger.debug("fromindex:" +fromindex + " toindex:"+toindex);
+		LOGGER.debug("fromindex:" +fromindex + " toindex:"+toindex);
 		for (int i = fromindex; i>toindex-1; i--){
 			LastStatus ls = listtosearch.get(i).copy();
 			list.addFirst(ls);
