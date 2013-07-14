@@ -65,7 +65,7 @@ public class ExecuteJEP {
         parser.addFunction("sumNull", new com.ingby.socbox.bischeck.jepext.Sum(true));
         parser.addFunction("multNull", new com.ingby.socbox.bischeck.jepext.NullableMultiply());
         parser.addFunction("divNull", new com.ingby.socbox.bischeck.jepext.NullableDivide());
-
+        
         // Add additional functions if available
         URL Url = ExecuteJEP.class.getClassLoader().getResource(RESOURCEFILENAME);
              
@@ -101,32 +101,10 @@ public class ExecuteJEP {
 			} catch (IllegalAccessException e) {
 				LOGGER.warn("Class "+ className + " could not be instantiated", e);
 			}
-
-
 		}
-        /*
-        String func1 = "avg";
-        String func1class = "com.ingby.socbox.bischeck.jepext.Average";
-        
-        Class<PostfixMathCommandI> cls = null;
-		try {
-			cls = (Class<PostfixMathCommandI>) Class.forName(func1class);
-		} catch (ClassNotFoundException e) {
-			logger.error("1 " + e.getMessage());
-		}
-        
-        try {
-			parser.addFunction(func1, cls.newInstance());
-		} catch (InstantiationException e) {
-			logger.error("2 " + e.getMessage());
-		} catch (IllegalAccessException e) {
-			logger.error("3 " +e.getMessage());
-		
-		}
-        */
-		
 	}
 
+	
 	public Float execute(String executeexp) throws ParseException {
 		if (LOGGER.isDebugEnabled()) 
 			LOGGER.debug("Parse :" + executeexp);
