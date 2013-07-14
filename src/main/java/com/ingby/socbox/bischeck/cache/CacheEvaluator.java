@@ -99,7 +99,6 @@ public class CacheEvaluator {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("String to cache parse: " + statement);
 
-		Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (statement);
 
 		cacheEntriesName = parseParameters(statement);
 
@@ -128,6 +127,7 @@ public class CacheEvaluator {
 			}
 		}
 
+		
 		if (notANumber) { 
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("One or more of the parameters are null");
@@ -135,7 +135,7 @@ public class CacheEvaluator {
 		} else  {
 
 			StringBuffer sb = new StringBuffer ();
-			mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (statement);
+			Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (statement);
 
 			int i=0;
 			while (mat.find ()) {
