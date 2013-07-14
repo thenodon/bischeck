@@ -748,34 +748,6 @@ public final class ConfigurationManager  {
     	return true;
     }
     
-    /*
-     * Moved to VaildateConfiguration
-     */
-    @Deprecated
-    public int verify() {
-        ConfigurationManager configMgr = null;
-
-        try {
-            configMgr = getInstance();
-        } catch (Exception e) {
-            System.out.println("Errors was found creating Configuration Manager");
-            e.printStackTrace();
-            return 1;
-        }
-
-        for (ConfigXMLInf.XMLCONFIG xmlconf :ConfigXMLInf.XMLCONFIG.values()) {
-            try {
-                configMgr.xmlfilemgr.getXMLConfiguration(xmlconf);
-            } catch (Exception e) {
-                System.out.println("Errors was found validating the configuration file " + 
-                        xmlconf.xml());
-                e.printStackTrace();
-                return 1;
-            }    
-        }
-        return 0;
-    }
-
         
     public Properties getURL2Service() {
         return url2service;
