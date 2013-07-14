@@ -25,6 +25,7 @@ import org.nfunk.jep.function.PostfixMathCommand;
 
 
 import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLS;
+import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLSException;
 
 public class OrdinaryLeastSquaresSlope extends PostfixMathCommand
 {
@@ -48,12 +49,19 @@ public class OrdinaryLeastSquaresSlope extends PostfixMathCommand
 		Object hostName =  inStack.pop();
 	    
 		
-		CalculateOLS ols = new CalculateOLS((String) hostName, 
+		CalculateOLS ols = null;
+		try {
+			ols = new CalculateOLS((String) hostName, 
 				(String) serviceName, 
 				(String) serviceItemName, 
 				(String) resolutionMethod, 
 				(String) resolution, 
 				(String) timeOffset);
+		} 
+		catch (CalculateOLSException ce) {
+			throw new ParseException(ce.getMessage());
+		}
+		
 	
 		Double forecastValue = ols.getPredictiveSlope();
 		
