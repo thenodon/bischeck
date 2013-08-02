@@ -103,6 +103,30 @@ public class ConfigMacroUtil {
     	return strbuf;
     }
     
+    /**
+     * The method replace all NAME macros with the paramters 
+     * @param strToReplace - the string to be replaces 
+     * @param hostName 
+     * @param serviceName
+     * @param serviceItemName
+     * @return the string with replaced NAME macros
+     */
+    public static String replaceMacros(String strToReplace, String hostName, String serviceName, String serviceItemName) {
+    	
+    	String str = strToReplace.replaceAll(HOST_NAME_MACRO, hostName);
+    	str = str.replaceAll(SERVICE_NAME_MACRO, serviceName);
+    	str = str.replaceAll(SERVICEITEM_NAME_MACRO, serviceItemName);
+    	return str;
+    
+    }
+    
+    /**
+     * Replace all NAME and ALIAS macros in a service and serviceitem that 
+     * belongs to the Host object 
+     * @param host - the host object and it all its related service and 
+     * serviceitem objects that will be replaced.
+     * @return a "replaced" Host object
+     */
     public static Host replaceMacros(Host host) {
     	
     	// Host replacement 
@@ -205,5 +229,6 @@ public class ConfigMacroUtil {
     	str = str.replaceAll("\\\\","");
     	return str;
     }
+   
     
 }

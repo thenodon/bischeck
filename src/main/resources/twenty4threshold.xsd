@@ -3,6 +3,8 @@
 	<xsd:element name="twenty4threshold">
 		<xsd:complexType>
 		   <xsd:sequence>
+		        <xsd:element ref="servicedefgroup" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="servicedeftemplate" minOccurs="0" maxOccurs="unbounded"/>                
 				<xsd:element ref="servicedef" minOccurs="0" maxOccurs="unbounded"/>
 				<xsd:element ref="hours" minOccurs="0" maxOccurs="unbounded"/>
 				<xsd:element ref="holiday" minOccurs="0" maxOccurs="unbounded"/>
@@ -10,6 +12,39 @@
 		</xsd:complexType>
 	</xsd:element>
 	
+	<xsd:element name="servicedefgroup">
+        <xsd:complexType>
+            <xsd:sequence>
+                    <xsd:element ref="member" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element ref="template" minOccurs="1" maxOccurs="1"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+     <xsd:element name="template" type="xsd:normalizedString"/>
+     
+    <xsd:element name="member">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="hostname" minOccurs="1" maxOccurs="1"/>
+                <xsd:element ref="servicename" minOccurs="1" maxOccurs="1"/>
+                <xsd:element ref="serviceitemname" minOccurs="1" maxOccurs="1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+     <xsd:element name="servicedeftemplate">
+        <xsd:complexType>
+            <xsd:sequence>
+                
+                <xsd:element ref="period" minOccurs="1" maxOccurs="unbounded"/>
+                
+            </xsd:sequence>
+            <xsd:attribute name="templatename" type="xsd:normalizedString" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    
+    
 	<xsd:element name="servicedef">
 		<xsd:complexType>
 			<xsd:sequence>

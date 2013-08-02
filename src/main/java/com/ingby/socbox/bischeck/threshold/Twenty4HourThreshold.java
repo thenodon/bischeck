@@ -39,6 +39,7 @@ import ch.qos.logback.classic.Level;
 
 import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.ConfigFileManager;
+import com.ingby.socbox.bischeck.ConfigMacroUtil;
 import com.ingby.socbox.bischeck.ConfigXMLInf;
 import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
@@ -48,9 +49,12 @@ import com.ingby.socbox.bischeck.jepext.ExecuteJEPPool;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHoliday;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHourinterval;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHours;
+import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLMember;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLMonths;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLPeriod;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLServicedef;
+import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLServicedefgroup;
+import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLServicedeftemplate;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLTwenty4Threshold;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLWeeks;
 
@@ -391,6 +395,32 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     }    
     
 
+
+    private List<XMLPeriod> findServicedefByTemplate(XMLTwenty4Threshold config) {
+
+    	List<XMLPeriod> periodList = null;
+
+    	for (XMLServicedefgroup servicedefGroup: config.getServicedefgroup()) {
+    		for (XMLMember member: servicedefGroup.getMember()) {
+    			
+    			if (member.getHostname().equals(this.hostName) &&
+    					member.getServicename().equals(this.serviceName) &&
+    					member.getServiceitemname().equals(this.serviceItemName)) {
+    				String templatename = servicedefGroup.getTemplate();
+    				
+    				for (XMLServicedeftemplate template: config.getServicedeftemplate()) {
+    					if (template.getTemplatename().equalsIgnoreCase(templatename)) {		
+    						periodList = template.getPeriod();
+    						return periodList;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return null;
+    }    
+    
+    
     /**
      * This method is one of the core in this class. Based on all period that 
      * exists for a serviceitem we need to find if one match the current day. 
@@ -708,6 +738,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     				try { 
     					tc.setFloatThreshold(Float.parseFloat(curhour));
     				} catch (NumberFormatException ne) {
+    					curhour = ConfigMacroUtil.replaceMacros(curhour, hostName, serviceName, serviceItemName);
     					tc.setExpThreshold(curhour);
     				}
     				this.thresholdByPeriod[i] = tc;
@@ -746,7 +777,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 		        try { 
 		            tc.setFloatThreshold(Float.parseFloat(curhour));
 		        } catch (NumberFormatException ne) {
-		            tc.setExpThreshold(curhour);
+		        	// Replace macros 
+		        	curhour = ConfigMacroUtil.replaceMacros(curhour, hostName, serviceName, serviceItemName);
+		        	tc.setExpThreshold(curhour);
 		        }
 		        this.thresholdByPeriod[i] = tc;
 		    }
@@ -805,6 +838,10 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         if (!isHoliday(twenty4hourconfig, year, month, dayofmonth)) {
             
             List<XMLPeriod> listPeriod = findServicedef(twenty4hourconfig);
+            if (listPeriod == null) {
+            	listPeriod = findServicedefByTemplate(twenty4hourconfig);
+            }
+            
             if (listPeriod != null) {
             	if (LOGGER.isDebugEnabled())
             		LOGGER.debug("Number of period for service def are " + listPeriod.size());
