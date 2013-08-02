@@ -93,7 +93,7 @@ public class ThresholdFactory {
 						serviceItem.getServiceItemName()); 
 			}         
 
-						current.init();
+			current.init();
 
 			cache.put(service.getHost().getHostname()+"-"+service.getServiceName()+"-"+serviceItem.getServiceItemName(),current);
 			
