@@ -22,10 +22,6 @@ package com.ingby.socbox.bischeck;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
@@ -77,17 +73,6 @@ public class NagiosUtil {
 					append(warnValue).append(" ").append(method).append(" ").append(" +-W ").append(method).append(" ").
 					append(critValue).append(" ").append(method).append(" ").append(" +-C ").append(method).append(" ) ");
 					
-					/*
-					message = message + serviceItem.getServiceItemName() +
-					" = " + 
-					currentMeasure +
-					" ("+ 
-					new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString()) + " " + method + " " +
-					(warnValue) + " " + method + " +-W " + method + " " +
-					(critValue) + " " + method + " +-C " + method + " " +
-					") ";
-					*/
-
 				} else {
 					warnValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float (serviceItem.getThreshold().getWarning()*currentThreshold)).toString());
 					critValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float (serviceItem.getThreshold().getCritical()*currentThreshold)).toString());
@@ -101,16 +86,6 @@ public class NagiosUtil {
 					append(warnValue).append(" ").append(method).append(" ").append(" W ").append(method).append(" ").
 					append(critValue).append(" ").append(method).append(" ").append(" C ").append(method).append(" ) ");
 					
-					/*
-					message = message + serviceItem.getServiceItemName() +
-					" = " + 
-					currentMeasure +
-					" ("+ 
-					new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString()) + " " + method + " " +
-					(warnValue) + " " + method + " W " + method + " " +
-					(critValue) + " " + method + " C " + method + " " +
-					") ";
-					*/
 				}
 
 			} else {
@@ -119,12 +94,6 @@ public class NagiosUtil {
 				append(currentMeasure).
 				append(" (NA) ");
 				
-				/*
-				message = message + serviceItem.getServiceItemName() +
-				" = " + 
-				currentMeasure +
-				" (NA) ";
-				*/
 				currentThreshold=new Float(0); //This is so the perfdata will be correct.
 				
 			}
