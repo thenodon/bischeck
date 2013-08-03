@@ -28,25 +28,24 @@ import org.testng.Assert;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
+import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 
 public class PredictiveTest {
 
 	ConfigurationManager confMgmr = null;
 	
-	String hostname = "prehost";
-	String qhostname = "prehost";
+	String hostname = "pre-hos@t";
+	String qhostname = "pre-host";
 	String servicename = "preservice";
-	String serviceitemname = "predict";
+	String serviceitemname = "predict/H";
 	String cachekey = Util.fullName(qhostname, servicename, serviceitemname);
 
 
@@ -99,17 +98,16 @@ public class PredictiveTest {
 	
 		
 		ExecuteJEP parser = new ExecuteJEP();        // Create a new parser
-		
 		String expr = "ols(" + 
 				"\""+ hostname +"\"," + 
 				"\""+ servicename+"\"," +
 				"\""+ serviceitemname+"\"," +
 				"\"AVG\",\"D\",\"30\",\"END\")";
-				
+			
 		
-		Float value = (float) parser.execute(expr);
+		Float value = (Float) parser.execute(expr);
 		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull((double)value);
+		Assert.assertNotNull(value);
 		
 		expr = "ols(" + 
 				"\""+ hostname +"\"," + 
@@ -118,9 +116,9 @@ public class PredictiveTest {
 				"\"MIN\",\"D\",\"30\",\"END\")";
 				
 		
-		value = (float) parser.execute(expr);
+		value = (Float) parser.execute(expr);
 		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull((double) value);
+		Assert.assertNotNull(value);
 		
 		expr = "ols(" + 
 				"\""+ hostname +"\"," + 
@@ -129,9 +127,42 @@ public class PredictiveTest {
 				"\"MAX\",\"D\",\"30\",\"END\")";
 				
 		
-		value = (float) parser.execute(expr);
+		value = (Float) parser.execute(expr);
 		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull((double) value);
+		Assert.assertNotNull(value);
+		
+		expr = "ols(" + 
+				"\""+ hostname +"\"," + 
+				"\""+ servicename+"\"," +
+				"\""+ serviceitemname+"\"," +
+				"\"AVG\",\"D\",\"30\",\"-28D\")";
+				
+		
+		value = (Float) parser.execute(expr);
+		System.out.println(expr + " -> " + value);
+		Assert.assertNotNull(value);
+		
+		expr = "ols(" + 
+				"\""+ hostname +"\"," + 
+				"\""+ servicename+"\"," +
+				"\""+ serviceitemname+"\"," +
+				"\"AVG\",\"D\",\"30\",\"-30D\")";
+				
+		
+		value = (Float) parser.execute(expr);
+		System.out.println(expr + " -> " + value);
+		Assert.assertNotNull(value);
+		
+		expr = "ols(" + 
+				"\"hostname1\"," + 
+				"\"servicename1\"," +
+				"\"serviceitemname1\"," +
+				"\"AVG\",\"D\",\"30\",\"-30D\")";
+				
+		
+		value = (Float) parser.execute(expr);
+		System.out.println(expr + " -> " + value);
+		Assert.assertNull(value);
 		
 		expr = "ols(" + 
 				"\""+ hostname +"\"," + 
@@ -140,9 +171,9 @@ public class PredictiveTest {
 				"\"AVG\",\"D\",\"30\",\"END\") * 2";
 				
 		
-		value = (float) parser.execute(expr);
+		value = (Float) parser.execute(expr);
 		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull((double) value);
+		Assert.assertNotNull(value);
 		
 		expr = "ols(" + 
 				"\""+ hostname +"\"," + 
@@ -150,9 +181,9 @@ public class PredictiveTest {
 				"\""+ serviceitemname+"\"," +
 				"\"MIN\",\"D\",\"30\",\"END\") * 2";
 				
-		value = (float) parser.execute(expr);
+		value = (Float) parser.execute(expr);
 		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull((double) value);
+		Assert.assertNotNull(value);
 		
 		expr = "ols(" + 
 				"\""+ hostname +"\"," + 
@@ -163,7 +194,7 @@ public class PredictiveTest {
 		
 		value = parser.execute(expr);
 		System.out.println(expr + " -> " + value);				
-		Assert.assertNotNull((double) value);
+		Assert.assertNotNull(value);
 		
 		expr = "olss(" + 
 				"\""+ hostname +"\"," + 
@@ -172,7 +203,7 @@ public class PredictiveTest {
 				"\"AVG\",\"D\",\"END\")";
 				
 		
-		value = (float) parser.execute(expr);
+		value = (Float) parser.execute(expr);
 		System.out.println(expr + " -> " + value);
 	
 	}
@@ -190,7 +221,7 @@ public class PredictiveTest {
 				
 		
 		Float value = (Float) parser.execute(expr);
-		Assert.assertNull((Float)value);
+		Assert.assertNull(value);
 	
 	}
 	
@@ -212,6 +243,26 @@ public class PredictiveTest {
 		Float value = (Float) parser.execute(expr);
 		Assert.assertNull((Float)value);
 	
+	}
+	
+	@Test (groups = { "JEP" })
+	public void verifyPredictiveExceptions() throws ParseException {
+	ExecuteJEP parser = new ExecuteJEP();        // Create a new parser
+		
+	LastStatus ls = new LastStatus("1000", (float) 0,  System.currentTimeMillis());
+	CacheFactory.getInstance().add(ls, Util.fullName( "hostname", "servicename", "serviceitemname"));
+	
+		String expr = "ols(" + 
+				"\"hostname\"," + 
+				"\"servicename\"," +
+				"\"serviceitemname\"," +
+				"\"AVG\",\"D\",\"-30\",\"END\")";
+				
+		
+		Float value = null;
+		value = (Float) parser.execute(expr);
+		Assert.assertNull(value);
+		
 	}
 	
 }

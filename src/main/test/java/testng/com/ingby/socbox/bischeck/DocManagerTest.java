@@ -28,8 +28,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.ingby.socbox.bischeck.ConfigurationManager;
-import com.ingby.socbox.bischeck.DocManager;
+import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.configuration.DocManager;
 
 public class DocManagerTest {
 	

@@ -29,13 +29,13 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
+import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 
 public class CacheTest {
@@ -45,7 +45,7 @@ public class CacheTest {
 	String hostname = "test-server.ingby.com";
 	String qhostname = "test\\-server.ingby.com";
 	String servicename = "service@first";
-	String serviceitemname = "_service.item_123";
+	String serviceitemname = "_service.item_123/";
 	String cachekey = Util.fullName(qhostname, servicename, serviceitemname);
 
 	private boolean supportNull = false;
