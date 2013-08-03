@@ -31,7 +31,7 @@ import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 
 public class LivestatusService extends ServiceAbstract implements Service {

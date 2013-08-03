@@ -38,11 +38,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
 
-import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache;
+import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLKey;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;

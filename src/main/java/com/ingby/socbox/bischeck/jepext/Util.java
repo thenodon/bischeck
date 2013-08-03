@@ -3,7 +3,7 @@ package com.ingby.socbox.bischeck.jepext;
 import java.util.Iterator;
 import java.util.Stack;
 
-import com.ingby.socbox.bischeck.ConfigurationManager;
+import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 public class Util {
 	

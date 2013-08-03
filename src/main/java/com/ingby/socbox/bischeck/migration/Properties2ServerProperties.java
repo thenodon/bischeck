@@ -31,8 +31,8 @@ import org.apache.commons.cli.Options;
 
 
 
-import com.ingby.socbox.bischeck.ConfigFileManager;
-import com.ingby.socbox.bischeck.ConfigXMLInf;
+import com.ingby.socbox.bischeck.configuration.ConfigFileManager;
+import com.ingby.socbox.bischeck.configuration.ConfigXMLInf;
 import com.ingby.socbox.bischeck.xsd.properties.XMLProperties;
 import com.ingby.socbox.bischeck.xsd.properties.XMLProperty;
 import com.ingby.socbox.bischeck.xsd.servers.XMLServer;

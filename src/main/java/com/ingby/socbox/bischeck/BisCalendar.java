@@ -4,6 +4,8 @@ import java.util.Calendar;
 
 import java.util.GregorianCalendar;
 
+import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+
 
 /**
  * This calendar class implements ISO 8601 calendar.

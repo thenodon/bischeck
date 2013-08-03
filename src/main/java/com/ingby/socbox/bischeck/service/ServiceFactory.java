@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ClassCache;
-import com.ingby.socbox.bischeck.ConfigurationManager;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 
 public class ServiceFactory {
