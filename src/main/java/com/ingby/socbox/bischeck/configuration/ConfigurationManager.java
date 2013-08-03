@@ -51,8 +51,8 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import ch.qos.logback.classic.Level;
 
-import com.ingby.socbox.bischeck.Host;
 import com.ingby.socbox.bischeck.configuration.ConfigXMLInf.XMLCONFIG;
+import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.servers.Server;
 import com.ingby.socbox.bischeck.service.RunAfter;
 import com.ingby.socbox.bischeck.service.Service;

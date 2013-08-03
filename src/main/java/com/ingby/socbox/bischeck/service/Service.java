@@ -22,7 +22,7 @@ package com.ingby.socbox.bischeck.service;
 import java.util.List;
 import java.util.Map;
 
-import com.ingby.socbox.bischeck.Host;
+import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
