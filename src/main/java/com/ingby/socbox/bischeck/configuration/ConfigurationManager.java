@@ -257,7 +257,7 @@ public final class ConfigurationManager  {
     
     private void initScheduler() throws Exception {
         try {
-            ThresholdTimer.init(this);
+            ThresholdCacheClearJob.init(this);
         } catch (SchedulerException e) {
             LOOGER.error("Quartz scheduler failed with - " + e +" - existing!");
             throw e;

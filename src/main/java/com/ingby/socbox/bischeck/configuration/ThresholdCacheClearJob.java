@@ -39,10 +39,13 @@ import static org.quartz.CronScheduleBuilder.*;
 
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 
+/**
+ * This class is executed as a Quartz job to remove all thresholds objects from
+ * the threshold object cache. By default it runs once a day at midnight.
+ */
+public class ThresholdCacheClearJob implements Job {
 
-public class ThresholdTimer implements Job {
-
-    private final static Logger  LOGGER = LoggerFactory.getLogger(ThresholdTimer.class);
+    private final static Logger  LOGGER = LoggerFactory.getLogger(ThresholdCacheClearJob.class);
 
     private static Scheduler sched;
 
@@ -54,7 +57,7 @@ public class ThresholdTimer implements Job {
         	sched.start();
         
         
-        JobDetail job = newJob(ThresholdTimer.class).
+        JobDetail job = newJob(ThresholdCacheClearJob.class).
             withIdentity("DepleteThresholdCache", "DailyMaintenance").
             withDescription("DepleteThresholdCache").    
             build();
