@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,8 +52,9 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import ch.qos.logback.classic.Level;
 
-import com.ingby.socbox.bischeck.configuration.ConfigXMLInf.XMLCONFIG;
+import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.host.Host;
+import com.ingby.socbox.bischeck.servers.LiveStatusServer;
 import com.ingby.socbox.bischeck.servers.Server;
 import com.ingby.socbox.bischeck.service.RunAfter;
 import com.ingby.socbox.bischeck.service.Service;
@@ -61,7 +63,9 @@ import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
+import com.ingby.socbox.bischeck.xsd.bischeck.XMLAggregate;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLBischeck;
+import com.ingby.socbox.bischeck.xsd.bischeck.XMLCache;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLHost;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLService;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLServiceitem;
@@ -73,6 +77,9 @@ import com.ingby.socbox.bischeck.xsd.servers.XMLServer;
 import com.ingby.socbox.bischeck.xsd.servers.XMLServers;
 import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlproperty;
 import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlservices;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 /**
  * The ConfigurationManager class is responsible for all core configuration of bischeck.
@@ -148,7 +155,6 @@ public final class ConfigurationManager  {
         
         /* Since this is running from command line stop all existing schedulers */
         StdSchedulerFactory.getDefaultScheduler().shutdown();
-        
     }
 
     
@@ -188,7 +194,11 @@ public final class ConfigurationManager  {
     private static void initConfiguration(boolean runOnce) throws ConfigurationException {
     	if (configMgr == null ) 
             configMgr = new ConfigurationManager();
-        
+
+    	final Timer timer = Metrics.newTimer(ConfigurationManager.class, 
+				"ConfigurationInit" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext context = timer.time();
+
         configMgr.allocateDataStructs();
         
         try {
@@ -210,6 +220,10 @@ public final class ConfigurationManager  {
         } catch (Exception e) {
         	LOOGER.error("Configuration Manager initzialization failed with " + e);
         	throw new ConfigurationException("Configuration Manager initzialization failed",e);
+        }
+        finally {
+        	long duration = context.stop()/1000000;
+			LOOGER.info("Configuration init time:" + duration + " ms");
         }
     	
     }
@@ -272,16 +286,17 @@ public final class ConfigurationManager  {
         XMLBischeck bischeckconfig  =
                 (XMLBischeck) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.BISCHECK);
 
-        // Init template 
+        // Init Service templates 
         for (XMLServicetemplate serviceTemplate: bischeckconfig.getServicetemplate()) {
         	serviceTemplateMap.put(serviceTemplate.getTemplatename(),serviceTemplate);
         }
         
+        // Init Serviceitem templates
         for (XMLServiceitemtemplate serviceItemTemplate: bischeckconfig.getServiceitemtemplate()) {
         	serviceItemTemplateMap.put(serviceItemTemplate.getTemplatename(),serviceItemTemplate);
         }
         
-        //
+        // Conduct the Host, Service and ServiceItem configuration 
         setupHost(bischeckconfig);
         
         // Create the quartz schedule triggers and store in a List
@@ -427,7 +442,7 @@ public final class ConfigurationManager  {
 
 
     private void setupServiceItem(XMLService serviceconfig, Service service)
-            throws NoSuchMethodException, InstantiationException,
+            throws Exception, NoSuchMethodException, InstantiationException,
             IllegalAccessException, InvocationTargetException,
             ClassNotFoundException {
         
@@ -445,7 +460,7 @@ public final class ConfigurationManager  {
         while (iterserviceitem.hasNext()) {
         	ServiceItem serviceitem = null;
         	
-                        // If a normal service configuration is detected
+        	// If a normal service configuration is detected
         	XMLServiceitem serviceitemconfig = iterserviceitem.next();
 
         	if (serviceItemTemplateMap.containsKey(serviceitemconfig.getTemplate())){
@@ -469,12 +484,9 @@ public final class ConfigurationManager  {
             	} else {
             		serviceitem.setThresholdClassName(template.getThresholdclass().trim());
             	}
-
-            }
-        	else {
-
-            	//XMLServiceitem serviceitemconfig = iterserviceitem.next();
-
+            	setAggregate(template.getCache(),service,serviceitem);
+                
+            } else {
             	serviceitem = ServiceItemFactory.createServiceItem(
             			serviceitemconfig.getName(),
             			serviceitemconfig.getServiceitemclass().trim());
@@ -494,14 +506,119 @@ public final class ConfigurationManager  {
             	} else {
             		serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
             	}
+            	
+            	setAggregate(serviceitemconfig.getCache(),service,serviceitem);
+                
             }
-            service.addServiceItem(serviceitem);
+        	
+        	setPurge(serviceitemconfig,service,serviceitem);
+            
+        	service.addServiceItem(serviceitem);
 
         }
     }
     
+    
 
-    private void initServers() throws Exception {
+
+	private void setPurge(XMLServiceitem xmlconfig, Service service, ServiceItem serviceitem) {
+    	
+    }
+
+    
+    private void setAggregate(XMLCache xmlconfig, Service service, ServiceItem serviceitem) throws Exception {
+    	if (xmlconfig == null)
+    		return;
+    	
+    	for (XMLAggregate aggregated: xmlconfig.getAggregate()) {
+
+    		Service aggregatedService = null;
+			
+    		if (aggregated.isUseweekend()) {
+    			aggregatedService = ServiceFactory.createService(
+    					service.getServiceName()+ "\\" + aggregated.getPeriod() + "\\" + aggregated.getMethod() + "\\weekend",
+    					"bischeck://cache");
+    		} else {
+    			aggregatedService = ServiceFactory.createService(
+        				service.getServiceName()+ "\\" + aggregated.getPeriod()  + "\\" + aggregated.getMethod(),
+        				"bischeck://cache");
+    		}
+    		
+    		
+    		aggregatedService.setHost(service.getHost());
+    		//service.setAlias(serviceconfig.getAlias());
+    		aggregatedService.setDecscription("");
+    		aggregatedService.setSchedules(getAggregatedSchedule(aggregated));
+    		aggregatedService.setConnectionUrl("bischeck://cache");
+    		aggregatedService.setSendServiceData(false);
+    		
+    		ServiceItem aggregatedServiceItem = null;
+			
+    		aggregatedServiceItem = ServiceItemFactory.createServiceItem(
+    				//serviceitem.getServiceItemName() + "\\" + aggregated.getMethod(),
+    				serviceitem.getServiceItemName(),
+        			"CalculateOnCache");
+
+    		aggregatedServiceItem.setClassName("CalculateonCache");
+    		aggregatedServiceItem.setExecution(getAggregatedExecution(aggregated,service,serviceitem));
+    		
+    		
+    		aggregatedServiceItem.setService(aggregatedService);
+    		aggregatedService.addServiceItem(aggregatedServiceItem);
+    		service.getHost().addService(aggregatedService);
+    		
+    	}
+    }
+    
+    
+    private String getAggregatedExecution(XMLAggregate aggregated,
+			Service service, ServiceItem serviceitem) {
+
+    	String aggregatedExecStatement = null;
+    	
+    	if (aggregated.getPeriod().equals("H")) {		
+    		aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + "[-0H:-1H]" + ")";
+    	} else if (aggregated.getPeriod().equals("D")) {
+    		aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + "[-0H:-24H]" + ")";
+    	} else if (aggregated.getPeriod().equals("W")) {
+    		if (aggregated.isUseweekend()) {
+    			aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + "[-0D:-7D]" + ")";
+    		} else {
+    			aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + "[-0D:-5D]"  + ")";
+    		}
+    	}
+    	return aggregatedExecStatement;
+		
+	}
+
+
+	private List<String> getAggregatedSchedule(XMLAggregate aggregated) {
+    	List<String> schedules = new ArrayList<String>();
+    	
+    	if (aggregated.getPeriod().equals("H")) {
+    		if (aggregated.isUseweekend()) {
+    			schedules.add("0 0 * ? * *");
+    		} else {
+    			schedules.add("0 0 * ? * MON-FRI");
+    		}
+    	} else if (aggregated.getPeriod().equals("D")) {
+    		if (aggregated.isUseweekend()) {
+    			schedules.add("0 0 0 ? * *");
+    		} else {
+    			schedules.add("0 0 0 ? * MON-FRI");
+    		}
+    	} else if (aggregated.getPeriod().equals("W")) {
+    		if (aggregated.isUseweekend()) {
+    			schedules.add("0 0 0 ? MON *");
+    		} else {
+    			schedules.add("0 0 0 ? * FRI");
+    		}
+    	}
+    	return schedules;
+	}
+
+
+	private void initServers() throws Exception {
         XMLServers serversconfig = (XMLServers) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.SERVERS);
 
         Iterator<XMLServer> iter = serversconfig.getServer().iterator();
