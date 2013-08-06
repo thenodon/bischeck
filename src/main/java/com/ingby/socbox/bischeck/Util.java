@@ -148,13 +148,11 @@ public abstract class Util {
      * @return the host-service-serviceitem string
      */
     public static String fullName(Service service, ServiceItem serviceitem) {
-    	StringBuffer strbuf = new StringBuffer();
+    	//StringBuffer strbuf = new StringBuffer();
     	
-    	strbuf.append(service.getHost().getHostname()).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(service.getServiceName()).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(serviceitem.getServiceItemName());
-    	return strbuf.toString();
+    	return fullName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName());
     }
+    
     
     /**
      * Create a host, service and service item name with - separator
@@ -171,6 +169,21 @@ public abstract class Util {
     	return strbuf.toString();
     }
 
+    
+    public static String fullQoutedName(Service service, ServiceItem serviceitem) {
+    	return fullQoutedName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName());
+    }
+    
+    
+    public static String fullQoutedName(String hostname, String servicename , String serviceitemname) {
+    	    
+    	StringBuffer strbuf = new StringBuffer();
+    	
+    	strbuf.append(hostname.replaceAll("-", "\\\\-")).append(ObjectDefinitions.getCacheKeySep());
+    	strbuf.append(servicename.replaceAll("-", "\\\\-")).append(ObjectDefinitions.getCacheKeySep());
+    	strbuf.append(serviceitemname.replaceAll("-", "\\\\-"));
+    	return strbuf.toString();	
+    }
     
     /**
      * 
