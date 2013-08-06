@@ -24,6 +24,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.ingby.socbox.bischeck.ObjectDefinitions;
+import com.ingby.socbox.bischeck.Util;
 
 public class NamingTest {
 
@@ -51,6 +52,13 @@ public class NamingTest {
 		ObjectDefinitions.verifyHostName("_bischeck.ingby.com");
 	}
 	
+
+	@Test (groups = { "Naming" })
+	public void verifyQoutedname() {
+		Assert.assertEquals(Util.fullQoutedName("local-host", "service-1","serviceitem-1"),"local\\-host-service\\-1-serviceitem\\-1");
+	}
+	
 }
+
 
 
