@@ -128,11 +128,17 @@ public abstract class CacheUtil {
 			StringTokenizer ind = new StringTokenizer(indexstr,":");
 			String indfromTime = ind.nextToken();
 			
-			Long indfrom = cache.getIndexByTime( 
-					host,
-					service, 
-					serviceitem,
-					System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(indfromTime))*1000);
+			Long indfrom;
+			/* Chech if the start is a zero definition */
+			if (indfromTime.trim().matches("^-0[HMSD]{1}")) {
+				indfrom = 0L;
+			} else {
+				indfrom = cache.getIndexByTime( 
+						host,
+						service, 
+						serviceitem,
+						System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(indfromTime))*1000);
+			}
 			
 			String indtoTime = ind.nextToken();
 			Long indto;
