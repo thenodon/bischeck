@@ -194,7 +194,7 @@ public class ConfigMacroUtil {
     		str = str.replaceAll(HOST_ALIAS_MACRO, "");        	
     	}
 		// Fix if the macro is quoted 
-    	str = str.replaceAll("\\\\","");
+    	//str = str.replaceAll("\\\\","");
     	return str;
     }
     
@@ -211,7 +211,7 @@ public class ConfigMacroUtil {
     	else {
     		str = str.replaceAll(SERVICE_ALIAS_MACRO, "");        	
     	}
-    	str = str.replaceAll("\\\\","");
+    	//str = str.replaceAll("\\\\","");
     	return str;
     }
 
@@ -227,7 +227,7 @@ public class ConfigMacroUtil {
     	else {
     		str = str.replaceAll(SERVICEITEM_ALIAS_MACRO, "");        	
     	}
-    	str = str.replaceAll("\\\\","");
+    	//str = str.replaceAll("\\\\","");
     	return str;
     }
    
