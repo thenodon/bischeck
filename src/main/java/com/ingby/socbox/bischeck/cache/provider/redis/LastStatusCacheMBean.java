@@ -20,7 +20,17 @@
 package com.ingby.socbox.bischeck.cache.provider.redis;
 
 public interface LastStatusCacheMBean {
-    public int getLastStatusCacheCount();
+
+	/**
+	 * Get the number of unique keys managed by the cache
+	 * @return
+	 */
+	public int getCacheKeyCount();
+	
+	/**
+	 * Get all the keys in the cache
+	 * @return
+	 */
     public String[] getCacheKeys();
     
     /**
