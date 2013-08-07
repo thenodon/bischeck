@@ -92,7 +92,7 @@ public class ServiceJob implements Job {
 		final TimerContext timercontext = timer.time();
 
 		Service service = null;
-
+		
 		try {
 			JobDataMap dataMap = context.getJobDetail().getJobDataMap();
 
@@ -109,9 +109,7 @@ public class ServiceJob implements Job {
 			if (service.isSendServiceData()) {
 				//ServerExecutor.getInstance().execute(service);
 				ServerMessageExecutor.getInstance().execute(service);
-				
-				// TODO pubsub
-				/* In a pub sub this would be the place to publish the data */ 
+				 
 			}
 		} finally {
 			long executetime = timercontext.stop()/1000000;         	
@@ -236,7 +234,7 @@ public class ServiceJob implements Job {
 
 	private void executeService(Service service, ServiceItem serviceitem) {
 		final Timer timer = Metrics.newTimer(ServiceJob.class, 
-				"execute", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				"executeService", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 
 		try {
