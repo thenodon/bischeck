@@ -64,7 +64,7 @@ public class ConfigUtilTest {
     	
     	Host host = new Host("hostNAME");
     	host.setAlias("hostALIAS");
-    	host.setDecscription("This is host \\$\\$HOSTNAME\\$\\$ for $$HOSTNAME$$ with alias $$HOSTALIAS$$");
+    	host.setDecscription("This is host $$HOSTNAME$$ with alias $$HOSTALIAS$$");
     	service.setHost(host);
     	host.addService(service);
     	
@@ -77,7 +77,7 @@ public class ConfigUtilTest {
     	System.out.println(strbuf.toString());
     	
     	Assert.assertEquals(host.getHostname(),"hostNAME");  	
-    	Assert.assertEquals(host.getDecscription(),"This is host $$HOSTNAME$$ for hostNAME with alias hostALIAS");
+    	Assert.assertEquals(host.getDecscription(),"This is host hostNAME with alias hostALIAS");
     	
     	Assert.assertEquals(host.getServiceByName("serviceNAME").getServiceName(),"serviceNAME");
     	Assert.assertEquals(host.getServiceByName("serviceNAME").getDecscription(),"Host hostNAME for service serviceNAME");
