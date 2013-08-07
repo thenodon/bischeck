@@ -49,6 +49,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheInf;
+import com.ingby.socbox.bischeck.cache.CacheQueue;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.provider.redis.Lookup;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
@@ -67,7 +68,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusCache.class);
 
-	private HashMap<String,LinkedList<LastStatus>> fastCache = null;
+	private HashMap<String,CacheQueue<LastStatus>> fastCache = null;
 
 	private static int fifosize = 500;
 	//private static boolean notFullListParse = false;
@@ -92,7 +93,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private boolean fastCacheEnable = true;
 	
 	private LastStatusCache() {
-		fastCache = new HashMap<String,LinkedList<LastStatus>>();
+		fastCache = new HashMap<String,CacheQueue<LastStatus>>();
 		jedispool = new JedisPool(new JedisPoolConfig(),redisserver,redisport);	
 		lu  = Lookup.init(jedispool);
 	}
@@ -247,19 +248,15 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	
 	@Override
 	public void add(LastStatus ls, String key) {
-		LinkedList<LastStatus> fifo;
+		CacheQueue<LastStatus> fifo;
 		
 		Jedis jedis = jedispool.getResource();
 		try {
 			if (fastCache.get(key) == null) {
-				fifo = new LinkedList<LastStatus>();
+				fifo = new CacheQueue<LastStatus>(fifosize);
 				fastCache.put(key, fifo);
 			} else {
 				fifo = fastCache.get(key);
-			}
-
-			if (fifo.size() >= fifosize) {
-				fifo.removeLast();
 			}
 
 			// Add local cache
@@ -361,15 +358,18 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			String service, 
 			String serviceitem, 
 			long from, long to) {
+		
 		Long indfrom = this.getIndexByTime( 
 				host,
 				service, 
 				serviceitem,from);
+		
 		if (indfrom == null) {
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("No data for from timestamp "+ from);
 			return null;
 		}
+		
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Index from " + indfrom);
 		Long indto = this.getIndexByTime( 
@@ -415,7 +415,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			if (LOGGER.isDebugEnabled() ) {
 				LOGGER.debug("Fast cache used for key " + key +" index " + toIndex);
 			}
-			incFastCacheCount(toIndex-fromIndex);
+			incFastCacheCount(toIndex-fromIndex+1);
 			
 			
 			for (long index = fromIndex; index <= toIndex; index++) {
@@ -439,7 +439,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		}	
 		
 		if (lsstr != null) {
-			incRedisCacheCount(fromIndex-toIndex);	
+			incRedisCacheCount(toIndex-fromIndex+1);	
 
 			for (String redstr: lsstr) {
 				LastStatus ls = new LastStatus(redstr);
@@ -640,15 +640,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 */
 	@Override
 	public void clear() {
-		Jedis jedis = jedispool.getResource();
-		try {
-			clearFastCache();
-			jedis.flushDB();
-		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
-		} finally {
-			jedispool.returnResource(jedis);
-		}
+		clearFastCache();
+		clearRedisCache();
+		
+		
 	}
 
 	@Override
@@ -657,6 +652,11 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		
 		String key = Util.fullName( hostName, serviceName, serviceItemName);
 		
+		// Clear fast cache data
+		if (fastCache == null)
+			fastCache.get(key).clear();
+		
+		// Clear redis cache data
 		Jedis jedis = jedispool.getResource();
 		try {
 			jedis.del(key);
@@ -728,10 +728,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getLastStatusCacheCount()
+	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#getCacheKeyCount()
 	 */
 	@Override
-	public int getLastStatusCacheCount() {
+	public int getCacheKeyCount() {
 		return fastCache.size();
 	}
 
@@ -803,7 +803,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	
 
 
-
+	/**
+	 * Remove all data in the fast cache and the keys
+	 */
 	private void clearFastCache() {
 		Iterator<String> iter = fastCache.keySet().iterator();
 		while (iter.hasNext()) {
@@ -813,7 +815,31 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		}
 	}
 
+	
+	/**
+	 * Remove every key that don not begin with ^config/
+	 */
+	private void clearRedisCache() {
+		
+		Jedis jedis = jedispool.getResource();
+		Iterator<String> iter = jedis.keys("*").iterator();
+		try {
+			while (iter.hasNext()) {
+				// Clear redis cache data
+				String key = iter.next();
+				if (!key.matches("^config/")) {
+					jedis.del(key);
+				}
 
+			}	
+		} catch (JedisConnectionException je) {
+			LOGGER.error("Redis connection failed: " + je.getMessage());
+		} finally {
+			jedispool.returnResource(jedis);
+		}
+	}
+	
+	
 	private LastStatus nearest(long time,  String id) {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Find value in cache at nearest " + new java.util.Date(time));
@@ -1038,7 +1064,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	private synchronized void incFastCacheCount(long inc){
-		fastcachehitcount =+ inc;
+		fastcachehitcount += inc;
 		if (fastcachehitcount == Long.MAX_VALUE) {
 			fastcachehitcount = 0L;
 			rediscachehitcount = 0L;
@@ -1051,7 +1077,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	
 	
 	private synchronized void incRedisCacheCount(long inc){
-		rediscachehitcount =+ inc;
+		rediscachehitcount += inc;
 		if (rediscachehitcount == Long.MAX_VALUE) {
 			rediscachehitcount = 0L;
 			fastcachehitcount = 0L;
