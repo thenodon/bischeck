@@ -321,7 +321,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     
     @Override
     public Float getThreshold() {
-    	LOGGER.debug("Call getThreshold");
+    	
     	Calendar c = BisCalendar.getInstance();
         int hourThreshold = c.get(Calendar.HOUR_OF_DAY);
         int minuteThreshold = c.get(Calendar.MINUTE);
