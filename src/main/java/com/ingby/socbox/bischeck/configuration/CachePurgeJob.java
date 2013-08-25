@@ -23,6 +23,7 @@ import java.text.ParseException;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,9 @@ import static org.quartz.CronScheduleBuilder.*;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CachePurgeInf;
-import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 /**
  * This class is executed as a Quartz job to remove all thresholds objects from
@@ -92,6 +95,10 @@ public class CachePurgeJob implements Job {
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         LOGGER.info("CachePurge running!");
+		final Timer timer = Metrics.newTimer(CachePurgeJob.class, 
+				"purge" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext context = timer.time();
+		try {
         Map<String, Long> purgeMap = ConfigurationManager.getInstance().getPurgeMap();
         for (String key : purgeMap.keySet()) {
         	CacheInf cache = CacheFactory.getInstance();
@@ -99,6 +106,9 @@ public class CachePurgeJob implements Job {
            		((CachePurgeInf) cache).trim(key, purgeMap.get(key) );
         	}
         }
+		} finally {
+			context.stop();
+		}
     }
 
 }
