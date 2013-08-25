@@ -66,7 +66,7 @@ public class ThresholdCacheClearJob implements Job {
         // Every day at 10 sec past midnight
         CronTrigger trigger = newTrigger()
         .withIdentity("DepleteThresholdCacheTrigger", "DailyMaintenance")
-        .withSchedule(cronSchedule(configMgr.getCacheClearCron()))
+        .withSchedule(cronSchedule(configMgr.getProperties().getProperty("thresholdCacheClear","10 0 00 * * ? *")))
         .forJob("DepleteThresholdCache", "DailyMaintenance")
         .build();
         
