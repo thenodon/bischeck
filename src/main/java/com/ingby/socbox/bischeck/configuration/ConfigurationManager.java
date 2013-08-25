@@ -115,6 +115,8 @@ public final class ConfigurationManager  {
     private Map<String,XMLServicetemplate> serviceTemplateMap = null;
     private Map<String,XMLServiceitemtemplate> serviceItemTemplateMap = null;
     
+    private Map<String,Long> purgeMap = null;
+    
     public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
         CommandLine line = null;
@@ -172,6 +174,7 @@ public final class ConfigurationManager  {
     	runafter = new HashMap<RunAfter,List<Service>>();
     	serviceTemplateMap = new HashMap<String, XMLServicetemplate>();
     	serviceItemTemplateMap = new HashMap<String, XMLServiceitemtemplate>();
+    	purgeMap = new HashMap<String, Long>();
     }
     
     
@@ -271,6 +274,7 @@ public final class ConfigurationManager  {
     
     private void initScheduler() throws Exception {
         try {
+        	CachePurgeJob.init(this);
             ThresholdCacheClearJob.init(this);
         } catch (SchedulerException e) {
             LOOGER.error("Quartz scheduler failed with - " + e +" - existing!");
@@ -485,6 +489,7 @@ public final class ConfigurationManager  {
             		serviceitem.setThresholdClassName(template.getThresholdclass().trim());
             	}
             	setAggregate(template.getCache(),service,serviceitem);
+            	setPurge(template.getCache(),service,serviceitem);
                 
             } else {
             	serviceitem = ServiceItemFactory.createServiceItem(
@@ -508,10 +513,10 @@ public final class ConfigurationManager  {
             	}
             	
             	setAggregate(serviceitemconfig.getCache(),service,serviceitem);
+            	setPurge(serviceitemconfig.getCache(),service,serviceitem);
                 
             }
         	
-        	setPurge(serviceitemconfig,service,serviceitem);
             
         	service.addServiceItem(serviceitem);
 
@@ -521,10 +526,18 @@ public final class ConfigurationManager  {
     
 
 
-	private void setPurge(XMLServiceitem xmlconfig, Service service, ServiceItem serviceitem) {
-    	
-    }
-
+	private void setPurge(XMLCache xmlconfig, Service service, ServiceItem serviceitem) {
+		if (xmlconfig == null)
+			return;
+		
+		if (xmlconfig.getPurge() != null) {
+			if(xmlconfig.getPurge().getMaxcount() != null) {
+				String key = Util.fullName(service, serviceitem);
+				purgeMap.put(key, xmlconfig.getPurge().getMaxcount());
+			}
+		}
+		
+	}
     
     private void setAggregate(XMLCache xmlconfig, Service service, ServiceItem serviceitem) throws Exception {
     	if (xmlconfig == null)
@@ -886,6 +899,9 @@ public final class ConfigurationManager  {
         return schedulejobs;
     }
         
+    public Map<String,Long> getPurgeMap() {
+    	return purgeMap;
+    }
     
     public  File getPidFile() {
         return new File(prop.getProperty("pidfile","/var/tmp/bischeck.pid"));
@@ -918,9 +934,9 @@ public final class ConfigurationManager  {
     public Map<RunAfter,List<Service>> getRunAfterMap() {
     	return runafter;
     }
-
+/*
     public  String getCacheClearCron() {
         return prop.getProperty("thresholdCacheClear","10 0 00 * * ? *");
     }
-
+*/
 }
