@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheInf;
+import com.ingby.socbox.bischeck.cache.CacheQueue;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
@@ -86,7 +87,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusCache.class);
 
-	private HashMap<String,LinkedList<LastStatus>> cache = null;
+	private HashMap<String, CacheQueue<LastStatus>> cache = null;
 
 	private static int fifosize = 500;
 	//private static boolean notFullListParse = false;
@@ -101,7 +102,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private static String lastStatusCacheDumpDir;
 	
 	private LastStatusCache() {
-		cache = new HashMap<String,LinkedList<LastStatus>>();
+		cache = new HashMap<String,CacheQueue<LastStatus>>();
 		
 	}
 	
@@ -218,19 +219,19 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	
 	@Override
 	public void add(LastStatus ls, String key) {
-		LinkedList<LastStatus> fifo;
+		CacheQueue<LastStatus> fifo;
 		synchronized (cache) {
 			if (cache.get(key) == null) {
-				fifo = new LinkedList<LastStatus>();
+				fifo = new CacheQueue<LastStatus>(fifosize);
 				cache.put(key, fifo);
 			} else {
 				fifo = cache.get(key);
 			}
-
+/*
 			if (fifo.size() >= fifosize) {
 				fifo.removeLast();
 			}
-
+*/
 			cache.get(key).addFirst(ls);
 		}
 	}
@@ -614,19 +615,19 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * @param key
 	 */
 	private void addLast(LastStatus ls, String key) {
-		LinkedList<LastStatus> fifo;
+		CacheQueue<LastStatus> fifo;
 		synchronized (cache) {
 			if (cache.get(key) == null) {
-				fifo = new LinkedList<LastStatus>();
+				fifo = new CacheQueue<LastStatus>(fifosize);
 				cache.put(key, fifo);
 			} else {
 				fifo = cache.get(key);
 			}
-
+/*
 			if (fifo.size() >= fifosize) {
 				fifo.removeLast();
 			}
-
+*/
 			cache.get(key).addLast(ls);
 		}
 	}

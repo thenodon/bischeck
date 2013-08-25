@@ -41,6 +41,7 @@ import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ingby.socbox.bischeck.cache.CacheQueue;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
@@ -119,7 +120,7 @@ public class BackendStorage {
 		return dumpfile.delete();
 	}
 
-	public static void dump2file(HashMap<String,LinkedList<LastStatus>> cache, File dumpfile) {
+	public static void dump2file(HashMap<String,CacheQueue<LastStatus>> cache, File dumpfile) {
 
 		long start = System.currentTimeMillis();
 		long countEntries = 0;
