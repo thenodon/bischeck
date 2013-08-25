@@ -49,6 +49,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheInf;
+import com.ingby.socbox.bischeck.cache.CachePurgeInf;
 import com.ingby.socbox.bischeck.cache.CacheQueue;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.provider.redis.Lookup;
@@ -59,18 +60,32 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 
 /**
- *      
- *    
- * @author andersh
- *
+ * This is the Bischeck based redis cache class. The cache implements a two level 
+ * cache - fast cache and redis cache. The fast cache is by default 100 slot fifo 
+ * cache implemented on the heap. On write data is stored both in the fast heap 
+ * cache and in the redis cache. On query the fast cache is first evaluated and
+ * then the redis cache is queried.<p>
+ * The cache has low memory footprint compare with the old all in heap cache 
+ * since redis store data so effective.<p>
+ * The class is controlled by X properties:<br>
+ * cache.provider.redis.server - the ip or name of where the redis service reside, default is 
+ * localhost.<br>
+ * cache.provider.redis.port - the socket port where the redis server listen, default is 6379.<br>
+ * cache.provider.redis.fastCacheSize - the size of the fast fifo cache, default is 100.<br>
+ * cache.provider.redis.db - default is 0.<br>   
+ * cache.provider.redis.auth - the password to the redis database, default is null.<br>
+ * cache.provider.redis.timeout - the timeout in milliseconds, default is 2000. <br>
  */
-public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
+
+public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatusCacheMBean {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusCache.class);
 
 	private HashMap<String,CacheQueue<LastStatus>> fastCache = null;
 
-	private static int fifosize = 500;
+	
+	private static int fastCacheSize = 100;
+	
 	//private static boolean notFullListParse = false;
 	private static LastStatusCache lsc; // = new LastStatusCache();
 	private static MBeanServer mbs = null;
@@ -83,6 +98,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	
 	private static String redisserver;
 	private static int redisport;
+	private static String redisauth = null;
+	private static int redisdb;
+	private static int redistimeout;
+
 	private JedisPool jedispool = null;
 	
 	private Lookup lu = null;
@@ -94,7 +113,11 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	
 	private LastStatusCache() {
 		fastCache = new HashMap<String,CacheQueue<LastStatus>>();
-		jedispool = new JedisPool(new JedisPoolConfig(),redisserver,redisport);	
+		
+		JedisPoolConfig poolConfig = new JedisPoolConfig();
+		
+		jedispool = new JedisPool(poolConfig,redisserver,redisport,redistimeout,redisauth,redisdb);	
+		
 		lu  = Lookup.init(jedispool);
 	}
 
@@ -112,16 +135,35 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		if (lsc == null) {
 			
 			redisserver = ConfigurationManager.getInstance().getProperties().
-					getProperty("redisserver","localhost");
+					getProperty("cache.provider.redis.server","localhost");
 
 			try {
 				redisport = Integer.parseInt(
 						ConfigurationManager.getInstance().getProperties().
-						getProperty("redisport","6379"));
+						getProperty("cache.provider.redis.port","6379"));
 			} catch (NumberFormatException ne) {
 				redisport = 6379;
 			}
 
+			redisauth = ConfigurationManager.getInstance().getProperties().
+					getProperty("cache.provider.redis.auth");
+
+			try {
+				redisdb = Integer.parseInt(
+						ConfigurationManager.getInstance().getProperties().
+						getProperty("cache.provider.redis.db","0"));
+			} catch (NumberFormatException ne) {
+				redisdb=0;
+			}
+			
+			try {
+				redistimeout = Integer.parseInt(
+						ConfigurationManager.getInstance().getProperties().
+						getProperty("cache.provider.redis.timeout","2000"));
+			} catch (NumberFormatException ne) {
+				redistimeout=2000;
+			}
+			
 			lsc = new LastStatusCache();
 			lsc.testConnection();
 			
@@ -145,16 +187,15 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			} catch (NotCompliantMBeanException e) {
 				LOGGER.error("Mbean exception - " + e.getMessage());
 			}
-
-						
+			
 			try {
-				fifosize = Integer.parseInt(
+				fastCacheSize = Integer.parseInt(
 						ConfigurationManager.getInstance().getProperties().
-						getProperty("lastStatusCacheSize","500"));
+						getProperty("cache.provider.redis.fastCacheSize","100"));
 			} catch (NumberFormatException ne) {
-				fifosize = 500;
+				fastCacheSize = 100;
 			}
-
+			
 			lsc.updateRuntimeMetaData();
 		}
 		
@@ -199,7 +240,8 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 					Service service = serviceentry.getValue();
 
 					for (Map.Entry<String, ServiceItem> serviceItemEntry : service.getServicesItems().entrySet()) {
-						updateMetaData(jedis, host, service, serviceItemEntry);
+						ServiceItem serviceitem = serviceItemEntry.getValue();					
+						updateMetaData(jedis, host, service, serviceitem);
 					}
 				}
 			}
@@ -251,9 +293,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		CacheQueue<LastStatus> fifo;
 		
 		Jedis jedis = jedispool.getResource();
+		
 		try {
 			if (fastCache.get(key) == null) {
-				fifo = new CacheQueue<LastStatus>(fifosize);
+				fifo = new CacheQueue<LastStatus>(fastCacheSize);
 				fastCache.put(key, fifo);
 			} else {
 				fifo = fastCache.get(key);
@@ -771,9 +814,11 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		}
 	}
 
+
+	
 	private void updateMetaData(Jedis jedis, Host host, Service service,
-			Map.Entry<String, ServiceItem> serviceItemEntry) {
-		ServiceItem serviceItem = serviceItemEntry.getValue();
+			ServiceItem serviceItem) {
+		
 		String key = "config/"+Util.fullName(host.getHostname(),service.getServiceName(), serviceItem.getServiceItemName());
 		jedis.hset(key,"hostDesc",checkNull(host.getDecscription()));
 		jedis.hset(key,"serviceDesc",checkNull(service.getDecscription()));
@@ -827,7 +872,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			while (iter.hasNext()) {
 				// Clear redis cache data
 				String key = iter.next();
-				if (!key.matches("^config/")) {
+				if (!key.matches("^config/.*")) {
 					jedis.del(key);
 				}
 
@@ -1086,6 +1131,19 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	private  void incRedisCacheCount(){
 		incRedisCacheCount(1);
+	}
+
+	@Override
+	public void trim(String key, Long maxSize) {
+		Jedis jedis = jedispool.getResource();
+		try {
+			jedis.ltrim(key, 0, maxSize-1);
+		} catch (JedisConnectionException je) {
+			LOGGER.error("Redis connection failed: " + je.getMessage());
+		} finally {
+			jedispool.returnResource(jedis);
+		}
+		
 	}
 	
 }
