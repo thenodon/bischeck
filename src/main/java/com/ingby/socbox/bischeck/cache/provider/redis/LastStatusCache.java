@@ -192,6 +192,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				fastCacheSize = Integer.parseInt(
 						ConfigurationManager.getInstance().getProperties().
 						getProperty("cache.provider.redis.fastCacheSize","100"));
+				if (fastCacheSize == 0) {
+					lsc.disableFastCache();
+				}
 			} catch (NumberFormatException ne) {
 				fastCacheSize = 100;
 			}
