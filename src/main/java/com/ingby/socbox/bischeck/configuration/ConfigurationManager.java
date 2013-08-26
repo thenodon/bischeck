@@ -54,7 +54,6 @@ import ch.qos.logback.classic.Level;
 
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.host.Host;
-import com.ingby.socbox.bischeck.servers.LiveStatusServer;
 import com.ingby.socbox.bischeck.servers.Server;
 import com.ingby.socbox.bischeck.service.RunAfter;
 import com.ingby.socbox.bischeck.service.Service;
@@ -63,7 +62,6 @@ import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
-import com.ingby.socbox.bischeck.xsd.bischeck.XMLAggregate;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLBischeck;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLCache;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLHost;
@@ -82,10 +80,12 @@ import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
 /**
- * The ConfigurationManager class is responsible for all core configuration of bischeck.
- * The ConfigurationManager is shared and only instantiated once through the class factory.
- *
- * @author Anders Haal
+ * The ConfigurationManager class is responsible for all core configuration of 
+ * bischeck.
+ * The ConfigurationManager is shared and only instantiated once through the 
+ * class factory at startup. 
+ * At a reload the ConfigurationManager is recreated and all configuration is 
+ * reread to enable update without a complete process restart.
  *
  */
 
@@ -488,7 +488,7 @@ public final class ConfigurationManager  {
             	} else {
             		serviceitem.setThresholdClassName(template.getThresholdclass().trim());
             	}
-            	setAggregate(template.getCache(),service,serviceitem);
+            	Aggregation.setAggregate(template.getCache(),service,serviceitem);
             	setPurge(template.getCache(),service,serviceitem);
                 
             } else {
@@ -512,7 +512,7 @@ public final class ConfigurationManager  {
             		serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
             	}
             	
-            	setAggregate(serviceitemconfig.getCache(),service,serviceitem);
+            	Aggregation.setAggregate(serviceitemconfig.getCache(),service,serviceitem);
             	setPurge(serviceitemconfig.getCache(),service,serviceitem);
                 
             }
@@ -526,6 +526,13 @@ public final class ConfigurationManager  {
     
 
 
+    /**
+     * For serviceitem that has <purge> defined the purging will be set up.
+     * Currently supporting only <maxcount>
+     * @param xmlconfig
+     * @param service
+     * @param serviceitem
+     */
 	private void setPurge(XMLCache xmlconfig, Service service, ServiceItem serviceitem) {
 		if (xmlconfig == null)
 			return;
@@ -536,100 +543,8 @@ public final class ConfigurationManager  {
 				purgeMap.put(key, xmlconfig.getPurge().getMaxcount());
 			}
 		}
-		
 	}
     
-    private void setAggregate(XMLCache xmlconfig, Service service, ServiceItem serviceitem) throws Exception {
-    	if (xmlconfig == null)
-    		return;
-    	
-    	for (XMLAggregate aggregated: xmlconfig.getAggregate()) {
-
-    		Service aggregatedService = null;
-			
-    		if (aggregated.isUseweekend()) {
-    			aggregatedService = ServiceFactory.createService(
-    					service.getServiceName()+ "\\" + aggregated.getPeriod() + "\\" + aggregated.getMethod() + "\\weekend",
-    					"bischeck://cache");
-    		} else {
-    			aggregatedService = ServiceFactory.createService(
-        				service.getServiceName()+ "\\" + aggregated.getPeriod()  + "\\" + aggregated.getMethod(),
-        				"bischeck://cache");
-    		}
-    		
-    		
-    		aggregatedService.setHost(service.getHost());
-    		//service.setAlias(serviceconfig.getAlias());
-    		aggregatedService.setDecscription("");
-    		aggregatedService.setSchedules(getAggregatedSchedule(aggregated));
-    		aggregatedService.setConnectionUrl("bischeck://cache");
-    		aggregatedService.setSendServiceData(false);
-    		
-    		ServiceItem aggregatedServiceItem = null;
-			
-    		aggregatedServiceItem = ServiceItemFactory.createServiceItem(
-    				//serviceitem.getServiceItemName() + "\\" + aggregated.getMethod(),
-    				serviceitem.getServiceItemName(),
-        			"CalculateOnCache");
-
-    		aggregatedServiceItem.setClassName("CalculateonCache");
-    		aggregatedServiceItem.setExecution(getAggregatedExecution(aggregated,service,serviceitem));
-    		
-    		
-    		aggregatedServiceItem.setService(aggregatedService);
-    		aggregatedService.addServiceItem(aggregatedServiceItem);
-    		service.getHost().addService(aggregatedService);
-    		
-    	}
-    }
-    
-    
-    private String getAggregatedExecution(XMLAggregate aggregated,
-			Service service, ServiceItem serviceitem) {
-
-    	String aggregatedExecStatement = null;
-    	
-    	if (aggregated.getPeriod().equals("H")) {		
-    		aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + "[-0H:-1H]" + ")";
-    	} else if (aggregated.getPeriod().equals("D")) {
-    		aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + "[-0H:-24H]" + ")";
-    	} else if (aggregated.getPeriod().equals("W")) {
-    		if (aggregated.isUseweekend()) {
-    			aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + "[-0D:-7D]" + ")";
-    		} else {
-    			aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + "[-0D:-5D]"  + ")";
-    		}
-    	}
-    	return aggregatedExecStatement;
-		
-	}
-
-
-	private List<String> getAggregatedSchedule(XMLAggregate aggregated) {
-    	List<String> schedules = new ArrayList<String>();
-    	
-    	if (aggregated.getPeriod().equals("H")) {
-    		if (aggregated.isUseweekend()) {
-    			schedules.add("0 0 * ? * *");
-    		} else {
-    			schedules.add("0 0 * ? * MON-FRI");
-    		}
-    	} else if (aggregated.getPeriod().equals("D")) {
-    		if (aggregated.isUseweekend()) {
-    			schedules.add("0 0 0 ? * *");
-    		} else {
-    			schedules.add("0 0 0 ? * MON-FRI");
-    		}
-    	} else if (aggregated.getPeriod().equals("W")) {
-    		if (aggregated.isUseweekend()) {
-    			schedules.add("0 0 0 ? MON *");
-    		} else {
-    			schedules.add("0 0 0 ? * FRI");
-    		}
-    	}
-    	return schedules;
-	}
-
 
 	private void initServers() throws Exception {
         XMLServers serversconfig = (XMLServers) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.SERVERS);
