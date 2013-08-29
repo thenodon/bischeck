@@ -76,7 +76,7 @@ public abstract class CacheUtil {
     }
 
     
-    public static boolean isByFromToTime(String schedule) {
+    public static boolean isFromToTime(String schedule) {
     	// Determine if there is an exact match
     	Matcher matcher = PATTERN_FIND_TO_FROM_TIME.matcher(schedule);
     	if (matcher.matches()) {
@@ -118,18 +118,18 @@ public abstract class CacheUtil {
 			
 			strbuf.delete(strbuf.length()-1, strbuf.length());
 			
-		} else if (CacheUtil.isByFromToTime(indexstr)) {
+		} else if (CacheUtil.isFromToTime(indexstr)) {
 			/*
 			 * Format x[-Tc:-Tc]
 			 * The element closest to time T at time granularity based on c 
-			 * that is S, M or H. 
+			 * that is S, M, H or D. 
 			 */ 
 			
 			StringTokenizer ind = new StringTokenizer(indexstr,":");
 			String indfromTime = ind.nextToken();
 			
 			Long indfrom;
-			/* Chech if the start is a zero definition */
+			/* Check if the start is a zero definition */
 			if (indfromTime.trim().matches("^-0[HMSD]{1}")) {
 				indfrom = 0L;
 			} else {
@@ -150,6 +150,10 @@ public abstract class CacheUtil {
 					service, 
 					serviceitem,
 					System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(indtoTime))*1000);
+				// If outside the cache use the last index
+				if (indto == null) {
+					indto = cache.getLastIndex(host, service, serviceitem);
+				}
 			}
 			
 			// If any of the index returned is null it means that there is 
