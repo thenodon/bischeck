@@ -166,22 +166,21 @@
         average calculation of the data on the period defined, like average for
         a week. Min and max will just extract the min or max value in the 
         defined period. 
-        The useholiday define if holidays and weekends should be include or not.
+        The useweekend define if holidays and weekends should be include or not.
     -->
     <xsd:element name="aggregate">
 		<xsd:complexType>
 			<xsd:sequence>
 			    <xsd:element ref="period" minOccurs="1" maxOccurs="1"/>
-                <xsd:element ref="retention" minOccurs="1" maxOccurs="1"/>
+                <xsd:element ref="retention" minOccurs="0" maxOccurs="1"/>
 				<xsd:element ref="method" minOccurs="1" maxOccurs="1" />
-				<xsd:element ref="useholiday" minOccurs="0" maxOccurs="1" />
+			    <xsd:element ref="useweekend" minOccurs="1" maxOccurs="1" />
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
 
     <xsd:element name="retention" type="xsd:int"/>
-    <xsd:element name="useholiday" type="xsd:boolean"/>
-    
+    <xsd:element name="useweekend" type="xsd:boolean" default="false"/>
     
     <xsd:element name="method">
         <xsd:simpleType>
@@ -201,10 +200,13 @@
 	-->
     <xsd:element name="purge">
 		<xsd:complexType>
+		  <xsd:choice>
+	   	    <xsd:element name="maxcount" type="xsd:long" minOccurs="0" maxOccurs="1"/>
 			<xsd:sequence>
-			    <xsd:element ref="offset" minOccurs="0" maxOccurs="1" />
-				<xsd:element ref="period" minOccurs="0" maxOccurs="1" />
+			  <xsd:element ref="offset" minOccurs="0" maxOccurs="1" />
+			  <xsd:element ref="period" minOccurs="0" maxOccurs="1" />
 			</xsd:sequence>
+		  </xsd:choice>
 		</xsd:complexType>
 	</xsd:element>
 
