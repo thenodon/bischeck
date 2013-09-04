@@ -103,6 +103,9 @@ public class CachePurgeJob implements Job {
         for (String key : purgeMap.keySet()) {
         	CacheInf cache = CacheFactory.getInstance();
            	if (cache instanceof CachePurgeInf) {
+           		if (LOGGER.isDebugEnabled()) {
+           			LOGGER.debug(key + ":" + purgeMap.get(key));
+           		}
            		((CachePurgeInf) cache).trim(key, purgeMap.get(key) );
         	}
         }
