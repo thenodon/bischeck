@@ -134,7 +134,7 @@ public class CacheTest {
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-6M:-20M]"),"21,20,19,18");
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M:END]"),"20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M:-105M]"),"20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M:-106M]"),"null");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M:-106M]"),"20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
 			
 			// Test that a if the end time range with no data in the cache returns "null"
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M:-120M]"),"null");
