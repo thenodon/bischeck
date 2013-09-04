@@ -167,7 +167,7 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
         
         payload.setLevel(level.toString());
         
-        //if (LOGGER.isInfoEnabled())
+        if (LOGGER.isInfoEnabled())
         	LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
         
         final String timerName = instanceName+"_execute";
