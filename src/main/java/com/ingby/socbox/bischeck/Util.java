@@ -155,7 +155,7 @@ public abstract class Util {
     
     
     /**
-     * Create a host, service and service item name with - separator
+     * Create a full servicedefinition name based on host, service and service item name with - separator
      * @param service
      * @param serviceitem
      * @return the host-service-serviceitem string
@@ -170,11 +170,40 @@ public abstract class Util {
     }
 
     
+    /**
+     * Create a full servicedefinition name that quote dash if it exists in 
+     * the name based on host, service and service item name with - separator
+     * @param service
+     * @param serviceitem
+     * @return
+     */
     public static String fullQoutedName(Service service, ServiceItem serviceitem) {
     	return fullQoutedName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName());
     }
     
     
+    /**
+     * Create a full servicedefinition name that quote dash if it exists in 
+     * the name based on host, service and service item name with - separator 
+     * and insert the insert string appended to the service name.
+     * @param service
+     * @param serviceitem
+     * @param insert
+     * @return
+     */
+    public static String fullQoutedName(Service service, ServiceItem serviceitem,String insert) {
+    	return fullQoutedName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName(),insert);
+    }
+    
+    
+    /**
+     * Create a full servicedefinition name that quote dash if it exists in 
+     * the name based on host, service and service item name with - separator
+     * @param hostname
+     * @param servicename
+     * @param serviceitemname
+     * @return
+     */
     public static String fullQoutedName(String hostname, String servicename , String serviceitemname) {
     	    
     	StringBuffer strbuf = new StringBuffer();
@@ -185,8 +214,32 @@ public abstract class Util {
     	return strbuf.toString();	
     }
     
+    
     /**
-     * 
+     * Create a full servicedefinition name that quote dash if it exists in 
+     * the name based on host, service and service item name with - separator 
+     * and insert the insert string appended to the service name.
+     * @param hostname
+     * @param servicename
+     * @param serviceitemname
+     * @param insert
+     * @return
+     */
+    public static String fullQoutedName(String hostname, String servicename , String serviceitemname, String insert) {
+	    
+    	StringBuffer strbuf = new StringBuffer();
+    	
+    	strbuf.append(hostname.replaceAll("-", "\\\\-")).append(ObjectDefinitions.getCacheKeySep());
+    	strbuf.append(servicename.replaceAll("-", "\\\\-")).append(ObjectDefinitions.getCacheKeySep());
+    	strbuf.append(insert).append("-");
+    	strbuf.append(serviceitemname.replaceAll("-", "\\\\-"));
+    	return strbuf.toString();	
+    }
+    
+    
+    /**
+     * If the input string is a number of the exponential format including E
+     * it transformed to a String without exponential format
      * @param latestExecuted
      * @return
      */
@@ -203,7 +256,7 @@ public abstract class Util {
 	
 	
 	/**
-	 * 
+	 * Extract the hour part of a format HH:MM 
 	 * @param hourAndMinute
 	 * @return
 	 * @throws IllegalArgumentException
@@ -224,7 +277,7 @@ public abstract class Util {
 	
 	
 	/**
-	 * 
+	 * Check if the input string include the string "null"
 	 * @param isnullin
 	 * @return
 	 */
