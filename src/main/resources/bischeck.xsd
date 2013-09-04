@@ -194,8 +194,8 @@
     <xsd:element name="retention">
         <xsd:complexType>
             <xsd:sequence>
-              <xsd:element ref="offset" minOccurs="0" maxOccurs="1" />
-              <xsd:element ref="period" minOccurs="0" maxOccurs="1" />
+              <xsd:element ref="period" minOccurs="1" maxOccurs="1" />
+              <xsd:element ref="offset" minOccurs="1" maxOccurs="1" />
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
