@@ -102,7 +102,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	private static int redisdb;
 	private static int redistimeout;
 
-	private JedisPool jedispool = null;
+	private JedisPoolWrapper jedispool = null;
 	
 	private Lookup lu = null;
 
@@ -114,9 +114,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	private LastStatusCache() {
 		fastCache = new HashMap<String,CacheQueue<LastStatus>>();
 		
-		JedisPoolConfig poolConfig = new JedisPoolConfig();
-		
-		jedispool = new JedisPool(poolConfig,redisserver,redisport,redistimeout,redisauth,redisdb);	
+		jedispool = new JedisPoolWrapper(redisserver,redisport,redistimeout,redisauth,redisdb);	
 		
 		lu  = Lookup.init(jedispool);
 	}
@@ -232,10 +230,12 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	
 	public void updateRuntimeMetaData() {
 		Map<String, Host> hostsmap = ConfigurationManager.getInstance().getHostConfig();
-		Jedis jedis = jedispool.getResource();
-		deleteAllMetaData(jedis);
+		Jedis jedis = null;
 		try {
-
+			jedis = jedispool.getResource();
+			
+			deleteAllMetaData(jedis);
+				
 			for (Map.Entry<String, Host> hostentry : hostsmap.entrySet()) {
 				Host host = hostentry.getValue();
 
@@ -249,7 +249,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				}
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -295,9 +295,11 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	public void add(LastStatus ls, String key) {
 		CacheQueue<LastStatus> fifo;
 		
-		Jedis jedis = jedispool.getResource();
+		Jedis jedis = null;
 		
 		try {
+			jedis = jedispool.getResource();
+			
 			if (fastCache.get(key) == null) {
 				fifo = new CacheQueue<LastStatus>(fastCacheSize);
 				fastCache.put(key, fifo);
@@ -311,7 +313,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			// Add redis
 			jedis.lpush(key, ls.getJson());
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -336,15 +338,17 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		LastStatus ls = null;
 
 		//String id = lu.getIdByName(key);
-		Jedis jedis = jedispool.getResource();
+		Jedis jedis = null;;
 		try {	
+			jedis = jedispool.getResource();
+			
 			if (jedis.llen(key) == 0)
 				return null;
 
 			ls = nearest(timestamp, key);
 
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -367,8 +371,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		
 		LastStatus ls = null;
 		
-		Jedis jedis = jedispool.getResource();
+		Jedis jedis = null;
 		try {
+			jedis = jedispool.getResource();
+			
 			if (fastCacheEnable && fastCache.get(key) != null && index < fastCache.get(key).size()-1) {
 				if (LOGGER.isDebugEnabled() ) {
 					LOGGER.debug("Fast cache used for key " + key +" index " + index);
@@ -391,7 +397,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				}
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -474,25 +480,28 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			return lslist;
 
 		}
-		
-		Jedis jedis = jedispool.getResource();
+	
+		Jedis jedis = null;
 		try {
+			jedis = jedispool.getResource();
+			
 			lsstr = jedis.lrange(key, fromIndex, toIndex);
+			
+			if (lsstr != null) {
+				incRedisCacheCount(toIndex-fromIndex+1);	
+
+				for (String redstr: lsstr) {
+					LastStatus ls = new LastStatus(redstr);
+					lslist.add(ls);
+				}
+			}
+
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}	
-		
-		if (lsstr != null) {
-			incRedisCacheCount(toIndex-fromIndex+1);	
 
-			for (String redstr: lsstr) {
-				LastStatus ls = new LastStatus(redstr);
-				lslist.add(ls);
-			}
-		}
-		
 		return lslist;
 	}
 
@@ -620,11 +629,13 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
     	String key = Util.fullName( hostName, serviceName, serviceItemName);
 		
     	Long size = 0L;
-		Jedis jedis = jedispool.getResource();
+		Jedis jedis = null;
 		try {	
+			jedis = jedispool.getResource();
+			
 			size = jedis.llen(key);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -642,13 +653,17 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		
 		//String id = lu.getIdByName(key);
 		Long index = null;
-		Jedis jedis = jedispool.getResource();
+		Jedis jedis = null;
 		try {
+			jedis = jedispool.getResource();
+			
 			if (jedis.llen(key) == 0)
 				return null;
 		
 			index = nearestByIndex(stime, key);
-		
+			
+		} catch (JedisConnectionException je) {
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -703,11 +718,12 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			fastCache.get(key).clear();
 		
 		// Clear redis cache data
-		Jedis jedis = jedispool.getResource();
+		Jedis jedis = null;
 		try {
+			jedis = jedispool.getResource();
 			jedis.del(key);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}	
@@ -869,9 +885,11 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	 */
 	private void clearRedisCache() {
 		
-		Jedis jedis = jedispool.getResource();
-		Iterator<String> iter = jedis.keys("*").iterator();
+		Jedis jedis = null;
+		
 		try {
+			jedis = jedispool.getResource();
+			Iterator<String> iter = jedis.keys("*").iterator();
 			while (iter.hasNext()) {
 				// Clear redis cache data
 				String key = iter.next();
@@ -881,7 +899,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 			}	
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -963,8 +981,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	private LastStatus nearestSlow(long time, String key) {
 		// Search the redis cache
 		LastStatus nearest = null;
-		Jedis jedis = jedispool.getResource();
+		Jedis jedis = null;
 		try {
+			jedis = jedispool.getResource();
 			if (time > new LastStatus(jedis.lindex(key, 0L)).getTimestamp() || 
 					time < new LastStatus(jedis.lindex(key, jedis.llen(key)-1)).getTimestamp() ) {
 				return null;
@@ -993,6 +1012,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 					}
 				}
 			}
+		} catch (JedisConnectionException je) {
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -1049,8 +1070,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	private Long nearestByIndexSlow(long time, String key) {
 		// Search the redis cache
 		Long index = null;
-		Jedis jedis = jedispool.getResource();
-		try {	
+		Jedis jedis = null;
+		try {
+			jedis = jedispool.getResource();
 			if (time > new LastStatus(jedis.lindex(key, 0L)).getTimestamp() || 
 					time < new LastStatus(jedis.lindex(key, jedis.llen(key)-1)).getTimestamp() ) {
 				
@@ -1083,6 +1105,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 					}
 				}
 			}
+		} catch (JedisConnectionException je) {
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -1138,11 +1162,12 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 	@Override
 	public void trim(String key, Long maxSize) {
-		Jedis jedis = jedispool.getResource();
+		Jedis jedis = null;
 		try {
+			jedis = jedispool.getResource();
 			jedis.ltrim(key, 0, maxSize-1);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.toString());
 		} finally {
 			jedispool.returnResource(jedis);
 		}

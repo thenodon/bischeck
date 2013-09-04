@@ -19,11 +19,11 @@ public final class Lookup {
 	private Map<String, Optimizer> optimizer = new HashMap<String, Optimizer>();
 	
 	// Lookup lookup = null;
-	private JedisPool jedispool = null;
+	private JedisPoolWrapper jedispool = null;
 
 	private final static String DICTIONARY = "dictionary";
 
-	private Lookup(JedisPool jedispool) {
+	private Lookup(JedisPoolWrapper jedispool) {
 		this.jedispool = jedispool;
 
 		Jedis jedis = this.jedispool.getResource();
@@ -42,7 +42,7 @@ public final class Lookup {
 	}
 
 	
-	public static Lookup init(JedisPool jedispool) {
+	public static Lookup init(JedisPoolWrapper jedispool) {
 
 		Lookup lookup = new Lookup(jedispool);
 		return lookup;
