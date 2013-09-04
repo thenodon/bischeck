@@ -1,7 +1,9 @@
 package com.ingby.socbox.bischeck.configuration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
@@ -10,6 +12,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLAggregate;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLCache;
+import com.ingby.socbox.bischeck.xsd.bischeck.XMLRetention;
 
 /**
  * The class is used to create configuration for a service definition that is
@@ -124,7 +127,19 @@ public class Aggregation {
 	}
 
 
-	static void setAggregate(XMLCache xmlconfig, Service service, ServiceItem serviceitem) throws Exception {
+	private XMLCache xmlconfig;
+	private Service service;
+	private ServiceItem serviceitem;
+	private Map<String,Long> retentionMap = new HashMap<String,Long>();
+
+	public Aggregation(XMLCache xmlconfig, Service service, ServiceItem serviceitem) {
+		this.xmlconfig = xmlconfig;
+		this.service = service;
+		this.serviceitem = serviceitem;
+	}
+
+	//static void setAggregate(XMLCache xmlconfig, Service service, ServiceItem serviceitem) throws Exception {
+	void setAggregate() throws Exception {
 		if (xmlconfig == null)
 			return;
 
@@ -170,12 +185,23 @@ public class Aggregation {
 				aggregatedService.addServiceItem(aggregatedServiceItem);
 				service.getHost().addService(aggregatedService);
 
+				////////////////
+				for (XMLRetention retention: aggregated.getRetention()){
+					if (retention.getPeriod().equals(period.prefix())) {
+						retentionMap .put(Util.fullName(aggregatedService, aggregatedServiceItem),Long.valueOf(retention.getOffset()));
+					}
+				}
 			}
 		}
 	}
 
+	
+	Map<String,Long> getRetentionMap() {
+		return retentionMap;
+	}
 
-	static private String getAggregatedExecution(AGGREGATION agg, XMLAggregate aggregated,
+	
+	private String getAggregatedExecution(AGGREGATION agg, XMLAggregate aggregated,
 			Service service, ServiceItem serviceitem) {
 		String aggregatedExecStatement = null;	
 
@@ -200,7 +226,7 @@ public class Aggregation {
 	}
 
 
-	static private List<String> getAggregatedSchedule(AGGREGATION agg, Boolean useWeekend) {
+	private List<String> getAggregatedSchedule(AGGREGATION agg, Boolean useWeekend) {
 		List<String> schedules = new ArrayList<String>();
 
 		if (useWeekend) {
