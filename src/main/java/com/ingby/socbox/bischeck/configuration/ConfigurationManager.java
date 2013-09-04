@@ -488,7 +488,11 @@ public final class ConfigurationManager  {
             	} else {
             		serviceitem.setThresholdClassName(template.getThresholdclass().trim());
             	}
-            	Aggregation.setAggregate(template.getCache(),service,serviceitem);
+            	
+            	Aggregation aggregation = new Aggregation(template.getCache(),service,serviceitem);
+            	aggregation.setAggregate();
+            	purgeMap.putAll(aggregation.getRetentionMap());
+            	
             	setPurge(template.getCache(),service,serviceitem);
                 
             } else {
@@ -512,7 +516,10 @@ public final class ConfigurationManager  {
             		serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
             	}
             	
-            	Aggregation.setAggregate(serviceitemconfig.getCache(),service,serviceitem);
+            	Aggregation aggregation = new Aggregation(serviceitemconfig.getCache(),service,serviceitem);
+            	aggregation.setAggregate();
+            	purgeMap.putAll(aggregation.getRetentionMap());
+            	
             	setPurge(serviceitemconfig.getCache(),service,serviceitem);
                 
             }
