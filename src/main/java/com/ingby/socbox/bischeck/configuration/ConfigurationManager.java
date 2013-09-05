@@ -115,7 +115,7 @@ public final class ConfigurationManager  {
     private Map<String,XMLServicetemplate> serviceTemplateMap = null;
     private Map<String,XMLServiceitemtemplate> serviceItemTemplateMap = null;
     
-    private Map<String,Long> purgeMap = null;
+    private Map<String,String> purgeMap = null;
     
     public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
@@ -174,7 +174,7 @@ public final class ConfigurationManager  {
     	runafter = new HashMap<RunAfter,List<Service>>();
     	serviceTemplateMap = new HashMap<String, XMLServicetemplate>();
     	serviceItemTemplateMap = new HashMap<String, XMLServiceitemtemplate>();
-    	purgeMap = new HashMap<String, Long>();
+    	purgeMap = new HashMap<String, String>();
     }
     
     
@@ -491,8 +491,8 @@ public final class ConfigurationManager  {
             	
             	Aggregation aggregation = new Aggregation(template.getCache(),service,serviceitem);
             	aggregation.setAggregate();
-            	purgeMap.putAll(aggregation.getRetentionMap());
-            	
+            	//purgeMap.putAll(aggregation.getRetentionMap());
+            	setPurge(aggregation.getRetentionMap());
             	setPurge(template.getCache(),service,serviceitem);
                 
             } else {
@@ -518,8 +518,8 @@ public final class ConfigurationManager  {
             	
             	Aggregation aggregation = new Aggregation(serviceitemconfig.getCache(),service,serviceitem);
             	aggregation.setAggregate();
-            	purgeMap.putAll(aggregation.getRetentionMap());
-            	
+            	//purgeMap.putAll(aggregation.getRetentionMap());
+            	setPurge(aggregation.getRetentionMap());
             	setPurge(serviceitemconfig.getCache(),service,serviceitem);
                 
             }
@@ -532,8 +532,17 @@ public final class ConfigurationManager  {
     
     
 
-
     /**
+     * A Map with the key servicedefs and the value of the max number in the 
+     * cache before purging. 
+     * @param retentionMap
+     */
+    private void setPurge(Map<String, String> retentionMap) {
+    	purgeMap.putAll(retentionMap);
+	}
+
+
+	/**
      * For serviceitem that has <purge> defined the purging will be set up.
      * Currently supporting only <maxcount>
      * @param xmlconfig
@@ -545,9 +554,11 @@ public final class ConfigurationManager  {
 			return;
 		
 		if (xmlconfig.getPurge() != null) {
+			String key = Util.fullName(service, serviceitem);
 			if(xmlconfig.getPurge().getMaxcount() != null) {
-				String key = Util.fullName(service, serviceitem);
-				purgeMap.put(key, xmlconfig.getPurge().getMaxcount());
+				purgeMap.put(key, String.valueOf(xmlconfig.getPurge().getMaxcount()));
+			} else if (xmlconfig.getPurge().getOffset() != null && xmlconfig.getPurge().getPeriod() != null) {
+				purgeMap.put(key, "-" + xmlconfig.getPurge().getOffset() + xmlconfig.getPurge().getPeriod());
 			}
 		}
 	}
@@ -821,7 +832,7 @@ public final class ConfigurationManager  {
         return schedulejobs;
     }
         
-    public Map<String,Long> getPurgeMap() {
+    public Map<String,String> getPurgeMap() {
     	return purgeMap;
     }
     
