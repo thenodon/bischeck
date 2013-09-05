@@ -119,8 +119,9 @@ public class NagiosUtil {
 			totalexectime = (totalexectime + serviceItem.getExecutionTime());
 			count++;
 		}
-		
-		return message.toString() + " | " + perfmessage.toString() +"avg-exec-time=" + ((totalexectime/count)+"ms");
+		message.append(" | ").append(perfmessage).append("avg-exec-time=").append(((totalexectime/count)+"ms"));
+		return message.toString();
+		//return message.toString() + " | " + perfmessage.toString() +"avg-exec-time=" + ((totalexectime/count)+"ms");
 	}
 
 }
