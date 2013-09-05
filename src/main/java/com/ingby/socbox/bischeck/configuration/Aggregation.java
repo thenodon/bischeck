@@ -20,7 +20,7 @@ import com.ingby.socbox.bischeck.xsd.bischeck.XMLRetention;
  */
 public class Aggregation {
 
-	private static final String WEEKEND = "\\weekend";
+	private static final String WEEKEND = "/weekend";
 
 	enum AGGREGATION  { 
 		HOUR { 
@@ -60,13 +60,13 @@ public class Aggregation {
 				return "[0:24]";
 			}
 			public String execPrefix() {
-				return "\\H\\";
+				return "/H/";
 			}
 			public String scheduleInclWeekend() {
-				return "0 0 0 ? * *";
+				return "0 59 23 ? * *";
 			}
 			public String schedule() {
-				return "0 0 0 ? * MON-FRI";
+				return "0 59 23 ? * MON-FRI";
 			}
 		}, 
 		WEEK { 
@@ -83,13 +83,13 @@ public class Aggregation {
 				return "[0:5]";
 			}
 			public String execPrefix() {
-				return "\\D\\";
+				return "/D/";
 			}
 			public String scheduleInclWeekend() {
-				return "0 0 0 ? * MON";
+				return "0 59 23 ? * SUN";
 			}
 			public String schedule() {
-				return "0 0 0 ? * FRI";
+				return "0 59 23 ? * FRI";
 			}
 		}, 
 
@@ -107,13 +107,13 @@ public class Aggregation {
 				return "[0:4]";
 			}
 			public String execPrefix() {
-				return "\\W\\";
+				return "/W/";
 			}
 			public String scheduleInclWeekend() {
-				return "0 0 0 ? * MON";
+				return "0 59 23 L * ?";
 			}
 			public String schedule() {
-				return "0 0 0 L * ?";
+				return "0 59 23 L * ?";
 			}
 		};
 
@@ -130,7 +130,7 @@ public class Aggregation {
 	private XMLCache xmlconfig;
 	private Service service;
 	private ServiceItem serviceitem;
-	private Map<String,Long> retentionMap = new HashMap<String,Long>();
+	private Map<String,String> retentionMap = new HashMap<String,String>();
 
 	public Aggregation(XMLCache xmlconfig, Service service, ServiceItem serviceitem) {
 		this.xmlconfig = xmlconfig;
@@ -156,11 +156,11 @@ public class Aggregation {
 
 				if (aggregated.isUseweekend()) {
 					aggregatedService = ServiceFactory.createService(
-							service.getServiceName()+ "\\" + period.prefix() + "\\" + aggregated.getMethod() + "\\weekend",
+							service.getServiceName()+ "/" + period.prefix() + "/" + aggregated.getMethod() + WEEKEND,
 							"bischeck://cache");
 				} else {
 					aggregatedService = ServiceFactory.createService(
-							service.getServiceName()+ "\\" + period.prefix()  + "\\" + aggregated.getMethod(),
+							service.getServiceName()+ "/" + period.prefix()  + "/" + aggregated.getMethod(),
 							"bischeck://cache");
 				}
 
@@ -185,10 +185,10 @@ public class Aggregation {
 				aggregatedService.addServiceItem(aggregatedServiceItem);
 				service.getHost().addService(aggregatedService);
 
-				////////////////
+				// Calculate the retention if it exists
 				for (XMLRetention retention: aggregated.getRetention()){
 					if (retention.getPeriod().equals(period.prefix())) {
-						retentionMap .put(Util.fullName(aggregatedService, aggregatedServiceItem),Long.valueOf(retention.getOffset()));
+						retentionMap .put(Util.fullName(aggregatedService, aggregatedServiceItem),String.valueOf(retention.getOffset()));
 					}
 				}
 			}
@@ -196,7 +196,7 @@ public class Aggregation {
 	}
 
 	
-	Map<String,Long> getRetentionMap() {
+	Map<String,String> getRetentionMap() {
 		return retentionMap;
 	}
 
