@@ -184,10 +184,9 @@ public final class Execute implements ExecuteMBean {
         	}
 
         	retStat = Execute.getInstance().daemon();
-        	LOGGER.info("Method Execute returned " + retStat);
+        	LOGGER.debug("Method Execute returned " + retStat);
         } while (retStat == RESTART);
  
-        //LogManager.shutdown();
         dumpthread.start();
         System.exit(retStat);
     }
@@ -386,7 +385,6 @@ public final class Execute implements ExecuteMBean {
       				.withDescription(jobentry.getService().getHost().getHostname()+"-"+jobentry.getService().getServiceName())
       				.usingJobData(jobmap)
       				.build();
-
 
       				sched.scheduleJob(job, trigger);
       				LOGGER.info("Adding trigger to job " + trigger.toString());
