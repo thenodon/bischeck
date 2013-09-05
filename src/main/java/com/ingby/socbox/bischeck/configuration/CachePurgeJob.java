@@ -40,16 +40,28 @@ import static org.quartz.JobBuilder.*;
 import static org.quartz.TriggerBuilder.*;
 import static org.quartz.CronScheduleBuilder.*;
 
+import com.ingby.socbox.bischeck.ServiceDef;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CachePurgeInf;
+import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
 /**
- * This class is executed as a Quartz job to remove all thresholds objects from
- * the threshold object cache. By default it runs once a day at midnight.
+ * This class is executed as a Quartz job to purge cache data according to:<br>
+ * <ul>
+ * <li>Max number of items in an LRU way - like 1000</li>
+ * <li>Purge data older then a specific time from purging time - like 2 days</li>
+ * </ul>
+ * <br>
+ * The purging strategy is based on what is specified in the &lt;cache&gt; tag 
+ * in the bischeck.xml file. The job is used both for &lt;purge&gt; and 
+ * &lt;retention&gt;.
+ * <br>
+ * The class take one property cachePurgeJobCron that is a cron expression when
+ * the purge job should be run. The default is every hour, "0 0 0/1 * * ? *" 
  */
 public class CachePurgeJob implements Job {
 
@@ -74,7 +86,7 @@ public class CachePurgeJob implements Job {
         // Every minute TODO MAKE A PROPERTY
         CronTrigger trigger = newTrigger()
         .withIdentity("CachePurgeTrigger", "DailyMaintenance")
-        .withSchedule(cronSchedule("0 0/1 * * * ? *"))
+        .withSchedule(cronSchedule(configMgr.getProperties().getProperty("cachePurgeJobCron","0 0/1 0/1 * * ? *")))
         .forJob("CachePurge", "DailyMaintenance")
         .build();
         
@@ -88,29 +100,41 @@ public class CachePurgeJob implements Job {
         LOGGER.info(job.getDescription() + " has been scheduled to run at: " + ft
                 + " and repeat based on expression: "
                 + trigger.getCronExpression());
-
     }
     
     
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        LOGGER.info("CachePurge running!");
-		final Timer timer = Metrics.newTimer(CachePurgeJob.class, 
+        final Timer timer = Metrics.newTimer(CachePurgeJob.class, 
 				"purge" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
+		
 		try {
-        Map<String, Long> purgeMap = ConfigurationManager.getInstance().getPurgeMap();
-        for (String key : purgeMap.keySet()) {
-        	CacheInf cache = CacheFactory.getInstance();
-           	if (cache instanceof CachePurgeInf) {
-           		if (LOGGER.isDebugEnabled()) {
-           			LOGGER.debug(key + ":" + purgeMap.get(key));
-           		}
-           		((CachePurgeInf) cache).trim(key, purgeMap.get(key) );
-        	}
-        }
+			Map<String, String> purgeMap = ConfigurationManager.getInstance().getPurgeMap();
+			for (String key : purgeMap.keySet()) {
+				CacheInf cache = CacheFactory.getInstance();
+				if (cache instanceof CachePurgeInf) {
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug(key + ":" + purgeMap.get(key));
+					}
+					
+					if (CacheUtil.isByTime(purgeMap.get(key))) {
+						// find the index of the time
+						ServiceDef servicedef = new ServiceDef(key);
+						Long index = cache.getIndexByTime( 
+								servicedef.getHostName(),
+								servicedef.getServiceName(), 
+								servicedef.getServiceItemName(),
+								System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(purgeMap.get(key)))*1000);
+						((CachePurgeInf) cache).trim(key, index);
+					} else {
+						((CachePurgeInf) cache).trim(key, Long.valueOf(purgeMap.get(key)));
+					}
+				}
+			}
 		} finally {
-			context.stop();
+			long duration = context.stop()/1000000;
+			LOGGER.info("CachePurge executed in " + duration + " ms");
 		}
     }
 
