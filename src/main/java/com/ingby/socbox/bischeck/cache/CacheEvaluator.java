@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ObjectDefinitions;
+import com.ingby.socbox.bischeck.ServiceDef;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.yammer.metrics.Metrics;
@@ -172,6 +172,7 @@ public class CacheEvaluator {
 		return cacheNameList;
 	}
 
+	
 	private List<String> getValues(List<String> listofenties) {
 		List<String> valueList = new ArrayList<String>();
 		
@@ -179,22 +180,13 @@ public class CacheEvaluator {
 		while (iter.hasNext()){
 			String token = iter.next();
 
-			int indexstart=token.indexOf("[");
-			int indexend=token.indexOf("]");
-
-			String indexstr = token.substring(indexstart+1, indexend);
-
-			String parameter1 = token.substring(0, indexstart);
-			String parameter2 = parameter1.replaceAll(ObjectDefinitions.getCacheQuoteString(), ObjectDefinitions.getQuoteConversionString());
-			StringTokenizer parameter = new StringTokenizer(parameter2,ObjectDefinitions.getCacheKeySep());
-						
-			String host = ((String) parameter.nextToken()).
-				replaceAll(ObjectDefinitions.getQuoteConversionString(), ObjectDefinitions.getCacheKeySep());
-			String service = (String) parameter.nextToken().
-				replaceAll(ObjectDefinitions.getQuoteConversionString(), ObjectDefinitions.getCacheKeySep());
-			String serviceitem = (String) parameter.nextToken().
-				replaceAll(ObjectDefinitions.getQuoteConversionString(), ObjectDefinitions.getCacheKeySep());        
-
+			ServiceDef servicedef = new ServiceDef(token);
+			String indexstr = servicedef.IndexStr();
+			
+			String host = servicedef.getHostName();
+			String service = servicedef.getServiceName();
+			String serviceitem = servicedef.getServiceItemName();
+		
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("Get from the LastStatusCahce " + 
 					host + "-" +
