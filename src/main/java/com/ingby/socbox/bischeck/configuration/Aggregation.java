@@ -128,17 +128,16 @@ public class Aggregation {
 
 
 	private XMLCache xmlconfig;
-	private Service service;
-	private ServiceItem serviceitem;
+	private Service baseService;
+	private ServiceItem baseServiceitem;
 	private Map<String,String> retentionMap = new HashMap<String,String>();
 
 	public Aggregation(XMLCache xmlconfig, Service service, ServiceItem serviceitem) {
 		this.xmlconfig = xmlconfig;
-		this.service = service;
-		this.serviceitem = serviceitem;
+		this.baseService = service;
+		this.baseServiceitem = serviceitem;
 	}
 
-	//static void setAggregate(XMLCache xmlconfig, Service service, ServiceItem serviceitem) throws Exception {
 	void setAggregate() throws Exception {
 		if (xmlconfig == null)
 			return;
@@ -152,45 +151,51 @@ public class Aggregation {
 		for (AGGREGATION period:periods) {
 			for (XMLAggregate aggregated: xmlconfig.getAggregate()) {
 
-				Service aggregatedService = null;
+				Service service = null;
 
 				if (aggregated.isUseweekend()) {
-					aggregatedService = ServiceFactory.createService(
-							service.getServiceName()+ "/" + period.prefix() + "/" + aggregated.getMethod() + WEEKEND,
+					service = ServiceFactory.createService(
+							baseService.getServiceName()+ "/" + period.prefix() + "/" + aggregated.getMethod() + WEEKEND,
 							"bischeck://cache");
 				} else {
-					aggregatedService = ServiceFactory.createService(
-							service.getServiceName()+ "/" + period.prefix()  + "/" + aggregated.getMethod(),
+					service = ServiceFactory.createService(
+							baseService.getServiceName()+ "/" + period.prefix()  + "/" + aggregated.getMethod(),
 							"bischeck://cache");
 				}
 
 
-				aggregatedService.setHost(service.getHost());
-				aggregatedService.setDecscription("");
-				aggregatedService.setSchedules(getAggregatedSchedule(period,aggregated.isUseweekend()));
-				aggregatedService.setConnectionUrl("bischeck://cache");
-				aggregatedService.setSendServiceData(false);
+				service.setHost(baseService.getHost());
+				service.setDecscription("");
+				service.setSchedules(getAggregatedSchedule(period,aggregated.isUseweekend()));
+				service.setConnectionUrl("bischeck://cache");
+				service.setSendServiceData(false);
 
-				ServiceItem aggregatedServiceItem = null;
+				ServiceItem serviceItem = null;
 
-				aggregatedServiceItem = ServiceItemFactory.createServiceItem(
-						serviceitem.getServiceItemName(),
+				serviceItem = ServiceItemFactory.createServiceItem(
+						baseServiceitem.getServiceItemName(),
 						"CalculateOnCache");
 
-				aggregatedServiceItem.setClassName("CalculateonCache");
-				aggregatedServiceItem.setExecution(getAggregatedExecution(period, aggregated,service,serviceitem));
+				serviceItem.setClassName("CalculateonCache");
+				serviceItem.setExecution(getAggregatedExecution(period, aggregated,baseService,baseServiceitem));
 
 
-				aggregatedServiceItem.setService(aggregatedService);
-				aggregatedService.addServiceItem(aggregatedServiceItem);
-				service.getHost().addService(aggregatedService);
+				serviceItem.setService(service);
+				service.addServiceItem(serviceItem);
+				baseService.getHost().addService(service);
 
-				// Calculate the retention if it exists
-				for (XMLRetention retention: aggregated.getRetention()){
-					if (retention.getPeriod().equals(period.prefix())) {
-						retentionMap .put(Util.fullName(aggregatedService, aggregatedServiceItem),String.valueOf(retention.getOffset()));
-					}
-				}
+				setRetention(period, aggregated, service,
+						serviceItem);
+			}
+		}
+	}
+
+	private void setRetention(AGGREGATION period, XMLAggregate aggregated,
+			Service service, ServiceItem serviceItem) {
+		// Calculate the retention if it exists
+		for (XMLRetention retention: aggregated.getRetention()){
+			if (retention.getPeriod().equals(period.prefix())) {
+				retentionMap .put(Util.fullName(service, serviceItem),String.valueOf(retention.getOffset()));
 			}
 		}
 	}
@@ -203,26 +208,26 @@ public class Aggregation {
 	
 	private String getAggregatedExecution(AGGREGATION agg, XMLAggregate aggregated,
 			Service service, ServiceItem serviceitem) {
-		String aggregatedExecStatement = null;	
+		String execStatement = null;	
 
 		if (agg.toString().equals("HOUR")) {
-			aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + 
+			execStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + 
 					agg.execStatInclWeekend() +")";
 		} else {
 
 			if (aggregated.isUseweekend()) {
-				aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem, 
+				execStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem, 
 						agg.execPrefix()+ aggregated.getMethod() + WEEKEND) +
 						agg.execStatInclWeekend() + 
 						")";
 
 			} else {
-				aggregatedExecStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem, 
+				execStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem, 
 						agg.execPrefix()+ aggregated.getMethod()) + 
 						agg.execStat()+ ")";
 			}	
 		}
-		return aggregatedExecStatement;
+		return execStatement;
 	}
 
 
