@@ -2,6 +2,15 @@ package com.ingby.socbox.bischeck;
 
 import java.util.StringTokenizer;
 
+
+/**
+ * The class manage the parsing of a host-service-serviceitem string and 
+ * breaks it up in host, service and serviceitem. The string can also take the
+ * string host-service-serviceitem[indexstring]. If the string include index the
+ * method hasIndex return true and the method getIndex return the index string 
+ * part.
+ * 
+ */
 public class ServiceDef {
 
 	private String hostName = null;
@@ -39,7 +48,7 @@ public class ServiceDef {
 		return hasIndex;
 	}
 	
-	public String IndexStr() {
+	public String getIndex() {
 		return indexstr;
 	}
 	

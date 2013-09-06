@@ -181,7 +181,7 @@ public class CacheEvaluator {
 			String token = iter.next();
 
 			ServiceDef servicedef = new ServiceDef(token);
-			String indexstr = servicedef.IndexStr();
+			String indexstr = servicedef.getIndex();
 			
 			String host = servicedef.getHostName();
 			String service = servicedef.getServiceName();
