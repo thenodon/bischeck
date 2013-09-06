@@ -230,8 +230,8 @@ public abstract class Util {
     	StringBuffer strbuf = new StringBuffer();
     	
     	strbuf.append(hostname.replaceAll("-", "\\\\-")).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(servicename.replaceAll("-", "\\\\-")).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(insert).append("-");
+    	strbuf.append(servicename.replaceAll("-", "\\\\-"));
+    	strbuf.append(insert).append(ObjectDefinitions.getCacheKeySep());
     	strbuf.append(serviceitemname.replaceAll("-", "\\\\-"));
     	return strbuf.toString();	
     }
