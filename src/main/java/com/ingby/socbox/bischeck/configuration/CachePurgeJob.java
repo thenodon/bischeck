@@ -86,7 +86,7 @@ public class CachePurgeJob implements Job {
         // Every minute TODO MAKE A PROPERTY
         CronTrigger trigger = newTrigger()
         .withIdentity("CachePurgeTrigger", "DailyMaintenance")
-        .withSchedule(cronSchedule(configMgr.getProperties().getProperty("cachePurgeJobCron","0 0/1 0/1 * * ? *")))
+        .withSchedule(cronSchedule(configMgr.getProperties().getProperty("cachePurgeJobCron","0 0 0/1 * * ? *")))
         .forJob("CachePurge", "DailyMaintenance")
         .build();
         
