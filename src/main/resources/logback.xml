@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- For assistance related to logback-translator or configuration  -->
-<!-- files in general, please contact the logback user mailing list -->
-<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
-<!--                                                                -->
-<!-- For professional support please see                            -->
-<!--    http://www.qos.ch/shop/products/professionalSupport         -->
-<!--                                                                -->
 <configuration>
-
+  <jmxConfigurator />
   <appender name="bischeck" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
     <File>/var/tmp/bischeck.log</File>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} ; %p ; %t ; %c ; %m%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %t ; %c ; %m%ex{short}%n</pattern>
     </encoder>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -36,10 +29,29 @@
   <logger name="com.ingby" level="INFO">
     <appender-ref ref="bischeck"/>
   </logger>
-
-  <logger name="com.ingby.socbox.bischeck.cache.provider.redis" level="DEBUG">
+ 
+  <!--
+  <logger name="com.ingby.socbox.bischeck.configuration.ConfigurationManager" level="DEBUG">
     <appender-ref ref="bischeck"/>
   </logger>
+
+  <logger name="com.ingby.socbox.bischeck.jepext" level="DEBUG">
+    <appender-ref ref="bischeck"/>
+  </logger>
+  
+  <logger name="com.ingby.socbox.bischeck.serviceitem.CalculateOnCache" level="DEBUG">
+    <appender-ref ref="bischeck"/>
+  </logger>
+
+  
+  <logger name="com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold" level="DEBUG">
+    <appender-ref ref="bischeck"/>
+  </logger>
+ 
+  <logger name="com.ingby.socbox.bischeck.cache.provider.redis" level="DEBUG" additivity="false">
+    <appender-ref ref="bischeck"/>
+  </logger>
+ -->
 
   <logger name="org.quartz" level="ERROR">
     <appender-ref ref="bischeck"/>
