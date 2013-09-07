@@ -23,7 +23,7 @@
   </host>
   
   <servicetemplate templatename="sshporttemplate">  
-    <service>
+    
       <name>sshport</name>
       <desc>Monitor the ssh port response time</desc>
       <schedule>5S</schedule> 
@@ -31,18 +31,16 @@
       <serviceitem>
         <template>sshresponsetimetemplate</template>
       </serviceitem>
-     </service>
-  </servicetemplate>
+   </servicetemplate>
   
   
   <serviceitemtemplate templatename="sshresponsetimetemplate">  
-    <serviceitem>
       <name>response</name>
       <desc>Response time for tcp check</desc>
       <execstatement>{"check":"/usr/lib/nagios/plugins/check_tcp -H $$HOSTALIAS$$ -p 22","label":"time"}</execstatement>
       <thresholdclass>Twenty4HourThreshold</thresholdclass>
       <serviceitemclass>CheckCommandServiceItem</serviceitemclass>
-    </serviceitem>
+   
   </serviceitemtemplate>
 
 </bischeck>
