@@ -1,0 +1,5 @@
+        <member>
+           <hostname>host0</hostname>
+            <servicename>avgrand</servicename>
+            <serviceitemname>avg</serviceitemname>
+        </member>

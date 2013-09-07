@@ -1,0 +1,25 @@
+        <template>randthreshold</template>    
+    </servicedefgroup>
+      
+    <servicedeftemplate templatename="randthreshold">
+        
+        <period>
+            <calcmethod>&gt;</calcmethod>
+            <warning>5</warning>
+            <critical>10</critical>
+            <hoursIDREF>0</hoursIDREF>
+        </period>
+    </servicedeftemplate>
+        
+    
+    <hours hoursID="0">
+        <hourinterval>
+            <from>00:00</from>
+            <to>23:00</to>
+            <threshold>avg($$HOSTNAME$$-rand-number[10:19])</threshold>
+        </hourinterval>
+    </hours>
+
+    <holiday year="2013">
+    </holiday>
+</twenty4threshold>

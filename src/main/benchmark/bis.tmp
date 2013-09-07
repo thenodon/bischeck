@@ -1,0 +1,11 @@
+    <host>
+        <name>host0</name>
+        <alias>127.0.0.1</alias>
+        <desc></desc>
+        <service>
+          <template>randtemplate</template>
+        </service>
+        <service>
+          <template>avgrandtemplate</template>
+        </service>
+    </host>
