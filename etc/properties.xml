@@ -59,12 +59,14 @@
     </property>
     <property>
         <key>cache.provider.redis.db</key>
-        <value>0</value>
+        <value>1</value>
     </property>
+
     <property>
         <key>cache.provider.redis.auth</key>
         <value></value>
     </property>
+
     <property>
         <key>cache.provider.redis.timeout</key>
         <value>2000</value>
