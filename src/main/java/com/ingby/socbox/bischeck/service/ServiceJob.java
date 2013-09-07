@@ -224,11 +224,9 @@ public class ServiceJob implements Job {
 
 			synchronized (service) {
 				executeService(service, serviceitem);
+				executeThreshold(service, serviceitem);
 			}
-
-			executeThreshold(service, serviceitem);
-
-		} // for serviceitem
+		} 
 	}
 
 
