@@ -1,37 +1,28 @@
-<?xml version='1.0' encoding='UTF-8'?>
-
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <servers>
+    <server name="NSCA-1">
+        <class>        NSCAServer     </class>
+        <property>
+            <key>hostAddress</key>
+            <value>localhost</value>
+        </property>
+        <property>
+            <key>encryptionMode</key>
+            <value>XOR</value>
+        </property>
+        <property>
+            <key>password</key>
+            <value>nscapassword</value>
+        </property>
+        <property>
+            <key>port</key>
+            <value>5667</value>
+        </property>
+        <property>
+            <key>connectionTimeout</key>
+            <value>5000</value>
+        </property>
+    </server>
 
-  <server name="NSCA">
-    <class>
-       NSCAServer
-    </class>
-    
-    <property>
-      <key>hostAddress</key>
-      <value>localhost</value>
-    </property>
-
-    <property>
-      <key>encryptionMode</key>
-      <value>XOR</value>
-    </property>
-
-    <property>
-      <key>password</key>
-      <value>change this</value>
-    </property>
-
-    <property>
-      <key>port</key>
-      <value>5667</value>
-    </property>
-
-    <property>
-      <key>connectionTimeout</key>
-      <value>5000</value>
-    </property>
-
-  </server>
 
 </servers>

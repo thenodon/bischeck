@@ -1,33 +1,74 @@
-<?xml version='1.0' encoding='UTF-8'?>
-
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <properties>
-
-  <property>
-    <key>pidfile</key>
-    <value>/var/tmp/bischeck.pid</value>
-  </property>
-
-  <!-- Clear the threshold cache every day 10 sec after midnight -->
-  <property>
-    <key>thresholdCacheClear</key>
-    <value>10 0 00 * * ? *</value>
-  </property>
-
-  <property>
-    <key>JDBCSerivce.querytimeout</key>
-    <value>5</value>
-  </property>
-
-  
-<!-- Already the default values to have week numbering according to ISO 8601 -->  
-  <property>
-    <key>mindaysinfirstweek</key>
-    <value>4</value>
-  </property>
-  
-  <property>
-    <key>firstdayofweek</key>
-    <value>2</value>
-  </property>
+    <!-- 
+        Where is the pid file stored when bischeck is run from the init.d script
+        bischeckd
+    -->
+    <property>
+        <key>pidfile</key>
+        <value>/var/tmp/bischeck.pid</value>
+    </property>
+    
+    <!-- 
+        When is the threshold configuration cache cleared. Must be at least 
+        once a day
+    -->
+    <property>
+        <key>thresholdCacheClear</key>
+        <value>10 0 00 * * ? *</value>
+    </property>
+    <property>
+        <key>JDBCSerivce.querytimeout</key>
+        <value>5</value>
+    </property>
+    <property>
+        <key>mindaysinfirstweek</key>
+        <value>4</value>
+    </property>
+    <property>
+        <key>firstdayofweek</key>
+        <value>2</value>
+    </property>
+    <property>
+        <key>stateOnNull</key>
+        <value>3</value>
+    </property>
+    <property>
+        <key>notFullListParse</key>
+        <value>true</value>
+    </property>
+    <property>
+        <key>sendInternal</key>
+        <value>true</value>
+    </property>
+    <property>
+        <key>sendInternalInterval</key>
+        <value>0 */1 * * * ? *</value>
+    </property>
+    
+    <!--
+        New properties for the redis based cache  
+    -->  
+    <property>
+        <key>cache.provider.redis.server</key>
+        <value>localhost</value>
+    </property>
+    <property>
+        <key>cache.provider.redis.port</key>
+        <value>6379</value>
+    </property>
+    <property>
+        <key>cache.provider.redis.db</key>
+        <value>0</value>
+    </property>
+    <property>
+        <key>cache.provider.redis.auth</key>
+        <value></value>
+    </property>
+    <property>
+        <key>cache.provider.redis.timeout</key>
+        <value>2000</value>
+    </property>
+    
 
 </properties>
