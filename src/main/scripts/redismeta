@@ -1,0 +1,23 @@
+#!/bin/bash
+db=$1
+
+for i in `echo KEYS "*" |redis-cli -n $db`
+do 
+    echo -n  "$i "
+    type=$(echo TYPE $i |redis-cli -n $db)
+    if [ "$type" = "list" ] 
+    then 
+        echo -n "(list): "
+        echo LLEN $i |redis-cli -n $db| sed -e "s/(integer)//"
+    elif [ "$type" = "set" ]
+    then
+        echo -n "(set): "
+        echo
+        echo SMEMBERS $i |redis-cli -n $db
+    elif [ "$type" = "hash" ]
+    then
+        echo -n "(hash): "
+        echo -n HLEN $i |redis-cli -n $db| sed -e "s/(integer)//"
+    fi
+
+done
