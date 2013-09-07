@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public final class Lookup {
@@ -35,7 +34,7 @@ public final class Lookup {
 				
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			this.jedispool.returnResource(jedis);
 		}
@@ -55,7 +54,7 @@ public final class Lookup {
 		try {
 			return jedis.hgetAll(DICTIONARY);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -85,7 +84,7 @@ public final class Lookup {
 //				id2name.put(keyid, keyname);
 				jedis.hset(DICTIONARY, keyname, keyid);
 			} catch (JedisConnectionException je) {
-				LOGGER.error("Redis connection failed: " + je.getMessage());
+				LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 			} finally {
 				jedispool.returnResource(jedis);
 			}

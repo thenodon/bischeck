@@ -42,8 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import com.ingby.socbox.bischeck.Util;
@@ -84,7 +82,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	private HashMap<String,CacheQueue<LastStatus>> fastCache = null;
 
 	
-	private static int fastCacheSize = 100;
+	private static int fastCacheSize = 0;
 	
 	//private static boolean notFullListParse = false;
 	private static LastStatusCache lsc; // = new LastStatusCache();
@@ -145,7 +143,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 			redisauth = ConfigurationManager.getInstance().getProperties().
 					getProperty("cache.provider.redis.auth");
-
+			if (redisauth.length() == 0) {
+				redisauth = null;
+			}
+			
 			try {
 				redisdb = Integer.parseInt(
 						ConfigurationManager.getInstance().getProperties().
@@ -170,31 +171,32 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			try {
 				mbeanname = new ObjectName(BEANNAME);
 			} catch (MalformedObjectNameException e) {
-				LOGGER.error("MBean object name failed, " + e);
+				LOGGER.error("MBean object name failed, " + e.getMessage(),e);
 			} catch (NullPointerException e) {
-				LOGGER.error("MBean object name failed, " + e);
+				LOGGER.error("MBean object name failed, " + e.getMessage(),e);
 			}
 
 
 			try {
 				mbs.registerMBean(lsc, mbeanname);
 			} catch (InstanceAlreadyExistsException e) {
-				LOGGER.error("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - " + e.getMessage(),e);
 			} catch (MBeanRegistrationException e) {
-				LOGGER.error("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - " + e.getMessage(),e);
 			} catch (NotCompliantMBeanException e) {
-				LOGGER.error("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - " + e.getMessage(),e);
 			}
 			
 			try {
 				fastCacheSize = Integer.parseInt(
 						ConfigurationManager.getInstance().getProperties().
-						getProperty("cache.provider.redis.fastCacheSize","100"));
+						getProperty("cache.provider.redis.fastCacheSize","0"));
 				if (fastCacheSize == 0) {
 					lsc.disableFastCache();
 				}
 			} catch (NumberFormatException ne) {
-				fastCacheSize = 100;
+				fastCacheSize = 0;
+				lsc.disableFastCache();
 			}
 			
 			lsc.updateRuntimeMetaData();
@@ -249,7 +251,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				}
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(), je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -313,7 +315,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			// Add redis
 			jedis.lpush(key, ls.getJson());
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -348,7 +350,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			ls = nearest(timestamp, key);
 
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -397,7 +399,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				}
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -497,7 +499,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			}
 
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}	
@@ -635,7 +637,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			
 			size = jedis.llen(key);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -663,7 +665,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			index = nearestByIndex(stime, key);
 			
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -723,7 +725,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			jedis = jedispool.getResource();
 			jedis.del(key);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}	
@@ -899,7 +901,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 			}	
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -1013,7 +1015,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				}
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -1106,7 +1108,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				}
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -1167,7 +1169,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			jedis = jedispool.getResource();
 			jedis.ltrim(key, 0, maxSize-1);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.toString());
+			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
