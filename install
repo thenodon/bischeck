@@ -112,7 +112,7 @@ function checkpackage() {
 }
 
 function distrocheck() {
-if [ -x lsb_release ] ; then
+if [ -x /usr/bin/lsb_release ] ; then
   DISTRIBUTION=$(lsb_release -i | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
   if [ "$DISTRIBUTION" != "unknown" ] ; then
     VERSION=$(lsb_release -r | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
@@ -133,13 +133,18 @@ fi
 
 
 function usage {
-  echo "Usage: $0: -U user -I directory -J java_home "
-  echo "-u show usage"
-  echo "-U the user name to install bischeck as and run the daemon as - default nagios"
-  echo "-J java home directory - default is none"
-  echo "-I installation directory for bischeck - default /opt/socbox/addons/bischeck"
-  echo "-R unistall - permanently remove the installation" 
-  echo "-X upgrade from current version - if possible"
+  echo "Usage for the bischeck installer"
+  echo "-u show usage."
+  echo "-U the user name to install bischeck as and run the daemon as - default nagios."
+  echo "-J java home directory, no default value."
+  echo "-I installation directory for bischeck - default /opt/socbox/addons/bischeck."
+  echo "-R uninstall - permanently remove the installation." 
+  echo "-X upgrade from current version - if possible."
+  echo "-d set the linux distribution name if the installer can not detected. Supported are"
+  echo "   rh, rhel, redhatenterpriseserver, centos, debian and ubuntu" 
+  echo "-p the port number for the JMX RMI server, for example 3333. No default value."
+  echo "-i the IP address where the RMI port should run, for example 127.0.0.1. No default value."
+  echo "-a if authentication should be used applied on JMX connection. Default is false."
 }
 
 
@@ -165,17 +170,18 @@ unistall=false
 upgrade=false
 DISTRO=""
 DISTROVERS=""
+JMXAUTH=false
 
 VERSION=$(basename `pwd` | sed -e "s/^.*-//")
 
 
 echo "Welcome to bischeck $VERSION installer"
 echo "===================================="
-echo "Copyright Anders Håål, Ingenjörsbyn AB 2011"
+echo "Copyright Anders Håål, Ingenjörsbyn AB 2011-2013"
 echo "Licensed under GPL version 2"
 echo 
 
-while getopts U:I:J:uRXd: name
+while getopts U:I:J:uRXd:p:i:a name
 do
   case $name in
     U)  USERINIT="$OPTARG";;
@@ -184,6 +190,9 @@ do
     X)  upgrade=true;;
     R)  uninstall=true;;
     d)  DISTRO="$OPTARG";;
+    p)  JMXPORT="$OPTARG";;
+    i)  JMXSERVERIP="$OPTARG";;
+    a)  JMXAUTH=true;;
     u)  usage; exit 0;;
   esac
 done
@@ -200,7 +209,7 @@ if [ "x$DISTRO" = "x" ] ; then
   DISTROVERS=$(distrocheck | cut -f2 -d:)
   if [ "x$DISTRO" = "x" ] ; then
     echo "Can not determine distribution - please try set distribution name with -d"
-    echo "Supported distributions are rh, rhel, centos and debian"
+    echo "Supported distributions are rh, rhel, redhatenterpriseserver, centos, debian and ubuntu" 
     exit 1
   fi 
 else
@@ -208,12 +217,12 @@ else
 fi
 
 case ${DISTRO} in
-  rh|rhel|centos|debian|ubuntu)
+  rh|rhel|redhatenterpriseserver|centos|debian|ubuntu)
       echo "Supported distribution - $DISTRO $DISTROVERS" 
       ;;
   *)
       echo "Linux distribution $DISTRO is not supported"
-      echo "Supported distributions are rh, rhel, centos and debian" 
+      echo "Supported distributions are rh, rhel, redhatenterpriseserver, centos, debian and ubuntu" 
       exit 1
       ;;
 esac;
@@ -229,7 +238,7 @@ if [ "x$uninstall" = "xtrue" ] ; then
   echo "Remove $BISHOME"
   rm -rf $BISHOME
   echo "Remove bischeckd from /etc/init.d"
-  if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+  if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "redhatenterpriseserver" -o "$DISTRO" = "centos" ] ; then
     chkconfig --del bischeckd
   elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
     update-rc.d bischeckd remove
@@ -261,6 +270,7 @@ fi
 #########################
 ## Pre install 
 #########################
+# Check that BISHOME directory do not exist
 if [ "$upgrade" = "false" ] ; then
   if [ -d $BISHOME ] ; then
     errormsg "Directory $BISHOME already exists"
@@ -270,6 +280,7 @@ if [ "$upgrade" = "false" ] ; then
   fi
 fi
 
+# Check JAVA is installed and correct version
 if [ "x$JAVA_HOME" = "x" ] ; then
   which java > /dev/null 2>&1
   if [ $? != 0 ] ; then
@@ -281,14 +292,27 @@ elif [ ! -f $JAVA_HOME/bin/java ] ; then
   initerror=true
 else 
   jver=$(java -version 2>&1 | awk '/version/ {print $3}' | awk -F . '{print $2}')
-  if [ $jver -qe 6 ] ; then 
+  if [ $jver -eq 6 ] ; then 
     echo "Java runtime exists"
   else
     errormsg "Java version is must be 6 or higher."
     initerror=true
   fi
 fi
+# Check if any JMX setting is defined, then all must be set   
+if [ "x$JMXPORT" != "x" -o  "x$JMXSERVERIP" != "x" ] ; then
   
+  if [ "x$JMXPORT" = "x" ] ; then
+    errormsg "The JMX server port must be set, like -p 3333"
+    initerror=true
+  fi  
+  
+  if [ "x$JMXSERVERIP" = "x" ] ; then
+    errormsg "The JMX server IP must be set, -i 127.0.0.1"
+    initerror=true
+  fi  
+
+fi
 
 #########################
 ## Upgrade check
@@ -368,7 +392,11 @@ if [ ! -d $BISHOME ] ; then
         -e "s#%VERSION%#$VERSION#g" \
         -e "s#%USERINIT%#$USERINIT#g" \
         -e "s#%JAVA_HOME%#$JAVA_HOME#g" \
-        -e "s#%DISTRO%#$DISTRO#g" > $BISHOME/bin/`basename ${i%\.template}`
+        -e "s#%DISTRO%#$DISTRO#g" \
+        -e "s#%JMXPORT%#$JMXPORT#g" \
+        -e "s#%JMXSERVERIP%#$JMXSERVERIP#g" \
+        -e "s#%JMXAUTH%#$JMXAUTH#g" \
+        > $BISHOME/bin/`basename ${i%\.template}`
     done
     chmod 750 $BISHOME/bin/* 
 
@@ -403,7 +431,7 @@ fi
 if [ "$upgrade" = "true" ] ; then
   headline "Upgrade of bischeck $newversion with $oldversion"
   echo "Copy customlib jars"
-  cp -a $upgradedir/customlib/* $BISHOME/customlib/
+  cp -a $upgradedir/customlib/* $BISHOME/customlib/  2>/dev/null
   echo "Running migrations scripts"    
   sh ./migscripts/$migscript $BISHOME $upgradedir
 fi
