@@ -37,7 +37,7 @@ DISTRO=%DISTRO%
 
 processName=com.ingby.socbox.bischeck.Execute
 
-pidFile=$(su $user -c "$bishome/bin/bischeck ConfigurationManager -p" | grep PidFile | cut -d: -f2)
+pidFile=$(su $user -c "$bishome/bin/bischeck configuration.ConfigurationManager -p" | grep PidFile | cut -d: -f2)
 
 isrunning() {
     ps -fu $user | grep $1 | grep java| tr -s " "| cut -f2 -d" " 
