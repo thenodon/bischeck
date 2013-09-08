@@ -23,24 +23,54 @@
   </host>
   
   <servicetemplate templatename="sshporttemplate">  
-    
-      <name>sshport</name>
-      <desc>Monitor the ssh port response time</desc>
-      <schedule>5S</schedule> 
-      <url>shell://localhost</url>
-      <serviceitem>
-        <template>sshresponsetimetemplate</template>
-      </serviceitem>
-   </servicetemplate>
+    <name>sshport</name>
+    <desc>Monitor the ssh port response time</desc>
+    <schedule>5S</schedule> 
+    <url>shell://localhost</url>
+    <serviceitem>
+      <template>sshresponsetimetemplate</template>
+    </serviceitem>
+  </servicetemplate>
   
   
   <serviceitemtemplate templatename="sshresponsetimetemplate">  
-      <name>response</name>
-      <desc>Response time for tcp check</desc>
-      <execstatement>{"check":"/usr/lib/nagios/plugins/check_tcp -H $$HOSTALIAS$$ -p 22","label":"time"}</execstatement>
-      <thresholdclass>Twenty4HourThreshold</thresholdclass>
-      <serviceitemclass>CheckCommandServiceItem</serviceitemclass>
+    <name>response</name>
+    <desc>Response time for tcp check</desc>
+    <execstatement>{"check":"/usr/lib/nagios/plugins/check_tcp -H $$HOSTALIAS$$ -p 22","label":"time"}</execstatement>
+    <thresholdclass>Twenty4HourThreshold</thresholdclass>
+    <serviceitemclass>CheckCommandServiceItem</serviceitemclass>
    
+    <cache>
+      <aggregate>
+        <!-- Aggregate with using average -->
+        <method>avg</method>
+        <!-- Include weekend data in the aggregation -->
+        <useweekend>true</useweekend>
+        <!-- 
+          Define retention for the aggregated periods. 
+          If no retention is define for a period no retention will be done.
+          Periods that can be define are (H)our,(D)ay, (W)eek and (M)onth    
+        -->
+        <retention>
+          <!-- Purge hours after after 7 days (24*7) -->
+          <period>H</period>
+          <offset>168</offset>
+        </retention>
+        <retention>
+          <!-- Purge days after 60 days -->
+          <period>D</period>
+          <offset>60</offset>
+        </retention>
+      </aggregate>
+      <!-- 
+        Define purge rules for the data that is collected with this serviceitem
+      -->
+      <purge>
+        <!--  The max number of items -->
+        <maxcount>1000</maxcount> 
+      </purge>
+    </cache>
+  
   </serviceitemtemplate>
 
 </bischeck>
