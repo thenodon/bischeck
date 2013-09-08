@@ -176,6 +176,7 @@
     	<copy todir="${build.home}" file="${docs.home}/README.pdf" />
         <copy todir="${build.home}" file="${docs.home}/LICENSE" />
     	<copy todir="${build.home}" file="${basedir}/install" />
+    	<chmod file="${build.home}/install" perm="ug+x"/>
     	<copy todir="${build.home}" file="${basedir}/svninfo.txt" />
     	<copy todir="${build.home}" file="${basedir}/migrationpath.txt" />
 	    <chmod file="${build.home}/install" perm="ugo+rx"/>
