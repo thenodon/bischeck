@@ -142,9 +142,11 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			}
 
 			redisauth = ConfigurationManager.getInstance().getProperties().
-					getProperty("cache.provider.redis.auth");
-			if (redisauth.length() == 0) {
-				redisauth = null;
+					getProperty("cache.provider.redis.auth",null);
+			if (redisauth != null) {
+				if (redisauth.length() == 0){
+					redisauth = null;
+				}
 			}
 			
 			try {
