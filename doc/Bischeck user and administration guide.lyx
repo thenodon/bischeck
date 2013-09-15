@@ -1,0 +1,7807 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass scrbook
+\begin_preamble
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+%\fancyhead[LE,RO]{\slshape bischeck Readme}
+\fancyhead[LE,RO]{bischeck - A business activity check command server for Nagios}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+%\lhead{bischeck}
+%\rhead{Text you want on the right top}
+%\chead{Text you want over the center}
+%\lfoot{left footer}
+%\rfoot{right footer}
+%\cfoot{\thepage}
+
+% \lhead{\nouppercase{\rightmark} (\nouppercase{\leftmark})}
+% \lhead{\nouppercase{\leftmark}}  
+% \chead{}
+%   \rhead{}
+%   \lfoot{2011}
+%   \cfoot{bischeck}
+%   \rfoot{\thepage}
+%   \renewcommand{\headrulewidth}{0.4pt}
+%   \renewcommand{\footrulewidth}{0.4pt}
+
+%  \renewcommand{\chaptermark}[1]{%
+ % \markboth{#1}{}}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle fancy
+\tracking_changes true
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\author -2048955058 "andersh,,," 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+
+\change_inserted -2048955058 1367249204
+B
+\change_deleted -2048955058 1367249203
+b
+\change_unchanged
+ischeck 
+\begin_inset Newline newline
+\end_inset
+
+-
+\begin_inset Newline newline
+\end_inset
+
+
+\change_deleted -2048955058 1367249219
+A Business Activity Monitoring Server
+\change_inserted -2048955058 1367249253
+Dynmaic and adaptive thresholding
+\change_deleted -2048955058 1367249219
+ 
+\change_unchanged
+
+\end_layout
+
+\begin_layout Date
+Version 0.4.3 
+\begin_inset Newline newline
+\end_inset
+
+2013-03-27
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Introduction"
+
+\end_inset
+
+Introduction 
+\end_layout
+
+\begin_layout Standard
+Monitoring and surveillance is today common in any IT operation.
+ The market is mature and a number of excellent solutions exist, especially
+ in the open source market, like Nagios.
+ 
+\change_inserted -2048955058 1367249408
+The major limitation is that the current solution predominately only work
+ with static thresholds.
+ This becomes especially limiting when working with dynamic process.
+ 
+\change_unchanged
+But when it comes to monitoring of business applications, the maturity is
+ not at the same level.
+ Business operations teams seldom have any monitoring solutions to understand
+ what goes on in their business processes and applications.
+ Business intelligence solutions can often tell what happened last month,
+ but from a more tactical operations view there is a gap.
+ So why do not business operations team implement the same surveillance
+ structure or use the existing IT operations infrastructure to understand
+ 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+why the number of orders have dropped under the current threshold
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+?
+\end_layout
+
+\begin_layout Standard
+What is the difference between business activity monitoring, BAM, and traditiona
+l IT infrastructure monitoring? Basically it is the same.
+ Some entity to measure and for that entity to define threshold levels that
+ will generate warnings or critical alarms.
+ The demands we have seen in addition to the basic functionality are the
+ following features provided by Bischeck:
+\end_layout
+
+\begin_layout Itemize
+Support for dynamic and adaptive thresholds.
+\end_layout
+
+\begin_layout Itemize
+Support dynamic configuration of thresholds depending of time of the day
+ and day of week or month.
+\end_layout
+
+\begin_layout Itemize
+Support thresholds based on fixed values as well as thresholds based on
+ measured 
+\change_deleted -2048955058 1367249795
+values
+\change_inserted -2048955058 1367249795
+data
+\change_unchanged
+ from other services.
+ This is typical for process driven businesses.
+ 
+\end_layout
+
+\begin_layout Itemize
+Support for a large number of mathematical functions used to calculate threshold
+s.
+\change_inserted -2048955058 1367249807
+
+\end_layout
+
+\begin_layout Itemize
+
+\change_inserted -2048955058 1367249920
+Predictive based mathematical operation like Linear Least Square to calculate
+ trends based notification.
+\change_unchanged
+
+\end_layout
+
+\begin_layout Itemize
+
+\change_inserted -2048955058 1367249476
+Historical d
+\change_deleted -2048955058 1367249476
+D
+\change_unchanged
+ata cache for all measured service
+\change_inserted -2048955058 1367249481
+s
+\change_unchanged
+ 
+\change_deleted -2048955058 1367249484
+items 
+\change_unchanged
+that can be retrieved based on index or time.
+ Cache
+\change_inserted -2048955058 1367249491
+d
+\change_unchanged
+ data is the main source to 
+\change_inserted -2048955058 1367249501
+calculate
+\change_deleted -2048955058 1367249497
+create
+\change_unchanged
+ dynamic and adaptive thresholds.
+\end_layout
+
+\begin_layout Itemize
+Support for multiple scheduling schema
+\change_inserted -2048955058 1367249530
+'s
+\change_deleted -2048955058 1367249525
+s
+\change_unchanged
+ per service
+\change_inserted -2048955058 1367249536
+s
+\change_unchanged
+.
+ This enables a fine grained control of when a service should be run.
+ Bischeck supports interval scheduling, cron scheduling and service relation
+ based scheduling.
+\end_layout
+
+\begin_layout Itemize
+Configuration of 
+\change_inserted -2048955058 1367249612
+virtual 
+\change_unchanged
+services 
+\change_inserted -2048955058 1367249616
+that is 
+\change_unchanged
+based on
+\change_inserted -2048955058 1367249589
+ calculation of data from multiple
+\change_deleted -2048955058 1367249573
+ multiple
+\change_unchanged
+ measured 
+\change_deleted -2048955058 1367249628
+values of
+\change_unchanged
+ other services
+\change_inserted -2048955058 1367249632
+.
+\change_deleted -2048955058 1367249634
+, which could be described as "virtual" entities.
+
+\change_unchanged
+ 
+\end_layout
+
+\begin_layout Itemize
+Support for date macros in the execution statements of a service, typically
+ used in a 
+\emph on
+where
+\emph default
+ clause when selecting from databases.
+\end_layout
+
+\begin_layout Itemize
+Support for a multitude of ways to connect to source systems by allowing
+ custom developed service connection methods.
+\end_layout
+
+\begin_layout Itemize
+Support for custom threshold classes to enable any way to define threshold
+ logic.
+ 
+\end_layout
+
+\begin_layout Itemize
+Integration with multiple monitoring and surveillance tools, like any Nagios
+ like systems that supports the Nagios Service Check Acceptor (NSCA) and/or
+ the Nagios Remote Data Processor (NRDP)
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.2]
+\end_layout
+
+\end_inset
+
+ protocol
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Nagios Core, Nagios XI, Icinga, OP5 Monitor, Shinken, Opsview, Centreon,
+ NetEye, etc.
+\end_layout
+
+\end_inset
+
+, OpenTSDB, Graphite 
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.2]
+\end_layout
+
+\end_inset
+
+ and more.
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.0]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let us look at 3 examples that can be solved by using Bischeck: 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+Example 1 – Monitor the number of orders received during the day 
+\end_layout
+
+\begin_layout Standard
+The order management application receives orders 24 hours a day during Monday
+ to Friday.
+ The total aggregated number of orders varies as a function of the time
+ of the day.
+ The business expects to have a total number of orders of 1500 at 13:00,
+ at 14:00 the order count should be 2300, at 15:00 it should be 3400, etc.
+ Between every hour the business requirement is to interpolate the order
+ rate according to a linear function between the defined hour rates.
+ This means that the threshold at 13:20 is (2300-1500)*20/60+1500 = 1767.
+ The warning alarm level should be between 90% and 70% of the threshold
+ and critical alarm if the measured value is below 70% of the threshold.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+Example 2 – Monitor the number of created invoices in relation to the number
+ of received orders
+\end_layout
+
+\begin_layout Standard
+The invoice system should invoice at least 80% of the daily incoming orders
+ in the same day with a maximum of one hour delay.
+ This means that the measured value of orders with one hour delay must be
+ used as a threshold for the number of created invoices.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+Example 3 – Monitor the current number of orders and if the incoming flow
+ is zero we need an alarm
+\series default
+ 
+\end_layout
+
+\begin_layout Standard
+The order system have a table with all received orders, but the requirement
+ is that we need to monitor how many that has been received during the last
+ 10 minutes.
+ If this 
+\change_inserted -2048955058 1367250030
+delta 
+\change_unchanged
+value is zero an alarm must be generated since that is an indication that
+ the sales system is not generating orders.
+ To achieve this monitoring we use the last and the previous sample of the
+ total number of orders from example 1 and create the difference between
+ the two to get a new virtual entity to measure, with a threshold level
+ of 0.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\change_inserted -2048955058 1367250263
+
+\series bold
+Example 4 – Monitor if we will run out of disk space in the next 40 days
+\series default
+ 
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1367250552
+To enable early information to purchase additional disk storage we need
+ to get an alarm of the predictive trend of growth will pass our 90 % utilizatio
+n level in the next 40 days.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Hopefully these examples have convinced you that with Bischeck you can do
+ complex application monitoring by advanced threshold management and processes
+ dependencies.
+ And this can be done by just integrate it with your existing IT surveillance
+ infrastructure.
+ 
+\end_layout
+
+\begin_layout Standard
+But complex threshold management is not limited to the area of BAM.
+ Even in the normal infrastructure and network monitoring the capabilities
+ are important.
+ A typical threshold for disk utilization is defined like 90% of total space.
+ This is of course important but it could be equally important to understand
+ the growth speed of the disk utilization, like if the size has grown with
+ 5% from yesterday.
+ This is simple in Bischeck without developing a specialized check command.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename overview.svg
+	width 16cm
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Architecture overview
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+The Bischeck architecture include the following main components:
+\end_layout
+
+\begin_layout Itemize
+Configuration - Manage all configuration of Bischeck
+\end_layout
+
+\begin_layout Itemize
+Scheduling - Controls the execution time of each service
+\end_layout
+
+\begin_layout Itemize
+Connection - Manage connection management against the source systems to
+ monitor
+\end_layout
+
+\begin_layout Itemize
+Threshold - Manage the threshold configuration and processing
+\end_layout
+
+\begin_layout Itemize
+Cache - Storage of
+\change_inserted -2048955058 1367250693
+ 
+\change_deleted -2048955058 1367250692
+ all 
+\change_inserted -2048955058 1367250696
+historical 
+\change_deleted -2048955058 1367250700
+values
+\change_inserted -2048955058 1367250700
+data
+\change_unchanged
+ that has been collected from the source systems
+\end_layout
+
+\begin_layout Itemize
+Server integration - Manage integration and formatting to the different
+ monitoring systems
+\end_layout
+
+\begin_layout Standard
+Bisconf is an optional web tool that provide editing management of the Bischeck
+ configuration files.
+ In addition it also provide life cycle management to deploy new configuration
+ and start and stop the Bischeck process.
+  
+\end_layout
+
+\begin_layout Standard
+Bischeck 
+\change_inserted -2048955058 1367250732
+and Bisconf 
+\change_unchanged
+is open source and licensed under GPL version 2.
+ Bischeck 
+\change_inserted -2048955058 1367250741
+and Bisconf 
+\change_unchanged
+is written in Java and runs as
+\change_deleted -2048955058 1367250749
+ a
+\change_unchanged
+ stand-alone daemon
+\change_inserted -2048955058 1367250755
+s
+\change_unchanged
+ and integrates with different monitoring and surveillance tools over open
+ protocols.
+ If you have ideas to new features, find bugs, etc please visit 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.bischeck.org
+\end_layout
+
+\end_inset
+
+ where you can fill in bug reports and feature requests.
+ You can also email anders.haal@ingby.com.
+ We look forward to your feedback.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Service-configuration"
+
+\end_inset
+
+Service configuration 
+\end_layout
+
+\begin_layout Standard
+The design of Bischeck is based on the concept of configuring hosts, services
+ and service items.
+ As an example we have host 
+\emph on
+erpserver
+\emph default
+ and we define a service called 
+\emph on
+orders
+\emph default
+.
+ For the 
+\emph on
+order
+\emph default
+ service we can have multiple service items, defined like 
+\emph on
+ediOrders
+\emph default
+ and 
+\emph on
+mailOrders
+\emph default
+.
+ The service define a connection url to connect to the 
+\change_inserted -2048955058 1367250829
+system
+\change_deleted -2048955058 1367250827
+entity
+\change_unchanged
+ to measure and the service items define the statement to be executed to
+ retrieve the 
+\change_inserted -2048955058 1367250859
+monitoring data
+\change_deleted -2048955058 1367250862
+entity value
+\change_unchanged
+.
+ The service url is used by Bischeck to instantiate the right service class
+ to manage the the connection.
+ For example if the url has a schema part that is jdbc, the JDBCService
+ class is used.
+ The mapping between the service url and the class to use is configurable.
+ Each service class must implement the Service interface.
+ The execution statement described for the service item must only return
+ one single value.
+ A service item class must implement the interface Serviceitem.
+ The host can av multiple service, and each service can have multiple service
+ items.
+\begin_inset Newline newline
+\end_inset
+
+All host, service and service items are described in xml configuration files
+ located in the 
+\emph on
+etc
+\emph default
+ directory of the installation,
+\emph on
+ $BISHOME
+\emph default
+.
+ For more information about services and service items classes please section
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Services-and-service"
+
+\end_inset
+
+.
+
+\change_inserted -2048955058 1367250958
+ A unique combination of a host, service and a service item are called a
+ service definition.
+\change_unchanged
+
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Services-and-service"
+
+\end_inset
+
+Services and service items classes
+\end_layout
+
+\begin_layout Standard
+The key configuration objects in Bischeck are the service and service item.
+ The service key attributes are the service name, the schedules when to
+ execute the service and the url that define the connection used by the
+ service item.
+ 
+\end_layout
+
+\begin_layout Standard
+The service item key attributes are the execute statement that define what
+ should be executed to retrieve the 
+\change_inserted -2048955058 1367251005
+data that is subject to the monitoring 
+\change_deleted -2048955058 1367251008
+measured entity 
+\change_unchanged
+and the threshold class used to process 
+\change_deleted -2048955058 1367251047
+the measured entity to 
+\change_inserted -2048955058 1367251050
+and 
+\change_unchanged
+validate the state of the measured 
+\change_inserted -2048955058 1367251030
+data
+\change_deleted -2048955058 1367251028
+entity
+\change_unchanged
+.
+ 
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Service-classes"
+
+\end_inset
+
+Service classes 
+\end_layout
+
+\begin_layout Standard
+The following Service classes is provided in the standard Bischeck distribution.
+\end_layout
+
+\begin_layout Subsection
+JDBC
+\end_layout
+
+\begin_layout Standard
+JDBCService manage services connecting to databases over JDBC.
+ JDBC driver jars should be put in the directory 
+\emph on
+customlib
+\emph default
+ in the Bischeck install directory to automatically be found at start-up.
+
+\change_inserted -2048955058 1367251107
+ No drivers are provided with the Bischeck distribution.
+
+\change_unchanged
+ 
+\end_layout
+
+\begin_layout Standard
+A JDBC connection is described with a normal jdbc url and with an additional
+ driver class 
+\change_inserted -2048955058 1367251128
+name 
+\change_deleted -2048955058 1367251133
+in the driver tag of the
+\change_inserted -2048955058 1367251133
+in
+\change_unchanged
+ 
+\change_inserted -2048955058 1367251140
+the 
+\change_unchanged
+Bischeck configuration.
+\end_layout
+
+\begin_layout Subsection
+Livestatus
+\end_layout
+
+\begin_layout Standard
+LivestatusService enable connectivity to any Nagios server supporting MK
+ Livestatus
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+More information on MK Livestatus can be found on 
+\begin_inset CommandInset href
+LatexCommand href
+name "http://mathias-kettner.de/checkmk_livestatus.html"
+target "http://mathias-kettner.de/checkmk_livestatus.html"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+ 
+\change_deleted -2048955058 1367251400
+With this service both the service state and performance data can be retrieved
+ from a Nagios server
+\change_unchanged
+.
+ 
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.0]
+\end_layout
+
+\end_inset
+
+.
+ A livestatus connection is specified with a url with the following format:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+livestatus://hostname:port
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The requirement for this type of connection is that livestatus is configured
+ as a xinetd service on the server running livestatus and Nagios.
+ To configure livestatus 
+\change_inserted -2048955058 1367251181
+with xinetd
+\change_deleted -2048955058 1367251173
+this
+\change_unchanged
+ way please see 
+\begin_inset Quotes eld
+\end_inset
+
+
+\begin_inset CommandInset href
+LatexCommand href
+name "Remote access to Livestatus via SSH or xinetd"
+target "http://mathias-kettner.de/checkmk_livestatus.html#H1:Remote access to Livestatus via SSH or xinetd"
+
+\end_inset
+
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Bischeck cache
+\end_layout
+
+\begin_layout Standard
+LastCacheService enables connection to Bischeck's 
+\change_inserted -2048955058 1367251203
+historical data 
+\change_deleted -2048955058 1367251198
+internal
+\change_unchanged
+ cache where the measured data is stored.
+ With the service any existing 
+\change_inserted -2048955058 1367251223
+service definition (
+\change_unchanged
+host-
+\change_deleted -2048955058 1367251225
+>
+\change_unchanged
+service-
+\change_deleted -2048955058 1367251229
+>
+\change_unchanged
+serviceitem
+\change_inserted -2048955058 1367251232
+)
+\change_unchanged
+ can be retrieved from the cache.
+ This 
+\change_deleted -2048955058 1367251251
+can
+\change_inserted -2048955058 1367251251
+is
+\change_unchanged
+ typical be used to create new virtual services based on mathematical expression
+ 
+\change_deleted -2048955058 1367251287
+for combination of
+\change_inserted -2048955058 1367251288
+on
+\change_unchanged
+ cache 
+\change_inserted -2048955058 1367251296
+data 
+\change_unchanged
+entities.
+ The connection url for the Bischeck cache is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+bischeck://cache
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Shell
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.1]
+\end_layout
+
+\end_inset
+
+ ShellService enables execution of programs and scripts on the localhost.
+ The connection url for the shell service is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+shell://localhost
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Service-item-classes"
+
+\end_inset
+
+Service item classes
+\end_layout
+
+\begin_layout Standard
+The following ServiceItem classes is provided in the standard Bischeck distribut
+ion.
+\end_layout
+
+\begin_layout Subsection
+SQL
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+SQLServiceItem
+\emph default
+ class enables execution of a SQL statements.
+ Its important that the SQL statement only return one single number value,
+ like a "
+\emph on
+select count(*) ....
+\emph default
+" or 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+select sum(orderValue) from ....
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The SQLServiceItem class can be used 
+\change_inserted -2048955058 1367394237
+with the service url matching 
+\emph on
+jdbc://
+\emph default
+.
+\change_deleted -2048955058 1367251368
+when the service url is a 
+\emph on
+jdbc://...
+
+\emph default
+ url.
+\change_unchanged
+
+\end_layout
+
+\begin_layout Subsection
+Livestatus 
+\end_layout
+
+\begin_layout Standard
+With the 
+\emph on
+LivestatusServiceItem
+\emph default
+ class both state and performance data can be queried for a Nagios service.
+ The query is formatted as a json structure.
+ To query a specific Nagios service state the following statement example
+ can be used:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+{"host":"linux-server1","service":"DNS","query":"state"}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above will query the current Nagios state of service 
+\emph on
+DNS
+\emph default
+ for host 
+\emph on
+linux-server1
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+To query the the performance data for the Nagios service 
+\emph on
+HTTP
+\emph default
+ just change the query key value to perfdata and add the label key so the
+ right label in a multi value performance data is retrieved:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+{"host":"linux-server1","service":"HTTP","query":"perfdata","label":"size"}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+LivestatusServiceItem
+\emph default
+ class can be used 
+\change_inserted -2048955058 1367394294
+with the service url
+\emph on
+ livestatus://hostname:port
+\emph default
+.
+\change_deleted -2048955058 1367255649
+for service url 
+\emph on
+livestatus://hostname:port
+\emph default
+.
+\change_unchanged
+
+\end_layout
+
+\begin_layout Subsection
+Cache calculations
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+CalculateOnCache
+\emph default
+ service item class enable statement execution using 
+\change_inserted -2048955058 1367255708
+data from the historical cache and 
+\change_deleted -2048955058 1367255719
+measured values residing in the Bischeck internal cache.
+ M
+\change_inserted -2048955058 1367255725
+m
+\change_unchanged
+athematical 
+\change_deleted -2048955058 1367255756
+statements
+\change_inserted -2048955058 1367393609
+functions, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Mathematical-expressions-on"
+
+\end_inset
+
+.
+ With this capability power full expression can be created on the cached
+ data 
+\change_deleted -2048955058 1367393384
+ according to jep expressions capability is possible 
+\change_unchanged
+like:
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset listings
+lstparams "breaklines=true,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1367393845
+
+avg
+\change_deleted -2048955058 1367393844
+if((
+\change_unchanged
+erpserver-orders-ediOrders[0
+\change_inserted -2048955058 1367393853
+:9
+\change_unchanged
+]
+\change_deleted -2048955058 1367393856
+ - erpserver-orders-ediOrders[1]) < 0,0, erpserver-orders-ediOrders[0] -
+ erpserver-orders-ediOrders[1])
+\change_unchanged
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1367393938
+The above example will calculate the average of the last 10 collected data
+ entries in the cache for the service definition 
+\change_deleted -2048955058 1367393962
+The above example check if the result of
+\change_unchanged
+ "erpserver-orders-ediOrders
+\change_deleted -2048955058 1367393969
+[0]
+\emph on
+ - 
+\emph default
+erpserver-orders-ediOrders[1]
+\change_unchanged
+"
+\change_inserted -2048955058 1367393971
+.
+
+\change_deleted -2048955058 1367393973
+ is less then 0.
+ If true, return 0 and if false return the result of "erpserver-orders-ediOrders
+[0]
+\emph on
+ - 
+\emph default
+erpserver-orders-ediOrders[1]".
+ The value to use from the cache is defined by an index [X], where 0 is
+ the latest value retrieved for the specific host-service-item.
+\change_unchanged
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+CalculateOnCache
+\emph default
+ class can be used with 
+\change_inserted -2048955058 1367394162
+the 
+\change_unchanged
+service url 
+\emph on
+bischeck://cache.
+\end_layout
+
+\begin_layout Subsection
+Check commands
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.1]
+\end_layout
+
+\end_inset
+
+ With the 
+\emph on
+CheckCommandServiceItem
+\emph default
+ class performance data can be retrieved by executing a Nagios check command.
+ The check command that is executed must output performance data according
+ the Nagios specifications for the 
+\emph on
+CheckCommandServiceItem
+\emph default
+ to work.
+ The execstatement query is formatted as a json structure.
+ To execute a check command and retrieve a specific performance data the
+ following statement example can be used:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+{"check":"
+\change_inserted -2048955058 1367394701
+/
+\change_unchanged
+usr/lib/nagios/plugins/check_tcp -H localhost -p 22","label":"time"}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above will execute the 
+\emph on
+check_tcp
+\emph default
+ program and retrieve the performance data with label 
+\emph on
+time
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The benefit of using a check command from Bischeck would be if there is
+ a need to manage the performance data with dynamic thresholds that is not
+ possible in Nagios Core.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1367394692
+It's 
+\change_deleted -2048955058 1367394693
+I
+\change_inserted -2048955058 1367394694
+i
+\change_unchanged
+mportant 
+\change_inserted -2048955058 1367394388
+to understand 
+\change_unchanged
+is that there is no management of environment variables through Bischeck
+ when executing a check command.
+ 
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+CheckCommandServiceItem
+\emph default
+ class can be used 
+\change_inserted -2048955058 1367394186
+with the
+\change_deleted -2048955058 1367394184
+for
+\change_unchanged
+ service url 
+\emph on
+shell://localhost
+\emph default
+.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Date-formatting"
+
+\end_inset
+
+Date formatting
+\end_layout
+
+\begin_layout Standard
+Many service items will typically execute something depending on a date.
+ For this reason Bischeck supports date macros in the execute statement
+ 
+\change_inserted -2048955058 1367394761
+of
+\change_deleted -2048955058 1367394760
+for
+\change_unchanged
+ 
+\change_inserted -2048955058 1367394766
+a 
+\change_unchanged
+service items.
+ For example, if this is a SQL select statement that using a date condition,
+ the formatting could be done like this:
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+select count(orders) from order where 
+\end_layout
+
+\begin_layout Plain Layout
+
+fromdate='%%yyyy-MM-dd%%' and 
+\end_layout
+
+\begin_layout Plain Layout
+
+todate='%%yy.MM.dd%[D2]%%'
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Bischeck will replace anything between %% and %% with the current date according
+ to the format string.
+ The formatting follows the structure of the Java SimpleDateFormatter class.
+ If the format string includes a %[] macro, the current date will be calculated,
+ where Y means year, M means month and D means day.
+ So %[D-1] 
+\change_inserted -2048955058 1367394819
+will
+\change_deleted -2048955058 1367394818
+means
+\change_unchanged
+ subtract one day from the current date and %[M2] 
+\change_inserted -2048955058 1367394828
+will
+\change_deleted -2048955058 1367394826
+means
+\change_unchanged
+ add two months to the current date.
+ A construction like D-1Y-1 is not supported.
+ 
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Service-item-cache"
+
+\end_inset
+
+Service item cache - LastStatusCache
+\end_layout
+
+\begin_layout Standard
+Bischeck keeps a cache of the measured data points for every 
+\change_inserted -2048955058 1367394855
+service definition
+\change_deleted -2048955058 1367394858
+service items
+\change_unchanged
+.
+ The cache content can be used in the specification of execute statements
+ of service
+\change_inserted -2048955058 1367394895
+ 
+\change_unchanged
+items 
+\change_inserted -2048955058 1367394911
+to create virtual services 
+\change_unchanged
+and in threshold classes to create dynamic and adaptive thresholds, see
+ section 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "label:Twenty4HourThreshold-class"
+
+\end_inset
+
+.
+ 
+\change_inserted -2048955058 1367394958
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1367395443
+The cache can by default hold the last 500 data entires collected per service
+ definition.
+ This size can be changed by setting the property 
+\emph on
+lastStatusCacheSize
+\emph default
+, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:properties.xml"
+
+\end_inset
+
+.
+\change_unchanged
+
+\end_layout
+
+\begin_layout Standard
+The cached data is saved to disk every time Bischeck is stopped and reloaded
+ every time Bischeck is started.
+ The stored data is written to a file called 
+\emph on
+lastStatusCacheDump
+\emph default
+ and located in the directory specified by the property 
+\emph on
+lastStatusCacheDumpDir
+\emph default
+, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:properties.xml"
+
+\end_inset
+
+.
+ Before a save is made a backup file is created in the same directory called
+ 
+\emph on
+lastStatusCacheDump.bak.
+\end_layout
+
+\begin_layout Section
+Methods to retrieve cache data
+\end_layout
+
+\begin_layout Standard
+There is a number of ways to retrieve data from the cache.
+ The cache support both retrieval by index or by time, and the retrieval
+ can be done for a single element or to a list of elements.
+ 
+\end_layout
+
+\begin_layout Subsection
+Retrieve single cache data element by index
+\end_layout
+
+\begin_layout Standard
+
+\change_deleted -2048955058 1367395149
+For each service item the last 500 measured values are kept in the cache
+ in a LRU list.
+
+\change_unchanged
+ To retrieve 
+\change_inserted -2048955058 1367395174
+a single 
+\change_unchanged
+data from the cache the following format is 
+\change_deleted -2048955058 1367395180
+used
+\change_inserted -2048955058 1367395187
+supported:
+\change_deleted -2048955058 1367395186
+,
+\change_unchanged
+ 
+\change_inserted -2048955058 1367395189
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\emph on
+host-service-item[
+\change_inserted -2048955058 1367395259
+X
+\change_deleted -2048955058 1367395258
+index
+\change_unchanged
+]
+\emph default
+ 
+\change_inserted -2048955058 1367395216
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1367395218
+W
+\change_deleted -2048955058 1367395218
+w
+\change_unchanged
+here 
+\change_inserted -2048955058 1367395268
+
+\emph on
+X
+\emph default
+ is the 
+\change_unchanged
+index 
+\change_deleted -2048955058 1367395273
+is the lru entry
+\change_inserted -2048955058 1367395301
+ in the cache for the service definition.
+\change_deleted -2048955058 1367395300
+,
+\change_unchanged
+ 
+\change_inserted -2048955058 1367395306
+Index
+\change_deleted -2048955058 1367395307
+with
+\change_unchanged
+ 0 
+\change_inserted -2048955058 1367395545
+will always return the last stored data for the service definition
+\change_deleted -2048955058 1367395551
+specifying that last retrieved measured value 
+\change_unchanged
+, e.g.
+ 
+\emph on
+erpserver-orders-ediOrders[0]
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Retrieve single cache data element by time
+\end_layout
+
+\begin_layout Standard
+Data can
+\change_deleted -2048955058 1367395685
+ also
+\change_unchanged
+ be retrieved from the cache by using a time offset
+\change_inserted -2048955058 1367395783
+.
+ This will retrieve the data for the service definition closes to the specified
+ time offset.
+ The support format is:
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\change_inserted -2048955058 1367395827
+
+\emph on
+host-service-item[-XS]
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\change_inserted -2048955058 1367395831
+
+\emph on
+host-service-item[-XM]
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\change_inserted -2048955058 1372019538
+
+\emph on
+host-service-item[-XH]
+\end_layout
+
+\begin_layout Standard
+
+\change_deleted -2048955058 1367395900
+, 
+\change_inserted -2048955058 1372019549
+X is the time and S (seconds),M (minutes) or H (hour) define the resolution
+ of X.
+ 
+\change_deleted -2048955058 1367396053
+like the cache data of 
+\emph on
+erpserver-orders-ediOrders
+\emph default
+ 30 minutes ago.
+ This is specified by setting the index part to 
+\emph on
+-30M, 
+\change_inserted -2048955058 1367396073
+
+\emph default
+For example the expression 
+\change_unchanged
+
+\emph on
+erpserver-orders-ediOrders[-30M]
+\change_inserted -2048955058 1367396158
+
+\emph default
+ will retrieve the data for the service definition closest to 30 minutes
+ ago
+\change_unchanged
+
+\emph on
+.
+ 
+\emph default
+This is useful since the relation between static index and service schedule
+ do not need to be known.
+ 
+\change_deleted -2048955058 1367396176
+The time operator supported is S for seconds, M for minutes and H for hours.
+\change_unchanged
+
+\end_layout
+
+\begin_layout Subsection
+Retrieve a list of cache data elements by index
+\end_layout
+
+\begin_layout Standard
+For mathematical functions that operates of a list of elements, like a sum,
+ avg
+\change_inserted -2048955058 1367396216
+ and 
+\change_deleted -2048955058 1367396214
+, 
+\change_unchanged
+max, Bischeck support two methods to 
+\change_deleted -2048955058 1367396194
+reterive
+\change_inserted -2048955058 1367396194
+retrieve
+\change_unchanged
+ the range by index.
+ The first method 
+\change_deleted -2048955058 1367396240
+is to 
+\change_unchanged
+define a 
+\change_inserted -2048955058 1367396262
+
+\begin_inset Quotes eld
+\end_inset
+
+
+\change_unchanged
+from
+\change_inserted -2048955058 1367396267
+-
+\change_deleted -2048955058 1367396264
+ 
+\begin_inset Quotes eld
+\end_inset
+
+
+\change_unchanged
+to index
+\begin_inset Quotes erd
+\end_inset
+
+, like 
+\emph on
+erpserver-orders-ediOrders[0:9] 
+\emph default
+that will retrieve all cache elements from index 0 to 9 as a list separated
+ by 
+\begin_inset Quotes eld
+\end_inset
+
+,
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The choice of , as separator character is due to this is the separator character
+ used by JEP functions that take a list of values.
+\end_layout
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sum(erphost-orders-ediorders[0:9])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This will calculate the sum of the last 10 cached elements for 
+\emph on
+erpserver-orders-ediOrders
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+The second methods is to define a list of index that do not need to be in
+ sequence, like 
+\emph on
+erpserver-orders-ediOrders[1,3,5] 
+\emph default
+that will retrieve the elements for index 1, 3 and 5 as a list separated
+ by 
+\begin_inset Quotes eld
+\end_inset
+
+,
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sum(erphost-orders-ediorders[1,3,5])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Retrieve a list of cache data elements by time range
+\end_layout
+
+\begin_layout Standard
+To retrieve list of the data elements based on a time range the expression
+ has the format 
+\emph on
+erpserver-orders-ediOrders[-30M:-120M].
+ 
+\emph default
+This will retrieve a list of all elements that exist in the cache between
+ 30 minutes to 120 minutes ago.
+ The time operator supported is 
+\change_inserted -2048955058 1367396400
+the same as for a single data
+\change_deleted -2048955058 1367396406
+S for seconds, M for minutes and H for hours
+\change_unchanged
+.
+\end_layout
+
+\begin_layout Section
+
+\change_inserted -2048955058 1367393275
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Mathematical-expressions-on"
+
+\end_inset
+
+
+\change_unchanged
+Mathematical expressions on cache data
+\end_layout
+
+\begin_layout Standard
+In places where cache data can be used, like thresholds and serviceitems,
+ it's possible to use mathematical expressions on the data.
+ In Bischeck we use the mathematical package JEP to evaluate mathematical
+ expressions and formulas.
+ Lets look at some examples.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+erphost-orders-ediorders[0] / erphost-orders-ediorders[-30M]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This example will divide the last cached data, index 0, for 
+\emph on
+erphost-orders-ediorders
+\emph default
+ with the cached data of
+\emph on
+ erphost-orders-ediorders
+\emph default
+ 30 minutes ago.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+max(erphost-orders-ediorders[-5M], erphost-orders-ediorders[-10M], erphost-order
+s-ediorders[-15M])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the above the highest value will be returned of the cached data for 
+\emph on
+erphost-orders-ediorders
+\emph default
+ cached 5, 10 and 15 minutes ago.
+\change_inserted -2048955058 1367393655
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1367393735
+Conditional expression is supported through the if statement
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1367393689
+\begin_inset listings
+lstparams "breaklines=true,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1367393689
+
+if((erpserver-orders-ediOrders[0] - erpserver-orders-ediOrders[1]) < 0,0,
+ erpserver-orders-ediOrders[0] - erpserver-orders-ediOrders[1])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1367393689
+The above example check if the result of "erpserver-orders-ediOrders[0]
+\emph on
+ - 
+\emph default
+erpserver-orders-ediOrders[1]" is less then 0.
+ If true, return 0 and if false return the result of "erpserver-orders-ediOrders
+[0]
+\emph on
+ - 
+\emph default
+erpserver-orders-ediOrders[1]".
+ The value to use from the cache is defined by an index [X], where 0 is
+ the latest value retrieved for the specific host-service-item.
+\change_unchanged
+
+\end_layout
+
+\begin_layout Standard
+For more information of all functions that can be used please visit 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+www.sourceforge.net
+\end_layout
+
+\end_inset
+
+ and download the JEP distribution to get access to the JEP version 2 documentat
+ion.
+\end_layout
+
+\begin_layout Subsection
+JEP standard functions
+\end_layout
+
+\begin_layout Standard
+The standard JEP functions supported are:
+\end_layout
+
+\begin_layout Itemize
+round(x,y) - rounding the value of x to y number of decimals.
+\end_layout
+
+\begin_layout Itemize
+ceil(x) - calculate the ceiling value of x.
+\end_layout
+
+\begin_layout Itemize
+floor(x) - calculate the floor value of x.
+\end_layout
+
+\begin_layout Itemize
+abs(x) - calculate the absolute value of x.
+\end_layout
+
+\begin_layout Itemize
+mod(x,y) - calculate the modulus of x % y.
+\end_layout
+
+\begin_layout Itemize
+sqrt(x) - calculate the square root of x.
+\end_layout
+
+\begin_layout Itemize
+sum(x1,x2,x3,.....) - calculate the sum of the list of values.
+\end_layout
+
+\begin_layout Itemize
+ln(x) - calculate the natural logarithm of x.
+\end_layout
+
+\begin_layout Itemize
+log(x) - calculate the logarithm base 10 of x.
+\end_layout
+
+\begin_layout Itemize
+exp(x) - calculate the exponential value of x.
+\end_layout
+
+\begin_layout Itemize
+pow(x,y) - calculate the x as the power of y.
+\end_layout
+
+\begin_layout Itemize
+rand() - random value between 0 and 1
+\end_layout
+
+\begin_layout Itemize
+if(cond, trueval, falseval) - if the cond expression is true trueval is
+ returned, if false falseval is returned.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "Label:JEP-extensions"
+
+\end_inset
+
+JEP extensions
+\end_layout
+
+\begin_layout Standard
+With JEP it's easy to create additional functions.
+ With Bischeck the following functions has been added as part of the distributio
+n.
+\end_layout
+
+\begin_layout Itemize
+avg(x1,x2,x3,...) - Calculate the average of the list of numbers.
+\end_layout
+
+\begin_layout Itemize
+max(x1,x2,x3,...) - Calculate the max value of the list of numbers.
+\end_layout
+
+\begin_layout Itemize
+min(x1,x2,x3,...) - Calculate the min value of the list of numbers.
+\end_layout
+
+\begin_layout Itemize
+multNull((x1,x2,x3,...) - Multiply the numbers in the list, but if any of the
+ numbers are null the function will return null.
+\end_layout
+
+\begin_layout Itemize
+divNull(x1,x2) - Divide the numbers, but if any of the numbers are null
+ the function will return null.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Null-value-in"
+
+\end_inset
+
+Null value in the cache
+\end_layout
+
+\begin_layout Standard
+Null values represent the existent of no data.
+ A null value in the cache can exists due to different reasons.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The connection specified in the service fails.
+ By default a null value will not be stored when this happens but if the
+ property 
+\emph on
+saveNullOnConnectionError
+\emph default
+ is set to true a null value will be inserted in the cache.
+\end_layout
+
+\begin_layout Enumerate
+If the execstatement specified for the serviceitem return null, a null value
+ is inserted in the cache.
+\end_layout
+
+\begin_layout Standard
+When accessing the cache by index or by time like, erphost-orders-ediorders[10]
+ or erphost-orders-ediorders[-5M] , it will return null:
+\end_layout
+
+\begin_layout Itemize
+If null is stored in the cache at the index.
+\end_layout
+
+\begin_layout Itemize
+If null is stored in the cache at the index that the time specification
+ resolves to.
+\end_layout
+
+\begin_layout Itemize
+If the index is not yet been populated with data.
+\end_layout
+
+\begin_layout Itemize
+If the index is out of bound of the specified cache size.
+\end_layout
+
+\begin_layout Standard
+When using cache data with mathematical function that takes a list of arguments,
+ the null value can be handled in different ways depending how the cache
+ data is retrieved and how the property 
+\emph on
+notFullListParse
+\emph default
+ is set.
+ Lets show an example to explain the different scenarios.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sum(erphost-orders-ediorders[0], erphost-orders-phoneorders[0]) * erphost-orders
+-state[0]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the above example the 
+\emph on
+sum
+\emph default
+ function will evaluate to null if erphost-orders-ediorders[0] 
+\bar under
+and/or 
+\bar default
+erphost-orders-phoneorders[0] return null.
+ If the the property 
+\emph on
+notFullListParse
+\emph default
+ is set the 
+\emph on
+sum
+\emph default
+ function will only return null if both erphost-orders-ediorders[0] 
+\series bold
+and
+\series default
+ erphost-orders-phoneorders[0] return null.
+ The whole statement will return null independent of the 
+\emph on
+notFullListParse
+\emph default
+ property if erphost-orders-state[0] returns null.
+ 
+\end_layout
+
+\begin_layout Standard
+By the example we can see that the property 
+\emph on
+notFullListParse 
+\emph default
+has effect on how null is managed for functions that manage a list of data
+ like 
+\emph on
+sum, avg, max, min
+\emph default
+, etc.
+ What the 
+\emph on
+notFullListParse
+\emph default
+ property do is that it will filter out all null values when they occur
+ in a function that take a list of data.
+ This works in the same way if ranges are used as the example below.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sum(erphost-orders-ediorders[0:100],erphost-orders-phoneorders[-5M:-15M])
+ * erphost-orders-state[0]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If the 
+\emph on
+notFullListParse
+\emph default
+ is set to true all the cache data in erphost-orders-ediorders[0:100] 
+\bar under
+and
+\bar default
+ erphost-orders-phoneorders[-5M:-15M] will be filtered out.
+ For functions like avg the average will only be based on the none null
+ values.
+\end_layout
+
+\begin_layout Standard
+The only exception to this rule is when using time range like erphost-orders-pho
+neorders[-5M:-15M].
+ A time range will resolve to null if the lower or higher boundaries are
+ not in the range of the data that exists in the cache.
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+nullFullListParse
+\emph default
+ property also have another implication and that if using mathematical expressio
+ns inside a function that take a list of values.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+avg(erphost-orders-ediorders[0] * 2, erphost-orders-phoneorders[0] * 3)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above example will result in null for the whole 
+\emph on
+avg
+\emph default
+ function if any of erphost-orders-ediorders[0] 
+\bar under
+or
+\bar default
+ erphost-orders-phoneorders[0] is null since the multiply with a constant
+ will fail if any of the cache data are null.
+ To manage this the 
+\emph on
+multNull
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+
+\emph on
+See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Label:JEP-extensions"
+
+\end_inset
+
+ for more information about functions that manage null.
+\end_layout
+
+\end_inset
+
+ 
+\emph default
+function must be used instead of the * operator.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+avg(multNull(erphost-orders-ediorders[0],2), multNull(erphost-orders-phoneorders
+[0],3))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using multNull will result in that the 
+\emph on
+avg
+\emph default
+ function will return null only if both erphost-orders-ediorders[0] 
+\bar under
+and
+\bar default
+ erphost-orders-phoneorders[0] are null.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Threshold-configuration"
+
+\end_inset
+
+Threshold configuration
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1367398889
+A threshold define if the measured value for the service definition is in
+ the boundary what is expected.
+ What threshold to usThresholds are in Bischeck defined as a threshold class
+ 
+\change_unchanged
+To define the state of the retrieved service items value a threshold class
+ is specified for each service item.
+ The threshold class evaluate the measured value with some logic and return
+ the state as okay, warning
+\change_inserted -2048955058 1367398932
+,
+\change_deleted -2048955058 1367398931
+ or
+\change_unchanged
+ critical 
+\change_inserted -2048955058 1367398923
+or unknown
+\change_deleted -2048955058 1367398928
+level
+\change_unchanged
+.
+ The threshold instance for the specific service item is stored in a threshold
+ cache and valid for a period of a day.
+ Every new day the threshold cache is invalidated and Bischeck looks for
+ new valid threshold classes to instantiate for the service item to be used
+ for the period of a day.
+ The reason that the period is set to a day is that there may be a need
+ to configure the threshold instance differently depending on the day of
+ the week or month.
+ 
+\end_layout
+
+\begin_layout Standard
+A valid threshold class must implement the interface Threshold.
+ This structure enables a flexible implementation of very different ways
+ to calculate or specify a threshold.
+ In the simplest form a threshold class could just return a okay independent
+ of measured value and in the more complex solution be based on algorithms,
+ database content, measured values from other service items, day of month
+ or some complex combination.
+ 
+\end_layout
+
+\begin_layout Standard
+Warning and critical level specification are also part of the threshold
+ class.
+ The threshold class are also responsible to define what operations are
+ support for the measured value, like measured value should be higher, lower
+ or in an interval of the threshold.
+ Warning and critical level are always defined as the percentage of the
+ threshold.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Twenty4HourThreshold-class"
+
+\end_inset
+
+Twenty4HourThreshold class
+\end_layout
+
+\begin_layout Standard
+The Twenty4Hour threshold class divides the day into 24 hours.
+ For each hour of the day a threshold is defined.
+ The two threshold values that are next to each other used to calculate
+ a slope of a linear equation between the two closest hours.
+ For example, if the threshold value is 1000 at 14:00 and 1600 at 15:00,
+ the calculation for a threshold value between 14:00 and 15:00 is y=x*(1600-1000
+)/60 + 1000.
+ At 14:20 the threshold is 20*(1600-1000)/60+1000 = 1200.
+ 
+\end_layout
+
+\begin_layout Standard
+The threshold model gives a linear equation with one hour granularity, but
+ over 24 hours it can resemble a curve.
+ This behavior is typical in business systems where the key business values
+ are distributed in a none linear and none constant way over the period
+ of a day, e.g.
+ incoming orders.
+ 
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Period-definition"
+
+\end_inset
+
+Period definition
+\end_layout
+
+\begin_layout Standard
+Since the threshold for a service item can be different depending on the
+ month, day of month, week, day of week the configuration supports thresholds
+ to be described on a granularity called period.
+ A period include multiple months and weeks definitions as long as they
+ share the same threshold definition.
+ For a month it is possible to specify a specific month and/or a day of
+ a month and for a week a specific week and/or a day of a week.
+ To find the right threshold period the the class look for threshold period
+ specification in the following order: 
+\end_layout
+
+\begin_layout Enumerate
+Month and day of month 
+\end_layout
+
+\begin_layout Enumerate
+Week and day of week 
+\end_layout
+
+\begin_layout Enumerate
+Day in month 
+\end_layout
+
+\begin_layout Enumerate
+Day in the week 
+\end_layout
+
+\begin_layout Enumerate
+Month 
+\end_layout
+
+\begin_layout Enumerate
+Week 
+\end_layout
+
+\begin_layout Enumerate
+Default 
+\end_layout
+
+\begin_layout Standard
+Month is specified between 1-12, week 1-53, day of month 1-31 and day of
+ week 1-7 (1=Sunday).
+ The default threshold period is used if no other matching occurs.
+\end_layout
+
+\begin_layout Standard
+Since holidays are often days where the business are not operational there
+ is a way to describe days that should no have any threshold checks.
+ These exclude days are checked before any other rule above are evaluated.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Calculation-definition"
+
+\end_inset
+
+Calculation definition
+\end_layout
+
+\begin_layout Standard
+The class support tree ways how the threshold is compered to the measured
+ value: 
+\end_layout
+
+\begin_layout Description
+">" Measured value should be higher then threshold.
+ If the measured value is lower then threshold*warning(%) warning state
+ is set and if measured value is lower then threshold*critical(%) critical
+ state is set.
+ 
+\end_layout
+
+\begin_layout Description
+"<" Measured value should be lower then threshold.
+ If the measured value is higher then threshold*(1-warning(%)) warning state
+ is set and if if measured value is higher then threshold*(1-critical(%))
+ critical state is set.
+\end_layout
+
+\begin_layout Description
+"=" Measured should be in the interval of the threshold.
+ If the measured value is lower then threshold*warning(%) OR higher then
+ threshold*(1-warning(%)) a warning state is set and if measured value is
+ lower then threshold*critical(%) OR higher then threshold*(1-critical(%))
+ a critical state is set.
+\end_layout
+
+\begin_layout Standard
+For complete configuration description see section 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "label:24thresholds.xml"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Hours-definition"
+
+\end_inset
+
+Hours and threshold definition
+\end_layout
+
+\begin_layout Standard
+The measured value is compered against the threshold value that is calculated
+ from linear equation of the two closest threshold values.
+ As described in the introduction of this chapter we can set the threshold
+ values to fixed number, but in a business system this is not enough.
+ Let take an example.
+ The number of orders that can be invoiced during a day is probably depending
+ on the number of orders received.
+ So instead of setting the threshold to a fixed number we can use an expression
+ based threshold like 
+\begin_inset Quotes eld
+\end_inset
+
+80 % of received orders
+\begin_inset Quotes erd
+\end_inset
+
+.
+
+\emph on
+ 
+\emph default
+The syntax of expression based thresholds is simple and powerful.
+ Expressions are based on the JEP package, see chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:System-requirements"
+
+\end_inset
+
+, where the parameters are any measured values that exist in the service
+ item cache, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Service-item-cache"
+
+\end_inset
+
+.
+ For example the expression 
+\emph on
+"erpserver-orders-ediorders[0]*0.8"
+\emph default
+ is the threshold is set to 80% of the last measured value of the service
+ item 
+\emph on
+ediorders
+\emph default
+ for the service 
+\emph on
+order
+\emph default
+ and host 
+\emph on
+erpserver
+\emph default
+.
+ We could also combine multiple cached values from different sources in
+ the same expression like, 
+\emph on
+"erpserver-orders-ediorders[0] / geoserver-route-finalroute[0]
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\emph default
+to get some sort of ratio threshold
+\emph on
+.
+\begin_inset Newline newline
+\end_inset
+
+
+\emph default
+If we just need to check parts of a day for thresholds, just set the hour
+ to NULL and no calculation will be done for that time interval.
+ For example if no threshold checks should be done on weekends just define
+ period rule number 4 for day 1 and 6 with all hour thresholds set to NULL.
+ 
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Server-integration"
+
+\end_inset
+
+Server integration
+\end_layout
+
+\begin_layout Standard
+Since Bischeck support integration with multiple monitoring infrastructures
+ its not possible to define a single message format or protocol.
+ For that reason each Server class implementation is responsible for message
+ formatting and communication with the integrated server.
+ If the server system is not responding the message will be dropped on the
+ Bischeck side.
+ 
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Nagios-integration-with"
+
+\end_inset
+
+Nagios integration with NSCA, NRDP and Livestatus
+\end_layout
+
+\begin_layout Standard
+The data format between Bischeck and Nagios follow the standard Nagios format.
+ This means that the Nagios host and service names must be the same as you
+ configure in Bischeck.
+ Since NSCA and NRDP
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.1]
+\end_layout
+
+\end_inset
+
+ works with passive checks the 
+\emph on
+check_dummy
+\emph default
+ or equivalent check command should be used on the Nagios side in the service
+ configuration.
+ For a service in Bischeck the data is split in the status and the performance
+ output.
+ The Bischeck status output has the following format: 
+\end_layout
+
+\begin_layout Standard
+<level> <service item name> = <measured value> (<threshold> <warning value>
+ <warning_calc method> <critical value>) <critical calc method> , <service
+ item name> = ...
+ 
+\end_layout
+
+\begin_layout Standard
+Since a service can have multiple service items, the output is presented
+ as a concatenated string of the service items.
+ The <measured value> is the value that was retrieved from the execution
+ of the specific service item execute statement.
+ The <threshold> is the current threshold value that the measured value
+ has been compared against.
+ The calculated warning and critical levels are also calculated based on
+ the percentage value of the threshold.
+\end_layout
+
+\begin_layout Standard
+Depending of the calculation method the string representation will differ.
+ The following methods are support: 
+\end_layout
+
+\begin_layout Itemize
+Measure value must be higher the threshold: <warning level> = > W > <critical
+ level> = > C >
+\end_layout
+
+\begin_layout Itemize
+Measure value must be lower the threshold: <warning level> = < W < <critical
+ level> = < C <
+\end_layout
+
+\begin_layout Itemize
+Measure value must be in the interval to the threshold: <warning level>
+ = = +-W = <critical level> = = +-C =
+\end_layout
+
+\begin_layout Standard
+Example of the output: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+OK ediOrders = 12000 (11000 > W > 9900 > C > 7700)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this case the threshold value is 11000 and warning and critical levels
+ has been set to 10% and 30 % of the current threshold.
+ Since the warning and critical level are as a fixed percentage the calculated
+ level will changed with the current threshold.
+\end_layout
+
+\begin_layout Standard
+If there are no threshold values defined for the current period in which
+ the measured value is done, the threshold is reported as null and no calculatio
+n is done that can be used for notification.
+ Null can also be reported as the measured value.
+ This can occur if a none or a null value is retrieved for the service item,
+ for example from a faulty SQL statement.
+ 
+\end_layout
+
+\begin_layout Standard
+Service connection problems will be reported as critical.
+ Warning and critical notification will be based on the service item that
+ has the highest level of severity if there are more then one service item
+ defined for a service.
+ If one service item reports critical and the other reports OK the service
+ will report critical.
+ 
+\end_layout
+
+\begin_layout Standard
+For the performance data, which Nagios graphs, like pnp4nagios, are based
+ upon, each service item is included with the addition of the current threshold.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ediOrders=12000;9900;7000;0; threshold=11000;0;0;0; avg-exec-time=223ms
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The execution time of the service execute statement is always part of the
+ performance data and reported in milliseconds.
+ With the pnp4nagios template that is provided by the Bischeck installation
+ the average execution time is not graphed.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+NSCA configuration
+\end_layout
+
+\begin_layout Standard
+The configuration parameters that need to be define in the server.xml for
+ NSCA are:
+\end_layout
+
+\begin_layout Itemize
+class - NSCAServer
+\end_layout
+
+\begin_layout Itemize
+hostAddress - the IP or name for the NSCA server, default is localhost.
+\end_layout
+
+\begin_layout Itemize
+port - the socket port number on the NSCA server where NSCA is listening,
+ default is 5667.
+\end_layout
+
+\begin_layout Itemize
+connectionTimeout - the timeout time in milliseconds before Bischeck give
+ up on the the connection, default is 5000.
+\end_layout
+
+\begin_layout Itemize
+encryptionMode - the encryption mode used in the communication with the
+ NSCA server.
+ Supported encryption modes are NONE, XOR, and TRIPLE_DES, default is XOR.
+\end_layout
+
+\begin_layout Itemize
+password - the NSCA server password, no by default.
+\end_layout
+
+\begin_layout Subsection
+NRDP configuration
+\end_layout
+
+\begin_layout Standard
+The configuration parameters that need to be define in the server.xml for
+ NRDP are:
+\end_layout
+
+\begin_layout Itemize
+class - NRDPServer
+\end_layout
+
+\begin_layout Itemize
+hostAddress - the IP or name for the NRDP server, default is localhost.
+\end_layout
+
+\begin_layout Itemize
+port - the socket port number on the NRDP server where NRDP is listening,
+ default is 80.
+\end_layout
+
+\begin_layout Itemize
+connectionTimeout - the timeout time in milliseconds before Bischeck give
+ up on the the connection, default is 5000.
+\end_layout
+
+\begin_layout Itemize
+path - the URL path for NRDP, default is nrdp.
+\end_layout
+
+\begin_layout Itemize
+password - the NRDP server token, no by default.
+\end_layout
+
+\begin_layout Subsection
+Livestatus configuration
+\end_layout
+
+\begin_layout Standard
+The configuration parameters that need to be define in the server.xml for
+ Livestatus are:
+\end_layout
+
+\begin_layout Itemize
+class - LiveStatusServer
+\end_layout
+
+\begin_layout Itemize
+hostAddress - the IP or name for the Livestatus server, default is localhost.
+\end_layout
+
+\begin_layout Itemize
+port - the socket port number on the server where Livestatus is listening,
+ default is 6557.
+\end_layout
+
+\begin_layout Itemize
+connectionTimeout - the timeout time in milliseconds before Bischeck give
+ up on the the connection, default is 5000.
+\end_layout
+
+\begin_layout Subsection
+Nagios state on null
+\end_layout
+
+\begin_layout Standard
+If the service connection fail or the service item execstatement returns
+ a null value its not possible to calculate thresholds or to determine the
+ state that should be propagated to Nagios.
+ The state that should be communicate to Nagios in this type of situation
+ is defined by property 
+\emph on
+stateOnNull
+\emph default
+, that can be set to CRITICAL (2), WARNING (1), OK (0) or UNKNOWN (3).
+ Default is UNKNOWN.
+ 
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:OpenTSDB"
+
+\end_inset
+
+OpenTSDB
+\end_layout
+
+\begin_layout Standard
+OpenTSDB is an monitoring system that provide storage and indexing of high
+ volume of time series data.
+ Access to the data in through a graphical web console provide easy way
+ to view many different data sources for advanced analysis.
+ The OpenTSDB integration is provided over OpenTSDB text based protocol.
+ From Bischeck the format will be the following for the host erpserver,
+ service orders and service item ediOrders:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+put bischeck.measured 1288946927 12000 host=erpserver service=orders serviceitem=
+ediOrders
+\end_layout
+
+\begin_layout Plain Layout
+
+put bischeck.threshold 1288946927 11000 host=erpserver service=orders serviceitem
+=ediOrders
+\end_layout
+
+\begin_layout Plain Layout
+
+put bischeck.warning 1288946927 9900 host=erpserver service=orders serviceitem=ed
+iOrders
+\end_layout
+
+\begin_layout Plain Layout
+
+put bischeck.critical 1288946927 7700 host=erpserver service=orders serviceitem=e
+diOrders
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So for each host, service and service item configuration 4 lines of data
+ will be sent to the OpenTSDB server for the measured, threshold, warning
+ and critical value.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The configuration parameters that need to be define in the server.xml for
+ OpenTSDB are:
+\end_layout
+
+\begin_layout Itemize
+class - OpenTSDBServer
+\end_layout
+
+\begin_layout Itemize
+hostAddress - the IP or name for the OpenTSDB server, default is localhost.
+\end_layout
+
+\begin_layout Itemize
+port - the socket port number on the OpenTSDB server where OpenTSDB is listening
+, default is 4242.
+\end_layout
+
+\begin_layout Itemize
+connectionTimeout - the timeout time in milliseconds before Bischeck give
+ up on the the connection, default is 5000.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Graphite"
+
+\end_inset
+
+Graphite
+\end_layout
+
+\begin_layout Standard
+Graphite is an monitoring system that provide excellent graphing.
+ Access to the data in through a graphical web console provide easy way
+ to view many different data sources for advanced analysis.
+ The Graphite integration is provided over Graphites text based protocol.
+ The format has the following simple format:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+metric_path value timestamp
+\backslash
+n
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The metric_path is the dot separated string like foo.bar.baz.
+ Value is a number and timestamp is the UNIX epoch time in milliseconds.
+ 
+\end_layout
+
+\begin_layout Standard
+From Bischeck the format will be the following for the host erpserver, service
+ orders and service item ediOrders:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+erpserver.orders.ediOrders.measured 12000 1288946927
+\backslash
+n
+\end_layout
+
+\begin_layout Plain Layout
+
+erpserver.orders.ediOrders.threshold 11000 1288946927
+\backslash
+n
+\end_layout
+
+\begin_layout Plain Layout
+
+erpserver.orders.ediOrders.warning 9900 1288946927
+\backslash
+n
+\end_layout
+
+\begin_layout Plain Layout
+
+erpserver.orders.ediOrders.critical 7700 1288946927
+\backslash
+n
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So for each host, service and service item configuration 4 lines of data
+ will be sent to the Graphite server for the measured, threshold, warning
+ and critical value.
+\end_layout
+
+\begin_layout Standard
+The Graphite server integration support a method to filter what data that
+ will be sent to Graphite.
+ The filter is defined by regular expression with the property 
+\emph on
+doNotSendRegex
+\emph default
+.
+ If a host-service-serviceitem in anyway match the regular expression it
+ will not be sent to Graphite.
+ Multiple regular expressions can be defined by a list of regular expressions
+ in the property 
+\emph on
+doNotSendRegex
+\emph default
+ by setting a delimiter between the regular expressions defined by the property
+ 
+\emph on
+doNotSendRegexDelim
+\emph default
+.
+ For example the regular expression 
+\emph on
+^erpserver
+\emph default
+ will not send any host-service-serviceitem that begins with the string
+ erpserver.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The configuration parameters that need to be define in the server.xml for
+ OpenTSDB are:
+\end_layout
+
+\begin_layout Itemize
+class - GraphiteServer
+\end_layout
+
+\begin_layout Itemize
+hostAddress - the IP or name for the Graphite server, default is localhost.
+\end_layout
+
+\begin_layout Itemize
+port - the socket port number on the Graphite server where Graphite is listening
+, default is 2003.
+\end_layout
+
+\begin_layout Itemize
+connectionTimeout - the timeout time in milliseconds before Bischeck give
+ up on the the connection, default is 5000.
+\end_layout
+
+\begin_layout Itemize
+doNotSendRegex - A list of regular expressions.
+ Default is no regular expressions.
+\end_layout
+
+\begin_layout Itemize
+doNotSendRegexDelim - The delimiter to separate regular expressions in the
+ property doNotSendRegex, default is 
+\begin_inset Quotes eld
+\end_inset
+
+%
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:bischeck-configuration-files"
+
+\end_inset
+
+Bischeck configuration files
+\end_layout
+
+\begin_layout Standard
+The basic configuration file are xml based and located in the 
+\emph on
+$BISHOME/etc
+\emph default
+ directory.
+ The distribution package also include all xml schema, xsd, files used for
+ validation.
+ For detail information please review the xsd files located in the directory
+\emph on
+ $BISHOME/resources
+\emph default
+.
+ Remember that all xml configuration files should use HTML encoded characters.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Naming-standard"
+
+\end_inset
+
+Naming standard
+\end_layout
+
+\begin_layout Standard
+The rules for naming hosts, services and serviceitems must adhere to the
+ following rules:
+\end_layout
+
+\begin_layout Itemize
+hostname - can include any character from a-z, A-Z and 0-9.
+ The hostname can also include the following special character, dash (-),
+ dot (.) and underscore (_).
+ Its not allowed to start the name with any of the special characters.
+ Examples of valid names are erphost.xyz.com and erp1_host.my-domain.com.
+\end_layout
+
+\begin_layout Itemize
+service and serviceitem - can include any character from a-z, A-Z and 0-9.
+ The name can also include the following special characters, dash (-), dot
+ (.), underscore (_), at sign (@) and space ( ).
+ Its not allowed to start or end the name with dash (-) and space ( ).
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+When using a host-servie-serviceitem[X] expression in the execstatement
+ tag of a serviceitem in the bischeck.xml configuration file or in the hour
+ tag of the 24threshold.xml configuration file, a dash (-) in any of the
+ names must be quoted with a backslash (
+\backslash
+), like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+erp1_host.my
+\backslash
+-domain.com-@service1-item.1.1[1]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:bischeck.xml"
+
+\end_inset
+
+bischeck.xml 
+\end_layout
+
+\begin_layout Standard
+The Bischeck configuration can be described as a hierarchy of hosts, services
+ and service items to monitor.
+ Each host can have one or more services, and for each service one or more
+ service items can be configured.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<bischeck>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<host>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<name>erpserver</name>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<desc>ERP server</desc>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<service>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<name>orders</name> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<desc>Order management</desc>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<schedule>0 0/5 * * * ?</schedule>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<url>
+\end_layout
+
+\begin_layout Plain Layout
+
+				jdbc:mysql://erphost/erpdb?user=bischeck&amp;password=bischeck
+\end_layout
+
+\begin_layout Plain Layout
+
+			</url>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<driver>
+\end_layout
+
+\begin_layout Plain Layout
+
+				com.mysql.jdbc.Driver
+\end_layout
+
+\begin_layout Plain Layout
+
+			</driver>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<serviceitem>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<name>ediorders</name>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<desc>Inbound edi orders</desc>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<execstatement>
+\end_layout
+
+\begin_layout Plain Layout
+
+					select count(*) from orders where createdate=&apos;%%yyyy-MM-dd%%&apos;
+     
+\end_layout
+
+\begin_layout Plain Layout
+
+				</execstatement> 
+\end_layout
+
+\begin_layout Plain Layout
+
+				<thresholdclass>
+\end_layout
+
+\begin_layout Plain Layout
+
+					Twenty4HourThreshold
+\end_layout
+
+\begin_layout Plain Layout
+
+				</thresholdclass>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<serviceitemclass>
+\end_layout
+
+\begin_layout Plain Layout
+
+					SQLServiceItem
+\end_layout
+
+\begin_layout Plain Layout
+
+				</serviceitemclass>
+\end_layout
+
+\begin_layout Plain Layout
+
+			</serviceitem>
+\end_layout
+
+\begin_layout Plain Layout
+
+		</service>
+\end_layout
+
+\begin_layout Plain Layout
+
+	</host>
+\end_layout
+
+\begin_layout Plain Layout
+
+</bischeck>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the host section the following elements are defined: 
+\end_layout
+
+\begin_layout Itemize
+name - the name of the host.
+ 
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Must be the same name as the host name is configured with on the Nagios
+ server.
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+desc - a optional description field 
+\end_layout
+
+\begin_layout Standard
+In the service section the following elements are defined: 
+\end_layout
+
+\begin_layout Itemize
+name - name of the service.
+ 
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Must be the same name as the host name is configured with on the Nagios
+ server.
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+desc - a optional description field 
+\end_layout
+
+\begin_layout Itemize
+schedule - one to many service execution schedules can be defined.
+ See the section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Service-scheduling"
+
+\end_inset
+
+ for more information about configuration options.
+ 
+\end_layout
+
+\begin_layout Itemize
+sendserver - true or false to define if the service data should be sent
+ to the configured monitoring servers, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:server.xml"
+
+\end_inset
+
+.
+ 
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.0]
+\end_layout
+
+\end_inset
+
+.
+ If set to false the measured data will only be placed in the Bischeck cache
+ and be used to create virtual services and threshold rules.
+\end_layout
+
+\begin_layout Itemize
+url - the connection specification for the server/service to monitor in
+ a url format 
+\end_layout
+
+\begin_layout Itemize
+driver - a class that is needed by the url specification.
+ The driver class should be placed in the 
+\emph on
+customlib
+\emph default
+ directory.
+ 
+\end_layout
+
+\begin_layout Standard
+In the service item section the following elements are defined:
+\end_layout
+
+\begin_layout Itemize
+name - name of the service item
+\end_layout
+
+\begin_layout Itemize
+desc - a optional description field
+\end_layout
+
+\begin_layout Itemize
+execstatement - the specification of what to be executed by the service
+ item.
+ The statement will be dependent on the type of service item class used.
+\end_layout
+
+\begin_layout Itemize
+serviceitemclass - the ServiceItem class to use for the service item.
+ For ServiceItem classes that are part of the distribution the class name
+ is enough.
+ For custom developed ServiceItem classes the full class name should be
+ specified and the classes or jar files should be located in the 
+\emph on
+customlib
+\emph default
+ directory.
+\end_layout
+
+\begin_layout Itemize
+thresholdclass - the Threshold class to be used by the service item configuratio
+n.
+ For Threshold classes part of the distribution the class name is enough.
+ For custom developed Threshold classes the full class name should be specified
+ and the classes or jar files should be located in the 
+\emph on
+customlib
+\emph default
+ directory.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:properties.xml"
+
+\end_inset
+
+properties.xml
+\end_layout
+
+\begin_layout Standard
+The properties.xml include properties used by the core of Bischeck, but can
+ also be used by custom developed services and threshold classes.
+ The properties xml has a simple structure of key/value pair: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<properties>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<property> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<key>akey</key> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<value>avalue</value>   
+\end_layout
+
+\begin_layout Plain Layout
+
+	</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+</properties>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Any properties should have a default value that is set in code.
+ The following properties are currently used by core Bischeck:
+\end_layout
+
+\begin_layout Itemize
+thresholdCacheClear- the time when the threshold cache should be evicted
+ each day, default is "10 0 00 * * ? *".
+ 
+\end_layout
+
+\begin_layout Itemize
+pidfile - the pid file for Bischeck, default is "
+\emph on
+/var/tmp/bischeck.pid
+\emph default
+".
+\end_layout
+
+\begin_layout Itemize
+mindaysinfirstweek - define the week numbering according to ISO 8601, default
+ is 4.
+\end_layout
+
+\begin_layout Itemize
+firstdayofweek - define the week numbering according to ISO 8601, default
+ is 2.
+ 
+\end_layout
+
+\begin_layout Itemize
+lastStatusCacheDumpDir - the directory where cache is stored, default is
+ /var/tmp.
+ 
+\end_layout
+
+\begin_layout Itemize
+lastStatusCacheSize - the maximum size of cached data per host, service
+ and serviceitem, default is 500.
+\end_layout
+
+\begin_layout Itemize
+runAfterDelay - the delay time in seconds used when a service is scheduled
+ to run with 
+\begin_inset Quotes eld
+\end_inset
+
+Service relation scheduling
+\begin_inset Quotes erd
+\end_inset
+
+, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Service-scheduling"
+
+\end_inset
+
+.
+ Default is 10 seconds.
+\end_layout
+
+\begin_layout Itemize
+notFullListParse - if set to true a reference to a cache item where a list
+ is used, like 
+\emph on
+erpserver-orders-ediorders[1:10],
+\emph default
+ will return data even if not all index in the list has data.
+ Read more about how this property affect the retrieval of cache data in
+ section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Null-value-in"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+stateOnNull - the Nagios state to be used if a execstatment in a service
+ item return null.
+ The property can be set to an integer 0,1,2 or 3 or to a string OK, WARNING,
+ CRITICAL or UNKNOWN.
+ The default is UNKNOWN.
+\end_layout
+
+\begin_layout Itemize
+saveNullOnConnectionError - this property define if a null value should
+ be stored in the cache if you have your service class has a connection
+ exception of any sort.
+ The default is false.
+ 
+\end_layout
+
+\begin_layout Standard
+The properties.xml file can also include class specific properties typical
+ used for custom developed service, service item and threshold classes.
+ A class specific property should have a key formatted in the following
+ way - classname.propertyname 
+\end_layout
+
+\begin_layout Standard
+Any class specific properties must have a default value implemented by the
+ class itself.
+ E.g.
+ for JDBCService there is a property called querytimeout that sets the max
+ time in seconds before aborting the query.
+ This property has the name JDBCService.querytimeout and have a default value
+ of 10 seconds.
+ 
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:urlservice.xml"
+
+\end_inset
+
+urlservice.xml 
+\end_layout
+
+\begin_layout Standard
+The configuration define of the mapping between service url schema and Service
+ class.
+ The urlservice xml has a structure of: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<urlservices>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<urlproperty>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<key>jdbc</key>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<value>JDBCService</value>
+\end_layout
+
+\begin_layout Plain Layout
+
+	</urlproperty>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<urlproperty>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<key>bischeck</key>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<value>LastCacheService</value>  
+\end_layout
+
+\begin_layout Plain Layout
+
+	</urlproperty>
+\end_layout
+
+\begin_layout Plain Layout
+
+</urlservices>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+key – the schema part of the service url, i.e.
+ jdbc.
+\end_layout
+
+\begin_layout Itemize
+value – the Service class name.
+ For Service classes part of the distribution the class name is enough to
+ specify.
+ For custom developed Service classes the full class name should be specified
+ and the classes or jar files should be located in the 
+\emph on
+customlib
+\emph default
+ directory.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:server.xml"
+
+\end_inset
+
+server.xml 
+\end_layout
+
+\begin_layout Standard
+The configuration file define the mapping between service url schema and
+ Server class.
+ The urlservice.xml has a structure of: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<servers>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<server name="Nagios1">     
+\end_layout
+
+\begin_layout Plain Layout
+
+		<class>NSCAServer</class>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<property>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<key>hostAddress</key>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<value>localhost</value>
+\end_layout
+
+\begin_layout Plain Layout
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<property>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<key>encryptionMode</key>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<value>XOR</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<property>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<key>password</key>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<value>change this</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<property>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<key>port</key>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<value>5667</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<property>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<key>connectionTimeout</key>       
+\end_layout
+
+\begin_layout Plain Layout
+
+			<value>5000</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</property> 
+\end_layout
+
+\begin_layout Plain Layout
+
+	</server>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	<server name="Nagios2">     
+\end_layout
+
+\begin_layout Plain Layout
+
+		......
+\end_layout
+
+\begin_layout Plain Layout
+
+	</server>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+</servers>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each server that is integrated with Bischeck must be defined with the server
+ tag and with a unique attribute name.
+ This solution enable Bischeck to send data to multiple servers of the same
+ type, like multiple Nagios servers.
+ The class tag define what Server class implementation to use for the integratio
+n.
+ Each Server implementation can have different numbers of properties that
+ is specific for the Server class.
+ Custom developed server classes should be placed in the 
+\emph on
+customlib
+\emph default
+ directory 
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:24thresholds.xml"
+
+\end_inset
+
+24thresholds.xml
+\end_layout
+
+\begin_layout Standard
+The threshold class Twenty4HourThreshold described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Twenty4HourThreshold-class"
+
+\end_inset
+
+is configured through the 24thresholds.xml file.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<twenty4threshold> 
+\end_layout
+
+\begin_layout Plain Layout
+
+	<servicedef>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hostname>erpserver</hostname>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<servicename>shipments</servicename> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<serviceitemname>outboundshipment</serviceitemname>  
+\end_layout
+
+\begin_layout Plain Layout
+
+		
+\end_layout
+
+\begin_layout Plain Layout
+
+		<period>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<!-- valid for any 21th day in the month -->  
+\end_layout
+
+\begin_layout Plain Layout
+
+			<months> 
+\end_layout
+
+\begin_layout Plain Layout
+
+				<dayofmonth>21</dayofmonth> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			</months> 			
+\end_layout
+
+\begin_layout Plain Layout
+
+			<!-- valid for week 12 (middle of March)
+\end_layout
+
+\begin_layout Plain Layout
+
+				and if its a Thursday -->
+\end_layout
+
+\begin_layout Plain Layout
+
+			<weeks> 
+\end_layout
+
+\begin_layout Plain Layout
+
+				<week>12</week>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<dayofweek>5</dayofweek>
+\end_layout
+
+\begin_layout Plain Layout
+
+			</weeks> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			
+\end_layout
+
+\begin_layout Plain Layout
+
+			<calcmethod>&gt;</calcmethod> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<warning>10</warning> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<critical>30</critical> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<hoursIDREF>1</hoursIDREF> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		</period>
+\end_layout
+
+\begin_layout Plain Layout
+
+		
+\end_layout
+
+\begin_layout Plain Layout
+
+		<period>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<!-- valid if its a Friday --> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<weeks> 
+\end_layout
+
+\begin_layout Plain Layout
+
+				<dayofweek>6</dayofweek>
+\end_layout
+
+\begin_layout Plain Layout
+
+			</weeks> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<calcmethod>&gt;</calcmethod> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<warning>10</warning> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<critical>30</critical> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<hoursIDREF>2</hoursIDREF> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		</period>
+\end_layout
+
+\begin_layout Plain Layout
+
+		
+\end_layout
+
+\begin_layout Plain Layout
+
+		<period>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<!-- This will be used if no 
+\end_layout
+
+\begin_layout Plain Layout
+
+				other rule if applicable -->
+\end_layout
+
+\begin_layout Plain Layout
+
+			<calcmethod>&gt;</calcmethod>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<warning>10</warning> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<critical>30</critical> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<hoursIDREF>31</hoursIDREF> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		</period>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	</servicedef> 
+\end_layout
+
+\begin_layout Plain Layout
+
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+	<hours hoursID="1"> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 00:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>500</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 01:00 -->	
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>1500</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 02:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>4000</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		.................
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 21:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>9000</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 22:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>10000</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 23:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>11000</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+	</hours>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	<hours hoursID="2"> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 00:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>1500</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 01:00 -->	
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>2500</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 02:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>5000</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		.................
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 21:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>10000</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 22:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>12000</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<!-- 23:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hour>14000</hour> 
+\end_layout
+
+\begin_layout Plain Layout
+
+	</hours>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	<hours hoursID="2"> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hourinterval> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<from>09:00</from>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<to>12:00</to>			
+\end_layout
+
+\begin_layout Plain Layout
+
+			<threshold>erpserver-orders-ediorders[0]*0.8</threshold> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		</hourinterval> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hourinterval> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<from>12:00</from>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<to>15:00</to>			
+\end_layout
+
+\begin_layout Plain Layout
+
+			<threshold>erpserver-orders-ediorders[0]*0.4</threshold>
+\end_layout
+
+\begin_layout Plain Layout
+
+		</hourinterval> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hourinterval> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<from>16:00</from>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<to>17:00</to>			
+\end_layout
+
+\begin_layout Plain Layout
+
+			<threshold>erpserver-orders-ediorders[0]*0.2</threshold>
+\end_layout
+
+\begin_layout Plain Layout
+
+		</hourinterval> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		
+\end_layout
+
+\begin_layout Plain Layout
+
+		<hourinterval> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<from>20:00</from>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<to>22:00</to>			
+\end_layout
+
+\begin_layout Plain Layout
+
+			<threshold>10000</threshold>
+\end_layout
+
+\begin_layout Plain Layout
+
+		</hourinterval> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	</hours> 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	<!-- Holidays -->
+\end_layout
+
+\begin_layout Plain Layout
+
+	<holiday year="2011">
+\end_layout
+
+\begin_layout Plain Layout
+
+		<dayofyear>0101</dayofyear>
+\end_layout
+
+\begin_layout Plain Layout
+
+		.................
+\end_layout
+
+\begin_layout Plain Layout
+
+		<dayofyear>1224</dayofyear>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<dayofyear>1225</dayofyear>
+\end_layout
+
+\begin_layout Plain Layout
+
+	</holiday> 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+</twenty4threshold> 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The configuration is based on two main parts, a service definition called
+ 
+\emph on
+servicedef
+\emph default
+ tag and an 
+\emph on
+hours
+\emph default
+ tag.
+ For each combination of host, service and serviceitem a 
+\emph on
+servicedef
+\emph default
+ tag is specified.
+ Each 
+\emph on
+servicedef
+\emph default
+ can have one to many period specifications, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Period-definition"
+
+\end_inset
+
+.
+ The period specify what hoursID that should be used for a specific combination
+ of months and weeks definitions, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Hours-definition"
+
+\end_inset
+
+for more information.
+ The period also define calculation method, warning and critical level,
+ see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Calculation-definition"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+hours
+\emph default
+ tag support two different formats, the 24 hour listing or a from-to listing.
+\end_layout
+
+\begin_layout Standard
+If the 
+\emph on
+hours
+\emph default
+ tag use the 24 hour listing there must be 24 
+\emph on
+hour
+\emph default
+ tags, each represent on hour of the day.
+ An hour tag can have a null value, meaning no threshold, a fixed value
+ or an mathematical expression according to JEP, but with variables from
+ any measured value existing in the last value cache, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Service-item-cache"
+
+\end_inset
+
+.
+ For more information about threshold specifications please see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Threshold-configuration"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+If the from-to format is used there can be one to many 
+\emph on
+hourintervals
+\emph default
+ that define what threshold that should be used between the from time to
+ the to time.
+ Only full hours are currently supported.
+ The following rules are valid for this format:
+\end_layout
+
+\begin_layout Itemize
+If there is overlapping hours exist the last hourinterval tag in the list
+ have precedence.
+ In the above listing that means that the threshold for 12:00 are 
+\begin_inset Quotes eld
+\end_inset
+
+erpserver-orders-ediorders[0]*0.4
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Any hour that are not defined are treated as to have no threshold.
+ In the above example there are no thresholds for 00:00-09:00, 17:00-20:00
+ and 22:00-00:00.
+\end_layout
+
+\begin_layout Standard
+The final section, holidays, describe days of the year where no threshold
+ will be tested.
+ For that reason the service will always return an OK state for a Bischeck
+ services using the threshold class Twenty4HourThreshold.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Service-scheduling"
+
+\end_inset
+
+Service scheduling 
+\end_layout
+
+\begin_layout Standard
+The service scheduling define when a service is triggered to be executed.
+ For each service there can be multiple scheduling configurations, but at
+ lest one is mandatory.
+ The scheduling can be described in three ways.
+ 
+\end_layout
+
+\begin_layout Section
+Interval scheduling
+\end_layout
+
+\begin_layout Standard
+The simple format describe a interval execution that are repeated forever.
+ The format is just a number and a indicator defining the granularity in
+ seconds (S), minutes (M) or hours (H).
+ 10M specify that the service should be executed every ten minutes.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<schedule>10M</schedule>		
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The initial start time for an interval based schedule is calculated as a
+ time randomly in the specified interval.
+ For 10M this means that the service first schedule is between 0 to 10 minutes
+ from the start time of Bischeck or at a reload.
+\end_layout
+
+\begin_layout Section
+Cron based scheduling
+\end_layout
+
+\begin_layout Standard
+The second format is more advanced and follow the cron specification of
+ Quartz, see 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.quartz-scheduler.org
+\end_layout
+
+\end_inset
+
+.
+ With this format its possible to define scheduling expression like 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+0 15 10 ? * MON-FRI
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+ which would schedule the service at 10:15am every Monday, Tuesday, Wednesday,
+ Thursday and Friday.
+ For more cron examples please visit 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<schedule>0 15 10 ? * MON-FRI</schedule>		
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Service relation scheduling
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[New in 0.4.0]
+\end_layout
+
+\end_inset
+
+The service relation scheduling trigger a service to execute after another
+ service has been scheduled.
+ This is useful when a service is depending on data for another service
+ for its thresholds or execution statement.
+ The format is 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+host-service
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\emph default
+specifying the host and service that will trigger the execution of the service.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<schedule>erpserver-orders</schedule>		
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Configuration-tools"
+
+\end_inset
+
+Configuration tools 
+\end_layout
+
+\begin_layout Standard
+Bischeck provides by default no additional tools for configuration other
+ than the normal editor to manage the xml configuration files.
+ The default configuration files in 
+\emph on
+etc
+\emph default
+ directory are valid for the test example configuration, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Getting-started"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A web based configuration tool, bisconf, is under development.
+ Bisconf is hosted on the Bischeck project site, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.bischeck.org
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:bischeck-internal-surveillance"
+
+\end_inset
+
+Bischeck internal surveillance 
+\end_layout
+
+\begin_layout Standard
+Bischeck use the Java JMX standard for internal monitoring.
+ Please read the javadoc for the classes ExecuteMBean and LastStatusCacheMBean
+ to to understand the methods available or just start 
+\emph on
+jconsole
+\emph default
+ or equivalent tool.
+ 
+\end_layout
+
+\begin_layout Standard
+To allow remote JMX connections the following JMX settings are used by the
+ 
+\emph on
+bischeck
+\emph default
+ script located in the 
+\emph on
+$BISHOME/bin
+\emph default
+ directory.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+jmxport=-Dcom.sun.management.jmxremote.port=<set by the installer script>
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxrmiserver=-Djava.rmi.server.hostname=<set by the installer script>
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxauth=-Dcom.sun.management.jmxremote.authenticate=<set by the installer script>
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxssl=-Dcom.sun.management.jmxremote.ssl=false
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If authentication should be used please change the configuration of the
+ roles and passwords in the files jmxremote.access and jmxremote.password.
+ For more information how to configure JMX please visit 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+JMX is only enabled when the 
+\emph on
+bischeck
+\emph default
+ script is called with the argument "
+\emph on
+Execute -d
+\emph default
+", which is the way the
+\emph on
+ bischeckd
+\emph default
+ init script call the script 
+\emph on
+bischeck
+\emph default
+ to start Bischeck in daemon mode.
+ 
+\end_layout
+
+\begin_layout Section
+Bischeck MBeans 
+\end_layout
+
+\begin_layout Standard
+The Bischeck JMX MBeans provide instrumentation of the running Bischeck
+ daemon.
+ From an operations perspective Bischeck can be shutdown and reloaded through
+ JMX.
+ A reload operations is used to force Bischeck to re-read it's configuration
+ files but without restarting the process.
+ 
+\end_layout
+
+\begin_layout Standard
+Different execution times of the Bischeck daemon are also exposed through
+ JMX.
+ All timers are based on the 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://metrics.codahale.com/"
+
+\end_inset
+
+and shows the following parameter for each defined timer:
+\end_layout
+
+\begin_layout Itemize
+FifteenMinuteRate 
+\end_layout
+
+\begin_layout Itemize
+FiveMinuteRate 
+\end_layout
+
+\begin_layout Itemize
+OneMinuteRate 
+\end_layout
+
+\begin_layout Itemize
+MeanRate 
+\end_layout
+
+\begin_layout Itemize
+Count 
+\end_layout
+
+\begin_layout Itemize
+Max
+\end_layout
+
+\begin_layout Itemize
+Min
+\end_layout
+
+\begin_layout Itemize
+Mean
+\end_layout
+
+\begin_layout Itemize
+Standard deviation (StdDev) 
+\end_layout
+
+\begin_layout Itemize
+50th Percentile
+\end_layout
+
+\begin_layout Itemize
+75th Percentile
+\end_layout
+
+\begin_layout Itemize
+95th Percentile
+\end_layout
+
+\begin_layout Itemize
+98th Percentile
+\end_layout
+
+\begin_layout Itemize
+99th Percentile
+\end_layout
+
+\begin_layout Itemize
+999th Percentile
+\end_layout
+
+\begin_layout Standard
+The timers used in Bischeck are:
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.service:name=execute,type=ServiceJob
+\emph default
+ 
+\begin_inset Newline linebreak
+\end_inset
+
+This is the most important metric since it shows the total execution time
+ to process a definition of a host, service and serviceitem(s) every time
+ it's scheduled.
+ The execution time included connecting and retrieving data, execution over
+ serviceitem logic, threshold calculation and the time to send data to the
+ defined servers.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.servers:name=execute,type=ServerExecutor
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+This is the total time to send the data to all the servers defined.
+ This time in is included in the 
+\emph on
+ServiceJob
+\emph default
+ time.
+ Each server also have it's own timer to track the time down on individual
+ servers.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.jepext:name=calulate,type=ExecuteJEP
+\emph default
+
+\begin_inset Newline linebreak
+\end_inset
+
+The execution time to calculate any mathematical expressions like sum, average,
+ etc used in serviceitem and threshold logic.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.cache.provider:name=parse,type=LastStatusCache
+\emph default
+ 
+\begin_inset Newline linebreak
+\end_inset
+
+The execution time to parse and retrieve data from the cache used in serviceitem
+ and threshold logic.
+ This include all different way to retrieved data like based on index, index
+ range, time and time range.
+ 
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Building-bischeck"
+
+\end_inset
+
+Building Bischeck
+\end_layout
+
+\begin_layout Standard
+To build Bischeck from source is simple.
+ Check out the Bischeck trunk from gforge.ingby.com: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ svn checkout --username anonymous http://gforge.ingby.com/svn/bischeck/trunk
+ bischeck
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To build a Bischeck distribution run from the directory where you checked
+ out the Bischeck code: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ant dist
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This will create a compressed tar file in the 
+\shape italic
+target
+\shape default
+ directory, named bischeck-x.y.z.tgz where x.y.z is the version number.
+ Different versions of Bischeck can be checked out from the tags directory
+ located in 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://gforge.ingby.com/svn/bischeck/tags
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Jar-customization"
+
+\end_inset
+
+Jar customization
+\end_layout
+
+\begin_layout Standard
+To support custom jar files please place them in the directory 
+\emph on
+customlib
+\emph default
+.
+ This would typical be jdbc drivers, custom threshold classes, etc.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Developing-with-bischeck"
+
+\end_inset
+
+Developing with Bischeck 
+\end_layout
+
+\begin_layout Standard
+Its simple to develop your own service, service item and threshold classes.
+ To develop your own you must follow the interface that exist for each type.
+ For service and service items an abstract class exist with default implementati
+on of most of the methods described in the interfaces.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Installation"
+
+\end_inset
+
+Installation 
+\end_layout
+
+\begin_layout Standard
+The latest binary version of Bischeck is available on 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.bischeck.org
+\end_layout
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Download the distribution file and follow the steps below to install.
+ Make sure you have root privileges doing this.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# tar xzvf bischeck-x.y.z.tgz 
+\end_layout
+
+\begin_layout Plain Layout
+
+# cd bischeck-x.y.z
+\end_layout
+
+\begin_layout Plain Layout
+
+# chmod 755 install 
+\end_layout
+
+\begin_layout Plain Layout
+
+# ./install -u #Get usage
+\end_layout
+
+\begin_layout Plain Layout
+
+# ./install    #Install default
+\end_layout
+
+\begin_layout Plain Layout
+
+# service bischeckd start    #Redhat/Centos
+\end_layout
+
+\begin_layout Plain Layout
+
+# /etc/init.d/bischeck start #Debian/Ubuntu
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To get full list of available options to the install script use -u.
+ By default the 
+\emph on
+install
+\emph default
+ script will install Bischeck in directory 
+\emph on
+/opt/socbox/addons/bischeck
+\emph default
+, referred to as 
+\emph on
+$BISHOME,
+\emph default
+ and with the ownership of the user id 
+\emph on
+nagios
+\emph default
+.
+ Make sure that the user exist before running install.
+\end_layout
+
+\begin_layout Standard
+The last commands start the Bischeck daemon with the effective user id of
+ the user id set during install, default user 
+\emph on
+nagios
+\emph default
+.
+ The installation will configure bischeckd to start automatically in run
+ level 3, 4 and 5.
+\end_layout
+
+\begin_layout Standard
+The process id of the java process running Bischeck in daemon mode is located
+ in a file, default in 
+\emph on
+/var/tmp/bischeck.pid
+\emph default
+.
+ This file is used by the bischeckd script to stop the java program running
+ Bischeck and make sure that only one instance of Bischeck is started on
+ the server.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Upgrading"
+
+\end_inset
+
+Upgrading
+\end_layout
+
+\begin_layout Standard
+From version 0.3.2 upgrading is possible.
+ If you already have an installation download the new version as described
+ in the previous chapter but to upgrade run: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# ./install -I /opt/socbox/addons/bischeck -X
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The upgrade will save the current installation in a directory parallel to
+ the new version named 
+\emph on
+bischeck_x.y.z
+\emph default
+, where x.y.z is the version of the old installation.
+\end_layout
+
+\begin_layout Standard
+The file 
+\emph on
+migrationpath.txt
+\emph default
+ describe the supported upgrade paths and what migration scripts that will
+ be run by the 
+\emph on
+install
+\emph default
+ script when running in upgrade mode, -X.
+\end_layout
+
+\begin_layout Standard
+If the upgrade is successful Bischeck can be started.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# service bischeckd start
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Getting-started"
+
+\end_inset
+
+Getting started
+\end_layout
+
+\begin_layout Standard
+In the 
+\emph on
+$BISHOME/etc
+\emph default
+ directory there are working examples of all the configuration files.
+ These works as an examples to get started with a simple Bischeck setup
+ of monitoring the response time of a tcp ping on the ssh port, port 22.
+ I think you will find this familiar if you been using Nagios before and
+ the example use the well known check command 
+\emph on
+check_tcp
+\emph default
+.
+ The example assume that you have the Nagios plugins installed.
+ To get the example running you need to do the following steps:
+\end_layout
+
+\begin_layout Enumerate
+Go to the 
+\emph on
+etc
+\emph default
+ directory where you installed Bischeck, default is 
+\emph on
+/opt/socbox/addons
+\emph default
+.
+\end_layout
+
+\begin_layout Enumerate
+Edit the 
+\emph on
+bischeck.xml
+\emph default
+ at line 16 with the path to the 
+\emph on
+check_tcp
+\emph default
+ command.
+ If you have 
+\emph on
+check_tcp
+\emph default
+ installed in 
+\emph on
+/usr/lib/nagios/plugins
+\emph default
+ you do not need to edit the file 
+\end_layout
+
+\begin_layout Enumerate
+Edit the 
+\emph on
+servers.xml
+\emph default
+ file to add correct host name, line 12, and password , line 22, for your
+ NSCA server.
+ Even if you do not have a NSCA server defined Bischeck will still run but
+ with a connection error when trying to send data to NSCA.
+\end_layout
+
+\begin_layout Enumerate
+Now you are done to start Bischeck and checkout what happens in the log
+ file.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ sudo /etc/init.d/bischeckd restart
+\end_layout
+
+\begin_layout Plain Layout
+
+$ tail -f /usr/tmp/bischeck.log
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Maybe you ask your self why you should use Bischeck to do a 
+\emph on
+check_tcp
+\emph default
+? Well this is just a simple example, but when you have this running you
+ can check out the 
+\emph on
+24thresholds.xml
+\emph default
+ file to get some more understanding about the power of dynamic and adaptive
+ thresholds.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Integration-with-pnp4nagios"
+
+\end_inset
+
+Integration with pnp4nagios
+\end_layout
+
+\begin_layout Standard
+pnp4nagios can create graph layouts depending on the check command used
+ for the service on the Nagios server.
+ Since Bischeck use a passive check we need to create a unique check command
+ that match the pnp4nagios layout for Bischeck.
+ Create a link in the 
+\emph on
+libexec
+\emph default
+ directory on the nagios server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+nagios$ ln -s check_dummy check_bischeck
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When describing the service always use the check_bischeck as the check command.
+ The 
+\emph on
+check_bischeck.php
+\emph default
+ that control the pnp4nagios layout must be copied to the directory 
+\emph on
+pnp4nagios/share/templates
+\emph default
+ on the Nagios server.
+ 
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Logging"
+
+\end_inset
+
+Logging
+\end_layout
+
+\begin_layout Standard
+Bischeck use log4j for log management.
+ The log4j configuration is described in the log4.properties file located
+ in the 
+\emph on
+resources
+\emph default
+ directory of the Bischeck installation.
+ By default Bischeck writes log information at level INFO to file 
+\emph on
+/var/tmp/bischeck.log
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Command-line-utilities"
+
+\end_inset
+
+Command line utilities
+\end_layout
+
+\begin_layout Standard
+There is a number of command line utilities available in Bischeck.
+ All can be ran through the 
+\emph on
+bischeck 
+\emph default
+script located in the 
+\emph on
+$BISHOME/bin
+\emph default
+ directory.
+ To use the bischeck script add it to your PATH variable.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ PATH=$BISHOME/bin:$PATH
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Run Bischeck
+\end_layout
+
+\begin_layout Standard
+The normal way to run Bischeck is as a daemon using the init.d script 
+\emph on
+bischeckd
+\emph default
+, but is also possible to start Bischeck in continues running mode by executing:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck Execute -d
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Running in this way have limitations since the execution will not automatically
+ be placed as a background process and the effective user id will be the
+ user starting the process which may not have all permissions according
+ to the installation.
+ Neither will pid files be updated correctly.
+ For production system always use the init.d script.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ sudo /etc/init.d/bischeckd start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+or
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# service bischeckd start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For testing purpose it can be good to just run Bischeck once and make sure
+ that every thing is executing as expected.
+ This is done by executing:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck Execute
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This will override all scheduling definitions and execute everything directly,
+ but only once.
+ 
+\end_layout
+
+\begin_layout Standard
+To show the pid file used for the Bischeck daemon running:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck ConfigurationManager -p
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This command is used in the init script bischeckd to retrieve the current
+ pid.
+\end_layout
+
+\begin_layout Section
+List Bischeck configuration
+\end_layout
+
+\begin_layout Standard
+Formatted listing of all configuration files is managed by the DocManager
+ class.
+ 
+\end_layout
+
+\begin_layout Standard
+To generate the configuration files in html format:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck DocManager -d <directory name> -t html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The files are generated to the directory set with -d.
+ Point your browser to the index.html file in the directory to get links
+ to each configuration file.
+\end_layout
+
+\begin_layout Standard
+To get the same but in plain text:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck DocManager -d <directory name> -t text
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If -d is omitted the files file be created in the default directory 
+\emph on
+bisheckdoc
+\emph default
+.
+ The default value for -t is html.
+\end_layout
+
+\begin_layout Section
+Validating configuration files
+\end_layout
+
+\begin_layout Standard
+To validate if the xml configuration files are correct the following command
+ will return 0 if correct.
+ Use $? to see return status.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck ConfigurationManager -v; echo $?
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Twenty4HourThreshold testing
+\end_layout
+
+\begin_layout Standard
+To verify which threshold rule that will used for a specific host, service
+ and service item for a specific date run:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck threshold.Twenty4HourThreshold -h erphost -s orders -i ediorders
+ -d 20111207
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above command will show which threshold definition that will be used
+ for host erphost, service orders and serviceitem ediorders on seventh of
+ December 2012.
+ If -d is omitted the current date will be used.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Releases"
+
+\end_inset
+
+Releases
+\end_layout
+
+\begin_layout Section
+Release 0.4.3 - 2013-03-27
+\end_layout
+
+\begin_layout Standard
+This release is a minor upgrade.
+ 
+\end_layout
+
+\begin_layout Subsection
+New feature
+\end_layout
+
+\begin_layout Itemize
+[FR-231] 
+\begin_inset Quotes eld
+\end_inset
+
+Add Livestatus as a new server integration alongside nsca and nrdp
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For more information please see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Nagios-integration-with"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+[FR-236] 
+\begin_inset Quotes eld
+\end_inset
+
+Extended configuration of threshold for threshold class Twenty4HourThreshold
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For more information please see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:24thresholds.xml"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+The installer script was updated to manage configuration of JMX.
+ The installer add switches for which JMX port to use (-p), which JMX RMI
+ server IP address to bind the port to (-i) and if authentication should
+ be enforced or not (-a).
+ This is related to the [TR-238].
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+If Bisconf will be used its required to configure JMX RMI support by defining
+ hostname/IP and port.
+\end_layout
+
+\begin_layout Itemize
+The internal surveillance of Bischeck that is based on JMX Mbeans was cleaned
+ up.
+ For more information see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:bischeck-internal-surveillance"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+The initial configuration files have changed to an example using a Nagios
+ check command instead of the previous example that used a database connection
+ to mysql.
+ This will be easier to get started with since no JDBC drivers for mysql
+ is required.
+ For more information see the section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Getting-started"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-235] 
+\begin_inset Quotes eld
+\end_inset
+
+NullPointer in management of exponential data
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+[TR-237] 
+\begin_inset Quotes eld
+\end_inset
+
+Faulty behavior for property lastStatusCacheDumpDir
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+[TR-238] 
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck will not start without hostname in /etc/hosts
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This is not a bug in Bischeck, but more a configuration of JMX to work
+ with remote connections.
+ The install script how been updated to manage the this in a better way.
+ 
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.4.3 support upgrade from release 0.4.2.
+\end_layout
+
+\begin_layout Section
+Release 0.4.2 - 2012-12-21
+\end_layout
+
+\begin_layout Standard
+Except for the new features introduced and bugs that has been fixed in 0.4.2,
+ there has also been some major work in making Bischeck more stable and
+ performance enhanrunning many host, service and service items configurations.
+ Our goal has been to secure a stable resource utilization of the Java virtual
+ machine (jvm) when running Bischeck over a long period of time.
+\end_layout
+
+\begin_layout Subsection
+New feature
+\end_layout
+
+\begin_layout Itemize
+[FR-234] Distribute the start time when running interval based scheduling.
+ This will increase the distribution of service executions especially if
+ Bischeck is configured with many services that is executed on the same
+ interval.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-233] Support for server integration with Graphite.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Graphite"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+[FR-232] Support for executing check commands.
+ The check commands that can be used must support an output of performance
+ data.
+ Bischeck will not care about the status that comes from a check command.
+ Instead it will only use the performance data to evaluate its own threshold.
+ This include the new service class 
+\emph on
+ShellService
+\emph default
+ and serviceitem class 
+\emph on
+CheckCommandServiceItem
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+[FR-224] Support for NRDP through the new server class NRDPServer.
+\end_layout
+
+\begin_layout Itemize
+Related to bug [TR-227 ] the naming of host, service and serviceitem names
+ has been improved.
+ For more info please see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Naming-standard"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Execution statements and thresholds hour specification where cache data
+ is retrieved as a list, like in a function as avg(x-y-z[4:10]) and max(x-y-z[-5
+M:-15M]), can now be configured to return a value as long as at lest one
+ index in the range is not null.
+ To support backwards capability the new functionality will only be used
+ if the property 
+\emph on
+notFullListParse
+\emph default
+ is set to true in the properties.xml.
+ The default value is false.
+ Read more about this option 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Null-value-in"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+There has been some discussion about what Nagios state should be sent if
+ the a the returned execute statement of a service item is null.
+ In previous releases this has been hard coded to OK, but now its possible
+ to define it by setting the property 
+\emph on
+stateOnNull
+\emph default
+.
+ The property can be set to an integer 0,1,2 or 3 or to a string OK, WARNING,
+ CRITICAL or UNKNOWN.
+ The default is UNKNOWN.
+\end_layout
+
+\begin_layout Itemize
+When a service class get an exception when creating a connection the previous
+ versions did not save any data to the cache.
+ If the property 
+\emph on
+saveNullOnConnectionError
+\emph default
+ you will now get a null value inserted into the cache when a connection
+ exception is thrown.
+ For backwards compatibility the default value of the property is false.
+ 
+\end_layout
+
+\begin_layout Itemize
+More mathematical functions like multNull and divNull that support null
+ value as part of the calculation and can be used with functions that take
+ a list of numbers to manage calculation where cache data may be null.
+ 
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-227] 
+\begin_inset Quotes eld
+\end_inset
+
+Cache parser do not work for host, service or serviceitems if the name include
+ 0 (zero)
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+[TR-228] 
+\begin_inset Quotes eld
+\end_inset
+
+Threshold factory return wrong threshold definition if service and serviceitem
+ name is the same for different hosts
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+[TR-229] 
+\begin_inset Quotes eld
+\end_inset
+
+When using service ShellService the number of open files limit will be reached
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+[TR-230] 
+\begin_inset Quotes eld
+\end_inset
+
+NRDP submissions all come in as OK
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+Fixed migration script from 0.4.0 to copy 
+\emph on
+etc
+\emph default
+ directory content correctly.
+ Changes in the file 
+\emph on
+urlservices.xm
+\emph default
+l will be overwritten.
+ Existing 0.4.0 configuration will still be available in the previous version
+ backup directory, bischeck_0.4.0.
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.3.3, 0.4.0 and 0.4.1 is supported for upgrade to 0.4.2.
+ The upgrading is NOT applicable for release candidate.
+\end_layout
+
+\begin_layout Section
+Release 0.4.1 - 2012-10-01
+\end_layout
+
+\begin_layout Subsection
+New feature
+\end_layout
+
+\begin_layout Itemize
+[FR-224] 
+\series bold
+Beta
+\series default
+ support for NRDP through the new server class NRDPServer.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Beta
+\series default
+ support for executing check commands.
+ The check commands that can be used must support an output of performance
+ data.
+ Bischeck will not care about the status that comes from a check command.
+ Instead it will only use the performance data to evaluate its own threshold.
+ This include the new service class 
+\emph on
+ShellService
+\emph default
+ and serviceitem class 
+\emph on
+CheckCommandServiceItem
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+[FR-223] Instrumentation metrics provided by 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://metrics.codahale.com/"
+
+\end_inset
+
+ has been implemented to enable fine grain real time process measuring through
+ JMX.
+ This is implemented for 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+All external interfaces to measure response time
+\end_layout
+
+\begin_layout Itemize
+Service execution time
+\end_layout
+
+\begin_layout Itemize
+Threshold processing time, etc.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-225] 
+\begin_inset Quotes eld
+\end_inset
+
+A service url that has no equivalent in urlservices.xml generate a NullPointerExc
+eption
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+[TR-226] 
+\begin_inset Quotes eld
+\end_inset
+
+For thresholds with more the two decimals will not be correctly validated
+\begin_inset Quotes erd
+\end_inset
+
+ has been fixed.
+ The bug was related to when Bischeck was used with data points with many
+ decimals, like the result from a ping.
+ Bischeck would strip of all decimals except 2 with caused small values
+ to become 0.
+ Now Bischeck will determine the number of decimals used by the collected
+ data point and use it when formatting the calculated threshold, warning
+ and critical value.
+ This will hopefully make data presented in Nagios UIs and graphs like pnp4nagio
+s look better.
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.4.0 is supported for upgrade to 0.4.1.
+\end_layout
+
+\begin_layout Section
+Release 0.4.0 - 2012-08-31
+\end_layout
+
+\begin_layout Subsection
+New feature
+\end_layout
+
+\begin_layout Itemize
+[FR-197] Support for different and multiple integration with different surveilla
+nce and monitoring systems.
+ With version 0.4.0 Bischeck is not limited to send data to Nagios.
+ It can now send the data to multiple Nagios servers and to other servers
+ like OpenTSB.
+ This is done by moving server formatting and protocol to server integration
+ classes that implements the interface com.ingby.socbox.bischeck.servers.Server.
+ The server integration is described in the xml configuration file servers.xml.
+ This also means that that some Nagios NSCA specific properties previous
+ configured in properties.xml has been moved to the servers.xml file in the
+ NSCA section.
+ The OpenTSDB server class should be regarded as beta.
+\end_layout
+
+\begin_layout Itemize
+[FR-204] The bischeck cache will be saved when the bischeck daemon is shutdown
+ and reloaded on bischeck startup.
+ Keeping the cache persistent between restarts is important since 0.4.0 support
+ time based cache retrieval.
+ The limitations is currently that if the Bischeck daemon is killed by a
+ signal that can not be caught or the daemon crash the data will not be
+ saved.
+ This will be improved in future versions.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-202] The implementation of running bischeck once, in a none daemon mode,
+ is changed so the same code is used as running in daemon mode.
+ The only difference is that the initialization of triggers are different
+ so all service items are just ran directly and and just once.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-218] The bischeck daemon can now reload the configuration without a
+ process restart.
+ This is support through the JMX operation 
+\begin_inset Quotes eld
+\end_inset
+
+reload
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The feature will limit the need of operating system access and authorization.
+\end_layout
+
+\begin_layout Itemize
+[FR-219] Bischeck can now retrieve state and performance data from a Nagios
+ server supporting livestatus.
+ With the service class LivestatusService a connection is set up over livestatus
+ and with the and serviceitem class LivestatusServiceItem state and/or performan
+ce data can be retrieved from the a Nagios service.
+ This can be useful when when creating virtual services in Bischeck or used
+ in complex thresholds.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-220] Bischeck now support one additional scheduling method where scheduling
+ can be defined to run a service after a different service has executed.
+ This can be useful when a service is depending on data for another service
+ for its thresholds or execution statement.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-221] Cache retrieval is now support by using a time offset to find the
+ nearest cache element to the time offset.
+ 
+\end_layout
+
+\begin_layout Itemize
+Cache data can be retrieved as a list of elements based both on index and
+ time.
+\end_layout
+
+\begin_layout Itemize
+Support for additional mathematical functions like average, min and max
+ calculations on list of elements.
+\end_layout
+
+\begin_layout Itemize
+Bischeck can now support the usage of cached data in an execution statement
+ of a serviceitem.
+ This is typical useful when a serviceitem execute statement is depending
+ on other service data.
+ For example in a SQL query string:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+select value from table1 where id = host1-web-state[0] and createdate =
+ '%%yyyy-MM-dd%%'");
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Added support for other Linux distributions then Redhat based.
+ Bischeck should now install on Debian 6 and Ubuntu 10/11.
+ 
+\end_layout
+
+\begin_layout Itemize
+Configuration listing.
+ The configuration listing has been moved from the ConfigurationManager
+ class to the DocManager class.
+ Currently html and text listing is supported.
+ The generated configuration data will by default placed in the 
+\emph on
+bischeckdoc
+\emph default
+ directory.
+ 
+\end_layout
+
+\begin_layout Itemize
+A configured service can be configured not to send its data to a the configured
+ monitoring servers like Nagios.
+ This can be useful if the service is just to be used to create virtual
+ services or just to be used as thresholds.
+ 
+\end_layout
+
+\begin_layout Itemize
+The bischeck script now support JMX authentication.
+ The authentication files are located in the etc directory and named jmxremote.pa
+ssword and jmxremote.access.
+ Default is to that authentication is disabled by the system property
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Quotes eld
+\end_inset
+
+-Dcom.sun.management.jmxremote.authenticate=false
+\begin_inset Quotes erd
+\end_inset
+
+.
+ To enable authentication set the property to true.
+ For more info about JMX see 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+The Twenty4Thresholds class was in previous version not doing a correct
+ linear equation calculation if a expression based threshold was defined.
+ Lets illustrate the errors with this example from the 24thresholds.xml configura
+tion file having a mix with static and expression based thresholds.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+....
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 12:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>7000</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 13:00 -->     
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>testhost-testservice-testitem[1] / 3</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 14:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>testhost-testservice-testitem[1] / 2</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 15:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>testhost-testservice-testitem[1] + 1000 </hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 16:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>12000</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+....
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the previous version the threshold value between 12:00 and 13:00 would
+ be null since it was a mix of static and expression based thresholds.
+ And between 15:00 and 16:00 the threshold would have been calculated as
+ 
+\begin_inset Quotes eld
+\end_inset
+
+testhost-testservice-testitem[1] + 1000
+\begin_inset Quotes erd
+\end_inset
+
+ independent of the time between 15:00 and 16:00.
+\end_layout
+
+\begin_layout Standard
+Now the linear equation will correctly be calculated with any mix of static
+ and expression based definitions.
+ In the above example the calculated threshold for 12:20 will now be:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+20*((testhost-testservice-testitem[1]/3) - 7000)/60 + 7000
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This fix will improve the correctness and also the capability of threshold
+ adaptivity.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The Service interface has a number of new methods that should been there
+ from the beginning.
+ If you developed any service class you need to add these, but if you just
+ inherited ServiceAbstract its fixed for you.
+ The new methods are:
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+public NAGIOSSTAT getLevel(); 
+\end_layout
+
+\begin_layout Plain Layout
+
+public void setLevel(NAGIOSSTAT level); 
+\end_layout
+
+\begin_layout Plain Layout
+
+public boolean isConnectionEstablished(); 
+\end_layout
+
+\begin_layout Plain Layout
+
+public void setConnectionEstablished(boolean connected); 
+\end_layout
+
+\begin_layout Plain Layout
+
+public Boolean isSendServiceData(); 
+\end_layout
+
+\begin_layout Plain Layout
+
+public setSendServiceData(Boolean sendServiceData);
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Property 
+\emph on
+cacheclear
+\emph default
+ is renamed to 
+\emph on
+thresholdCacheClear
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+All the nsca related properties has been moved from properties.xml to servers.xml
+ when used for the NSCAServer class.
+ The new property names has also gone through some minor changes.
+ When upgrading a manual update is needed of the servers.xml file with the
+ current setting of nsca related properties in properties.xml.
+ Recommended that these are later removed.
+\end_layout
+
+\begin_layout Itemize
+All JAXB generated configuration classes now support serialization.
+ 
+\end_layout
+
+\begin_layout Itemize
+Quartz jar is upgraded from 2.0.1 to 2.1.5.
+\end_layout
+
+\begin_layout Itemize
+[TR-216] 
+\begin_inset Quotes eld
+\end_inset
+
+Shutdown is automatic triggered
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+[TR-217] 
+\begin_inset Quotes eld
+\end_inset
+
+Configuration Manager initialization failed with java.lang.NullPointerException
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+[TR-207] 
+\begin_inset Quotes eld
+\end_inset
+
+sudo in bischeckd script cause problem at boot
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.3.3 and 0.4.0_RC2 are supported for upgrade to 0.4.0.
+\end_layout
+
+\begin_layout Section
+Release 0.3.3 - 2011-11-14
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+Bischeck are no longer limited to just be integrated with a single Nagios
+ server over the NSCA protocol.
+ Now is it possible to integrate with multiple monitoring servers over different
+ protocols.
+ Currently Nagios/NSCA and OpenTSDB is support.
+ To enable this a new class component called Server has been introduced.
+ The class is responsible for communication and formatting for the specific
+ monitoring server it integrate against.
+ A new configuration file, server.xml is used for configuration of server
+ integration.
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-207] 
+\begin_inset Quotes eld
+\end_inset
+
+sudo in bischeckd script cause problem at boot
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+[TR-214] 
+\begin_inset Quotes eld
+\end_inset
+
+Threshold object cache is no cleared
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Release 0.3.2 - 2011-07-29
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+The configuration system has been completely rewritten and now us xml based
+ configuration files.
+ Each configuration file has a corresponding xsd file that can be used for
+ verifications.
+ The dependencies to sqlite3 has been deprecated and is just part of this
+ release to support upgrade.
+ 
+\end_layout
+
+\begin_layout Itemize
+The scheduling of services and its related serviceitem(s) has been rewritten
+ to support different scheduling polices per service instead of earlier
+ versions of fixed interval scheduling.
+ With 0.3.2 each service can have one to many schedule tags in bischeck.xml
+ configuration file.
+ For more info please see the chapter 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "label:Service-scheduling"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+The active attribute on Hosts, Services and Serviceitem has been removed.
+\end_layout
+
+\begin_layout Itemize
+The interface com.ingby.socbox.bischeck.threshold.Threshold has a new signature
+ on the method init().
+ This method now throws Exception.
+ 
+\end_layout
+
+\begin_layout Itemize
+The Service interface has two additional methods, setSchedules() and getSchedule
+s().
+ 
+\end_layout
+
+\begin_layout Itemize
+The Service interface has changed the signature of getServicesItems() to
+ return Map instead of HashMap.
+ 
+\end_layout
+
+\begin_layout Itemize
+buildr has been replaced by ant as the build management system.
+\end_layout
+
+\begin_layout Section
+Release 0.3.1 - 2011-04-08 
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+The ServiceFactory class now use a property table, urlservice, to map what
+ Service class should be instantiate for a specific url schema.
+ The url schema is the key.
+ The current default mapping are: 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+jdbc -> JDBCService 
+\end_layout
+
+\begin_layout Itemize
+bischeck -> LastCacheService
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The ServiceItemFactory class use an additional field, serviceitemclass,
+ in the items configuration table to determine what ServiceItem class to
+ instantiate.
+\end_layout
+
+\begin_layout Itemize
+Calendar in Bischeck follows the ISO 8601 date standard by default.
+ This means that the first day in the week is Monday, day 2 according to
+ java.utilCalendar, and that the first week of the year must have a minimum
+ of 4 days.
+ The importance of this is to get the week numbering correct that is used
+ in the configuration in Twenty4HourThreshold class, but day one (1) in
+ the week is still Sunday when defining the tag dayofweek in 24threshols.xml.
+ The setting can be overidden by setting the properties 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+mindaysinfirstweek
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ (default 4) and 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+firstdayofweek
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ (default 2) in the properties.xml file.
+ 
+\end_layout
+
+\begin_layout Itemize
+If no threshold class has been specified, null in the thresholdclass field
+ in the items table, Bischeck will instantiate the “empty” class DummyThreshold.
+\end_layout
+
+\begin_layout Itemize
+For all class configuration of Service, ServiceItem and Threshold its now
+ possible to specify the class name without the package path if the class
+ is part of the Bischeck distribution.
+ 
+\end_layout
+
+\begin_layout Itemize
+Clean up of the exception handling process when starting Bischeck.
+ Now the execution should not start if there are configuration issues with
+ missing classes for Service, ServiceItem and Threshold.
+ 
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues 
+\end_layout
+
+\begin_layout Itemize
+N/A
+\end_layout
+
+\begin_layout Subsection
+Upgrade issues 
+\end_layout
+
+\begin_layout Itemize
+Upgrade by doing a fresh installation, but first save the old installation
+ directory.
+ After saving the old installation do a new install.
+ Then copy the files bischeck.conf and 24threshold.conf from old to new installati
+on dir.
+\end_layout
+
+\begin_layout Itemize
+The field serviceitemclass (varchar(256)) in table items in configuration
+ database bischeck.conf must be manual added and populated with the right
+ Service class name.
+ If corresponding service is jdbc:// set the field serviceitemclass to SQLServic
+eItem and if the service is bischeck:// set the field to CalculateOnCache.
+\end_layout
+
+\begin_layout Itemize
+To add the column:
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ sqlite3 bischeck.conf sqlite> ALTER TABLE items ADD COLUMN serviceitemclass
+ varchar(256);
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Update the serviceitemclass for all rows in items: 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+sqlite> update items set serviceitemclass='SQLServiceItem' where ....
+ ....
+ 
+\end_layout
+
+\begin_layout Itemize
+sqlite> update items set serviceitemclass='CalculateOnCache' where .....
+ ....
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Add the new table url2service in database bischeck.conf.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ cat << EOF | sqlite3 bischeck.conf 
+\end_layout
+
+\begin_layout Plain Layout
+
+drop table IF EXISTS urlservice; 
+\end_layout
+
+\begin_layout Plain Layout
+
+create table urlservice(key varchar(128), value varchar(256)); 
+\end_layout
+
+\begin_layout Plain Layout
+
+insert into urlservice values ("jdbc","JDBCService"); 
+\end_layout
+
+\begin_layout Plain Layout
+
+insert into urlservice values ("bischeck","LastCacheService"); 
+\end_layout
+
+\begin_layout Plain Layout
+
+EOF
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Copy all file located in the old installation customlib directory to the
+ customlib directory in the new installation.
+\end_layout
+
+\begin_layout Section
+Release 0.3.0 - 2011-03-03 
+\end_layout
+
+\begin_layout Subsection
+New features 
+\end_layout
+
+\begin_layout Itemize
+This is the first binary distribution, but should be regarded as a beta
+ version.
+ 
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+N/A
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:System-requirements"
+
+\end_inset
+
+System requirements
+\end_layout
+
+\begin_layout Standard
+Bischeck should run on any operating system that supports Java 6.
+ The installation script and init scripts are supported on Redhat and Debian
+ equivalent Linux distributions.
+ Running on none Linux operating system has not been tested.
+\end_layout
+
+\begin_layout Standard
+The following jar packages are distributed as part of the Bischeck distribution.
+ All these packages have their own open source licenses.
+ 
+\end_layout
+
+\begin_layout Itemize
+commons-lang-2.5.jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/lang/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-cli-1.2.jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/cli/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+log4j-1.2.16.jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://logging.apache.org/log4j/ Apache project
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+quartz-2.1.5.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.quartz-scheduler.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+jsendnsca-2.0.1.jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://code.google.com/p/jsendnsca/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+slf4j-api-1.6.0.jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.slf4j.org/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.opensource.org/licenses/mit-license.php
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+slf4j-log4j12-1.6.0.jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.slf4j.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.opensource.org/licenses/mit-license.php
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+jep-2.3.1.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://sourceforge.net/projects/jep/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.gnu.org/licenses/gpl-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+json-lib-2.4 - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://json-lib.sourceforge.net/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+ezmorph-1.0.6.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ezmorph.sourceforge.net/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-beanutils-1.8.3.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/beanutils/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-collections-3.2.1.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/collections/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+metrics-core.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/codahale/metrics
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+All jar files distributed as part of Bischeck are located in the lib directory.
+ 
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:bischeck-license"
+
+\end_inset
+
+Bischeck license 
+\end_layout
+
+\begin_layout Standard
+Bischeck is licensed under GNU license version 2.
+ For more info please visit 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.gnu.org/licenses/gpl-2.0.htm
+\end_layout
+
+\end_inset
+
+l
+\end_layout
+
+\begin_layout Chapter
+Bug reports and feature requests
+\end_layout
+
+\begin_layout Standard
+Please submit bug reports and feature requests on 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+www.bischeck.org
+\end_layout
+
+\end_inset
+
+ in the Forge section.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Credits"
+
+\end_inset
+
+Credits
+\end_layout
+
+\begin_layout Standard
+Thanks to all people who has developed all the great software that Bischeck
+ depends on, and especially all who made Nagios and the Nagios community
+ a success.
+ A special thanks goes to Peter Johansson and his colleagues at DHL Freight
+ Sweden for sponsoring the development and providing ideas and important
+ feedback.
+ 
+\end_layout
+
+\end_body
+\end_document
