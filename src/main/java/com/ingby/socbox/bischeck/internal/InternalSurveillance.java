@@ -47,9 +47,9 @@ public class InternalSurveillance implements Job {
 
 		bischeckHostName = ConfigurationManager.getInstance().getProperties().getProperty("bischeckHostName","bischeck");
 		boolean sendInternal= Boolean.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("sendInternal","false"));
-		String sendInternalInterval= ConfigurationManager.getInstance().getProperties().getProperty("sendInternalInterval","0 */10 * * * ? *");
+		String sendInternalInterval= ConfigurationManager.getInstance().getProperties().getProperty("sendInternalInterval","0 */5 * * * ? *");
 		if (!CronExpression.isValidExpression(sendInternalInterval)){
-			sendInternalInterval= "0 */10 * * * ? *";
+			sendInternalInterval= "0 */5 * * * ? *";
 		}
 		
 		if (sendInternal) {
