@@ -21,7 +21,7 @@
     <servicedeftemplate templatename="sshResponse">
         
         <period>
-            <calcmethod>&gt;</calcmethod>
+            <calcmethod>&lt;</calcmethod>
             <warning>5</warning>
             <critical>10</critical>
             <hoursIDREF>0</hoursIDREF>
