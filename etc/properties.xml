@@ -17,10 +17,7 @@
         <key>thresholdCacheClear</key>
         <value>10 0 00 * * ? *</value>
     </property>
-    <property>
-        <key>JDBCSerivce.querytimeout</key>
-        <value>5</value>
-    </property>
+   
     <property>
         <key>mindaysinfirstweek</key>
         <value>4</value>
@@ -29,22 +26,22 @@
         <key>firstdayofweek</key>
         <value>2</value>
     </property>
+    
     <property>
         <key>stateOnNull</key>
-        <value>3</value>
+        <value>UNKNOWN</value>
     </property>
+    
     <property>
         <key>notFullListParse</key>
         <value>true</value>
     </property>
+    
     <property>
         <key>sendInternal</key>
         <value>true</value>
     </property>
-    <property>
-        <key>sendInternalInterval</key>
-        <value>0 */1 * * * ? *</value>
-    </property>
+   
     
     <!--
         New properties for the redis based cache  
