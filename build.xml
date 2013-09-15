@@ -166,10 +166,12 @@
             </fileset>
         </copy>
         
+    	<!--
 	    <copy todir="${build.home}/examples">
             <fileset dir="${examples.home}"/>
         </copy>
-        
+        -->
+    	
     	<!--
         <copy todir="${build.home}" file="${docs.home}/README" />
     	-->
