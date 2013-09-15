@@ -174,10 +174,11 @@ public final class Execute implements ExecuteMBean {
         do {
         	
         	try {
-        		if (line.hasOption("deamon")) 
+        		if (line.hasOption("deamon")) { 
         			ConfigurationManager.init();
-        		else 
+        		} else {  
         			ConfigurationManager.initonce();
+        		}
         	} catch (Exception e) {
         		LOGGER.error("Creating bischeck Configuration Manager failed with:" + e.getMessage());
         		System.exit(FAILED);
@@ -259,11 +260,13 @@ public final class Execute implements ExecuteMBean {
         //CacheFactory.close();
         LOGGER.info("******************* Shutdown ********************");
         
-        if (reloadRequested) 
-        	return RESTART;
-        else
+        if (reloadRequested) { 
+        	return RESTART;	
+        } else {
         	return OKAY;
+        }
     }
+    
 
     /**
      * The first time the daemon method is called this method will be invoked
@@ -288,6 +291,7 @@ public final class Execute implements ExecuteMBean {
 		try {
 		    System.in.close();
 		} catch (IOException ignore) {}
+	
 		System.out.close();
 		System.err.close();
 
@@ -348,6 +352,7 @@ public final class Execute implements ExecuteMBean {
             } 
         
         } while (!isShutdownRequested());
+		
 		allowReload = false;
 	}
 
@@ -405,18 +410,11 @@ public final class Execute implements ExecuteMBean {
 	 */
 	private Scheduler initScheduler() throws SchedulerException {
 		Scheduler sched = null;
-		try {
-            LOGGER.info("Create scheduler");
-            sched = StdSchedulerFactory.getDefaultScheduler();
-        } catch (SchedulerException e) {
-            LOGGER.warn("Scheduler creation failed with exception " + e);    
-            throw e;
-        }
-        
+		
         try {
             LOGGER.info("Start scheduler");
+            sched = StdSchedulerFactory.getDefaultScheduler();
             sched.start();
-            LOGGER.info("Start scheduler - done");
         } catch (SchedulerException e) {
             LOGGER.warn("Scheduler failed to start with exception " + e);
             throw e;
@@ -426,7 +424,6 @@ public final class Execute implements ExecuteMBean {
         try {
             LOGGER.info("Add scheduler listener");
             sched.getListenerManager().addJobListener(jobListener, allJobs());
-            LOGGER.info("Add scheduler listener - done");
         } catch (SchedulerException e) {
             LOGGER.warn("Add listener failed with exception "+ e);
             throw e;    
@@ -476,8 +473,7 @@ public final class Execute implements ExecuteMBean {
 
         try {
                 Thread.sleep(shutdownsleep);
-        }
-        catch(InterruptedException e) {
+        } catch(InterruptedException e) {
             LOGGER.error("Interrupted which waiting on main daemon thread to complete.");
         }
     }
@@ -555,7 +551,7 @@ public final class Execute implements ExecuteMBean {
 
             List<String> triggerGroups = sched.getTriggerGroupNames();
             for (String triggergroup: triggerGroups) {
-                //Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.groupEquals(triggergroup));
+               
                 Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggergroup));
                 
                 Iterator<TriggerKey> iter = keys.iterator();
@@ -568,9 +564,7 @@ public final class Execute implements ExecuteMBean {
                             trigger.getNextFireTime());        
                 }
             }
-        
-        }
-        catch (SchedulerException se) {
+        } catch (SchedulerException se) {
             LOGGER.error("Build trigger list failed, " + se);
         }
         
@@ -592,12 +586,11 @@ public final class Execute implements ExecuteMBean {
             Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
             List<String> triggerGroups = sched.getTriggerGroupNames();
             for (String triggergroup: triggerGroups) {
-                //Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.groupEquals(triggergroup));
-                Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggergroup));
+               
+            	Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggergroup));
                 
                 numberoftriggers += keys.size();
             }
-      
         } catch (SchedulerException se) {
             LOGGER.error("Build trigger list failed, " + se);
         }
@@ -613,9 +606,9 @@ public final class Execute implements ExecuteMBean {
 		BufferedReader br = null;
 		String path = null;
 		
-		if (System.getProperty("bishome") != null)
+		if (System.getProperty("bishome") != null) {
 			path=System.getProperty("bishome");
-		else {
+		} else {
 			LOGGER.error("System property bishome must be set");
 		}
 
@@ -628,9 +621,8 @@ public final class Execute implements ExecuteMBean {
 			LOGGER.info("Bisheck version is " + bischeckversion);
 		} catch (Exception ioe) {
 			bischeckversion = "N/A";
-			LOGGER.error("Can not determine the bischeck version");
-		}
-		finally {
+			LOGGER.warn("Can not determine the bischeck version");
+		} finally {
 			try {
 				br.close();
 			} catch (Exception ignore) {}
