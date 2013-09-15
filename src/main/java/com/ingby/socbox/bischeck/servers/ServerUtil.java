@@ -7,15 +7,19 @@ import com.ingby.socbox.bischeck.service.Service;
 public class ServerUtil {
 
 	public static String logFormat(String instanceName, Service service, String message) {
+		
+		return logFormat(instanceName, service.getHost().getHostname(),service.getServiceName(), message);
+	}
+
+	public static String logFormat(String instanceName, String hostName, String serviceName, String message) {
 		StringBuffer strbuf = new StringBuffer();
 		strbuf.append(instanceName).
 		append(":").
-		append(service.getHost().getHostname()).
+		append(hostName).
 		append(":").
-		append(service.getServiceName()).
+		append(serviceName).
 		append(":").
 		append(message);
-		
 		
 		return strbuf.toString();
 	}
