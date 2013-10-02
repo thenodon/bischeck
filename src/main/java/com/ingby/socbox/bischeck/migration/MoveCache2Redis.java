@@ -36,6 +36,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.quartz.impl.StdSchedulerFactory;
 
 
 import com.ingby.socbox.bischeck.cache.CacheFactory;
@@ -51,13 +52,17 @@ import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
 public class MoveCache2Redis {
 
 	
+	private static boolean verbose = false;
+	private static boolean check = false;
+
 	public static void main(String[] args) throws Exception {
 		CommandLineParser parser = new GnuParser();
 		CommandLine line = null;
 		// create the Options
 		Options options = new Options();
 		options.addOption( "u", "usage", false, "show usage." );
-		options.addOption( "v", "verbose", false, "verbose - do not write to files" );
+		options.addOption( "v", "verbose", false, "verbose output" );
+		options.addOption( "c", "check", false, "check - do not write to files" );
 		options.addOption( "f", "cachefile", true, "The name of the cache file" );
 
 
@@ -75,16 +80,27 @@ public class MoveCache2Redis {
 			formatter.printHelp( "MoveCache2Redis", options );
 			System.exit(0);
 		}
+		
+		if (line.hasOption("verbose")) {
+			verbose = true;
+		}
 
+		if (line.hasOption("check")) {
+			check = true;
+		}
 
 		if (!line.hasOption("cachefile")) {
 			System.out.println("Please supply cache file name");
 			System.exit(1);
 		}
 
-
+		ConfigurationManager.init();
+		CacheFactory.init();
+		
 		loaddump(line.getOptionValue("cachefile"));
 
+		CacheFactory.destroy();
+		StdSchedulerFactory.getDefaultScheduler().shutdown();
 	}
 
 
@@ -113,11 +129,10 @@ public class MoveCache2Redis {
 
 			xmlobj = getXMLFromBackend(xmlobj, dumpfile, jc);
 
-			ConfigurationManager.init();
-			CacheFactory.init();
 			CacheInf lsc = CacheFactory.getInstance();
 			
 			XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
+			long totalCountEntries = 0;
 			for (XMLKey key:cache.getKey()) {
 				countKeys++;
 				
@@ -130,23 +145,32 @@ public class MoveCache2Redis {
 					
 					countEntries++;
 				}   
-				for (LastStatus ls: list) {
-					lsc.add(ls, key.getId());	
-				}
 				
-				System.out.println("Cache loaded " + key.getId() +  " number of entries " + countEntries);
+				totalCountEntries += countEntries;
+				
+				if (verbose)
+					System.out.println("Loading : " + key.getId());
+			
+				for (LastStatus ls: list) {
+					if (verbose)
+						System.out.println(ls.getJson());
+					if (!check) {
+						lsc.add(ls, key.getId());	
+					}
+				}
+				System.out.println("Loaded " + key.getId() +  ": Number of entries " + countEntries);
 			}
 
 			long end = System.currentTimeMillis();
-			System.out.println("Cache loaded " + countKeys + " keys and " +
-					countEntries + " entries in " + (end-start) + " ms");
+			System.out.println("Loaded totally " + countKeys + " keys and " +
+					totalCountEntries + " entries in " + (end-start) + " ms");
 		} else {
 			System.out.println("Cache file do not exists - will be created on next shutdown");
 			throw new Exception();
 		}
-
 	}
 
+	
 	public static Object getXMLFromBackend(Object xmlobj, File configfile, JAXBContext jc)
 			throws Exception {
 		try {
