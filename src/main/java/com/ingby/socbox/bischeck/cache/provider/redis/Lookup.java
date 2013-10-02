@@ -22,11 +22,13 @@ public final class Lookup {
 
 	private final static String DICTIONARY = "dictionary";
 
-	private Lookup(JedisPoolWrapper jedispool) {
+	private Lookup(JedisPoolWrapper jedispool) throws JedisConnectionException {
 		this.jedispool = jedispool;
-
-		Jedis jedis = this.jedispool.getResource();
+		Jedis jedis = null;
+		
+		
 		try {
+			jedis = this.jedispool.getResource();
 			for (String keyname : jedis.hgetAll(DICTIONARY).keySet()) {
 				name2id.put(keyname, jedis.hget(DICTIONARY, keyname));
 				//id2name.put(jedis.hget(DICTIONARY, keyname), keyname);
@@ -35,13 +37,14 @@ public final class Lookup {
 			}
 		} catch (JedisConnectionException je) {
 			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			throw je;
 		} finally {
 			this.jedispool.returnResource(jedis);
 		}
 	}
 
 	
-	public static Lookup init(JedisPoolWrapper jedispool) {
+	public static Lookup init(JedisPoolWrapper jedispool) throws JedisConnectionException {
 
 		Lookup lookup = new Lookup(jedispool);
 		return lookup;
