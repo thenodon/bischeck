@@ -24,6 +24,9 @@
 program=$1
 shift
 arg=$@
+
+export LC_ALL=en_US.UTF-8
+
 bishome=%BISHOME%
 
 port=%JMXPORT%
