@@ -21,9 +21,11 @@ package com.ingby.socbox.bischeck;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +46,7 @@ public abstract class Util {
     private final static Pattern ISNULLIN = Pattern.compile(".*null.*");
     private static Map<String,DecimalFormat> decFormatMapCache = new HashMap<String, DecimalFormat>();
     
+    private final static DecimalFormatSymbols DECIMALSEP = new DecimalFormatSymbols(new Locale("us_US"));
 	/**
      * Obfuscate a string including password= until none character or number. 
      * @param url typical a url string
@@ -89,11 +92,14 @@ public abstract class Util {
 
     		StringBuffer strbuf = new StringBuffer();
     		strbuf.append("#.");
-    		for (int i = 0; i< nrdec;i++) 
+    		for (int i = 0; i< nrdec;i++) { 
     			strbuf.append("#");
+    		}
+    		
     		DecimalFormat decformatter = decFormatMapCache.get(strbuf.toString());
+    		
     		if (decformatter == null) {
-    			decformatter = new DecimalFormat(strbuf.toString());
+    			decformatter = new DecimalFormat(strbuf.toString(),DECIMALSEP);
     			decFormatMapCache.put(strbuf.toString(), decformatter);
     		}
     		return Float.valueOf(decformatter.format(d2));
@@ -113,10 +119,21 @@ public abstract class Util {
             //DecimalFormat oneDForm = new DecimalFormat("#");
         	StringBuffer strbuf = new StringBuffer();
         	strbuf.append("#.");
-            for (int i = 0; i< nrdec;i++) strbuf.append("#");
-            DecimalFormat oneDForm = new DecimalFormat(strbuf.toString());
-        	//DecimalFormat oneDForm = new DecimalFormat("#.######");
-            return Float.valueOf(oneDForm.format(d));
+            for (int i = 0; i< nrdec;i++) {
+            	strbuf.append("#");         
+            }
+            
+            DecimalFormat decformatter = decFormatMapCache.get(strbuf.toString());
+            
+            if (decformatter == null) {
+    			decformatter = new DecimalFormat(strbuf.toString(),DECIMALSEP);
+    			decFormatMapCache.put(strbuf.toString(), decformatter);
+    		}
+            
+            //DecimalFormat oneDForm = new DecimalFormat(strbuf.toString(),DECIMALSEP);
+            
+            return Float.valueOf(decformatter.format(d));
+            //return Float.valueOf(oneDForm.format(d));
         }
         return null;
     }
@@ -148,7 +165,6 @@ public abstract class Util {
      * @return the host-service-serviceitem string
      */
     public static String fullName(Service service, ServiceItem serviceitem) {
-    	//StringBuffer strbuf = new StringBuffer();
     	
     	return fullName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName());
     }
