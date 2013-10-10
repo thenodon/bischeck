@@ -95,7 +95,7 @@ public final class ConfigurationManager  {
 
 	public static final String INTERVALSCHEDULEPATTERN = "^[0-9]+ *[HMS]{1} *$";
 
-    private final static Logger  LOOGER = LoggerFactory.getLogger(ConfigurationManager.class);
+    private final static Logger  LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
 
     /*
      * The ConfigurationManager 
@@ -144,7 +144,7 @@ public final class ConfigurationManager  {
         ConfigurationManager.initonce();
         ConfigurationManager confMgmr = ConfigurationManager.getInstance();
         
-        ((ch.qos.logback.classic.Logger) LOOGER).setLevel(Level.WARN);
+        ((ch.qos.logback.classic.Logger) LOGGER).setLevel(Level.WARN);
         
         if (line.hasOption("verify")) {
             System.exit(ValidateConfiguration.verify());
@@ -216,17 +216,17 @@ public final class ConfigurationManager  {
         	
         	// Verify if the pid file is writable
         	if (!configMgr.checkPidFile()) {
-        		LOOGER.error("Can not write to pid file " + configMgr.getPidFile());
+        		LOGGER.error("Can not write to pid file " + configMgr.getPidFile());
         		throw new ConfigurationException("Can not write to pid file " + configMgr.getPidFile());
         	}
         	configMgr.getServerClassMap();
         } catch (Exception e) {
-        	LOOGER.error("Configuration Manager initzialization failed with " + e);
+        	LOGGER.error("Configuration Manager initzialization failed with " + e);
         	throw new ConfigurationException("Configuration Manager initzialization failed",e);
         }
         finally {
         	long duration = context.stop()/1000000;
-			LOOGER.info("Configuration init time:" + duration + " ms");
+			LOGGER.info("Configuration init time:" + duration + " ms");
         }
     	
     }
@@ -277,10 +277,10 @@ public final class ConfigurationManager  {
         	CachePurgeJob.init(this);
             ThresholdCacheClearJob.init(this);
         } catch (SchedulerException e) {
-            LOOGER.error("Quartz scheduler failed with - " + e +" - existing!");
+            LOGGER.error("Quartz scheduler failed with - " + e +" - existing!");
             throw e;
         } catch (ParseException e) {
-            LOOGER.error("Quartz scheduler failed with - " + e +" - existing!");
+            LOGGER.error("Quartz scheduler failed with - " + e +" - existing!");
             throw e;
         }
     }
@@ -362,9 +362,9 @@ public final class ConfigurationManager  {
 
             // Set the macro values
             ConfigMacroUtil.replaceMacros(host);
-            if (LOOGER.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
             	StringBuffer strbuf = ConfigMacroUtil.dump(host);
-            	LOOGER.debug(strbuf.toString());
+            	LOGGER.debug(strbuf.toString());
             }
         }
     }
@@ -384,7 +384,7 @@ public final class ConfigurationManager  {
             // If a template is detected
             if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) { 
             	XMLServicetemplate template = serviceTemplateMap.get(serviceconfig.getTemplate());
-            	LOOGER.debug("Found Service template " + template.getTemplatename());
+            	LOGGER.debug("Found Service template " + template.getTemplatename());
             	service = ServiceFactory.createService(
             			template.getName(),
             			template.getUrl().trim());
@@ -427,11 +427,11 @@ public final class ConfigurationManager  {
             // Common actions
             if (service.getDriverClassName() != null) {
         		if (service.getDriverClassName().trim().length() != 0) {
-        			LOOGER.debug("Driver name: " + service.getDriverClassName().trim());
+        			LOGGER.debug("Driver name: " + service.getDriverClassName().trim());
         			try {
         				Class.forName(service.getDriverClassName().trim()).newInstance();
         			} catch ( ClassNotFoundException e) {
-        				LOOGER.error("Could not find the driver class - " + service.getDriverClassName() + 
+        				LOGGER.error("Could not find the driver class - " + service.getDriverClassName() + 
         						" " + e.toString());
         				throw new Exception(e.getMessage());
         			}
@@ -469,7 +469,7 @@ public final class ConfigurationManager  {
 
         	if (serviceItemTemplateMap.containsKey(serviceitemconfig.getTemplate())){
         		XMLServiceitemtemplate template = serviceItemTemplateMap.get(serviceitemconfig.getTemplate());
-            	LOOGER.debug("Found ServiceItem template " + template.getTemplatename());
+            	LOGGER.debug("Found ServiceItem template " + template.getTemplatename());
             	serviceitem = ServiceItemFactory.createServiceItem(
             			template.getName(),
             			template.getServiceitemclass().trim());
@@ -605,7 +605,7 @@ public final class ConfigurationManager  {
     			//loadClass(clazzname);
     			clazz=(Class<Server>) Class.forName(clazzname);
     		}catch (ClassNotFoundException ee) {
-    			LOOGER.error("Server class " + clazzname + " not found.");
+    			LOGGER.error("Server class " + clazzname + " not found.");
     			throw ee;
     		}
     	}
@@ -662,11 +662,11 @@ public final class ConfigurationManager  {
         	int index = schedule.indexOf("-");
         	String hostname = schedule.substring(0, index);
         	String servicename = schedule.substring(index+1, schedule.length());
-        	LOOGER.debug("Service will run after " + hostname + " " + servicename);
+        	LOGGER.debug("Service will run after " + hostname + " " + servicename);
         	RunAfter runafterkey = new RunAfter(hostname, servicename);
 
         	if (!runafter.containsKey(runafterkey)) {
-        		LOOGER.debug("Add service to " + hostname + " " + servicename);
+        		LOGGER.debug("Add service to " + hostname + " " + servicename);
         		runafter.put(runafterkey, new ArrayList<Service>());		
         	}
         	
@@ -714,7 +714,7 @@ public final class ConfigurationManager  {
                     .startNow()
                     .build();
         } catch (Exception e) {
-            LOOGER.error("Tigger parse error for host " + service.getHost().getHostname() + 
+            LOGGER.error("Tigger parse error for host " + service.getHost().getHostname() + 
                     " and service " + service.getServiceName() + 
                     " for schedule " + schedule);
             throw new Exception(e.getMessage());
@@ -741,7 +741,7 @@ public final class ConfigurationManager  {
             String withoutSpace=schedule.replaceAll(" ","");
             char time = withoutSpace.charAt(withoutSpace.length()-1);
             String value = withoutSpace.substring(0, withoutSpace.length()-1);
-            LOOGER.debug("Time selected "+ time + " : " + value);
+            LOGGER.debug("Time selected "+ time + " : " + value);
             switch (time) {
             case 'S' : return (Integer.parseInt(value)); 
             case 'M' : return (Integer.parseInt(value)*60); 
@@ -788,14 +788,14 @@ public final class ConfigurationManager  {
     		
     			if (!(hostname.equals(hostafter.getHostname()) && 
     				servicename.equals(serviceafter.getServiceName()))) { 
-    				LOOGER.warn("RunAfter host and/or service do not exists for host " + 
+    				LOGGER.warn("RunAfter host and/or service do not exists for host " + 
     						hostname + 
     						"-" +
     						servicename);
     				return false;
     			}
     		} else {
-    			LOOGER.warn("RunAfter service do not exists for " + 
+    			LOGGER.warn("RunAfter service do not exists for " + 
     					hostname + 
     					"-" +
     					servicename);
@@ -803,7 +803,7 @@ public final class ConfigurationManager  {
     		}
     			
     	} else {
-    		LOOGER.warn("RunAfter host do not exists for " + 
+    		LOGGER.warn("RunAfter host do not exists for " + 
 					hostname + 
 					"-" +
 					servicename);
