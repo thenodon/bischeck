@@ -1,8 +1,28 @@
-#!/bin/sh
+#!/bin/bash
 
+function usage {
+    echo "Usage: $0: [-u] -i interval -m services"
+    echo "-m the number of services to create, default 100"
+    echo "-i interval to run services, default every minute (1M)"
+    echo "-u show usage"
+    echo ""
+    echo "Generate the bischeck.xml and 24thresholds.xml files used for benchmark"
+    echo "testing"
+}
 
-schedule=$1
-max=$2
+schedule=1M
+max=100
+
+while getopts ui:m: name
+do
+    case $name in
+        i) schedule="$OPTARG";;
+        m) max="$OPTARG";;
+        u) usage;exit 0;;
+    esac
+done
+
+shift $(($OPTIND - 1))
 
 count=0
 tmp24file="24.tmp"
@@ -43,3 +63,7 @@ cat template/24threshold_foot.temp >> 24thresholds.xml
 cat template/bischeck_head.temp > bischeck.xml
 cat $tmpbischeckfile >> bischeck.xml
 cat template/bischeck_foot.temp | sed -e "s/SCHEDULE/$schedule/" >> bischeck.xml
+
+rm $tmp24file
+rm $tmpbischeckfile
+
