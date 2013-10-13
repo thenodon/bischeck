@@ -1,5 +1,7 @@
 package com.ingby.socbox.bischeck.cache.provider.redis;
 
+import org.apache.commons.pool.impl.GenericObjectPool;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -11,7 +13,7 @@ public class JedisPoolWrapper {
 
 	public JedisPoolWrapper(String redisserver, Integer redisport, Integer redistimeout, String redisauth, Integer redisdb) {
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
-		
+		poolConfig.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
 		jedispool = new JedisPool(poolConfig,redisserver,redisport,redistimeout,redisauth,redisdb);	
 	}
 
