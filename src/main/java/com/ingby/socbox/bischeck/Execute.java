@@ -189,6 +189,7 @@ public final class Execute implements ExecuteMBean {
         } while (retStat == RESTART);
  
         dumpthread.start();
+        
         System.exit(retStat);
     }
     
@@ -249,7 +250,7 @@ public final class Execute implements ExecuteMBean {
         deamonLoop(); 
   
         try {
-            sched.shutdown();
+            sched.shutdown(true);
             LOGGER.info("Scheduler shutdown");
         } catch (SchedulerException e) {
             LOGGER.warn("Stopping Quartz scheduler failed with - " + e);
