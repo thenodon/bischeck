@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -44,11 +45,14 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
+import com.ingby.socbox.bischeck.ServiceDef;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
+import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CachePurgeInf;
 import com.ingby.socbox.bischeck.cache.CacheQueue;
+import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.provider.redis.Lookup;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
@@ -69,7 +73,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  * cache.provider.redis.server - the ip or name of where the redis service reside, default is 
  * localhost.<br>
  * cache.provider.redis.port - the socket port where the redis server listen, default is 6379.<br>
- * cache.provider.redis.fastCacheSize - the size of the fast fifo cache, default is 100.<br>
+ * cache.provider.redis.fastCacheSize - the size of the fast fifo cache, default is 0 and means disabled.<br>
  * cache.provider.redis.db - default is 0.<br>   
  * cache.provider.redis.auth - the password to the redis database, default is null.<br>
  * cache.provider.redis.timeout - the timeout in milliseconds, default is 2000. <br>
@@ -79,7 +83,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusCache.class);
 
-	private HashMap<String,CacheQueue<LastStatus>> fastCache = null;
+	private ConcurrentHashMap<String,CacheQueue<LastStatus>> fastCache = null;
 
 	
 	private static int fastCacheSize = 0;
@@ -110,7 +114,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	private boolean fastCacheEnable = true;
 	
 	private LastStatusCache() {
-		fastCache = new HashMap<String,CacheQueue<LastStatus>>();
+		fastCache = new ConcurrentHashMap<String,CacheQueue<LastStatus>>();
 		
 		jedispool = new JedisPoolWrapper(redisserver,redisport,redistimeout,redisauth,redisdb);	
 		
@@ -229,6 +233,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	 */
 	
 	public void disableFastCache() {
+		LOGGER.info("Fast cache disabled");
 		fastCacheEnable  = false;
 	}
 	
@@ -1175,7 +1180,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		} finally {
 			jedispool.returnResource(jedis);
 		}
-		
 	}
-	
+
 }
