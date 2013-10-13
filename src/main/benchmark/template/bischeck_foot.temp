@@ -1,6 +1,6 @@
 
 
-  <!-- Service template sshport with a complete serviceitem configuration -->
+  <!-- The template generate a random number between 0-10 -->
   <servicetemplate templatename="randtemplate">  
     <name>rand</name>
     <schedule>SCHEDULE</schedule>
@@ -14,7 +14,6 @@
       <serviceitemclass>Random</serviceitemclass>    
       <cache>  
         <aggregate>
-          <period>H</period>
           <method>avg</method>
           <useweekend>true</useweekend>
         </aggregate>
@@ -25,6 +24,8 @@
     </serviceitem>
   </servicetemplate>
 
+  <!-- The template calculate a average of the 10 last numbers collected by -->
+  <!-- the randtemplate --> 
   <servicetemplate templatename="avgrandtemplate">  
     <name>avgrand</name>
     <schedule>SCHEDULE</schedule>
@@ -38,7 +39,6 @@
       <serviceitemclass>CalculateOnCache</serviceitemclass> 
       <cache> 
         <aggregate>
-          <period>H</period>
           <method>avg</method>
           <useweekend>true</useweekend>
         </aggregate>
