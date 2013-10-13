@@ -130,8 +130,7 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
     	 payload.setMessage(level +"|"+ message);
     	 payload.setLevel(level.toString());
     	 
-    	 if (LOGGER.isInfoEnabled())
-         	LOGGER.info(ServerUtil.logFormat(instanceName, host, service, payload.getMessage()));
+    	 LOGGER.info(ServerUtil.logFormat(instanceName, host, service, payload.getMessage()));
          
     	 try {
 			sender.send(payload);

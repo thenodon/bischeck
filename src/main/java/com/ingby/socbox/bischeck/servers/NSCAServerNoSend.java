@@ -129,7 +129,7 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
         .create();
     	 payload.setMessage(level +"|"+ message);
     	 payload.setLevel(level.toString());
-    	 LOGGER.info("Send Internal - sender.send(payload)");	    
+    	 //LOGGER.info("Send Internal - sender.send(payload)");	    
     }
         
     @Override
@@ -171,7 +171,7 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
     	final TimerContext context = timer.time();
 
         try {
-        	LOGGER.info("Send - sender.send(payload)");
+        	//LOGGER.info("Send - sender.send(payload)");
         } finally { 
         	long duration = context.stop()/1000000;
 			if (LOGGER.isDebugEnabled())
