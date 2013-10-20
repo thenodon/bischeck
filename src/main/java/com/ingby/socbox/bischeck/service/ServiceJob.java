@@ -304,6 +304,7 @@ public class ServiceJob implements Job {
 				servicestate = curstate;
 			}
 		} catch (ThresholdException te) {
+			LOGGER.warn("Threshold excution failed", te);
 			servicestate = levelOnError();
 		} finally {
 			ctxthreshold.stop();
