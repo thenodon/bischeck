@@ -24,6 +24,7 @@ import java.util.Calendar;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -57,6 +58,9 @@ import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLServicedefgroup;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLServicedeftemplate;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLTwenty4Threshold;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLWeeks;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 
 public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
@@ -332,8 +336,12 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         
         if (LOGGER.isDebugEnabled())
         	LOGGER.debug("Cache miss getThreshold");
-    	
-        if (thresholdByPeriod[hourThreshold] == null || 
+        
+        final Timer timer = Metrics.newTimer(Threshold.class, 
+				"recalculate", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext ctxthreshold = timer.time();
+        
+		if (thresholdByPeriod[hourThreshold] == null || 
         		thresholdByPeriod[(hourThreshold+1)%24] == null) {
             currentthreshold = null;
         } else {
@@ -351,6 +359,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         
         currenthour = hourThreshold;
         currentminute = minuteThreshold;
+        ctxthreshold.stop();
+	
         return currentthreshold;
     }
     
