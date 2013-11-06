@@ -145,8 +145,8 @@ public final class CalculateOLS {
 		
 		SimpleRegression regression = createRegression(pa);
 		
-		Double state =  regression.predict(pa.getSize()+forecast);
-
+		Double state = regression.predict(pa.getSize()+forecast);
+	
 		return state;
 	}
 
@@ -162,11 +162,28 @@ public final class CalculateOLS {
 		
 		SimpleRegression regression = createRegression(pa);
 		
-		Double state =  regression.getSlope();
+		Double state = regression.getSlope();
 
 		return state;
 	}
-    
+
+	/**
+	 * Calculate the slope of the predicted linear equation 
+	 * @return the slope value 
+	 */
+	public Double getPredictiveSignificance() {
+		
+		PredictArray pa = createPredictionArray();
+		if (pa == null)
+			return null;
+		
+		SimpleRegression regression = createRegression(pa);
+		
+		Double state = regression.getSignificance();
+
+		return state;
+	}
+
 	
     private RESMETHOD getResolutioMethod(String resolutionmethod) {
 		RESMETHOD resmeth = RESMETHOD.AVG;
