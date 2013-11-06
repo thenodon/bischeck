@@ -100,16 +100,20 @@ public class ServiceJob implements Job {
 			service = (Service) dataMap.get("service");
 
 			RunAfter runafter = new RunAfter(service.getHost().getHostname(), service.getServiceName());
-
-			executeService(service);
+			
+			try {
+			executeJob(service);
+			} catch (RuntimeException e) {
+				LOGGER.warn("Service job exception!", e);
+				throw e;
+			}
+			
 			// Check if there is any run after
 
 			checkRunImmediate(runafter);
 
 			if (service.isSendServiceData()) {
-				//ServerExecutor.getInstance().execute(service);
-				ServerMessageExecutor.getInstance().execute(service);
-				 
+				ServerMessageExecutor.getInstance().execute(service); 
 			}
 		} finally {
 			long executetime = timercontext.stop()/1000000;         	
@@ -197,23 +201,13 @@ public class ServiceJob implements Job {
 
 
 	/**
-	 * The strategy 
-	 * @param service
-	 */
-	private void executeService(Service service) {
-		checkServiceItem(service);
-	}
-
-
-	/**
-	 * 
+	 * Execute the the full service definition and its threshold
 	 * @param service
 	 * @return
 	 * @throws ServiceItemException 
 	 * @throws ServiceException 
 	 */
-	private void checkServiceItem(Service service) {// throws ServiceItemException, ServiceException, ThresholdException {
-
+	private void executeJob(Service service) {// throws ServiceItemException, ServiceException, ThresholdException {
 
 		for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
 			ServiceItem serviceitem = serviceitementry.getValue();
