@@ -17,6 +17,10 @@ public abstract class ObjectDefinitions {
 		OBJECT_REGEXP +
 		"\\[.*?\\]";
 	
+	public static final String VALID_HOST_NAME = OBJECT_HOSTNAME;
+	public static final String VALID_SERVICE_NAME = OBJECT_REGEXP;
+	public static final String VALID_SERVICEITEM_NAME = OBJECT_REGEXP;
+	
 	private static final String QUOTE_CONVERSION_STRING = "~";
 	
 	private static final String CACHE_KEY_SEP = "-";
