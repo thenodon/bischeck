@@ -21,6 +21,10 @@ package com.ingby.socbox.bischeck.cache;
 
 import java.io.Serializable;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
@@ -29,7 +33,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
 
 public class LastStatus implements Serializable, Cloneable {
-
+	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatus.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -76,7 +80,14 @@ public class LastStatus implements Serializable, Cloneable {
 	}
 
 	public LastStatus(String jsonstr) {
-		JSONObject json = (JSONObject) JSONSerializer.toJSON(jsonstr);
+		JSONObject json = null;
+		try { 
+			json = (JSONObject) JSONSerializer.toJSON(jsonstr);
+		} catch (ClassCastException ce) {
+			LOGGER.warn("Cast exception on json string <" + jsonstr + ">", ce);
+			throw ce;
+		}
+		
 		this.value = json.getString("value");
 		if (json.getString("threshold").equalsIgnoreCase("null"))
 			this.threshold = null;
