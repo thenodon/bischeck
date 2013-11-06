@@ -23,6 +23,7 @@ package com.ingby.socbox.bischeck.cache.provider.redis;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -199,6 +200,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 						getProperty("cache.provider.redis.fastCacheSize","0"));
 				if (fastCacheSize == 0) {
 					lsc.disableFastCache();
+				} else {
+					LOGGER.info("Fast cache enable with size " + fastCacheSize);
+					lsc.warmUpFastCache();
 				}
 			} catch (NumberFormatException ne) {
 				fastCacheSize = 0;
@@ -237,6 +241,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		fastCacheEnable  = false;
 	}
 	
+	
 	public void updateRuntimeMetaData() {
 		Map<String, Host> hostsmap = ConfigurationManager.getInstance().getHostConfig();
 		Jedis jedis = null;
@@ -265,7 +270,43 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 	}
 
+	public void warmUpFastCache() {
+		Map<String, Host> hostsmap = ConfigurationManager.getInstance().getHostConfig();
+		Jedis jedis = null;
+		try {
+			jedis = jedispool.getResource();
+				
+			for (Map.Entry<String, Host> hostentry : hostsmap.entrySet()) {
+				Host host = hostentry.getValue();
 
+				for (Map.Entry<String, Service> serviceentry : host.getServices().entrySet()) {
+					Service service = serviceentry.getValue();
+
+					for (Map.Entry<String, ServiceItem> serviceItemEntry : service.getServicesItems().entrySet()) {
+						ServiceItem serviceitem = serviceItemEntry.getValue();					
+						String key = Util.fullName(host.getHostname(), service.getServiceName(), serviceitem.getServiceItemName()); 
+						List<LastStatus> lslist = (ArrayList<LastStatus>) getLastStatusListByIndex(host.getHostname(), service.getServiceName(), serviceitem.getServiceItemName(), 0L, fastCacheSize-1); 
+						CacheQueue<LastStatus> fifo = new CacheQueue<LastStatus>(fastCacheSize);
+
+						if (lslist.size()  > 0) {
+							int count = 0;
+							for (int i = lslist.size()-1; i >= 0;i--){
+								LastStatus ls = lslist.get(i);
+								fifo.addLast(ls);
+								count++;
+							}
+							fastCache.put(key, fifo);
+							LOGGER.info("Fast cache warmup " + key+":"+ count);
+						}
+					}
+				}
+			}
+		} catch (JedisConnectionException je) {
+			LOGGER.error("Redis connection failed: " + je.getMessage(), je);
+		} finally {
+			jedispool.returnResource(jedis);
+		}		
+	}
 
 	/*
 	 ***********************************************
