@@ -4,6 +4,15 @@ import org.slf4j.Logger;
 
 import com.ingby.socbox.bischeck.service.Service;
 
+
+/**
+ * Utilities used by the {@link Server} implementations.<br>
+ * The utilities supported are: <br>
+ * <ul>
+ * <li>Different log formats for sent data to the server(s)</li>
+ * </ul>
+ *
+ */
 public class ServerUtil {
 
 	public static String logFormat(String instanceName, Service service, String message) {
