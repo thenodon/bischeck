@@ -95,7 +95,7 @@ public final class ConfigurationManager  {
 
 	public static final String INTERVALSCHEDULEPATTERN = "^[0-9]+ *[HMS]{1} *$";
 
-    private final static Logger  LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
 
     /*
      * The ConfigurationManager 
@@ -216,17 +216,17 @@ public final class ConfigurationManager  {
         	
         	// Verify if the pid file is writable
         	if (!configMgr.checkPidFile()) {
-        		LOGGER.error("Can not write to pid file " + configMgr.getPidFile());
+        		LOGGER.error("Can not write to pid file {}", configMgr.getPidFile());
         		throw new ConfigurationException("Can not write to pid file " + configMgr.getPidFile());
         	}
         	configMgr.getServerClassMap();
         } catch (Exception e) {
-        	LOGGER.error("Configuration Manager initzialization failed with " + e);
+        	LOGGER.error("Configuration Manager initzialization failed with {}", e.getMessage(),e);
         	throw new ConfigurationException("Configuration Manager initzialization failed",e);
         }
         finally {
         	long duration = context.stop()/1000000;
-			LOGGER.info("Configuration init time:" + duration + " ms");
+			LOGGER.info("Configuration init time: {} ms", duration);
         }
     	
     }
@@ -277,10 +277,10 @@ public final class ConfigurationManager  {
         	CachePurgeJob.init(this);
             ThresholdCacheClearJob.init(this);
         } catch (SchedulerException e) {
-            LOGGER.error("Quartz scheduler failed with - " + e +" - existing!");
+            LOGGER.error("Quartz scheduler failed with exception {}", e.getMessage(), e);
             throw e;
         } catch (ParseException e) {
-            LOGGER.error("Quartz scheduler failed with - " + e +" - existing!");
+            LOGGER.error("Quartz scheduler failed with exception " + e.getMessage());
             throw e;
         }
     }
@@ -384,7 +384,7 @@ public final class ConfigurationManager  {
             // If a template is detected
             if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) { 
             	XMLServicetemplate template = serviceTemplateMap.get(serviceconfig.getTemplate());
-            	LOGGER.debug("Found Service template " + template.getTemplatename());
+            	LOGGER.debug("Found Service template {}", template.getTemplatename());
             	service = ServiceFactory.createService(
             			template.getName(),
             			template.getUrl().trim());
@@ -427,13 +427,13 @@ public final class ConfigurationManager  {
             // Common actions
             if (service.getDriverClassName() != null) {
         		if (service.getDriverClassName().trim().length() != 0) {
-        			LOGGER.debug("Driver name: " + service.getDriverClassName().trim());
+        			LOGGER.debug("Driver name: {}", service.getDriverClassName().trim());
         			try {
         				Class.forName(service.getDriverClassName().trim()).newInstance();
         			} catch ( ClassNotFoundException e) {
-        				LOGGER.error("Could not find the driver class - " + service.getDriverClassName() + 
-        						" " + e.toString());
-        				throw new Exception(e.getMessage());
+        				LOGGER.error("Could not find the driver class {}, exception {}", 
+        						service.getDriverClassName(), e.getMessage(), e);
+        				throw new Exception(e);
         			}
         		}
         	}
@@ -594,18 +594,12 @@ public final class ConfigurationManager  {
     	Class<Server> clazz = null;
 
     	try {
-    		//clazz = (Class<Server>) Thread.currentThread().
-    		//getContextClassLoader().
-    		//loadClass("com.ingby.socbox.bischeck.servers." +clazzname);
     		clazz=(Class<Server>) Class.forName("com.ingby.socbox.bischeck.servers." +clazzname);
     	} catch (ClassNotFoundException e) {
     		try {
-    			//clazz = (Class<Server>) Thread.currentThread().
-    			//getContextClassLoader().
-    			//loadClass(clazzname);
     			clazz=(Class<Server>) Class.forName(clazzname);
     		}catch (ClassNotFoundException ee) {
-    			LOGGER.error("Server class " + clazzname + " not found.");
+    			LOGGER.error("Server class {} not found.",  clazzname);
     			throw ee;
     		}
     	}
@@ -662,17 +656,16 @@ public final class ConfigurationManager  {
         	int index = schedule.indexOf("-");
         	String hostname = schedule.substring(0, index);
         	String servicename = schedule.substring(index+1, schedule.length());
-        	LOGGER.debug("Service will run after " + hostname + " " + servicename);
+        	LOGGER.debug("Check for services that will run after host {} and service {}", hostname, servicename);
         	RunAfter runafterkey = new RunAfter(hostname, servicename);
 
         	if (!runafter.containsKey(runafterkey)) {
-        		LOGGER.debug("Add service to " + hostname + " " + servicename);
+        		LOGGER.debug("Add service {}-{} to run after host {} and service {} ", 
+        				service.getHost().getHostname(),service.getServiceName(), hostname, servicename);
         		runafter.put(runafterkey, new ArrayList<Service>());		
         	}
         	
-        	
         	runafter.get(runafterkey).add(service);
-
         }
         	
         return trigger;
@@ -690,7 +683,6 @@ public final class ConfigurationManager  {
     	long randomininterval = ((long) (Math.random()*intervalinsec*1000));
     	long starttime = System.currentTimeMillis()+randomininterval;
     	return new Date(starttime);
-    	
     }
     
     
@@ -714,10 +706,9 @@ public final class ConfigurationManager  {
                     .startNow()
                     .build();
         } catch (Exception e) {
-            LOGGER.error("Tigger parse error for host " + service.getHost().getHostname() + 
-                    " and service " + service.getServiceName() + 
-                    " for schedule " + schedule);
-            throw new Exception(e.getMessage());
+            LOGGER.error("Tigger parse error for host {} and service {} for schedule {}", 
+            		service.getHost().getHostname(), service.getServiceName(), schedule);
+            throw new Exception(e);
         }
 
         return trigger;
@@ -741,7 +732,7 @@ public final class ConfigurationManager  {
             String withoutSpace=schedule.replaceAll(" ","");
             char time = withoutSpace.charAt(withoutSpace.length()-1);
             String value = withoutSpace.substring(0, withoutSpace.length()-1);
-            LOGGER.debug("Time selected "+ time + " : " + value);
+            LOGGER.debug("Time selected {}:{}", time, value);
             switch (time) {
             case 'S' : return (Integer.parseInt(value)); 
             case 'M' : return (Integer.parseInt(value)*60); 
@@ -867,9 +858,5 @@ public final class ConfigurationManager  {
     public Map<RunAfter,List<Service>> getRunAfterMap() {
     	return runafter;
     }
-/*
-    public  String getCacheClearCron() {
-        return prop.getProperty("thresholdCacheClear","10 0 00 * * ? *");
-    }
-*/
+
 }
