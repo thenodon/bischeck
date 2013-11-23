@@ -21,6 +21,10 @@ package com.ingby.socbox.bischeck.servers;
 
 import com.ingby.socbox.bischeck.service.Service;
 
+/**
+ * The interface must be implemented by any server implementation.
+ * 
+ */
 public interface Server {
     
     /**
@@ -28,8 +32,17 @@ public interface Server {
      * to manage protocol and formatting of message data.
      * @param service
      */
-    public void send(Service service);
-
+    public void send(Service service) throws ServerException;
     
+    
+    /**
+     * Get the name of the server set in the server.xml tag server, like:<br>
+     * <code>
+     * <server name="NSCA-1">
+     * </code>
+     * 
+     * @return the name of the server instance
+     */
+    public String getInstanceName();
 
 }
