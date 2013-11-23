@@ -36,6 +36,13 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
+/**
+ * 
+ * @see {@link ServerMessageExecutor}
+ *
+ */
+
+@Deprecated
 public final class ServerExecutor {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ServerExecutor.class);
@@ -139,6 +146,8 @@ public final class ServerExecutor {
 				} catch (SecurityException e) {
 					LOGGER.error(e.toString(), e);
 				} catch (NoSuchMethodException e) {
+					LOGGER.error(e.toString(), e);
+				} catch (ServerException e) {
 					LOGGER.error(e.toString(), e);
 				}
 			}
