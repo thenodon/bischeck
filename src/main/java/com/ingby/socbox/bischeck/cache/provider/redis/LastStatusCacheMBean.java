@@ -19,6 +19,10 @@
 
 package com.ingby.socbox.bischeck.cache.provider.redis;
 
+/**
+ * The MBeans exposed for the redis {@link LastStatusCache}
+ * 
+ */
 public interface LastStatusCacheMBean {
 
 	/**
