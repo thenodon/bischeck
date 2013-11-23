@@ -23,8 +23,6 @@ package com.ingby.socbox.bischeck.cache.provider.redis;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,14 +44,11 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-import com.ingby.socbox.bischeck.ServiceDef;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
-import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CachePurgeInf;
 import com.ingby.socbox.bischeck.cache.CacheQueue;
-import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.provider.redis.Lookup;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
@@ -73,11 +68,13 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  * The class is controlled by X properties:<br>
  * cache.provider.redis.server - the ip or name of where the redis service reside, default is 
  * localhost.<br>
- * cache.provider.redis.port - the socket port where the redis server listen, default is 6379.<br>
- * cache.provider.redis.fastCacheSize - the size of the fast fifo cache, default is 0 and means disabled.<br>
- * cache.provider.redis.db - default is 0.<br>   
- * cache.provider.redis.auth - the password to the redis database, default is null.<br>
- * cache.provider.redis.timeout - the timeout in milliseconds, default is 2000. <br>
+ * <ul>
+ * <li>cache.provider.redis.port - the socket port where the redis server listen, default is 6379.</li>
+ * <li>cache.provider.redis.fastCacheSize - the size of the fast fifo cache, default is 0 and means disabled.</li>
+ * <li>cache.provider.redis.db - default is 0.</li>   
+ * <li>cache.provider.redis.auth - the password to the redis database, default is null.</li>
+ * <li>cache.provider.redis.timeout - the timeout in milliseconds, default is 2000. </li>
+ * </ul>
  */
 
 public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatusCacheMBean {
@@ -128,7 +125,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	 */
 	public static LastStatusCache getInstance() {
 		if (lsc == null)
-			LOGGER.error("Cache impl has not been initilized");
+			LOGGER.error("Cache has not been initilized, must call init() first");
 		return lsc;
 	}
 	
@@ -178,20 +175,20 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			try {
 				mbeanname = new ObjectName(BEANNAME);
 			} catch (MalformedObjectNameException e) {
-				LOGGER.error("MBean object name failed, " + e.getMessage(),e);
+				LOGGER.error("MBean object name failed, {}", e.getMessage(),e);
 			} catch (NullPointerException e) {
-				LOGGER.error("MBean object name failed, " + e.getMessage(),e);
+				LOGGER.error("MBean object name failed, {}", e.getMessage(),e);
 			}
 
 
 			try {
 				mbs.registerMBean(lsc, mbeanname);
 			} catch (InstanceAlreadyExistsException e) {
-				LOGGER.error("Mbean exception - " + e.getMessage(),e);
+				LOGGER.error("Mbean exception - {}", e.getMessage(),e);
 			} catch (MBeanRegistrationException e) {
-				LOGGER.error("Mbean exception - " + e.getMessage(),e);
+				LOGGER.error("Mbean exception - {}", e.getMessage(),e);
 			} catch (NotCompliantMBeanException e) {
-				LOGGER.error("Mbean exception - " + e.getMessage(),e);
+				LOGGER.error("Mbean exception - {}", e.getMessage(),e);
 			}
 			
 			try {
@@ -201,7 +198,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				if (fastCacheSize == 0) {
 					lsc.disableFastCache();
 				} else {
-					LOGGER.info("Fast cache enable with size " + fastCacheSize);
+					LOGGER.info("Fast cache enable with size {}", fastCacheSize);
 					lsc.warmUpFastCache();
 				}
 			} catch (NumberFormatException ne) {
@@ -220,9 +217,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		try {
 			mbs.unregisterMBean(mbeanname);
 		} catch (MBeanRegistrationException e) {
-			LOGGER.warn("Mbean " + mbeanname +" could not be unregistered",e);
+			LOGGER.warn("Mbean {} could not be unregistered", mbeanname, e);
 		} catch (InstanceNotFoundException e) {
-			LOGGER.warn("Mbean " + mbeanname +" instance could not be found",e);
+			LOGGER.warn("Mbean {} instance could not be found", mbeanname, e);
 		}
 		lsc = null;
 		
@@ -263,7 +260,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				}
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(), je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -296,13 +293,13 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 								count++;
 							}
 							fastCache.put(key, fifo);
-							LOGGER.info("Fast cache warmup " + key+":"+ count);
+							LOGGER.info("Fast cache warmup {}:{}", key, count);
 						}
 					}
 				}
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(), je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}		
@@ -363,7 +360,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			// Add redis
 			jedis.lpush(key, ls.getJson());
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -382,12 +379,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			String serviceitem, long timestamp) {
 		String key = Util.fullName( host, service, serviceitem);
 		
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Find cache data for " + key + " at time " + new java.util.Date(timestamp));
+		LOGGER.debug("Find cache data for key {} at time {}", key, new java.util.Date(timestamp));
 		
 		LastStatus ls = null;
 
-		//String id = lu.getIdByName(key);
 		Jedis jedis = null;;
 		try {	
 			jedis = jedispool.getResource();
@@ -398,7 +393,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			ls = nearest(timestamp, key);
 
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -426,17 +421,13 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			jedis = jedispool.getResource();
 			
 			if (fastCacheEnable && fastCache.get(key) != null && index < fastCache.get(key).size()-1) {
-				if (LOGGER.isDebugEnabled() ) {
-					LOGGER.debug("Fast cache used for key " + key +" index " + index);
-				}
+				LOGGER.debug("Fast cache used for key {} at index {}", key, index);
 				incFastCacheCount();
 				ls = fastCache.get(key).get((int)index).copy();
 			}
 		
 			else {
-				if (LOGGER.isDebugEnabled() ) {
-					LOGGER.debug("Redis cache used for key " + key +" index " + index);
-				}
+				LOGGER.debug("Redis cache used for key {} at index {}", key, index);
 				String redstr = jedis.lindex(key, index);
 
 				if (redstr == null)
@@ -447,7 +438,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				}
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -467,24 +458,20 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				serviceitem,from);
 		
 		if (indfrom == null) {
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("No data for from timestamp "+ from);
+			LOGGER.debug("No data for from timestamp {}", from);
 			return null;
 		}
 		
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Index from " + indfrom);
+		LOGGER.debug("Index from {}", indfrom);
 		Long indto = this.getIndexByTime( 
 				host,
 				service, 
 				serviceitem,to);
 		if (indto == null) {
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("No data for from timestamp "+ to);
+			LOGGER.debug("No data for from timestamp {}", to);
 			return null;
 		}
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Index from " + indto);
+		LOGGER.debug("Index from {}", indto);
 		
 		List<LastStatus> lslist = new ArrayList<LastStatus>();
 		
@@ -514,9 +501,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		
 	
 		if (fastCacheEnable && fastCache.get(key) != null && toIndex < fastCache.get(key).size()-1) {
-			if (LOGGER.isDebugEnabled() ) {
-				LOGGER.debug("Fast cache used for key " + key +" index " + toIndex);
-			}
+			LOGGER.debug("Fast cache used for key {} at index {}", key, toIndex);
 			incFastCacheCount(toIndex-fromIndex+1);
 			
 			
@@ -547,7 +532,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			}
 
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}	
@@ -685,7 +670,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			
 			size = jedis.llen(key);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -698,10 +683,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			String serviceItemName, long stime) {
 		
 		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Find cache index for " + key +" at time " + new java.util.Date(stime));
+		LOGGER.debug("Find cache index for key {} at timestamp {}", key, new java.util.Date(stime));
 		
-		//String id = lu.getIdByName(key);
 		Long index = null;
 		Jedis jedis = null;
 		try {
@@ -713,7 +696,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			index = nearestByIndex(stime, key);
 			
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -731,14 +714,17 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		return size(hostName, serviceName, serviceItemName) - 1;
 	}
 	
+	
 	@Override
 	public long getLastTime(String hostName, 
 			String serviceName, 
 			String serviceItemName) {
+		
 		long lastindex = getLastIndex(hostName, serviceName, serviceItemName);
 		long lasttimestamp = getLastStatusByIndex(hostName, serviceName, serviceItemName, lastindex).getTimestamp();
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Last index is" + lastindex + " and have timestamp " + lasttimestamp);
+		
+		LOGGER.debug("Last index is {} and have timestamp {}", lastindex, lasttimestamp);
+		
 		return lasttimestamp;
 	}
 
@@ -773,13 +759,15 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			jedis = jedispool.getResource();
 			jedis.del(key);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}	
 	}
 
-
+	private void connectionFailed(JedisConnectionException je) {
+		LOGGER.error("Redis connection failed, {}", je.getMessage(),je);
+	}
     
 	/*
 	 ***********************************************
@@ -949,7 +937,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 			}	
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -957,9 +945,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	
 	
 	private LastStatus nearest(long time,  String id) {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Find value in cache at nearest " + new java.util.Date(time));
 		
+		LOGGER.debug("Find value for key {} at nearest timestamp {}", id, new java.util.Date(time));
 		
 		LastStatus nearest = null;
 		
@@ -1015,8 +1002,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				bestDistanceFoundYet = d1;
 				nearest = listtosearch.get(i);
 				if (d1 <= d2) { 
-					if (LOGGER.isDebugEnabled())
-						LOGGER.debug("Break at index " + i);
+					LOGGER.debug("Nearest fast for key {} break at index {}", key, i);
 					break;
 				}
 			}
@@ -1056,8 +1042,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 					bestDistanceFoundYet = d1;
 					nearest = new LastStatus(jedis.lindex(key, i));
 					if (d1 <= d2) { 
-						if (LOGGER.isDebugEnabled())
-							LOGGER.debug("Break at index " + i);
+						LOGGER.debug("Nearest slow for key {} break at index {}", key, i);
 						break;
 					}
 				}
@@ -1107,8 +1092,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				bestDistanceFoundYet = d1;
 				index=i;
 				if (d1 <= d2) {
-					if (LOGGER.isDebugEnabled())
-						LOGGER.debug("Break at index " + i);
+					LOGGER.debug("Nearest fast for key {} break at index {}", key, i);
 					break;
 				}
 			}
@@ -1149,14 +1133,13 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 					bestDistanceFoundYet = d1;
 					index=i;
 					if (d1 <= d2) {
-						if (LOGGER.isDebugEnabled())
-							LOGGER.debug("Break at index " + i);
+						LOGGER.debug("Nearest slow for key {} break at index {}", key, i);
 						break;
 					}
 				}
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -1165,8 +1148,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 	
 	private Long nearestByIndex(long time, String key) {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Find value in cache at index " + new java.util.Date(time));
+		LOGGER.debug("For key {} find value in cache at index {}", key, new java.util.Date(time));
 		
 		Long index = null;
 		
@@ -1217,7 +1199,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			jedis = jedispool.getResource();
 			jedis.ltrim(key, 0, maxSize-1);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			connectionFailed(je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
