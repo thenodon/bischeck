@@ -26,6 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.cache.LastStatus;
 
+/**
+ * Different static query methods to search a {@link LinkedList of {@link LastStatus} objects.
+ *
+ */
 public class Query {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(Query.class);
@@ -34,9 +38,9 @@ public class Query {
 	/**
 	 * The method search for the LastStatus object stored in the cache that has 
 	 * a timestamp closest to the time parameter.
-	 * @param time 
-	 * @param listtosearch
-	 * @return the LastStatus object closes to the time
+	 * @param time the timestamp to search for
+	 * @param listtosearch the list to search in 
+	 * @return the {@link LastStatus} object closes to the time
 	 */
 	public static LastStatus nearest(long time, LinkedList<LastStatus> listtosearch) {
 		
@@ -46,9 +50,10 @@ public class Query {
 			time < listtosearch.getLast().getTimestamp() ) {
 			return null;
 		}
+		
 		LastStatus nearest = null;
 		long bestDistanceFoundYet = Long.MAX_VALUE;
-		// We iterate on the array...
+		
 		for (int i = 0; i < listtosearch.size(); i++) {
 			long d1 = Math.abs(time - listtosearch.get(i).getTimestamp());
 			long d2;
@@ -74,10 +79,10 @@ public class Query {
 	
 	
 	/**
-	 * Return the cache index closes to the timestamp define in time
-	 * @param time
-	 * @param listtosearch
-	 * @return cache index
+	 * Return the cache index closes to a timestamp 
+	 * @param time the timestamp to search the closest index for
+	 * @param listtosearch the list to search in
+	 * @return cache the index closest to the timestamp
 	 */
 	public static Integer nearestByIndex(long time, LinkedList<LastStatus> listtosearch) {
 		
@@ -116,13 +121,13 @@ public class Query {
 
 	/**
 	 * Search for all LastStatus elements in the cache that exists between the 
-	 * time fromtime to totime.
-	 * Checks are done:</br>
+	 * time fromtime and to totime.
+	 * Following checks are done:</br>
 	 * check if totime < fromtime</br>
 	 * check if first elments timestamp is 
-	 * @param to
-	 * @param from
-	 * @param listtosearch
+	 * @param to the to timestamp
+	 * @param from the from timestamp
+	 * @param listtosearch the list to search in
 	 * @return a copy of list and its elements
 	 * @deprecated 
 	 */
