@@ -44,6 +44,15 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
+/**
+ * ServerMessageExecutor manage the messages asynchronously between a 
+ * executing {@link ServiceJob} and the configured {@link Server} 
+ * implementations. <br>
+ * The {@link ServiceJob} call the {@link #execute(Service)} method that will
+ * publish the {@link Service} object that will be subscribed by the 
+ * {@link MessageServerInf#onMessage(Service)}.
+ * 
+ */
 public final class ServerMessageExecutor {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ServerMessageExecutor.class);
@@ -64,7 +73,8 @@ public final class ServerMessageExecutor {
 	private Channel<Service> channel = null;
 	private ExecutorService execService = null;
     private PoolFiberFactory fact = null;
-    
+
+   
     /**
      * Create an instance of the class
      */
@@ -75,9 +85,11 @@ public final class ServerMessageExecutor {
 		} catch (ClassNotFoundException e) {
 			LOGGER.error("Class error in servers.xml - not server connection will be available",e);
 		}
-		//execService = Executors.newCachedThreadPool();
+		
+		// TODO - check how the pool size of this is managed compared to fixed
+		execService = Executors.newCachedThreadPool();
 		// Create a pool with the size of the number of server instances
-		execService = Executors.newFixedThreadPool(serverSet.size());
+		//execService = Executors.newFixedThreadPool(serverSet.size());
         fact = new PoolFiberFactory(execService);
         channel = new MemoryChannel<Service>();
 
@@ -110,14 +122,12 @@ public final class ServerMessageExecutor {
 				LOGGER.error(e.toString(), e);
 			}
 		}
-
-		
 	}
 
 
 	/**
 	 * Factory to get a ServerExecutor instance.
-	 * @return
+	 * @return 
 	 */
 	synchronized public static ServerMessageExecutor getInstance() {
 		if (serverexecutor == null) {
@@ -175,7 +185,8 @@ public final class ServerMessageExecutor {
 	 * @param service the Service object that contain data to be send to the 
 	 * servers.
 	 */
-	synchronized public void execute(Service service) {
+	//synchronized 
+	public void execute(Service service) {
 
 		
 		final Timer timer = Metrics.newTimer(ServerMessageExecutor.class, 
@@ -183,7 +194,8 @@ public final class ServerMessageExecutor {
 		final TimerContext context = timer.time();
 
 		try { 
-			publish(service);
+			//publish(service);
+			channel.publish(service);
 		}finally { 			
 			Long duration = context.stop()/1000000;
 			if (LOGGER.isDebugEnabled())
@@ -191,6 +203,7 @@ public final class ServerMessageExecutor {
 		}
 	}
 
+	
 	synchronized public void executeInternal(String host, String service, NAGIOSSTAT level, String message) {
 
 		final Timer timer = Metrics.newTimer(ServerMessageExecutor.class, 
