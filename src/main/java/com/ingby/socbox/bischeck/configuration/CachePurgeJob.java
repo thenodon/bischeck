@@ -97,9 +97,8 @@ public class CachePurgeJob implements Job {
         
         sched.addJob(job, true);
         
-        LOGGER.info(job.getDescription() + " has been scheduled to run at: " + ft
-                + " and repeat based on expression: "
-                + trigger.getCronExpression());
+        LOGGER.info("{} has been scheduled to run at: {} and repeat based on expression: {}",
+                job.getDescription(), ft, trigger.getCronExpression());
     }
     
     
@@ -114,9 +113,7 @@ public class CachePurgeJob implements Job {
 			for (String key : purgeMap.keySet()) {
 				CacheInf cache = CacheFactory.getInstance();
 				if (cache instanceof CachePurgeInf) {
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug(key + ":" + purgeMap.get(key));
-					}
+					LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
 					
 					if (CacheUtil.isByTime(purgeMap.get(key))) {
 						// find the index of the time
@@ -134,7 +131,7 @@ public class CachePurgeJob implements Job {
 			}
 		} finally {
 			long duration = context.stop()/1000000;
-			LOGGER.info("CachePurge executed in " + duration + " ms");
+			LOGGER.info("CachePurge executed in {} ms", duration);
 		}
     }
 
