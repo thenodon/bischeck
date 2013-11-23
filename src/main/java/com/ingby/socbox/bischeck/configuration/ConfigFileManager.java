@@ -91,7 +91,7 @@ public class ConfigFileManager {
 		if (configDir.isDirectory() && configDir.canRead()) 
 			return configDir;    
 		else {
-			LOGGER.warn("Configuration directory " + configDir.getPath() + " does not exist or is not readable.");
+			LOGGER.warn("Configuration directory {} does not exist or is not readable.", configDir.getPath());
 			throw new Exception("Configuration directory " + configDir.getPath() + " does not exist or is not readable.");
 		}
 	}

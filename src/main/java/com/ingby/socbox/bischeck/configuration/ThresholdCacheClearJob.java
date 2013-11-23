@@ -77,9 +77,8 @@ public class ThresholdCacheClearJob implements Job {
         
         sched.addJob(job, true);
         
-        LOGGER.info(job.getDescription() + " has been scheduled to run at: " + ft
-                + " and repeat based on expression: "
-                + trigger.getCronExpression());
+        LOGGER.info("{} has been scheduled to run at: {} and repeat based on expression: {}",
+                job.getDescription(), ft, trigger.getCronExpression());
 
     }
     

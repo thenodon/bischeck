@@ -34,7 +34,7 @@ public abstract class ValidateConfiguration {
             try {
               	xmlfilemgr.getXMLConfiguration(xmlconf);
             } catch (Exception e) {
-                LOOGER.error("Errors was found validating the configuration file " + 
+                LOOGER.error("Errors was found validating the configuration file {}", 
                         xmlconf.xml(),e);
                 return 1;
             }    
@@ -48,8 +48,8 @@ public abstract class ValidateConfiguration {
 			try {
 				xmlfilemgr.getXMLConfiguration(xmlconf,dir);
 			} catch (Exception e) {
-				LOOGER.error("Errors was found validating the configuration file " + 
-                        xmlconf.xml() + " in directory "+ dir ,e);
+				LOOGER.error("Errors was found validating the configuration file {} in directory ", 
+                        xmlconf.xml(), dir ,e);
 				throw new Exception(xmlconf.xml(), e);
 			}
 		}    
