@@ -5,6 +5,9 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.RuntimeMXBean;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.SortedMap;
@@ -24,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
-import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
@@ -37,6 +39,9 @@ import com.yammer.metrics.core.Timer;
 
 public class InternalSurveillance implements Job {
 	private final static Logger  LOGGER = LoggerFactory.getLogger(InternalSurveillance.class);
+	private final OperatingSystemMXBean osMxBean = ManagementFactory.getOperatingSystemMXBean();
+	private final RuntimeMXBean rtMxBean = ManagementFactory.getRuntimeMXBean();
+	
 	private static String bischeckHostName;
 
 	/**
@@ -87,18 +92,16 @@ public class InternalSurveillance implements Job {
 
 	/**
 	 * Retrieve metrics timers and create a nagios performance data string
-	 * for execution timers
+	 * for execution timers mean value.
 	 * @return the performance data string
 	 */
 	public String executeTimers() {
 		
 		StringBuffer strbuf = new StringBuffer();
 
-
 		MetricPredicate predicate =MetricPredicate.ALL;
 		for (Entry<String, SortedMap<MetricName, Metric>> entry : getMetricsRegistry().getGroupedMetrics(
 				predicate ).entrySet()) {
-
 
 			for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
 				Timer timer = ((Timer) subEntry.getValue());
@@ -110,15 +113,12 @@ public class InternalSurveillance implements Job {
 					strbuf.append("=");    
 					strbuf.append(Util.roundDecimals((float)timer.getMean()));
 					strbuf.append("ms;;;; ");
-
 				}
 			}
 			strbuf.append(" ");
 		}
 		
-		if(LOGGER.isDebugEnabled()) {
-			LOGGER.debug(strbuf.toString());
-		}
+		LOGGER.debug("Timers: {}", strbuf.toString());
 		
 		return strbuf.toString();
 	}
@@ -156,21 +156,33 @@ public class InternalSurveillance implements Job {
 			strbuf.append(" ");
 		}
 		
-		if(LOGGER.isDebugEnabled()) {
-			LOGGER.debug(strbuf.toString());
-		}
+		LOGGER.debug("TPS: {}", strbuf.toString());
 		
 		return strbuf.toString();
 	}
 
-	/*
-	public String jvm() {
-		final OperatingSystemMXBean myOsBean = ManagementFactory.getOperatingSystemMXBean();
 	
-		String loadAvg =(new BigDecimal(myOsBean.getSystemLoadAverage())).toString();		
+	public String jvm() {
+	
 		
+		double loadAvg = osMxBean.getSystemLoadAverage();
+		//int nProcessors = osMxBean.getAvailableProcessors();
+		long uptime = rtMxBean == null ? 1 : rtMxBean.getUptime();
+		// Get the CPU time of the process in nanoseconds...
+		//long processCpuTime = osMxBean == null ? 0 : osMxBean.ggetProcessCpuTime();
+		StringBuffer strbuf = new StringBuffer();
+		strbuf.append("Uptime=");    
+		strbuf.append(uptime);
+		strbuf.append(";;;; ");
+		strbuf.append("LoadAvg=");    
+		strbuf.append(loadAvg);
+		strbuf.append(";;;;");
+
+		LOGGER.debug("JVM: {}", strbuf.toString());
+		
+		return strbuf.toString();
 	}
-	*/
+	
 	
 	private String trim(String key) {
 		int lastdot = key.lastIndexOf('.');
@@ -190,6 +202,7 @@ public class InternalSurveillance implements Job {
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
 		ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-timers", NAGIOSSTAT.OK, this.executeTimers());
 		ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-tps", NAGIOSSTAT.OK, this.tpsTimers());
+		ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-jvm", NAGIOSSTAT.OK, this.jvm());
 	}
 
 }
