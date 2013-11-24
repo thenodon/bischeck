@@ -20,6 +20,10 @@
 package com.ingby.socbox.bischeck.service;
 
 
+/**
+ * Class to execute any Service that are in a run after description
+ * 
+ */
 public class RunAfter {
     
 	private String hostname = null;

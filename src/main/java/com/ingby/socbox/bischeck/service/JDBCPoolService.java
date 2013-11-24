@@ -19,8 +19,6 @@
 
 package com.ingby.socbox.bischeck.service;
 
-
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,7 +29,10 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
-
+/**
+ * Pooled version of JDBC based service
+ *
+ */
 public class JDBCPoolService extends ServiceAbstract implements Service {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(JDBCPoolService.class);
@@ -45,7 +46,7 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
                     getProperty("JDBCService.querytimeout","10"));
         } catch (NumberFormatException ne) {
             LOGGER.error("Property JDBCSerivce.querytimeout is not " + 
-                    "set correct to an integer: " +
+                    "set correct to an integer: {}",
                     ConfigurationManager.getInstance().getProperties().getProperty(
                     "JDBCSerivce.querytimeout"));
         }
@@ -97,7 +98,7 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
     			return (res.getString(1));
     		}
     	} catch (SQLException sqle) {
-    		LOGGER.warn("Executing " + exec + " statement failed",sqle);
+    		LOGGER.warn("Executing {} statement failed",exec, sqle);
     		ServiceException se = new ServiceException(sqle);
     		se.setServiceName(this.serviceName);
     		throw se;

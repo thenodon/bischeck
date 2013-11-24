@@ -30,12 +30,12 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 /**
  * The ServiceAbstract class provide most of the methods needed by a Service 
  * implementation. The methods not implemented in the abstract class are: <b>
- * public void openConnection() throws Exception <b>
- * public void closeConnection() throws Exception <b>
- * public String getNSCAMessage() <b>
- * public String executeStmt(String exec) throws Exception <b>
- *  
- * @author Anders Håål
+ * <ul>
+ * <li>public void openConnection() throws ServiceException</li>
+ * <li>public void closeConnection() throws ServiceException</li>
+ * <li>public String getNSCAMessage()</li>
+ * <li>public String executeStmt(String exec) throws ServiceException</li>
+ * </ul> 
  *
  */
 

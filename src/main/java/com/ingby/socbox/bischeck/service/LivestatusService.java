@@ -34,6 +34,10 @@ import org.slf4j.LoggerFactory;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 
+/**
+ * Service to connect and execute Livestatus query
+ *
+ */
 public class LivestatusService extends ServiceAbstract implements Service {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(LivestatusService.class);
@@ -49,7 +53,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
                     getProperty("LiveStatusService.querytimeout","10")) * 1000;
         } catch (NumberFormatException ne) {
             LOGGER.error("Property LiveStatusService.querytimeout is not " + 
-                    "set correct to an integer: " +
+                    "set correct to an integer: {}",
                     ConfigurationManager.getInstance().getProperties().getProperty(
                     "LiveStatusService.querytimeout"));
         }
@@ -99,7 +103,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
     public String executeStmt(String exec) throws ServiceException {
         
         /*
-         * Replace all \n occurance with real newlines 
+         * Replace all \n occurrence with real newlines 
          */
         String message = exec.replaceAll("\\\\n", "\n");
         
@@ -108,7 +112,7 @@ public class LivestatusService extends ServiceAbstract implements Service {
         
         StringBuffer responseBuffer = new StringBuffer();
         
-        LOGGER.debug("Execute request: " + message);
+        LOGGER.debug("Execute request: {}", message);
         
         try {
 

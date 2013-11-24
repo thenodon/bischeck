@@ -28,7 +28,10 @@ import java.util.Map;
 
 import org.apache.commons.dbcp.ManagedBasicDataSource;
 
-
+/**
+ * Utility class for pooled connection. 
+ *
+ */
 public class JDBCPoolServiceUtil {
 
   
@@ -37,20 +40,21 @@ public class JDBCPoolServiceUtil {
     
     static public Connection getConnection(String connectionurl) throws SQLException {
     	
-    	Connection jdbccoon = null;
+    	Connection jdbccon = null;
     	
     	if (poolmap.containsKey(connectionurl)) {
     		ManagedBasicDataSource bds = poolmap.get(connectionurl);
-    		jdbccoon = bds.getConnection();
+    		jdbccon = bds.getConnection();
     	} else {
     		ManagedBasicDataSource bds = new ManagedBasicDataSource();
             bds.setUrl(connectionurl);
             poolmap.put(connectionurl, bds);
-            jdbccoon = bds.getConnection();		
+            jdbccon = bds.getConnection();		
     	}
     	
-    	return jdbccoon;
+    	return jdbccon;
     }
+    
 }
 
 

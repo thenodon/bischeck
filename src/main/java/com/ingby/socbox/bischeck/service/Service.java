@@ -39,11 +39,9 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  * &nbsp;&nbsp;this.servicename=servicename; <br>
  * } <br>
  * </code> 
- * To implement a custom Service its adviced to extend the abstracted class
- * ServiceAbstract class.
+ * To implement a custom Service its advised to extend the abstracted class
+ * {@link ServiceAbstract} class.
  *  
- *   
- * @author Anders Håål
  *
  */
 public interface Service {

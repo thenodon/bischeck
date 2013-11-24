@@ -28,7 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
+/**
+ * This service execute shell scripts on the local server.
+ *
+ */
 public class ShellService extends ServiceAbstract implements Service {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ShellService.class);
@@ -63,12 +66,12 @@ public class ShellService extends ServiceAbstract implements Service {
         	buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
     		ret = buf.readLine();
     	} catch (IOException ioe) {
-    		LOGGER.warn("Executing " + exec + "failed",ioe);
+    		LOGGER.warn("Executing {} failed",exec, ioe);
     		ServiceException se = new ServiceException(ioe);
     		se.setServiceName(this.serviceName);
     		throw se;
     	} catch (InterruptedException ie) {
-    		LOGGER.warn("Executing " + exec + "failed with execption", ie);
+    		LOGGER.warn("Executing {} failed with execption",exec, ie);
     		ServiceException se = new ServiceException(ie);
     		se.setServiceName(this.serviceName);
     		throw se;

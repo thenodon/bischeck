@@ -30,28 +30,40 @@ import com.ingby.socbox.bischeck.ClassCache;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
-
+/**
+ * Service factory to instantiate {@link Service} objects 
+ *
+ */
 public class ServiceFactory {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ServiceFactory.class);
     
+    /**
+     * Create the service based on the uri
+     * @param serviceName the name of the service
+     * @param url the service url
+     * @return
+     * @throws Exception if the service url is not available, the class do 
+     * not exists, a constructor is not existing or if a constructor that 
+     * take a the service name as a parameter do not exists
+     */
     @SuppressWarnings("unchecked")
-    public static Service createService(String name, String url) throws Exception 
+    public static Service createService(String serviceName, String url) throws Exception 
     {
         
         URI uri = null;
         try {
             uri= new URI(url);
-            LOGGER.debug("uri - " + uri.toString());
+            LOGGER.debug("uri - {}", uri.toString());
         } catch (URISyntaxException e) {
-            LOGGER.warn("URL malformed - " + url + " - " + e.getMessage());
+            LOGGER.warn("Malformed uri - {}", url, e.getMessage());
             throw new Exception(e.getMessage());
         }
         
         String clazzname = ConfigurationManager.getInstance().getURL2Service().getProperty(uri.getScheme());
         
         if (clazzname == null) {
-            LOGGER.error("Service uri " + Util.obfuscatePassword(uri.toString()) + " is not matched in the urlservice.xml configuration file.");
+            LOGGER.error("Service uri {} is not matched in the urlservice.xml configuration file.", Util.obfuscatePassword(uri.toString()));
             throw new Exception("Service uri " + Util.obfuscatePassword(uri.toString()) + " is not matched in the urlservice.xml configuration file.");
         }
         
@@ -63,7 +75,7 @@ public class ServiceFactory {
             try { 
                 clazz = (Class<Service>) ClassCache.getClassByName(clazzname);
             }catch (ClassNotFoundException ee) {
-                LOGGER.error("Service class " + clazzname + " not found.");
+                LOGGER.error("Service class {} not found.", clazzname);
                 throw new Exception(e.getMessage());
             }
         }
@@ -76,15 +88,15 @@ public class ServiceFactory {
         try {
             cons = clazz.getConstructor(param);
         } catch (Exception e) {
-            LOGGER.error("Error getting class constructor for "+ clazz.getName());
+            LOGGER.error("Error getting class constructor for {}", clazz.getName());
             throw new Exception(e.getMessage());
         }
         
         Service service = null;
         try {
-            service = (Service) cons.newInstance(name);
+            service = (Service) cons.newInstance(serviceName);
         } catch (Exception e) {
-            LOGGER.error("Error creating an instance of " + name + " with class " + clazz.getName());
+            LOGGER.error("Error creating an instance of {} with class {}", serviceName, clazz.getName());
             throw new Exception(e.getMessage());
         }
         return service;

@@ -56,6 +56,12 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
+/**
+ * The ServiceJob is a quartz job that execute the task of each {@link Service} 
+ * object. That include both connection setup and {@link ServiceItem} execution 
+ * and threshold validation
+ * 
+ */
 public class ServiceJob implements Job {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ServiceJob.class);
@@ -68,9 +74,8 @@ public class ServiceJob implements Job {
 			runAfterDelay = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
 					getProperty("runAfterDelay", Integer.toString(runAfterDelay)));
 		} catch (NumberFormatException ne) {
-			LOGGER.error("Property " + 
-					runAfterDelay + 
-					" is not set correct to an integer: " +
+			LOGGER.error("Property {} is not set correct to an integer: {}", 
+					runAfterDelay, 
 					ConfigurationManager.getInstance().getProperties().getProperty(
 							"runAfterDelay"));
 		}
@@ -82,10 +87,6 @@ public class ServiceJob implements Job {
 
 
 	@Override
-	/**
-	 * The method is called every time the service is define to run by the 
-	 * scheduler
-	 */
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		final Timer timer = Metrics.newTimer(ServiceJob.class, 
 				"execute", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
@@ -102,7 +103,7 @@ public class ServiceJob implements Job {
 			RunAfter runafter = new RunAfter(service.getHost().getHostname(), service.getServiceName());
 			
 			try {
-			executeJob(service);
+				executeJob(service);
 			} catch (RuntimeException e) {
 				LOGGER.warn("Service job exception!", e);
 				throw e;
@@ -132,25 +133,27 @@ public class ServiceJob implements Job {
 	}
 
 	private void checkRunImmediate(RunAfter runafter) {
-		if (LOGGER.isDebugEnabled()) 
-			LOGGER.debug("Service " + runafter.getHostname() + "-" + runafter.getServicename() + " has runAfter " + 
-					ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter));
+		
+		LOGGER.debug("Service {}-{} has runAfter {}",
+				runafter.getHostname(),
+				runafter.getServicename(),
+				ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter));
 
 		if (ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter)) {
 			for (Service servicetorunafter : ConfigurationManager.getInstance().getRunAfterMap().get(runafter)) {
-				if (LOGGER.isDebugEnabled()) 
-					LOGGER.debug("The services to run after is: " + servicetorunafter.getHost().getHostname() + 
-							"-" + servicetorunafter.getServiceName());
+				
+				LOGGER.debug("The services to run after is: {}-{}",
+						servicetorunafter.getHost().getHostname(), 
+						servicetorunafter.getServiceName());
 			}
 
 			try {
 				runImmediate(ConfigurationManager.getInstance().getRunAfterMap().get(runafter));
 			} catch (SchedulerException e) {
-				LOGGER.warn("Scheduled immediate job for host + " +
-						runafter.getHostname() + 
-						" and service " +
-						runafter.getServicename() + 
-						" failed with exception " + e);
+				LOGGER.warn("Scheduled immediate job for {}-{} failed with exception",  
+						runafter.getHostname(),
+						runafter.getServicename(), 
+						e);
 			}
 		}
 	}
@@ -169,7 +172,8 @@ public class ServiceJob implements Job {
 
 		for (Service service:services) {
 			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Service to run immiediate run - " + service.getHost().getHostname() + "-" + 
+				LOGGER.debug("Service to run immiediate {}-{}",
+						service.getHost().getHostname(), 
 						service.getServiceName());
 
 			Map<String,Object> map = new HashMap<String, Object>();
@@ -213,8 +217,8 @@ public class ServiceJob implements Job {
 			ServiceItem serviceitem = serviceitementry.getValue();
 
 			String fullservicename = Util.fullName(service, serviceitem);
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Executing ServiceItem: "+ fullservicename);
+			
+			LOGGER.debug("Executing ServiceItem: {}", fullservicename);
 
 			synchronized (service) {
 				executeService(service, serviceitem);
@@ -238,7 +242,7 @@ public class ServiceJob implements Job {
 					serviceitem.setLatestExecuted("null");
 					CacheFactory.getInstance().add(service,serviceitem);
 				}
-				LOGGER.warn("Connection to " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed.", e);
+				LOGGER.warn("Connection to {} failed", Util.obfuscatePassword(service.getConnectionUrl()), e);
 				setLevelOnError(service);
 			}
 
@@ -249,26 +253,28 @@ public class ServiceJob implements Job {
 						service.closeConnection();
 					} catch (ServiceException ignore) {}
 				} catch (ServiceItemException si) {
-					LOGGER.warn(si.getServiceItemName() +" execution prepare and/or query \""+ serviceitem.getExecution() 
-							+ "\" failed", si);
+					LOGGER.warn("{} execution prepare and/or query \"{}\" failed",
+							si.getServiceItemName(), 
+							serviceitem.getExecution(), 
+							si);
 					setLevelOnError(service);
-					//return;
+					
 				} catch (ServiceException se) {
-					LOGGER.warn(se.getServiceName() + " execution prepare and/or query \""+ serviceitem.getExecution() 
-							+ "\" failed", se);
+					LOGGER.warn("{} execution prepare and/or query \"{}\" failed",
+							se.getServiceName(), 
+							serviceitem.getExecution(), 
+							se);
 					setLevelOnError(service);
-					//return;
+					
 				}
 			}
 		}
 		finally {
 			long executetime = context.stop()/1000000;         	
 			serviceitem.setExecutionTime(executetime);
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Time to execute " + 
-						serviceitem.getExecution() + 
-						" : " + serviceitem.getExecutionTime() +
-						" ms");
+			LOGGER.debug("Time to execute {} : {} ms",
+						serviceitem.getExecution(),
+						serviceitem.getExecutionTime());
 		}
 	}
 
@@ -288,8 +294,7 @@ public class ServiceJob implements Job {
 
 		
 			// Always report the state for the worst service item 
-			if(LOGGER.isDebugEnabled())
-				LOGGER.debug(serviceitem.getServiceItemName()+ " last executed value "+ serviceitem.getLatestExecuted());
+			LOGGER.debug("{} last executed value {}", serviceitem.getServiceItemName(), serviceitem.getLatestExecuted());
 			NAGIOSSTAT curstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
 
 			CacheFactory.getInstance().add(service,serviceitem);
@@ -313,7 +318,6 @@ public class ServiceJob implements Job {
 	 * @param service
 	 */
 	private void setLevelOnError(Service service) {
-		// TODO
 		service.setLevel(NAGIOSSTAT.CRITICAL);
 	}
 
