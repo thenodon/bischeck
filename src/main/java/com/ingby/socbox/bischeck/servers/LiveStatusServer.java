@@ -40,6 +40,10 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
+/**
+ * Nagios server integration over the livestatus protocol over the network.
+ *
+ */
 public final class LiveStatusServer implements Server, MessageServerInf {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(LiveStatusServer.class);
@@ -101,6 +105,13 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 
 	}
 
+	
+	@Override
+    public String getInstanceName() {
+    	return instanceName;
+    }
+	
+	
 	/**
 	 * COMMAND [timestamp] PROCESS_SERVICE_CHECK_RESULT;hostname;servicename;status;description
 	 * timestamp in seconds 
@@ -166,9 +177,9 @@ public final class LiveStatusServer implements Server, MessageServerInf {
             out.flush();
 
 		} catch (UnknownHostException e) {
-			LOGGER.error("Network error - don't know about host: " + hostAddress,e);
+			LOGGER.error("Network error - don't know about host: {}", hostAddress,e);
 		} catch (IOException e) {
-			LOGGER.error("Network error - check livestatus server and that service is started - " + e);
+			LOGGER.error("Network error - check livestatus server and that service is started", e);
 		} finally { 
 			if (out != null)
 				out.close();
@@ -178,9 +189,7 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 			} catch (IOException ignore) {}
 
 			long duration = context.stop()/1000000;
-			
-			if (LOGGER.isDebugEnabled())
-            	LOGGER.debug("Livestatus send execute: " + duration + " ms");
+			LOGGER.debug("Livestatus send execute: {} ms", duration);
 		}
 	}
 

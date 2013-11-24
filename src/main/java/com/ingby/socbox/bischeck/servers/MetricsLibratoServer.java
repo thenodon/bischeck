@@ -43,7 +43,6 @@ import com.yammer.metrics.core.TimerContext;
 /**
  * This class provide integration with https://metrics.librato.com, a cloud 
  * based monitoring service.
- * @author andersh
  *
  */
 public final class MetricsLibratoServer implements Server, MessageServerInf {
@@ -146,6 +145,12 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 
 
 	@Override
+    public String getInstanceName() {
+    	return instanceName;
+    }
+	
+	
+	@Override
 	public synchronized void send(Service service) {
 		
 		if(!doNotSendRegex.isEmpty()) {
@@ -186,7 +191,7 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 			LOGGER.error("Network error - check connection", e);
 		} finally { 		
 			duration = context.stop()/1000000;
-			LOGGER.info("Librato send execute: " + duration + " ms");
+			LOGGER.debug("Librato send execute: {} ms", duration);
 		}
 	}
 
@@ -209,21 +214,21 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 			}	
 			
 			if (serviceItem.getLatestExecuted() != null){
-				if (LOGGER.isInfoEnabled())
-					strbuf.append(metricName).
-						append("=").
-						append(serviceItem.getLatestExecuted());
-				
+				//if (LOGGER.isInfoEnabled())
+				strbuf.append(metricName).
+					append("=").
+					append(serviceItem.getLatestExecuted());
+
 				batch.addGaugeMeasurement(metricName.toString(),
 						new BigDecimal(serviceItem.getLatestExecuted()));   	
 			}	
 			
 			if (sendThreshold && serviceItem.getThreshold().getThreshold() != null){
-				if (LOGGER.isInfoEnabled())
-					strbuf.append(" ").
-						append(metricName).
-						append("_threshold=").
-						append(serviceItem.getThreshold().getThreshold());
+				//if (LOGGER.isInfoEnabled())
+				strbuf.append(" ").
+					append(metricName).
+					append("_threshold=").
+					append(serviceItem.getThreshold().getThreshold());
 				
 				batch.addGaugeMeasurement(metricName.toString()+"_threshold",
 						new BigDecimal(serviceItem.getThreshold().getThreshold()));   	

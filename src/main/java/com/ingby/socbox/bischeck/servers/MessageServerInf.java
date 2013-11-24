@@ -25,11 +25,14 @@ import com.ingby.socbox.bischeck.service.Service;
 /**
  * The interface used by Server implementations to manage async message based 
  * communication with ServiceJobs.
- *  
- * @author andersh
- *
+ * 
  */
 public interface MessageServerInf extends Callback<Service>{
 	
+	
+	/**
+	 * The callback method used by any {@link Server} to receive messages with 
+	 * the {@link Service} data to processes 
+	 */
 	public void onMessage(Service message);	
 }

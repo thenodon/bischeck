@@ -22,6 +22,11 @@ package com.ingby.socbox.bischeck.servers;
 
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
+/**
+ * The interface must be implemented by any server implementation that could 
+ * publish bischeck internal status to the server.
+ * 
+ */
 public interface ServerInternal {
     
     /**

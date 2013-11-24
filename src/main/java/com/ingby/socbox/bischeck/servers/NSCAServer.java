@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 import com.googlecode.jsendnsca.MessagePayload;
 import com.googlecode.jsendnsca.NagiosException;
@@ -45,12 +47,12 @@ import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 /**
  * Nagios server integration over NSCA protocol, using the jnscasend package.
- * @author andersh
  *
  */
 public final class NSCAServer implements Server, ServerInternal, MessageServerInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NSCAServer.class);
+    
     /**
      * The server map is used to manage multiple configuration based on the 
      * same NSCAServer class.
@@ -60,6 +62,9 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
     private NagiosPassiveCheckSender sender = null;
     private String instanceName;
 	private NagiosUtil nagutil = new NagiosUtil();
+	private ServerCircuitBreak cb;
+
+	private final Marker marker;
 
     
     /**
@@ -94,7 +99,9 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
      * @param name
      */
     private NSCAServer(String name) {
+    	marker = MarkerFactory.getMarker(name);
         instanceName=name;
+        cb = new ServerCircuitBreak(this);
     }
     
     
@@ -124,25 +131,35 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
     @Override
     synchronized public void sendInternal(String host, String service, NAGIOSSTAT level, String message) {
     	MessagePayload payload = new MessagePayloadBuilder()
-        .withHostname(host)
-        .withServiceName(service)
-        .create();
-    	 payload.setMessage(level +"|"+ message);
-    	 payload.setLevel(level.toString());
-    	 
-    	 LOGGER.info(ServerUtil.logFormat(instanceName, host, service, payload.getMessage()));
-         
-    	 try {
-			sender.send(payload);
-		} catch (NagiosException e) {
-        	LOGGER.warn("Nsca server error", e);
-        } catch (IOException e) {
-        	LOGGER.error("Network error - check nsca server and that service is started", e);
-        }	    
+    	.withHostname(host)
+    	.withServiceName(service)
+    	.create();
+
+    	payload.setMessage(level +"|"+ message);
+    	payload.setLevel(level.toString());
+
+    	if (LOGGER.isInfoEnabled()) {
+    		LOGGER.info(marker, ServerUtil.logFormat(instanceName, host, service, payload.getMessage()));
+    	}
+    	
+    	try {
+    		sender.send(payload);
+    	} catch (NagiosException e) {
+    		LOGGER.warn(marker, "Nsca server error", e);
+    	} catch (IOException e) {
+    		LOGGER.error(marker, "Network error - check nsca server and that service is started", e);
+    	}	    
     }
-        
+
+    
     @Override
-    synchronized public void send(Service service) {
+    public String getInstanceName() {
+    	return instanceName;
+    }
+    
+    @Override
+    //synchronized 
+    public void send(Service service) throws ServerException {
         NAGIOSSTAT level;
     
         MessagePayload payload = new MessagePayloadBuilder()
@@ -154,16 +171,16 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
          * Check the last connection status for the Service
          */
         if ( service.isConnectionEstablished() ) {
-            try {
+            //try {
                 level = service.getLevel();
                 payload.setMessage(level + nagutil.createNagiosMessage(service));
-            } catch (Exception e) {
+            /*} catch (Exception e) {
                 level=NAGIOSSTAT.CRITICAL;
                 payload.setMessage(level + " " + e.getMessage());
-            }
+            }*/
         } else {
             // If no connection is established still write a value 
-            //of null value=null;
+            // of null value=null;
             level=NAGIOSSTAT.CRITICAL;
             payload.setMessage(level + " " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
         }
@@ -171,7 +188,7 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
         payload.setLevel(level.toString());
         
         if (LOGGER.isInfoEnabled())
-        	LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
+        	LOGGER.info(marker, ServerUtil.logFormat(instanceName, service, payload.getMessage()));
         
         final String timerName = instanceName+"_execute";
 
@@ -182,13 +199,15 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
         try {
         	sender.send(payload);
         }catch (NagiosException e) {
-        	LOGGER.warn("Nsca server error", e);
+        	LOGGER.warn(marker, "Nsca server error", e);
+        	throw new ServerException(e);
         } catch (IOException e) {
-        	LOGGER.error("Network error - check nsca server and that service is started", e);
+        	LOGGER.error(marker, "Network error - check nsca server and that service is started", e);
+        	throw new ServerException(e);
         } finally { 
         	long duration = context.stop()/1000000;
 			if (LOGGER.isDebugEnabled())
-            	LOGGER.debug("Nsca send execute: " + duration + " ms");
+            	LOGGER.debug(marker, "Nsca send execute: {} ms", duration);
         }	    
     }
     
@@ -208,7 +227,9 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
 
 	@Override
 	public void onMessage(Service message) {
-		send(message);
+		//send(message);
+		cb.execute(message);
 	}
+
 
 }

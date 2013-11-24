@@ -43,8 +43,11 @@ import com.yammer.metrics.core.TimerContext;
 
 /**
  * This class is responsible to send bischeck data to a graphite server
- * @author andersh
- *
+ * <br>
+ * The Graphite message has the following format: <b>
+ * <code>
+ * metric_path value timestamp\n
+ * </code>
  */
 public final class GraphiteServer implements Server, MessageServerInf {
 
@@ -107,7 +110,13 @@ public final class GraphiteServer implements Server, MessageServerInf {
     	servers.remove(name);
     }
     
-    	
+    
+    @Override
+    public String getInstanceName() {
+    	return instanceName;
+    }
+    
+    
     @Override
     synchronized public void send(Service service) {
         String message;    
@@ -158,7 +167,7 @@ public final class GraphiteServer implements Server, MessageServerInf {
             out.flush();
             
         } catch (UnknownHostException e) {
-            LOGGER.error("Network error - don't know about host: " + hostAddress,e);
+            LOGGER.error("Network error - don't know about host: {} ",hostAddress,e);
         } catch (IOException e) {
             LOGGER.error("Network error - check Graphite server and that service is started", e);
         } finally {
@@ -170,8 +179,7 @@ public final class GraphiteServer implements Server, MessageServerInf {
             } catch (IOException ignore) {}    
         
         	long duration = context.stop()/1000000;
-            if (LOGGER.isDebugEnabled())
-            	LOGGER.debug("Graphite send execute: " + duration + " ms");
+        	LOGGER.debug("Graphite send execute: {} ms", duration);
         
         }
 	}
@@ -183,7 +191,7 @@ public final class GraphiteServer implements Server, MessageServerInf {
         long currenttime = System.currentTimeMillis()/1000;
         for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
             ServiceItem serviceItem = serviceItementry.getValue();
-            //metric_path value timestamp\n
+            
             
             strbuf = formatRow(strbuf, 
                     currenttime,

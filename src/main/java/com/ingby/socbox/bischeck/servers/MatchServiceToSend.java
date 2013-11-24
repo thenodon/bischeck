@@ -18,8 +18,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  * This class is used to check if a string match a specific pattern. The pattern
  * used can be defined as a string or as a list of string to match against.
  * When a string is matched by the isMatch its stored in a cache so it do not 
- * need to execute the matching next time.    
- * @author andersh
+ * need to execute the matching next time.
  *
  */
 public class MatchServiceToSend {

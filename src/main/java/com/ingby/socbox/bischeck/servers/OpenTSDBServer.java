@@ -42,6 +42,10 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
+/**
+ * This class is responsible to send bischeck data to a opentsdb server
+ * 
+ */
 public final class OpenTSDBServer implements Server,  MessageServerInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OpenTSDBServer.class);
@@ -92,6 +96,12 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     }
     
     
+	@Override
+    public String getInstanceName() {
+    	return instanceName;
+    }
+	
+    
     @Override
     synchronized public void send(Service service) {
 
@@ -134,7 +144,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
             out.flush();
             
         } catch (UnknownHostException e) {
-            LOGGER.error("Network error - don't know about host: " + hostAddress, e);
+            LOGGER.error("Network error - don't know about host: {}", hostAddress, e);
         } catch (IOException e) {
             LOGGER.error("Network error - check OpenTSDB server and that service is started", e);
         }
@@ -147,8 +157,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
             } catch (IOException ignore) {}    
             
             long duration = context.stop()/1000000;
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("OpenTSDB send execute: " + duration + " ms");
+			LOGGER.debug("OpenTSDB send execute: {} ms", duration);
             
         }
 	}

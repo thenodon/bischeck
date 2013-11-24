@@ -132,6 +132,13 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
     	 //LOGGER.info("Send Internal - sender.send(payload)");	    
     }
         
+    
+	@Override
+    public String getInstanceName() {
+    	return instanceName;
+    }
+	
+	
     @Override
     synchronized public void send(Service service) {
         NAGIOSSTAT level;

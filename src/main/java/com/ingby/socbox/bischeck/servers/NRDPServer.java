@@ -55,6 +55,23 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
+/**
+ * Nagios server integration over http based NRDP protocol.
+ * <br>
+ * The message has the following structure when sent from Bischeck to NRDP.
+ * <br>
+ * <code>
+ * <?xml version='1.0'?>"<br>
+ * &nbsp;&nbsp;<checkresults>"<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;<checkresult type=\"service\" checktype=\"1\">"<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<hostname>YOUR_HOSTNAME</hostname>"<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<servicename>YOUR_SERVICENAME</servicename>"<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<state>0</state>"<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<output>OK|perfdata=1.00;5;10;0</output>"<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</checkresult>"<br>
+ * &nbsp;&nbsp;</checkresults>"<br>
+ * <code>
+ */
 
 public final class NRDPServer implements Server, MessageServerInf {
 
@@ -135,18 +152,13 @@ public final class NRDPServer implements Server, MessageServerInf {
 		} 
 	}
 
-	/**
-	 * <?xml version='1.0'?>"
-	 * <checkresults>"
-	 *    <checkresult type=\"service\" checktype=\"1\">"
-	 *      <hostname>YOUR_HOSTNAME</hostname>"
-	 *      <servicename>YOUR_SERVICENAME</servicename>"
-	 *      <state>0</state>"
-	 *      <output>OK|perfdata=1.00;5;10;0</output>"
-	 *   </checkresult>"
-	 * </checkresults>"
-	 */
-
+	
+	@Override
+    public String getInstanceName() {
+    	return instanceName;
+    }
+	
+	
 	@Override
 	public void send(Service service) {
 
@@ -252,7 +264,7 @@ public final class NRDPServer implements Server, MessageServerInf {
 	            if (!result.equals("0")) {  
 	            	String message = (String) ((Element) responselist.item(0)).getElementsByTagName("message").  
 	            		item(0).getChildNodes().item(0).getNodeValue().trim();  
-	            	LOGGER.error("nrdp returned message \"" + message + "\" for xml:  " + xml);
+	            	LOGGER.error("nrdp returned message \"{}\" for xml: {}",message, xml);
 	            }
 			} catch (SAXException e) {
 				LOGGER.error("Could not parse response xml", e);
@@ -267,8 +279,7 @@ public final class NRDPServer implements Server, MessageServerInf {
 			} catch (IOException ignore) {}
 			
 			long duration = context.stop()/1000000;
-			if (LOGGER.isDebugEnabled())
-            	LOGGER.debug("Nrdp send execute: " + duration + " ms");
+			LOGGER.debug("Nrdp send execute: {} ms", duration);
 		}
 	}
 

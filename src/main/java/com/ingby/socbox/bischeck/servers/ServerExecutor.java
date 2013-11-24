@@ -153,8 +153,7 @@ public final class ServerExecutor {
 			}
 		}finally { 			
 			Long duration = context.stop()/1000000;
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("All servers execution time: " + duration + " ms");
+			LOGGER.debug("All servers execution time: {} ms", duration);
 		}
 	}
 
@@ -192,8 +191,7 @@ public final class ServerExecutor {
 			}
 		}finally { 			
 			Long duration = context.stop()/1000000;
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("All servers execution time: " + duration + " ms");
+			LOGGER.debug("All servers execution time: {} ms", duration);
 		}
 	}
 }
