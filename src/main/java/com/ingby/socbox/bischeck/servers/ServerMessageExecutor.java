@@ -136,9 +136,6 @@ public final class ServerMessageExecutor {
 		return serverexecutor;
 	}
 
-	private void publish(Service service) {
-		channel.publish(service);
-	}
 	
 	/**
 	 * Call all registered Server implementations and invoke their 
@@ -194,16 +191,22 @@ public final class ServerMessageExecutor {
 		final TimerContext context = timer.time();
 
 		try { 
-			//publish(service);
 			channel.publish(service);
 		}finally { 			
 			Long duration = context.stop()/1000000;
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("All servers execution time: " + duration + " ms");
+			LOGGER.debug("All servers execution time: {} ms", duration);
 		}
 	}
 
-	
+
+	/**
+	 * The method to send bischeck internal data to servers that implements 
+	 * {@link ServerInternal}
+	 * @param host the hostname defined for the server running bischeck
+	 * @param service the service decribed as the internal bischeck service
+	 * @param level the state level
+	 * @param message the message to send
+	 */
 	synchronized public void executeInternal(String host, String service, NAGIOSSTAT level, String message) {
 
 		final Timer timer = Metrics.newTimer(ServerMessageExecutor.class, 
@@ -238,8 +241,7 @@ public final class ServerMessageExecutor {
 			}
 		} finally { 			
 			Long duration = context.stop()/1000000;
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("All servers execution time: " + duration + " ms");
+			LOGGER.debug("All servers execution time: {} ms", duration);
 		}
 	}
 }
