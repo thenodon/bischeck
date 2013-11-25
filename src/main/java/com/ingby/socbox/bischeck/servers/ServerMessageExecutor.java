@@ -78,6 +78,7 @@ public final class ServerMessageExecutor {
     /**
      * Create an instance of the class
      */
+	@SuppressWarnings("unchecked")
 	private ServerMessageExecutor() {
 		try {
 			// Get all configure Servers 
