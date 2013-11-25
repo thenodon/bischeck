@@ -20,13 +20,17 @@
 package com.ingby.socbox.bischeck.threshold;
 
 
+/**
+ * The threshold class used when a serviceitem do not specify a threshold class.
+ * The class do not implement any threshold logic.
+ * 
+ */
 public class DummyThreshold implements Threshold {
     
 	private String hostName;
     private String serviceName;
     private String serviceItemName;
     private NAGIOSSTAT state;
-    
     
     
     public DummyThreshold(String hostName, String serviceName, String serviceItemName) {

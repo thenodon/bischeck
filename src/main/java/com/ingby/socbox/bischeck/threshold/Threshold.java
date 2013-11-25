@@ -20,9 +20,9 @@
 package com.ingby.socbox.bischeck.threshold;
 
 /**
- * The interface describe all methods need to create a Threshold compatible 
+ * The interface describe all methods needed to create a Threshold compatible 
  * class that can be instantiated by ThresholdFactory class. The implemented 
- * class must have a constructor that implements the following constuctor that
+ * class must have a constructor that implements the following constructor that
  * takes 3 parameters and in the following order:<br>
  * <code>
  * {@link String} hostName<br>
@@ -30,7 +30,6 @@ package com.ingby.socbox.bischeck.threshold;
  * {@link String} serviceItemName<br>
  * </code>
  * See example {@link Twenty4HourThreshold#Twenty4HourThreshold(String, String,String)}
- * @author Anders Håål
  *
  */
 

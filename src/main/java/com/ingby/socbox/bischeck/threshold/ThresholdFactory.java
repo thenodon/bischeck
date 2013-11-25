@@ -35,7 +35,10 @@ import com.ingby.socbox.bischeck.ClassCache;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
-
+/**
+ * Threshold factory that create {@link Threshold} implementations based on their
+ * name.
+ */
 public class ThresholdFactory {
 
 	private static Map<String,Threshold> cache = Collections.synchronizedMap(new HashMap<String,Threshold>());
@@ -80,7 +83,7 @@ public class ThresholdFactory {
 								serviceItem.getServiceItemName(),
 								serviceItem.getThresholdClassName());
 					} catch (ClassNotFoundException ee) {
-						LOGGER.error("Threshold class " + serviceItem.getThresholdClassName() + " not found.", ee);
+						LOGGER.error("Threshold class {} not found.", serviceItem.getThresholdClassName(), ee);
 						ThresholdException te = new ThresholdException(ee);
 						te.setThresholdName(serviceItem.getThresholdClassName());
 						throw te;
@@ -130,37 +133,37 @@ public class ThresholdFactory {
 			current = (Threshold) constructor.newInstance(new Object[] { hostName, serviceName, serviceItemName});
 			
 		} catch (IllegalAccessException e) {
-			LOGGER.error("Illegal access to instance Threshold class " +
+			LOGGER.error("Illegal access to instance Threshold class {}",
 					className, e);
 			ThresholdException te = new ThresholdException(e);
 			te.setThresholdName(className);
 			throw te;
 		} catch (InstantiationException e) {
-			LOGGER.error("Failed to instance Threshold class " +
+			LOGGER.error("Failed to instance Threshold class {}",
 					className, e);
 			ThresholdException te = new ThresholdException(e);
 			te.setThresholdName(className);
 			throw te;
 		} catch (SecurityException e) {
-			LOGGER.error("Failed to instance Threshold class due to security " +
+			LOGGER.error("Failed to instance Threshold class due to security {}",
 					className, e);
 			ThresholdException te = new ThresholdException(e);
 			te.setThresholdName(className);
 			throw te;
 		} catch (NoSuchMethodException e) {
-			LOGGER.error("Failed to instance Threshold class due to illegal constructor method " +
+			LOGGER.error("Failed to instance Threshold class due to illegal constructor method {}",
 					className, e);
 			ThresholdException te = new ThresholdException(e);
 			te.setThresholdName(className);
 			throw te;
 		} catch (IllegalArgumentException e) {
-			LOGGER.error("Failed to instance Threshold class due to illegal arguments " +
+			LOGGER.error("Failed to instance Threshold class due to illegal arguments {}",
 					className, e);
 			ThresholdException te = new ThresholdException(e);
 			te.setThresholdName(className);
 			throw te;
 		} catch (InvocationTargetException e) {
-			LOGGER.error("Failed to instance Threshold class due invocation error " +
+			LOGGER.error("Failed to instance Threshold class due invocation error {}",
 					className, e);
 			ThresholdException te = new ThresholdException(e);
 			te.setThresholdName(className);

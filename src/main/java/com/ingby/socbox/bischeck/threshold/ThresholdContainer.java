@@ -19,6 +19,11 @@
 
 package com.ingby.socbox.bischeck.threshold;
 
+/**
+ * Place hold class to define the threshold in a full hour, based on an expression
+ * or a static value.
+ *
+ */
 public class ThresholdContainer {
     private Float floatThreshold = null;
     private String expThreshold = null;
