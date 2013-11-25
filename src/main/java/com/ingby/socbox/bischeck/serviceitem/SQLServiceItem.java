@@ -23,7 +23,10 @@ package com.ingby.socbox.bischeck.serviceitem;
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 import com.ingby.socbox.bischeck.service.ServiceException;
 
-
+/**
+ * Class execute SQL based executestatements.
+ *
+ */
 public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     
         

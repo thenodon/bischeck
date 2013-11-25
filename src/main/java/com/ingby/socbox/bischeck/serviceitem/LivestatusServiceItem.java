@@ -40,20 +40,20 @@ import com.ingby.socbox.bischeck.service.ServiceException;
  * nagios state 0 (okay),1 (warning),2 (critical)and 3 (unknown). 
  * If perfdata is used a additional it must contain 'label' : 'name'. An example 
  * <br>
+ * <code>
  * 'rta'=0.251ms;100.000;500.000;0; 'pl'=0%;20;60;; 
+ *  </code>
  *  <br>
  * To extract the rta the meassage should have the following format:<br>
  * {"host":"linux-server1","service":"DNS","query":"perfdata","label":"rta"}<br> 
  * The data retrieved is only the first field, what has been measured. 
  * All text like ms, B (byte), % etc will be removed to the result is just an
- * number.
+ * number.<br>
  * Output format is also in json format. If the response include more the one 
  * value and single value the only the first value in the array will be used 
  * and a logger error will be created showing the content.
  *  
  *  
- * @author andersh
- *
  */
 public class LivestatusServiceItem extends ServiceItemAbstract implements ServiceItem {
     

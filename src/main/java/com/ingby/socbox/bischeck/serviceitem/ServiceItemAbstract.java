@@ -29,8 +29,6 @@ import com.ingby.socbox.bischeck.threshold.Threshold;
  * class is: <b>
  * public void execute() throws Exception <b>
  *  
- * @author Anders Håål
- *
  */
 
 

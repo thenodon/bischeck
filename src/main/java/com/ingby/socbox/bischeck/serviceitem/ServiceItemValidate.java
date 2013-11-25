@@ -22,9 +22,7 @@ package com.ingby.socbox.bischeck.serviceitem;
 
 /**
  * The interface describe all methods need to validate configuration
- * using this service item
- *   
- * @author Anders Håål
+ * using this service item.
  *
  */
 public interface ServiceItemValidate {

@@ -29,7 +29,18 @@ import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEPPool;
 import com.ingby.socbox.bischeck.service.ServiceException;
 
-
+/**
+ * The class enable query against the Laststatus cache. Used to create virtual
+ * services based on existing cached data.
+ * <br>
+ * The executestatment string must follow the normal rules define for a 
+ * JEP expression with cache query statement, like: 
+ * <br>
+ * <code>
+ * avg(erpserver-orders-ediOrders[0:19]) / erpserver-orders-webOrders[0:19])
+ * </code>
+ * 
+ */
 public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem {
     
 	private final static Logger LOGGER = LoggerFactory.getLogger(CalculateOnCache.class);

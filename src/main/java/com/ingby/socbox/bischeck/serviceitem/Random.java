@@ -26,7 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.service.ServiceException;
 
-
+/**
+ * The class simply generate a random number between 0 and the number define
+ * in the executestatement.
+ */
 public class Random extends ServiceItemAbstract implements ServiceItem {
     
 	private final static Logger LOGGER = LoggerFactory.getLogger(Random.class);

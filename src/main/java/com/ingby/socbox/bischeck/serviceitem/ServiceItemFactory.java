@@ -27,7 +27,11 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ClassCache;
 
-
+/**
+ * Factory class to create {@link ServiceItem} implementation classes based on the 
+ * class name.
+ * 
+ */
 public class ServiceItemFactory {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ServiceItemFactory.class);
@@ -46,7 +50,7 @@ public class ServiceItemFactory {
             try {
             	clazz = (Class<ServiceItem>) ClassCache.getClassByName(clazzname);
             }catch (ClassNotFoundException ee) {
-                LOGGER.error("ServiceItem class " + clazzname + " not found.");
+                LOGGER.error("ServiceItem class {} not found.", clazzname);
                 throw ee;
             }
         }

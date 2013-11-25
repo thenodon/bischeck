@@ -30,8 +30,15 @@ import com.ingby.socbox.bischeck.service.ServiceException;
 
 
 /**  
- * @author andersh
- *
+ * Class enable parsing of the performance data string returned by a Nagios
+ * check command.<br>
+ * The executestatment is a json string with the check and label key:<br>
+ * <code>
+ * {"check":"usr/lib/nagios/plugins/check_tcp -H localhost -p 22","label":"time"}<br>
+ * </code>
+ * The check define the check command to run and the label define the performance 
+ * data label to extract.
+ * 
  */
 
 public class CheckCommandServiceItem extends ServiceItemAbstract implements ServiceItem {

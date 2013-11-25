@@ -24,7 +24,7 @@ import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.threshold.Threshold;
 
 /**
- * The interface describe all methods need to create a ServiceItem compatible 
+ * The interface describe all methods needed to create a ServiceItem compatible 
  * class that can be instantiated by ServiceItemFactory class. The implemented 
  * class must have a constructor with a parameter of String that is the service 
  * item name.
@@ -37,12 +37,9 @@ import com.ingby.socbox.bischeck.threshold.Threshold;
  * &nbsp;&nbsp;this.serviceitemname=serviceitemname; <br>
  * } <br>
  * </code> 
- * To implement a custom Service its adviced to extend the abstracted class
+ * To implement a custom Service its advised to extend the abstracted class
  * ServiceItemAbstract class.
  *  
- *   
- * @author Anders Håål
- *
  */
 public interface ServiceItem {
     
@@ -158,14 +155,31 @@ public interface ServiceItem {
      */
     public void setService(Service service);
     
+    
+    /**
+     * Set the class name to be used to exceute the serviceitem
+     * @param classname
+     */
     public void setClassName(String classname);
 
+    
+    /**
+     * Get the class name used for the service item
+     * @return
+     */
     public String getClassName();
 
-    
+    /**
+     * Set the serviceitem alias
+     * @return
+     */
     public String getAlias();
 
 
+    /**
+     * Get the serviceitem alias
+     * @param alias
+     */
 	public void setAlias(String alias);
 
 }
