@@ -153,8 +153,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 			try {
 				server.send(service); 
 				exceptionCount.set(0); 
-				return;
-			} catch (Exception e) {
+			} catch (ServerException e) {
 				if (exceptionCount.incrementAndGet() >= exceptionThreshold) { 
 					firstOpen = true;
 					trip(); 
@@ -175,7 +174,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 			try {
 				server.send(service); 
 				reset(); 
-			} catch (Exception e) {
+			} catch (ServerException e) {
 				totalFailed.incrementAndGet();
 				firstOpen = true;
 				trip();
