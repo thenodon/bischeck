@@ -28,6 +28,28 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 
+/**
+ * The class is responsible to manage different cache query statements. 
+ * Supported are: 
+ * <ul>
+ * <li>
+ * Single index - <code>erpserver-orders-ediOrders[9]</code>
+ * </li>
+ * <li>
+ * Single time - <code>erpserver-orders-ediOrders[-30M]</code>
+ * </li>
+ * <li> 
+ * Range by index - <code>erphost-orders-ediorders[0:9]</code> and 
+ * <code>erphost-orders-ediorders[1,3,9]</code>
+ * </li>
+ * <li>
+ * Range by time - <code>erpserver-orders-ediOrders[-30M:-120M]</code>
+ * </li>
+ * For time related the S (second), M (minute), H (hour) and D (day) are allowed.<br>
+ * For range, both index and time the END directive is allowed which means until 
+ * the last entry in the cache. 
+ * 
+ */
 public abstract class CacheUtil {
 
 	private final static Logger  LOGGER = LoggerFactory.getLogger(CacheUtil.class);

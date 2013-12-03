@@ -32,6 +32,11 @@ import net.sf.json.JSONSerializer;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
 
+/**
+ * The class is responsible to manage data that goes in and out of the LastStatus
+ * cache.<br>
+ * The class support different constructors from object, data and json.
+ */
 public class LastStatus implements Serializable, Cloneable {
 	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatus.class);
 

@@ -9,7 +9,10 @@ import org.slf4j.LoggerFactory;
 import com.ingby.socbox.bischeck.ClassCache;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
-
+/**
+ * The factory class select which cache provider to use based on properties
+ * <i>cacheProvider</i>
+ */
 public class CacheFactory {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(CacheFactory.class);
@@ -75,7 +78,7 @@ public class CacheFactory {
 				throw new CacheException(e);
 			}
 
-			LOGGER.info("Cache provider selected is - " + className);
+			LOGGER.info("Cache provider selected is {}", className);
 		}
 	}
 
@@ -107,7 +110,7 @@ public class CacheFactory {
 			cache = null;
 		}
 	
-		LOGGER.info("Cache provider destroyed - " + classCacheName);
+		LOGGER.info("Cache provider destroyed {}", classCacheName);
 	}
 	
 }

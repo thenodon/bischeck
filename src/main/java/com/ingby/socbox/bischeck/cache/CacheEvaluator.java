@@ -20,30 +20,39 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
+/**
+ * The main class to manage parsing and execution of cache data in
+ * 
+ */
 public class CacheEvaluator {
-	
-	private final static Logger  LOGGER = LoggerFactory.getLogger(CacheEvaluator.class);
+
+	private final static Logger LOGGER = LoggerFactory
+			.getLogger(CacheEvaluator.class);
 
 	private String statement = null;
 	private String parsedstatement = null;
 	private List<String> cacheEntriesName = null;
 	private List<String> cacheEntriesValue = null;
-	private static final Pattern PATTERN_HOST_SERVICE_SERVICEITEM = Pattern.compile (ObjectDefinitions.getHostServiceItemRegexp());
+	private static final Pattern PATTERN_HOST_SERVICE_SERVICEITEM = Pattern
+			.compile(ObjectDefinitions.getHostServiceItemRegexp());
 
-	//private static boolean notFullListParse = false;
-	
-	static  boolean notNullSupport = ConfigurationManager.getInstance().getProperties().getProperty("notFullListParse","false").equalsIgnoreCase("false");
+	// private static boolean notFullListParse = false;
+
+	static boolean notNullSupport = ConfigurationManager.getInstance()
+			.getProperties().getProperty("notFullListParse", "false")
+			.equalsIgnoreCase("false");
+
 	/**
 	 * 
 	 * @param statement
 	 * @return
 	 */
 	public static String parse(String statement) {
-		final Timer timer = Metrics.newTimer(CacheEvaluator.class, 
-				"parse", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-		
+		final Timer timer = Metrics.newTimer(CacheEvaluator.class, "parse",
+				TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+
 		final TimerContext context = timer.time();
-	
+
 		CacheEvaluator cacheeval;
 		try {
 			cacheeval = new CacheEvaluator(statement);
@@ -54,101 +63,87 @@ public class CacheEvaluator {
 		return cacheeval.getParsedStatement();
 	}
 
-
 	/**
 	 * 
 	 * @param statement
 	 */
-	public CacheEvaluator(String statement) {
+	private CacheEvaluator(String statement) {
 		this.statement = statement;
 	}
 
-
 	/**
 	 * 
 	 * @return
 	 */
-	public String getParsedStatement() {
+	private String getParsedStatement() {
 		return parsedstatement;
 	}
 
-
 	/**
 	 * 
 	 * @return
 	 */
-	public List<String> statementValues() {
+	private List<String> statementValues() {
 		return Collections.unmodifiableList(cacheEntriesValue);
 	}
 
-
 	/**
 	 * 
 	 * @return
 	 */
-	public List<String> statementEntries() {
+	private List<String> statementEntries() {
 		return Collections.unmodifiableList(cacheEntriesName);
 	}
-
 
 	/***
 	 * 
 	 */
 	private void parse() {
-		//Pattern pat = null;
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("String to cache parse: " + statement);
-
+		LOGGER.debug("String to cache parse: {}", statement);
 
 		cacheEntriesName = parseParameters(statement);
 
-
 		// If no cache definition present return the orignal string
-		if (cacheEntriesName.size() == 0) 
+		if (cacheEntriesName.size() == 0)
 			parsedstatement = statement;
 
 		// If cache entries in the string parse and replace
 		cacheEntriesValue = getValues(cacheEntriesName);
 
-		// Indicator to see if any parameters are null since then no calc will be done
+		// Indicator to see if any parameters are null since then no calc will
+		// be done
 		boolean notANumber = false;
-		//ArrayList<String> paramOut = new ArrayList<String>();
+		// ArrayList<String> paramOut = new ArrayList<String>();
 
 		Iterator<String> iter = cacheEntriesValue.iterator();
 
-		
 		while (iter.hasNext()) {
 			String retvalue = iter.next();
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug(">>> retvalue " + retvalue);
+			LOGGER.debug("Parsed return value: {}", retvalue);
 			if (notNullSupport && Util.hasStringNull(retvalue)) {
-				notANumber= true;
+				notANumber = true;
 				break;
 			}
 		}
 
-		
-		if (notANumber) { 
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("One or more of the parameters are null");
+		if (notANumber) {
+			LOGGER.debug("One or more of the parameters are null");
 			parsedstatement = null;
-		} else  {
+		} else {
 
-			StringBuffer sb = new StringBuffer ();
-			Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (statement);
+			StringBuffer sb = new StringBuffer();
+			Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher(statement);
 
-			int i=0;
-			while (mat.find ()) {
-				mat.appendReplacement (sb, cacheEntriesValue.get(i++));
+			int i = 0;
+			while (mat.find()) {
+				mat.appendReplacement(sb, cacheEntriesValue.get(i++));
 			}
-			mat.appendTail (sb);
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Parsed string with cache data: " + sb.toString());
+			mat.appendTail(sb);
+			LOGGER.debug("Parsed string with cache data: {}", sb.toString());
 			parsedstatement = sb.toString();
 		}
-		
-	}
 
+	}
 
 	/**
 	 * 
@@ -156,58 +151,56 @@ public class CacheEvaluator {
 	 * @return
 	 * @throws PatternSyntaxException
 	 */
-	private static List<String> parseParameters(String execute) throws PatternSyntaxException {
+	private static List<String> parseParameters(String execute)
+			throws PatternSyntaxException {
 
 		List<String> cacheNameList = new ArrayList<String>();
 
-		Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher (execute);
+		Matcher mat = PATTERN_HOST_SERVICE_SERVICEITEM.matcher(execute);
 
 		// empty array to be filled with the cache fields to find
 
-		while (mat.find ()) {
+		while (mat.find()) {
 			String param = mat.group();
 			cacheNameList.add(param);
 
-		}	    
+		}
 		return cacheNameList;
 	}
 
-	
 	private List<String> getValues(List<String> listofenties) {
 		List<String> valueList = new ArrayList<String>();
-		
+
 		Iterator<String> iter = listofenties.iterator();
-		while (iter.hasNext()){
+		while (iter.hasNext()) {
 			String token = iter.next();
 
 			ServiceDef servicedef = new ServiceDef(token);
 			String indexstr = servicedef.getIndex();
-			
+
 			String host = servicedef.getHostName();
 			String service = servicedef.getServiceName();
 			String serviceitem = servicedef.getServiceItemName();
-		
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Get from the LastStatusCahce " + 
-					host + "-" +
-					service + "-"+
-					serviceitem + "[" +
-					indexstr+"]");
 
-			
-			valueList.add(CacheUtil.parseIndexString(CacheFactory.getInstance(), indexstr, host, service, serviceitem));
-		}    
+			LOGGER.debug("Get from the LastStatusCahce {}-{}-{}[{}]", host,
+					service, serviceitem, indexstr);
+
+			valueList.add(CacheUtil.parseIndexString(
+					CacheFactory.getInstance(), indexstr, host, service,
+					serviceitem));
+		}
 
 		if (!notNullSupport) {
-			for(int i=0;i<valueList.size();i++) {
-				String trimNull = valueList.get(i).replaceAll("null,", "").replaceAll(",null","");
-				if (trimNull.length()==0)					
-					valueList.set(i,"null");
+			for (int i = 0; i < valueList.size(); i++) {
+				String trimNull = valueList.get(i).replaceAll("null,", "")
+						.replaceAll(",null", "");
+				if (trimNull.length() == 0)
+					valueList.set(i, "null");
 				else
-					valueList.set(i,trimNull);	
+					valueList.set(i, trimNull);
 			}
 		}
-	
+
 		return valueList;
 	}
 
