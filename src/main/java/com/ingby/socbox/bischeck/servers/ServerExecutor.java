@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ingby.socbox.bischeck.configuration.ConfigurationException;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
@@ -59,11 +60,7 @@ public final class ServerExecutor {
 	private static final String UNREGISTER = "unregister";
 
 	private ServerExecutor() {
-		try {
-			serverSet = ConfigurationManager.getInstance().getServerClassMap();
-		} catch (ClassNotFoundException e) {
-			LOGGER.error("Class error in servers.xml - not server connection will be available",e);
-		}
+		serverSet = ConfigurationManager.getInstance().getServerClassMap();
 	}
 
 

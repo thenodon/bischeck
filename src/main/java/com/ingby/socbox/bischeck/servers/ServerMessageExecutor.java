@@ -80,12 +80,7 @@ public final class ServerMessageExecutor {
      */
 	@SuppressWarnings("unchecked")
 	private ServerMessageExecutor() {
-		try {
-			// Get all configure Servers 
-			serverSet = ConfigurationManager.getInstance().getServerClassMap();
-		} catch (ClassNotFoundException e) {
-			LOGGER.error("Class error in servers.xml - not server connection will be available",e);
-		}
+		serverSet = ConfigurationManager.getInstance().getServerClassMap();
 		
 		// TODO - check how the pool size of this is managed compared to fixed
 		execService = Executors.newCachedThreadPool();
