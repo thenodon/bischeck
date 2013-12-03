@@ -25,10 +25,21 @@ import com.ingby.socbox.bischeck.threshold.Threshold;
 
 /**
  * The ServiceItemAbstract class provide most of the methods needed by a 
- * ServiceItem implementation. The methods not implemented in the abstract 
+ * ServiceItem implementation. The methods not implemented from the interface 
+ * {@link ServiceItem} in the abstract 
  * class is: <b>
- * public void execute() throws Exception <b>
- *  
+ * <code>
+ * public void execute() throws Exception 
+ * </code>
+ * <b>
+ * In the implementation class the following constructor must also be 
+ * implemented:
+ * <code>
+ * public ServiceItemImpl(String name) 
+ * </code> 
+ * <br>
+ * Where name is the the name of the serviceitem taken from the bischeck.xml 
+ * configuration file.   
  */
 
 
