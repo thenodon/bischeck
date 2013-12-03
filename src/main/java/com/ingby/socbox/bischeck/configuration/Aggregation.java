@@ -1,6 +1,5 @@
 package com.ingby.socbox.bischeck.configuration;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,9 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.service.LastCacheService;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
 import com.ingby.socbox.bischeck.service.ServiceFactoryException;
+import com.ingby.socbox.bischeck.serviceitem.CalculateOnCache;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactoryException;
@@ -21,8 +22,11 @@ import com.ingby.socbox.bischeck.xsd.bischeck.XMLCache;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLRetention;
 
 /**
- * The class is used to create configuration for a service definition that is
- * configured with the aggregate tag.
+ * The class is used to create configuration for a serviceitem definition that is
+ * configured with the aggregate tag.<br>
+ * Aggregations are just configured as a {@link LastCacheService} service with one 
+ * or multiple {@link CalculateOnCache} serviceitems. The service is attached 
+ * to the same host as the serviceitem with the aggregation belongs to.
  */
 public class Aggregation {
 	private final static Logger LOGGER = LoggerFactory.getLogger(Aggregation.class);
@@ -156,10 +160,13 @@ public class Aggregation {
 	 * Configure the Aggregation object for a {@link ServiceItem} set in the 
 	 * constructor and link it to the specific {@link Service} set in the 
 	 * constructor
+	 * @throws ServiceFactoryException if the Service used for aggregations 
+	 * can not be found  
+	 * @throws ServiceItemFactoryException if the ServiceItem used for 
+	 * aggregations can not be found   
 	 * 
-	 * @throws Exception
 	 */
-	void setAggregate() throws AggregationException {
+	void setAggregate() throws ServiceFactoryException, ServiceItemFactoryException  {
 		if (xmlconfig == null)
 			return;
 
@@ -182,7 +189,7 @@ public class Aggregation {
 						service = ServiceFactory.createService(aggregationServiceName, "bischeck://cache");
 					} catch (ServiceFactoryException e) {
 						LOGGER.error("Could not create service for {}", aggregationServiceName, e);
-						throw new AggregationException(e);
+						throw e;
 					}
 				} else {
 					String aggregationServiceName = baseService.getServiceName()+ "/" + 
@@ -192,7 +199,7 @@ public class Aggregation {
 						service = ServiceFactory.createService(aggregationServiceName, "bischeck://cache");
 					} catch (ServiceFactoryException e) {
 						LOGGER.error("Could not create service for {}", aggregationServiceName, e);
-						throw new AggregationException(e);
+						throw e;
 					}
 				}
 
@@ -212,7 +219,7 @@ public class Aggregation {
 							"CalculateOnCache");
 				} catch (ServiceItemFactoryException e) {
 					LOGGER.error("Could not create serviceitem for {}",baseServiceitem.getServiceItemName(), e);
-					throw new AggregationException(e);
+					throw e;
 				}
 
 				serviceItem.setClassName("CalculateonCache");

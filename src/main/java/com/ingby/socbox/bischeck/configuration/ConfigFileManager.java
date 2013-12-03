@@ -38,13 +38,13 @@ import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.ingby.socbox.bischeck.configuration.ConfigXMLInf.XMLCONFIG;
 
 /**
  * This class manage the low level processing of managing the configuration
  * files. This include reading, writing, diff two of the same sort, etc 
- * @author Anders Haal
  *
  */
 public class ConfigFileManager {
@@ -66,16 +66,16 @@ public class ConfigFileManager {
 	 * $bishome/$xmlconfigdir<br>
 	 *
 	 * @return a File object to the configuration directory.
-	 * @throws Exception if the configuration directory do not exist or
+	 * @throws ConfigurationException if the configuration directory do not exist or
 	 * if the directory is not readable.
 	 */
-	static public File initConfigDir() throws Exception {
+	static public File initConfigDir() throws ConfigurationException {
 		String path = "";
 		String xmldir;
 
 		if (System.getProperty("bishome") == null) {
 			LOGGER.warn("System property bishome must be set");
-			throw new Exception("System property bishome must be set");
+			throw new ConfigurationException("System property bishome must be set");
 
 		} else {
 			path=System.getProperty("bishome");
@@ -92,7 +92,7 @@ public class ConfigFileManager {
 			return configDir;    
 		else {
 			LOGGER.warn("Configuration directory {} does not exist or is not readable.", configDir.getPath());
-			throw new Exception("Configuration directory " + configDir.getPath() + " does not exist or is not readable.");
+			throw new ConfigurationException("Configuration directory " + configDir.getPath() + " does not exist or is not readable.");
 		}
 	}
 
@@ -103,9 +103,11 @@ public class ConfigFileManager {
 	 * @param xmlconf member of the enum {@link ConfigXMLInf.XMLCONFIG}
 	 * @return return the object to the JAXB generated class based on the
 	 * configuration files xsd schema files.
-	 * @throws Exception
+	 * @throws ConfigurationException if any errors when manage the xml 
+	 * configuration file, like don't exist, can not be read, is not valid, 
+	 * missing xsd file, etc.
 	 */
-	synchronized public Object getXMLConfiguration(XMLCONFIG xmlconf)  throws Exception {
+	synchronized public Object getXMLConfiguration(XMLCONFIG xmlconf)  throws ConfigurationException {
 		Object xmlobj = null;
 
 		xmlobj = createXMLConfig(xmlconf,ConfigFileManager.initConfigDir().getPath());
@@ -119,9 +121,11 @@ public class ConfigFileManager {
 	 * @param directory the directory location where to find the config file
 	 * @return return the object to the JAXB generated class based on the
 	 * configuration files xsd schema files.
-	 * @throws Exception
+	 * @throws ConfigurationException if any errors when manage the xml 
+	 * configuration file, like don't exist, can not be read, is not valid, 
+	 * missing xsd file, etc.
 	 */
-	synchronized public Object getXMLConfiguration(XMLCONFIG xmlconf,String directory)  throws Exception {
+	synchronized public Object getXMLConfiguration(XMLCONFIG xmlconf,String directory)  throws ConfigurationException {
 		Object xmlobj = null;
 
 		xmlobj = createXMLConfig(xmlconf,directory);
@@ -134,9 +138,11 @@ public class ConfigFileManager {
 	 * @param xmlconf
 	 * @param directory
 	 * @return
-	 * @throws Exception
+	 * @throws ConfigurationException if any errors when manage the xml 
+	 * configuration file, like don't exist, can not be read, is not valid, 
+	 * missing xsd file, etc. 
 	 */
-	private Object createXMLConfig(XMLCONFIG xmlconf, String directory) throws Exception {
+	private Object createXMLConfig(XMLCONFIG xmlconf, String directory) throws ConfigurationException {
 		Object xmlobj = null;
 		File configfile = new File(directory,xmlconf.xml());
 		JAXBContext jc;
@@ -148,8 +154,8 @@ public class ConfigFileManager {
 				jc = JAXBContext.newInstance(xmlconf.instance());
 				jccache.put(xmlconf.instance(),jc);
 			} catch (JAXBException e) {
-				LOGGER.error("Could not get JAXB context from class");
-				throw new Exception(e.getMessage());
+				LOGGER.error("Could not get JAXB context for {}", xmlconf.instance(), e);
+				throw new ConfigurationException(e);
 			}
 		}
 		
@@ -159,36 +165,37 @@ public class ConfigFileManager {
 
 		URL xsdUrl = ConfigurationManager.class.getClassLoader().getResource(xmlconf.xsd());
 		if (xsdUrl == null) {
-			LOGGER.error("Could not find xsd file " +
-					xmlconf.xsd() + " in classpath");
-			throw new Exception("Could not find xsd file " +
-					xmlconf.xsd() + " in classpath");
+			LOGGER.error("Could not find xsd file {} in classpath", xmlconf.xsd());
+			throw new ConfigurationException("Could not find xsd file " + xmlconf.xsd() + " in classpath");
 		}
 
 		try {
 			schema = sf.newSchema(new File(xsdUrl.getFile()));
-		} catch (Exception e) {
-			LOGGER.error("Could not parse xsd file " +
-					xmlconf.xsd() + ": " + e.getMessage());
-			throw new Exception(e.getMessage());
+		} catch (SAXException e) {
+			LOGGER.error("Could not parse xsd file {}", xmlconf.xsd(), e);
+			throw new ConfigurationException(e);
 		} 
 
 		Unmarshaller u = null;
 		try {
 			u = jc.createUnmarshaller();
 		} catch (JAXBException e) {
-			LOGGER.error("Could not create an unmarshaller for for context " + xmlconf.instance());
-			throw new Exception(e);
+			LOGGER.error("Could not create an unmarshaller for for context {}", xmlconf.instance(), e);
+			throw new ConfigurationException(e);
 		}
 		u.setSchema(schema);
 		ValidationEventCollector vec = new ValidationEventCollector();
-		u.setEventHandler( vec );
+		try {
+			u.setEventHandler( vec );
+		} catch (JAXBException e) {
+			LOGGER.error("Could not create set event handler vector for unmarshaller for {}", xmlconf.instance(), e);
+			throw new ConfigurationException(e);
+		}
 
 		try {
 			xmlobj =  u.unmarshal(configfile);
 		} catch (JAXBException e) {
-			LOGGER.error("Could not unmarshall the file " + xmlconf.xml() +":" + e);
-
+			
 			if (vec.hasEvents()) {
 				StringBuffer strbuf = new StringBuffer();
 				for( ValidationEvent event: vec.getEvents() ){
@@ -201,14 +208,14 @@ public class ConfigFileManager {
 					strbuf.append(" Object:").append(locator.getObject());
 					strbuf.append(" - Error at line " + line + " column "+ column);
 				}
-
-				throw new Exception(strbuf.toString());
+				LOGGER.error("Could not unmarshall the file {} - {}" + xmlconf.xml(),strbuf.toString(), e);
+				throw new ConfigurationException(e);
 			}
-
-			throw new Exception(e);
+			LOGGER.error("Could not unmarshall the file {}" + xmlconf.xml(), e);
+			throw new ConfigurationException(e);
 		}
 
-		LOGGER.debug("Create new object for xml file " + xmlconf.xml());
+		LOGGER.debug("Create new object for xml file {}", xmlconf.xml());
 		return xmlobj;
 	}
 

@@ -24,7 +24,6 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,9 +57,11 @@ import com.ingby.socbox.bischeck.servers.Server;
 import com.ingby.socbox.bischeck.service.RunAfter;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
+import com.ingby.socbox.bischeck.service.ServiceFactoryException;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactoryException;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLBischeck;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLCache;
@@ -177,7 +178,13 @@ public final class ConfigurationManager  {
     	purgeMap = new HashMap<String, String>();
     }
     
-    
+    /**
+     * The method is used to verify and init all data structures based on 
+     * bischeck configuration files. The method will only schedule any services
+     * just once. This can be used for testing.
+     * This method should be called before any getInstance() calls are done. 
+     * @throws ConfigurationException if the configuration is faulty
+     */
     synchronized public static void initonce() throws  ConfigurationException {
     	initConfiguration(true);
     }
@@ -187,7 +194,7 @@ public final class ConfigurationManager  {
      * The method is used to verify and init all data structures based on 
      * bischeck configuration files. 
      * This method should be called before any getInstance() calls are done. 
-     * @throws Exception
+     * @throws ConfigurationException if the configuration is faulty
      */
     synchronized public static void init() throws ConfigurationException {
     	initConfiguration(false);
@@ -219,10 +226,10 @@ public final class ConfigurationManager  {
         		LOGGER.error("Can not write to pid file {}", configMgr.getPidFile());
         		throw new ConfigurationException("Can not write to pid file " + configMgr.getPidFile());
         	}
-        	configMgr.getServerClassMap();
-        } catch (Exception e) {
+        	
+        } catch (ConfigurationException e) {
         	LOGGER.error("Configuration Manager initzialization failed with {}", e.getMessage(),e);
-        	throw new ConfigurationException("Configuration Manager initzialization failed",e);
+        	throw e;
         }
         finally {
         	long duration = context.stop()/1000000;
@@ -246,7 +253,7 @@ public final class ConfigurationManager  {
     }
 
     
-    private void initProperties() throws Exception {
+    private void initProperties() throws ConfigurationException  {
         XMLProperties propertiesconfig = 
             (XMLProperties) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.PROPERTIES);
 
@@ -259,7 +266,7 @@ public final class ConfigurationManager  {
     }
 
     
-    private void initURL2Service() throws Exception {     
+    private void initURL2Service() throws ConfigurationException {     
 
         XMLUrlservices urlservicesconfig  = 
             (XMLUrlservices) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.URL2SERVICES);
@@ -272,21 +279,22 @@ public final class ConfigurationManager  {
     }
 
     
-    private void initScheduler() throws Exception {
+    private void initScheduler() throws ConfigurationException {
         try {
         	CachePurgeJob.init(this);
             ThresholdCacheClearJob.init(this);
         } catch (SchedulerException e) {
             LOGGER.error("Quartz scheduler failed with exception {}", e.getMessage(), e);
-            throw e;
+            throw new ConfigurationException(e);
         } catch (ParseException e) {
             LOGGER.error("Quartz scheduler failed with exception " + e.getMessage());
-            throw e;
+            throw new ConfigurationException(e);
         }
     }
     
     
-    private void initBischeckServices(boolean once) throws Exception {
+    private void initBischeckServices(boolean once) 
+    		throws ConfigurationException {
         XMLBischeck bischeckconfig  =
                 (XMLBischeck) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.BISCHECK);
 
@@ -301,14 +309,20 @@ public final class ConfigurationManager  {
         }
         
         // Conduct the Host, Service and ServiceItem configuration 
-        setupHost(bischeckconfig);
+        try {
+			setupHost(bischeckconfig);
+		} catch (ServiceFactoryException e) {
+			throw new ConfigurationException(e);
+		} catch (ServiceItemFactoryException e) {
+			throw new ConfigurationException(e);
+		}
         
         // Create the quartz schedule triggers and store in a List
         setServiceTriggers(once);
     }
 
 
-    private void setServiceTriggers(boolean once) throws Exception {
+    private void setServiceTriggers(boolean once) throws ConfigurationException {
         for (Map.Entry<String, Host> hostentry: hostsmap.entrySet()) {
             Host host = hostentry.getValue();
             for (Map.Entry<String, Service> serviceentry: host.getServices().entrySet()) {
@@ -337,10 +351,8 @@ public final class ConfigurationManager  {
     }
 
 
-    private void setupHost(XMLBischeck bischeckconfig)
-            throws Exception, InstantiationException, IllegalAccessException,
-            NoSuchMethodException, InvocationTargetException,
-            ClassNotFoundException {
+    private void setupHost(XMLBischeck bischeckconfig) 
+    		throws ServiceFactoryException, ConfigurationException, ServiceItemFactoryException {
         Iterator<XMLHost> iterhost = bischeckconfig.getHost().iterator();
         
         while (iterhost.hasNext() ) {
@@ -370,10 +382,8 @@ public final class ConfigurationManager  {
     }
 
 
-    private void setupService(XMLHost hostconfig, Host host) throws Exception,
-            InstantiationException, IllegalAccessException,
-            NoSuchMethodException, InvocationTargetException,
-            ClassNotFoundException {
+    private void setupService(XMLHost hostconfig, Host host) 
+    		throws ServiceFactoryException, ConfigurationException, ServiceItemFactoryException {
         Iterator<XMLService> iterservice = hostconfig.getService().iterator();
         
         while (iterservice.hasNext()) {
@@ -430,11 +440,20 @@ public final class ConfigurationManager  {
         			LOGGER.debug("Driver name: {}", service.getDriverClassName().trim());
         			try {
         				Class.forName(service.getDriverClassName().trim()).newInstance();
-        			} catch ( ClassNotFoundException e) {
-        				LOGGER.error("Could not find the driver class {}, exception {}", 
-        						service.getDriverClassName(), e.getMessage(), e);
-        				throw new Exception(e);
-        			}
+						
+        			} catch (ClassNotFoundException e) {
+        				LOGGER.error("Could not find the driver class {} for service {} ", 
+        						service.getServiceName(), service.getDriverClassName(), e);
+        				throw new ConfigurationException(e);
+        			} catch (InstantiationException e) {
+        				LOGGER.error("Could not instantiate the driver class {} for service {}", 
+        						service.getServiceName(), service.getDriverClassName(), e);
+        				throw new ConfigurationException(e);
+					} catch (IllegalAccessException e) {
+						LOGGER.error("Could not acces the driver class {} for service {}", 
+								service.getServiceName(), service.getDriverClassName(), e);
+        				throw new ConfigurationException(e);
+					}
         		}
         	}
 
@@ -446,9 +465,7 @@ public final class ConfigurationManager  {
 
 
     private void setupServiceItem(XMLService serviceconfig, Service service)
-            throws Exception, NoSuchMethodException, InstantiationException,
-            IllegalAccessException, InvocationTargetException,
-            ClassNotFoundException {
+            throws ServiceItemFactoryException, ServiceFactoryException {
         
     	Iterator<XMLServiceitem> iterserviceitem = null; 
     	
@@ -564,14 +581,19 @@ public final class ConfigurationManager  {
 	}
     
 
-	private void initServers() throws Exception {
+	private void initServers() throws ConfigurationException {
         XMLServers serversconfig = (XMLServers) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.SERVERS);
 
         Iterator<XMLServer> iter = serversconfig.getServer().iterator();
 
         while (iter.hasNext()) {
             XMLServer serverconfig = iter.next(); 
-            setServers(serverconfig);        
+            try {
+				setServers(serverconfig);
+			} catch (ClassNotFoundException e) {
+				LOGGER.error("The class {} for server {} was not found", serverconfig.getClazz(), serverconfig.getName(), e);
+				throw new ConfigurationException(e);
+			}        
         }
     }
 
@@ -625,9 +647,9 @@ public final class ConfigurationManager  {
      * @param service
      * @param triggerid
      * @return 
-     * @throws Exception
+     * @throws ConfigurationException 
      */
-    private Trigger triggerFactory(String schedule, Service service, int triggerid) throws Exception {
+    private Trigger triggerFactory(String schedule, Service service, int triggerid) throws ConfigurationException {
         
         Trigger trigger = null;
         
@@ -694,22 +716,18 @@ public final class ConfigurationManager  {
      * @return 
      * @throws Exception
      */
-    private Trigger triggerFactoryOnce(String schedule, Service service, int triggerid) throws Exception {
+    private Trigger triggerFactoryOnce(String schedule, Service service, int triggerid) {
 
-        Trigger trigger = null;
+    	Trigger trigger = null;
 
-        try {
-            trigger = newTrigger()
-            .withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
-            .withSchedule(simpleSchedule().
-                    withRepeatCount(0))
-                    .startNow()
-                    .build();
-        } catch (Exception e) {
-            LOGGER.error("Tigger parse error for host {} and service {} for schedule {}", 
-            		service.getHost().getHostname(), service.getServiceName(), schedule);
-            throw new Exception(e);
-        }
+    	trigger = newTrigger()
+    			.withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
+    			.withSchedule(simpleSchedule().
+    					withRepeatCount(0))
+    					.startNow()
+    					.build();
+    	LOGGER.debug("Tigger for host {} and service {} for schedule {}", 
+    			service.getHost().getHostname(), service.getServiceName(), schedule);
 
         return trigger;
     }
@@ -720,9 +738,10 @@ public final class ConfigurationManager  {
      * every 50 seconds.
      * @param schedule the scheduling string
      * @return the interval in seconds
-     * @throws Exception
+     * @throws ConfigurationException if the formating of an interval is not 
+     * correct
      */
-    private int calculateInterval(String schedule) throws Exception {
+    private int calculateInterval(String schedule) throws ConfigurationException {
         //"^[0-9]+ *[HMS]{1} *$" - check for a
         Pattern pattern = Pattern.compile(INTERVALSCHEDULEPATTERN);
 
@@ -739,7 +758,8 @@ public final class ConfigurationManager  {
             case 'H' : return (Integer.parseInt(value)*60*60);
             }
         }
-        throw new Exception("String" + schedule + " is not according to regex " + INTERVALSCHEDULEPATTERN );
+        
+        throw new ConfigurationException("String" + schedule + " is not according to regex " + INTERVALSCHEDULEPATTERN );
     }
 
 
@@ -851,7 +871,7 @@ public final class ConfigurationManager  {
         return servermap.get(name);
     }
 
-    public Map<String,Class<?>> getServerClassMap() throws ClassNotFoundException {
+    public Map<String,Class<?>> getServerClassMap() {
         return serversclass;
     }
     
