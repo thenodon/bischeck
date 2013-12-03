@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ingby.socbox.bischeck.configuration.ConfigurationException;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
