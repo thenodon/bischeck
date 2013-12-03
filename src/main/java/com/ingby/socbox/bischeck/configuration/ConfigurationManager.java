@@ -714,7 +714,6 @@ public final class ConfigurationManager  {
      * @param service
      * @param triggerid
      * @return 
-     * @throws Exception
      */
     private Trigger triggerFactoryOnce(String schedule, Service service, int triggerid) {
 
