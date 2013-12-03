@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.servers.ServerInternal;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
@@ -36,7 +37,25 @@ import com.yammer.metrics.core.MetricPredicate;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
 
-
+/**
+ * Gather internal bischeck statistics that can be pushed to the server that
+ * implements {@link ServerInternal}<br>
+ * The class is configured through the following properties in properties.xml:
+ * <ul>
+ * <li>
+ * bischeckHostName - the name used as the host definition of the server,
+ * default is bischeck
+ * </li>
+ * <li>
+ * sendInternal - if true send the internal statistics, default is false.
+ * </li>
+ * <li>
+ * sendInternalInterval - the cron expression to define how often the data should
+ * be sent.
+ * </li>
+ * </ul>
+ * 
+ */
 public class InternalSurveillance implements Job {
 	private final static Logger  LOGGER = LoggerFactory.getLogger(InternalSurveillance.class);
 	private final OperatingSystemMXBean osMxBean = ManagementFactory.getOperatingSystemMXBean();
@@ -82,9 +101,8 @@ public class InternalSurveillance implements Job {
 
 			sched.addJob(job, true);
 
-			LOGGER.info(job.getDescription() + " has been scheduled to run at: " + ft
-					+ " and repeat based on expression: "
-					+ trigger.getCronExpression());
+			LOGGER.info("{} has been scheduled to run at: {} and repeat based on expression: {}",
+					job.getDescription(), ft, trigger.getCronExpression());
 		} else {
 			LOGGER.info("Internal bischeck monitoring disabled");
 		}
