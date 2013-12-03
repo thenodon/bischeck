@@ -48,7 +48,7 @@ public class ServiceFactory {
      * take a the service name as a parameter do not exists
      */
     @SuppressWarnings("unchecked")
-    public static Service createService(String serviceName, String url) throws Exception 
+    public static Service createService(String serviceName, String url) throws ServiceFactoryException 
     {
         
         URI uri = null;
@@ -57,14 +57,19 @@ public class ServiceFactory {
             LOGGER.debug("uri - {}", uri.toString());
         } catch (URISyntaxException e) {
             LOGGER.warn("Malformed uri - {}", url, e.getMessage());
-            throw new Exception(e.getMessage());
+            ServiceFactoryException sfe = new ServiceFactoryException(e);
+            sfe.setServiceName(serviceName);
+            throw sfe;
         }
         
         String clazzname = ConfigurationManager.getInstance().getURL2Service().getProperty(uri.getScheme());
         
         if (clazzname == null) {
             LOGGER.error("Service uri {} is not matched in the urlservice.xml configuration file.", Util.obfuscatePassword(uri.toString()));
-            throw new Exception("Service uri " + Util.obfuscatePassword(uri.toString()) + " is not matched in the urlservice.xml configuration file.");
+            ServiceFactoryException sfe = new ServiceFactoryException();
+            sfe.setServiceName(serviceName);
+            throw sfe;
+            
         }
         
         Class<Service> clazz = null;
@@ -75,8 +80,10 @@ public class ServiceFactory {
             try { 
                 clazz = (Class<Service>) ClassCache.getClassByName(clazzname);
             }catch (ClassNotFoundException ee) {
-                LOGGER.error("Service class {} not found.", clazzname);
-                throw new Exception(e.getMessage());
+                LOGGER.error("Service class {} not found for service {}", clazzname, serviceName, e);
+                ServiceFactoryException sfe = new ServiceFactoryException(e);
+                sfe.setServiceName(serviceName);
+                throw sfe;
             }
         }
          
@@ -88,16 +95,20 @@ public class ServiceFactory {
         try {
             cons = clazz.getConstructor(param);
         } catch (Exception e) {
-            LOGGER.error("Error getting class constructor for {}", clazz.getName());
-            throw new Exception(e.getMessage());
+            LOGGER.error("Error getting class constructor for class {} and service {}", clazz.getName(), serviceName);
+            ServiceFactoryException sfe = new ServiceFactoryException(e);
+            sfe.setServiceName(serviceName);
+            throw sfe;
         }
         
         Service service = null;
         try {
             service = (Service) cons.newInstance(serviceName);
         } catch (Exception e) {
-            LOGGER.error("Error creating an instance of {} with class {}", serviceName, clazz.getName());
-            throw new Exception(e.getMessage());
+            LOGGER.error("Error creating an instance of {} with class {}", serviceName, clazz.getName(), e);
+            ServiceFactoryException sfe = new ServiceFactoryException(e);
+            sfe.setServiceName(serviceName);
+            throw sfe;
         }
         return service;
     }
