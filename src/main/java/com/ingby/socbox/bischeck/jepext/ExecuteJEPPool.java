@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * This is a pool the manage objects of the type ExecuteJEP. Since the JEP object 
  * is a very large and "heavy" object we do not want to have on unique for every 
  * object using it like CalculateOnCache and Twenty4Threshold. The pool will
- * give the needing thread on reguest a ExecuteJEP object and if it do not 
+ * give the needing thread on request a ExecuteJEP object and if it do not 
  * exist in the pool the pool will just create one. After the object has
  * been used X number of times its thrown away. This is due that we have seen
  * symptoms that member objects are not garbage collected (this must 
@@ -24,12 +24,9 @@ import org.slf4j.LoggerFactory;
  * <br>
  * <code>
  * ExecuteJEP myjep = ExecuteJEPPool.checkOut();<br>
- * do stuff ...<br>
+ * <i> do stuff ... </i><br>
  * ExecuteJEPPool.checkIn(myjep);<br>
- * <br>
- *   
- * @author andersh
- *
+ * </code>
  */
 public final class ExecuteJEPPool {
 
@@ -69,22 +66,24 @@ public final class ExecuteJEPPool {
 		ExecuteJEP jep;
 		
 		if (unlocked.size() > 0) {
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Free JEP obj: "+ unlocked.size());
+			
+			LOGGER.debug("Free JEP obj: {}", unlocked.size());
+			
 			Iterator<ExecuteJEP> iter = unlocked.keySet().iterator();
 			jep = iter.next();
 			count=unlocked.get(jep);
 			unlocked.remove(jep);
 		} else {
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("No Free JEP obj: " + unlocked.size());
+			
+			LOGGER.debug("No Free JEP obj: {}", unlocked.size());
+			
 			jep = create();	
 			count=1;
 		}
 		
 		locked.put(jep, count);
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Locked Free JEP obj: " + locked.size());
+		
+		LOGGER.debug("Locked Free JEP obj: {}", locked.size());
 		return jep;
 
 	}  
@@ -101,8 +100,9 @@ public final class ExecuteJEPPool {
 		locked.remove(jep);
 		if (count < DIECOUNT)
 			unlocked.put(jep,count);
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Return JEP obj used " + count + " (unlocked/locked): "+ unlocked.size() +"/" +locked.size());
+		
+		LOGGER.debug("Return JEP obj used {} (unlocked/locked): {} / {}", 
+				count, unlocked.size(),  +locked.size());
 	}
 
 }

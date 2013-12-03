@@ -1,11 +1,3 @@
-/*****************************************************************************
- 
- JEP 2.4.1, Extensions 1.1.1
-      April 30 2007
-      (c) Copyright 2007, Nathan Funk and Richard Morris
-      See LICENSE-*.txt for license information.
-
-*****************************************************************************/
 /*
 #
 # Copyright (C) 2010-2012 Anders Håål, Ingenjorsbyn AB
@@ -31,7 +23,11 @@ import java.util.*;
 import org.nfunk.jep.*;
 import org.nfunk.jep.type.*;
 import org.nfunk.jep.function.PostfixMathCommand;
-
+/**
+ * Multiply the numbers in the list od values, but if any of the numbers are 
+ * null the function will return null
+ *
+ */
 public class NullableMultiply extends PostfixMathCommand
 {
 	
@@ -119,8 +115,10 @@ public class NullableMultiply extends PostfixMathCommand
 	{
 		Vector result = new Vector();
 
-		for (int i=0; i<v.size(); i++)
+		for (int i=0; i<v.size(); i++) 
+		{
 			result.addElement(mul((Number)v.elementAt(i), d));
+		}
 		
 		return result;
 	}
@@ -130,7 +128,9 @@ public class NullableMultiply extends PostfixMathCommand
 		Vector result = new Vector();
 
 		for (int i=0; i<v.size(); i++)
+		{
 			result.addElement(mul(c, (Number)v.elementAt(i)));
+		}
 		
 		return result;
 	}	

@@ -26,6 +26,9 @@ import org.nfunk.jep.*;
 import org.nfunk.jep.function.Add;
 import org.nfunk.jep.function.PostfixMathCommand;
 
+/**
+ * Calculate the average value from a series of values.
+ */
 public class Average extends PostfixMathCommand {
 
 	private Add addFun = new Add();

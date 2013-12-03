@@ -24,6 +24,9 @@ import java.util.*;
 import org.nfunk.jep.*;
 import org.nfunk.jep.function.PostfixMathCommand;
 
+/**
+ * Calculate the min value in a array of values
+ */
 public class Min extends PostfixMathCommand {
 
 	private boolean supportNull = false;
@@ -74,8 +77,6 @@ public class Min extends PostfixMathCommand {
 
 			i++;
 		}
-
-		// push the result on the inStack
 
 		stack.push(min);
 	}

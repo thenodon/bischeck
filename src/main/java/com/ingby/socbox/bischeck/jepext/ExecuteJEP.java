@@ -40,7 +40,13 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
-
+/**
+ * The main class to execute JEP based math expressions
+ * <br>
+ * The class will load any extension classes that are described in the 
+ * configuration file jepextfunctions.xml
+ * <br>
+ */
 public class ExecuteJEP {
     private final static Logger LOGGER = LoggerFactory.getLogger(ExecuteJEP.class);
 
@@ -48,6 +54,7 @@ public class ExecuteJEP {
 
 	
 	private static final String RESOURCEFILENAME = "jepextfunctions.xml";
+	
 	
 	public ExecuteJEP() {
 		
@@ -73,7 +80,7 @@ public class ExecuteJEP {
 		try {
 			fileInput = new FileInputStream(new File(Url.getFile()));
 		} catch (FileNotFoundException e) {
-			LOGGER.warn("The additonal function describtion file "+ RESOURCEFILENAME +" is not available in classpath",e);
+			LOGGER.warn("The additonal function describtion file {} is not available in classpath", RESOURCEFILENAME, e);
 		}
 		
 		Properties properties = null;
@@ -82,9 +89,9 @@ public class ExecuteJEP {
 			try {
 				properties.loadFromXML(fileInput);
 			} catch (InvalidPropertiesFormatException e) {
-				LOGGER.warn("The property file, "+ RESOURCEFILENAME +", format is not valied", e);
+				LOGGER.warn("The property file, {}, format is not valied", RESOURCEFILENAME, e);
 			} catch (IOException e) {
-				LOGGER.warn("The property file, "+ RESOURCEFILENAME +", could not be read", e);
+				LOGGER.warn("The property file, {}, could not be read", RESOURCEFILENAME, e);
 			}
 		}
 		
@@ -93,21 +100,29 @@ public class ExecuteJEP {
 			try {
 				parser.removeFunction(jepFunctionName);
 				parser.addFunction(jepFunctionName, (PostfixMathCommandI) ClassCache.getClassByName(className).newInstance());
-				LOGGER.debug("Jep extended function "+ jepFunctionName +" loaded with classname " + className);
+				LOGGER.debug("Jep extended function {} loaded with classname {}", jepFunctionName, className);
 			} catch (ClassNotFoundException e) {
-				LOGGER.warn("Class "+ className + " could not be found", e);
+				LOGGER.warn("Class {} could not be found", className, e);
 			} catch (InstantiationException e) {
-				LOGGER.warn("Class "+ className + " can not be instantiated", e);
+				LOGGER.warn("Class {} can not be instantiated", className, e);
 			} catch (IllegalAccessException e) {
-				LOGGER.warn("Class "+ className + " could not be instantiated", e);
+				LOGGER.warn("Class {} could not be instantiated", className, e);
 			}
 		}
 	}
 
 	
+	/**
+	 * Execute a JEP based expression
+	 * @param executeexp the expression to calculate
+	 * @return the value returned from the evaluation
+	 * @throws ParseException is thrown if the expression could not be parsed 
+	 * correctly, 
+	 */
 	public Float execute(String executeexp) throws ParseException {
-		if (LOGGER.isDebugEnabled()) 
-			LOGGER.debug("Parse :" + executeexp);
+		
+		LOGGER.debug("Parse : {}", executeexp);
+		
 		final Timer timer = Metrics.newTimer(ExecuteJEP.class, 
 				"calulate", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
@@ -115,14 +130,14 @@ public class ExecuteJEP {
 		try {
 			parser.parseExpression(executeexp);
 			if (parser.hasError()) {
-				LOGGER.warn("Math jep expression error, " +parser.getErrorInfo());
+				LOGGER.warn("Math jep expression error, {}", parser.getErrorInfo());
 				throw new ParseException(parser.getErrorInfo());
 			}
 
 			value = (float) parser.getValue();
 		
 			if (parser.hasError()) {
-				LOGGER.warn("Math jep expression error, " +parser.getErrorInfo());
+				LOGGER.warn("Math jep expression error, {}", parser.getErrorInfo());
 				// This may change but currently it break compatibility
 				//throw new ParseException(parser.getErrorInfo());
 			}
@@ -135,8 +150,7 @@ public class ExecuteJEP {
 			value=null;
 		}
 		
-		if (LOGGER.isDebugEnabled()) 
-			LOGGER.debug("Calculated :" + value);
+		LOGGER.debug("Calculated : {}", value);
 		
 		return value;
 	}

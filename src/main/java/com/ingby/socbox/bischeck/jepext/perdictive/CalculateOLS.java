@@ -39,8 +39,6 @@ import com.ingby.socbox.bischeck.jepext.perdictive.RESMETHOD;
  * <code>
  * ols("host","service","serviceitem,"AVG","D","5","-10D")		
  * </code>
-
- * @author andersh
  *
  */
 public final class CalculateOLS {

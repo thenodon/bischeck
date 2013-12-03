@@ -1,18 +1,32 @@
-/*****************************************************************************
-
- JEP 2.4.1, Extensions 1.1.1
-      April 30 2007
-      (c) Copyright 2007, Nathan Funk and Richard Morris
-      See LICENSE-*.txt for license information.
-
-*****************************************************************************/
+/*
+#
+# Copyright (C) 2010-2012 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+*/
 package com.ingby.socbox.bischeck.jepext;
 
 import java.util.*;
 import org.nfunk.jep.*;
 import org.nfunk.jep.function.PostfixMathCommand;
 import org.nfunk.jep.type.*;
-
+/**
+ * Divide the numbers, but if any of the numbers are null the function will 
+ * return null.
+ * 
+ */
 public class NullableDivide extends PostfixMathCommand
 {
 	public NullableDivide()
@@ -94,7 +108,9 @@ public class NullableDivide extends PostfixMathCommand
 		Vector result = new Vector();
 
 		for (int i=0; i<v.size(); i++)
+		{
 			result.addElement(div((Number)v.elementAt(i), d));
+		}
 		
 		return result;
 	}
@@ -104,7 +120,9 @@ public class NullableDivide extends PostfixMathCommand
 		Vector result = new Vector();
 
 		for (int i=0; i<v.size(); i++)
+		{
 			result.addElement(div(d, (Number)v.elementAt(i)));
+		}
 		
 		return result;
 	}
@@ -114,7 +132,9 @@ public class NullableDivide extends PostfixMathCommand
 		Vector result = new Vector();
 
 		for (int i=0; i<v.size(); i++)
+		{
 			result.addElement(div((Number)v.elementAt(i), c));
+		}
 		
 		return result;
 	}
@@ -124,7 +144,9 @@ public class NullableDivide extends PostfixMathCommand
 		Vector result = new Vector();
 
 		for (int i=0; i<v.size(); i++)
+		{
 			result.addElement(div(c, (Number)v.elementAt(i)));
+		}
 		
 		return result;
 	}	

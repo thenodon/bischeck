@@ -24,7 +24,10 @@ import java.util.*;
 
 import org.nfunk.jep.*;
 
-
+/**
+ * Calculate the sum of a series of values
+ *
+ */
 public class Sum extends org.nfunk.jep.function.Sum {
 
 	private boolean supportNull = false;
@@ -53,7 +56,7 @@ public class Sum extends org.nfunk.jep.function.Sum {
 	@Override
 	public void run(Stack stack) throws ParseException {
 		
-		checkStack(stack);// check the stack
+		checkStack(stack);
 		if (supportNull) {
 			curNumberOfParameters -= Util.deleteNullFromStack(stack);
 		}

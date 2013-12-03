@@ -14,11 +14,11 @@ public class Util {
 	 */
 	public static boolean getSupportNull() {
 		try {
-		if (ConfigurationManager.getInstance().getProperties().
-				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
-			return true;
-		else
-			return false;
+			if (ConfigurationManager.getInstance().getProperties().
+					getProperty("notFullListParse","false").equalsIgnoreCase("true"))
+				return true;
+			else
+				return false;
 		} catch (NullPointerException ne) {
 			return false;
 		}

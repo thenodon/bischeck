@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
- */
+*/
 
 package com.ingby.socbox.bischeck.jepext;
 
@@ -24,6 +24,9 @@ import java.util.*;
 import org.nfunk.jep.*;
 import org.nfunk.jep.function.PostfixMathCommand;
 
+/**
+ * Calculating the max value in a array of values
+ */
 public class Max extends PostfixMathCommand {
 
 	private boolean supportNull = false;
@@ -75,8 +78,6 @@ public class Max extends PostfixMathCommand {
 
 			i++;
 		}
-
-		// push the result on the inStack
 
 		stack.push(max);
 	}

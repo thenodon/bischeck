@@ -29,6 +29,10 @@ import com.beust.jcommander.ParameterException;
 import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLS;
 import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLSException;
 
+/**
+ * Calculate the forecasted value in the future for a series of data points,
+ * based on the ordinary least square method.
+ */
 public class OrdinaryLeastSquares extends PostfixMathCommand
 {
 	public OrdinaryLeastSquares()
@@ -69,8 +73,8 @@ public class OrdinaryLeastSquares extends PostfixMathCommand
 		
 		Double forecastValue = ols.getPredictiveValue();
 		
-		inStack.push(forecastValue); //push the result on the inStack
+		inStack.push(forecastValue); 
 		return;
 	}
 	
-	}
+}

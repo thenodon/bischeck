@@ -27,6 +27,10 @@ import org.nfunk.jep.function.PostfixMathCommand;
 import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLS;
 import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLSException;
 
+/**
+ * Calculate the slope value ifor a series of data points,
+ * based on the ordinary least square method.
+ */
 public class OrdinaryLeastSquaresSlope extends PostfixMathCommand
 {
 	public OrdinaryLeastSquaresSlope()
@@ -65,8 +69,8 @@ public class OrdinaryLeastSquaresSlope extends PostfixMathCommand
 	
 		Double forecastValue = ols.getPredictiveSlope();
 		
-		inStack.push(forecastValue); //push the result on the inStack
+		inStack.push(forecastValue); 
 		return;
 	}
 	
-	}
+}
