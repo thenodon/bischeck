@@ -8,7 +8,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 /**
- * Provide a wrapper the JedisPool to enable specific pool configuration.
+ * Provide a wrapper of JedisPool to enable specific pool configuration.
  */
 public class JedisPoolWrapper {
 
