@@ -26,6 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.service.Service;
 
+/**
+ * The host container class that holds reference to the service configured for
+ * the host.
+ */
 public class Host {
 
     private final static Logger  LOGGER = LoggerFactory.getLogger(Host.class);
@@ -36,21 +40,38 @@ public class Host {
     private String alias;
 
 
+    /**
+     * Create a Host object with name hostname
+     * @param hostname name of the host
+     */
 	public Host (String hostname) {
         this.hostname = hostname;
     }
 
     
+	/**
+	 * Add {@link Service} to the Host object
+	 * @param service the service to add
+	 */
     public void addService(Service service) {
         services.put(service.getServiceName(), service);
     }
 
     
+    /**
+     * Get all {@link Service} configured for the Host
+     * @return 
+     */
     public HashMap<String,Service> getServices() {
         return services;
     }
 
     
+    /**
+     * Get a configured {@link Service} by using its name
+     * @param name name of the service
+     * @return 
+     */
     public Service getServiceByName(String name) {
         for (Map.Entry<String, Service> serviceentry: services.entrySet()) {
             Service service = serviceentry.getValue();
@@ -62,26 +83,47 @@ public class Host {
     }
 
     
+    /**
+     * Get the name of the Host object
+     * @return
+     */
     public String getHostname() {
         return hostname;
     }
 
     
+    /**
+     * Get the description text for the Host
+     * @return
+     */
     public String getDecscription() {
         return description;
     }
     
     
+    /**
+     * Set the description text for the Host
+     * @param decscription
+     */
     public void setDecscription(String decscription) {
         this.description = decscription;
     }
     
+    
+    /**
+     * Get the alias for the Host
+     * @return
+     */
     public String getAlias() {
 		return alias;
 	}
 
-
-	public void setAlias(String alias) {
+    
+    /**
+     * Set the alias for the Host 
+     * @param alias
+     */
+    public void setAlias(String alias) {
 		this.alias = alias;
 	}
 }
