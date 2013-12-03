@@ -132,20 +132,20 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			try {
 				mbeanname = new ObjectName(BEANNAME);
 			} catch (MalformedObjectNameException e) {
-				LOGGER.error("MBean object name failed, " + e);
+				LOGGER.error("MBean object name failed, {}",e.getMessage(), e);
 			} catch (NullPointerException e) {
-				LOGGER.error("MBean object name failed, " + e);
+				LOGGER.error("MBean object name failed, {}",e.getMessage(), e);
 			}
 
 
 			try {
 				mbs.registerMBean(lsc, mbeanname);
 			} catch (InstanceAlreadyExistsException e) {
-				LOGGER.error("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - {}", e.getMessage(), e);
 			} catch (MBeanRegistrationException e) {
-				LOGGER.error("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - {}", e.getMessage(), e);
 			} catch (NotCompliantMBeanException e) {
-				LOGGER.error("Mbean exception - " + e.getMessage());
+				LOGGER.error("Mbean exception - {}", e.getMessage(), e);
 			}
 
 			lastStatusCacheDumpDir = ConfigurationManager.getInstance().getProperties().
@@ -173,9 +173,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		try {
 			mbs.unregisterMBean(mbeanname);
 		} catch (MBeanRegistrationException e) {
-			LOGGER.warn("Mbean " + mbeanname +" could not be unregistered",e);
+			LOGGER.warn("Mbean {} could not be unregistered", mbeanname , e);
 		} catch (InstanceNotFoundException e) {
-			LOGGER.warn("Mbean " + mbeanname +" instance could not be found",e);
+			LOGGER.warn("Mbean {} instance could not be found", mbeanname , e);
 		}
 		lsc = null;
 	}
@@ -651,17 +651,17 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		File dumpfile = new File(lastStatusCacheDumpDir,LASTSTATUSCACHE_DUMP_FILE);
 		
 		if (!dumpdir.isDirectory()) {
-			LOGGER.debug("Dump cache directory property " + dumpdir.getAbsolutePath() + " is not a directory");
+			LOGGER.error("Dump cache directory property " + dumpdir.getAbsolutePath() + " is not a directory");
 			throw new Exception("Dump cache directory property " + dumpdir.getAbsolutePath() + " is not a directory");
 		}
 		
 		if (!dumpdir.canWrite()) {
-			LOGGER.debug("No permission to write to cache dir " + dumpdir.getAbsolutePath());
+			LOGGER.error("No permission to write to cache dir " + dumpdir.getAbsolutePath());
 			throw new Exception("No permission to write to cache dir " + dumpdir.getAbsolutePath());
 		}
 
 		if (dumpfile.exists() && !dumpfile.canWrite()) {
-			LOGGER.debug("No permission to write to cache file " + dumpfile.getAbsolutePath());
+			LOGGER.error("No permission to write to cache file " + dumpfile.getAbsolutePath());
 			throw new Exception("No permission to write to cache file " + dumpfile.getAbsolutePath());
 		}
 

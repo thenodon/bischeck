@@ -30,7 +30,6 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
