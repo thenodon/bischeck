@@ -1,15 +1,21 @@
 package com.ingby.socbox.bischeck.configuration;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
+import com.ingby.socbox.bischeck.service.ServiceFactoryException;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactoryException;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLAggregate;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLCache;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLRetention;
@@ -19,6 +25,7 @@ import com.ingby.socbox.bischeck.xsd.bischeck.XMLRetention;
  * configured with the aggregate tag.
  */
 public class Aggregation {
+	private final static Logger LOGGER = LoggerFactory.getLogger(Aggregation.class);
 
 	private static final String WEEKEND = "/weekend";
 
@@ -132,13 +139,27 @@ public class Aggregation {
 	private ServiceItem baseServiceitem;
 	private Map<String,String> retentionMap = new HashMap<String,String>();
 
+	/**
+	 * Create an Aggregation object for a specific {@link ServiceItem} 
+	 * and link it to the specific {@link Service}
+	 * @param xmlconfig the configuration for the aggregation
+	 * @param service
+	 * @param serviceitem
+	 */
 	public Aggregation(XMLCache xmlconfig, Service service, ServiceItem serviceitem) {
 		this.xmlconfig = xmlconfig;
 		this.baseService = service;
 		this.baseServiceitem = serviceitem;
 	}
 
-	void setAggregate() throws Exception {
+	/**
+	 * Configure the Aggregation object for a {@link ServiceItem} set in the 
+	 * constructor and link it to the specific {@link Service} set in the 
+	 * constructor
+	 * 
+	 * @throws Exception
+	 */
+	void setAggregate() throws AggregationException {
 		if (xmlconfig == null)
 			return;
 
@@ -154,13 +175,25 @@ public class Aggregation {
 				Service service = null;
 
 				if (aggregated.isUseweekend()) {
-					service = ServiceFactory.createService(
-							baseService.getServiceName()+ "/" + period.prefix() + "/" + aggregated.getMethod() + WEEKEND,
-							"bischeck://cache");
+					String aggregationServiceName = baseService.getServiceName()+ "/" + 
+													period.prefix() + "/" + 
+													aggregated.getMethod() + WEEKEND;
+					try {
+						service = ServiceFactory.createService(aggregationServiceName, "bischeck://cache");
+					} catch (ServiceFactoryException e) {
+						LOGGER.error("Could not create service for {}", aggregationServiceName, e);
+						throw new AggregationException(e);
+					}
 				} else {
-					service = ServiceFactory.createService(
-							baseService.getServiceName()+ "/" + period.prefix()  + "/" + aggregated.getMethod(),
-							"bischeck://cache");
+					String aggregationServiceName = baseService.getServiceName()+ "/" + 
+													period.prefix()  + "/" + 
+													aggregated.getMethod();
+					try {
+						service = ServiceFactory.createService(aggregationServiceName, "bischeck://cache");
+					} catch (ServiceFactoryException e) {
+						LOGGER.error("Could not create service for {}", aggregationServiceName, e);
+						throw new AggregationException(e);
+					}
 				}
 
 
@@ -172,9 +205,15 @@ public class Aggregation {
 
 				ServiceItem serviceItem = null;
 
-				serviceItem = ServiceItemFactory.createServiceItem(
-						baseServiceitem.getServiceItemName(),
-						"CalculateOnCache");
+
+				try {
+					serviceItem = ServiceItemFactory.createServiceItem(
+							baseServiceitem.getServiceItemName(),
+							"CalculateOnCache");
+				} catch (ServiceItemFactoryException e) {
+					LOGGER.error("Could not create serviceitem for {}",baseServiceitem.getServiceItemName(), e);
+					throw new AggregationException(e);
+				}
 
 				serviceItem.setClassName("CalculateonCache");
 				serviceItem.setExecution(getAggregatedExecution(period, aggregated,baseService,baseServiceitem));
@@ -184,8 +223,7 @@ public class Aggregation {
 				service.addServiceItem(serviceItem);
 				baseService.getHost().addService(service);
 
-				setRetention(period, aggregated, service,
-						serviceItem);
+				setRetention(period, aggregated, service, serviceItem);
 			}
 		}
 	}
@@ -201,6 +239,10 @@ public class Aggregation {
 	}
 
 	
+	/**
+	 * Get retention description for the Aggregation object 
+	 * @return
+	 */
 	Map<String,String> getRetentionMap() {
 		return retentionMap;
 	}
