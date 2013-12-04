@@ -114,19 +114,19 @@ public final class Execute implements ExecuteMBean {
         try {
             mbeanname = new ObjectName(ExecuteMBean.BEANNAME);
         } catch (MalformedObjectNameException e) {
-            LOGGER.error("MBean object name failed, " + e);
+            LOGGER.error("MBean object name failed, {}",e.getMessage(), e);
         } catch (NullPointerException e) {
-            LOGGER.error("MBean object name failed, " + e);
+            LOGGER.error("MBean object name failed, {}",e.getMessage(), e);
         }
 
         try {
             mbs.registerMBean(exec, mbeanname);
         } catch (InstanceAlreadyExistsException e) {
-            LOGGER.error("Mbean exception - " + e.getMessage());
+            LOGGER.error("Mbean register exception - {}", e.getMessage(),e);
         } catch (MBeanRegistrationException e) {
-        	LOGGER.error("Mbean exception - " + e.getMessage());
+        	LOGGER.error("Mbean register exception - {}", e.getMessage(),e);
         } catch (NotCompliantMBeanException e) {
-        	LOGGER.error("Mbean exception - " + e.getMessage());
+        	LOGGER.error("Mbean register exception - {}", e.getMessage(),e);
         }
     }
     
@@ -163,7 +163,7 @@ public final class Execute implements ExecuteMBean {
             	try {
 					CacheFactory.destroy();
 				} catch (CacheException e) {
-					LOGGER.warn("Cache was not destoryed", e);
+					LOGGER.warn("Cache could not be destoryed", e);
 				}
               }
             };
@@ -180,12 +180,12 @@ public final class Execute implements ExecuteMBean {
         			ConfigurationManager.initonce();
         		}
         	} catch (Exception e) {
-        		LOGGER.error("Creating bischeck Configuration Manager failed with:" + e.getMessage());
+        		LOGGER.error("Creating bischeck Configuration Manager failed with: {}" + e.getMessage(),e);
         		System.exit(FAILED);
         	}
 
         	retStat = Execute.getInstance().daemon();
-        	LOGGER.debug("Method Execute returned " + retStat);
+        	LOGGER.debug("Method Execute returned {}", retStat);
         } while (retStat == RESTART);
  
         dumpthread.start();
@@ -253,7 +253,7 @@ public final class Execute implements ExecuteMBean {
             sched.shutdown(true);
             LOGGER.info("Scheduler shutdown");
         } catch (SchedulerException e) {
-            LOGGER.warn("Stopping Quartz scheduler failed with - " + e);
+            LOGGER.warn("Stopping Quartz scheduler failed", e);
         }
         
         ServerMessageExecutor.getInstance().unregisterAll();
@@ -368,7 +368,7 @@ public final class Execute implements ExecuteMBean {
             ConfigurationManager.getInstance().getScheduleJobConfigs();
         
         for (ServiceJobConfig jobentry: schedulejobs) {
-            LOGGER.info("Configure job " + jobentry.getService().getServiceName());
+            LOGGER.info("Configure job {}",jobentry.getService().getServiceName());
             Map<String,Object> map = new HashMap<String, Object>();
             map.put("service", jobentry.getService());
             createJob(sched, jobentry, map);
@@ -393,9 +393,9 @@ public final class Execute implements ExecuteMBean {
       				.build();
 
       				sched.scheduleJob(job, trigger);
-      				LOGGER.info("Adding trigger to job " + trigger.toString());
+      				LOGGER.info("Adding trigger to job {}",trigger.toString());
       			} catch (SchedulerException e) {
-      				LOGGER.warn("Scheduled job failed with exception " + e);
+      				LOGGER.warn("Scheduled job failed with exception {}", e.getMessage(), e);
       				throw e;
       			}
       		}
@@ -417,7 +417,7 @@ public final class Execute implements ExecuteMBean {
             sched = StdSchedulerFactory.getDefaultScheduler();
             sched.start();
         } catch (SchedulerException e) {
-            LOGGER.warn("Scheduler failed to start with exception " + e);
+            LOGGER.warn("Scheduler failed to start with exception - {}", e.getMessage(), e);
             throw e;
         }
         
@@ -426,7 +426,7 @@ public final class Execute implements ExecuteMBean {
             LOGGER.info("Add scheduler listener");
             sched.getListenerManager().addJobListener(jobListener, allJobs());
         } catch (SchedulerException e) {
-            LOGGER.warn("Add listener failed with exception "+ e);
+            LOGGER.warn("Add listener failed with exception {}", e.getMessage(), e);
             throw e;    
         }
 		return sched;
@@ -475,7 +475,7 @@ public final class Execute implements ExecuteMBean {
         try {
                 Thread.sleep(shutdownsleep);
         } catch(InterruptedException e) {
-            LOGGER.error("Interrupted which waiting on main daemon thread to complete.");
+            LOGGER.error("Interrupted which waiting on main daemon thread to complete");
         }
     }
 
@@ -566,7 +566,7 @@ public final class Execute implements ExecuteMBean {
                 }
             }
         } catch (SchedulerException se) {
-            LOGGER.error("Build trigger list failed, " + se);
+            LOGGER.error("Build trigger list failed with exception - {}", se.getMessage(), se);
         }
         
         String[] arr = new String[triggerList.size()];
@@ -593,7 +593,7 @@ public final class Execute implements ExecuteMBean {
                 numberoftriggers += keys.size();
             }
         } catch (SchedulerException se) {
-            LOGGER.error("Build trigger list failed, " + se);
+            LOGGER.error("Build trigger list failed with exception - {}", se.getMessage(), se);
         }
         
         return numberoftriggers-NUMOFADMINJOBS;
@@ -619,7 +619,7 @@ public final class Execute implements ExecuteMBean {
 			in = new DataInputStream(fstream);
 			br = new BufferedReader(new InputStreamReader(in));
 			bischeckversion = br.readLine();
-			LOGGER.info("Bisheck version is " + bischeckversion);
+			LOGGER.info("Bisheck version is {}", bischeckversion);
 		} catch (Exception ioe) {
 			bischeckversion = "N/A";
 			LOGGER.warn("Can not determine the bischeck version");

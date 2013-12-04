@@ -31,11 +31,10 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * The QueryDate can parse a date specification in a sql string. The date specification must
- * be like in a format  %%<FORMAT>-+X%% where FORMAT is the way that date should be presented
- * in the SQL string and
- * @author andersh
- *
+ * The QueryDate parse a date specification and replace it with a valid date. 
+ * The date specification must be in the format  
+ * <code>%%<FORMAT>-+X%%</code> where FORMAT is the way that date 
+ * should be presented like MM-DD-YY, YY/MM/DD, etc.
  */
 public abstract class QueryDate {
 
@@ -46,7 +45,7 @@ public abstract class QueryDate {
     private final static Pattern DATEINDICATOR = Pattern.compile("\\[([DMY].*?)\\]");
     
     public static String parse(String strtoparse) {
-        LOOGER.debug("String to date parse - " + strtoparse);
+        LOOGER.debug("String to date parse - {}", strtoparse);
         Calendar now = null;
 
         int count =0;
@@ -114,7 +113,7 @@ public abstract class QueryDate {
         for (int i = 0; i< count; i++) {
             parsedString = parsedString.replaceFirst("%%(.*?)%%", datereplace[i]);
         }
-        LOOGER.debug("Parsed string - " + strtoparse);
+        LOOGER.debug("Parsed string - {}", strtoparse);
         return parsedString;
     }
 }

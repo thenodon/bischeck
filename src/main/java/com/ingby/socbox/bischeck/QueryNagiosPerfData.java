@@ -17,7 +17,6 @@
 #
 */
 
-
 package com.ingby.socbox.bischeck;
 
 import java.util.regex.Matcher;
@@ -28,17 +27,13 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * The QueryNagiosPerfData can parse a date specification in a Nagios 
+ * The QueryNagiosPerfData can parse a Nagios 
  * performance data string. The performance data specification must
- * be in a format:<br>
- * 'label'=value[UOM];[warn];[crit];[min];[max] 
- * <br>
- * @author andersh
- *
+ * be in the format:<br>
+ * <code>'label'=value[UOM];[warn];[crit];[min];[max]</code> 
+ * TODO move this to NagiosUtil
  */
 public abstract class QueryNagiosPerfData {
-
-   
     
     private final static Logger  LOGGER = LoggerFactory.getLogger(QueryNagiosPerfData.class);
 
@@ -79,8 +74,7 @@ public abstract class QueryNagiosPerfData {
      * If the label do not exist null is returned.
      */
     public static String parse(String label, String performanceData) {
-        if (LOGGER.isDebugEnabled())
-        	LOGGER.debug("Perf data to parse - " + performanceData);
+        LOGGER.debug("Perf data to parse - {}", performanceData);
         
 
         Matcher mat = LABELMATCH.matcher(performanceData);
@@ -89,37 +83,34 @@ public abstract class QueryNagiosPerfData {
         boolean labelfound = false;
         while (mat.find()) {            
             perflabel = mat.group().trim();
-            if (LOGGER.isDebugEnabled())
-            	LOGGER.debug("<"+perflabel+">");
+            LOGGER.debug("Label is: {}", perflabel);
             if (perflabel.equals(label+"=") || perflabel.equals("'"+label+"'"+"=")) {
                 labelfound=true; 
                 break;
             }
-        }//while
+        }
         
         // Not hits
-        if (!labelfound) 
-        	return null;
-        
-        Pattern perfMatch = Pattern.compile(perflabel+"(.*?)( |$)");
-        
-        mat = perfMatch.matcher(performanceData);
-
-        String perfdata = null;
-        while (mat.find()) {
-            perfdata = mat.group();
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug(">"+perfdata+"<");        
-        }
-        
-        mat = DATAMATCH.matcher(perfdata);
         String value = null;
-        while (mat.find()) {
-            value = removeUOM(mat.group().replaceAll("=","").replaceAll(";", ""));
-            if (LOGGER.isDebugEnabled())
-            	LOGGER.debug("Performance data value "+value);        
+    	
+        if (labelfound) { 
+        	Pattern perfMatch = Pattern.compile(perflabel+"(.*?)( |$)");
+
+        	mat = perfMatch.matcher(performanceData);
+
+        	String perfdata = null;
+        	while (mat.find()) {
+        		perfdata = mat.group();
+        		LOGGER.debug("Performance data is: {}", perfdata);        
+        	}
+
+        	mat = DATAMATCH.matcher(perfdata);
+        	//String value = null;
+        	while (mat.find()) {
+        		value = removeUOM(mat.group().replaceAll("=","").replaceAll(";", ""));
+        		LOGGER.debug("Performance data value is {}:", value);        
+        	}
         }
-        
         return value;
     }
     
@@ -129,7 +120,7 @@ public abstract class QueryNagiosPerfData {
      * @param stdoutString
      * @return the performance data string, the right side of the | sign
      */
-    public static String getPerfdata(String stdoutString) {
+    private static String getPerfdata(String stdoutString) {
 		return  stdoutString.substring(stdoutString.indexOf('|')+1);
 	}
     

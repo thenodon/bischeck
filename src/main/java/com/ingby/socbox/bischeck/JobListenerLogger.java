@@ -40,7 +40,8 @@ public class JobListenerLogger implements JobListener {
     public void jobExecutionVetoed(JobExecutionContext arg0) {
         if (arg0 instanceof Service) {    
             Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-            LOOGER.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed vetoed");
+            LOOGER.info("{}:{} to be executed vetoed",
+            		service.getHost().getHostname(), service.getServiceName());
         }
     }
 
@@ -48,7 +49,8 @@ public class JobListenerLogger implements JobListener {
     public void jobToBeExecuted(JobExecutionContext arg0) {
         if (arg0 instanceof Service) {
             Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-            LOOGER.info(service.getHost().getHostname() + ":" + service.getServiceName() + " to be executed");
+            LOOGER.info("{}:{} to be executed",
+            		service.getHost().getHostname(), service.getServiceName());
         }
 
     }
@@ -58,7 +60,8 @@ public class JobListenerLogger implements JobListener {
             JobExecutionException arg1) {
         if (arg0 instanceof Service) {
             Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
-            LOOGER.info(service.getHost().getHostname() + ":" + service.getServiceName() + " execution completed");
+            LOOGER.info("{}:{} execution completed",
+            		service.getHost().getHostname(), service.getServiceName());
         }    
     }
 

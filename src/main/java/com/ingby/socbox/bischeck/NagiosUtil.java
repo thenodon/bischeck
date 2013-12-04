@@ -25,18 +25,18 @@ import java.util.Map;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
+/**
+ * Common utilities to manage Nagios integration 
+ */
 public class NagiosUtil {
 	
-	
-	
-	
 	/**
-	 * Formating to Nagios style
+	 * Formatting to Nagios style return message
 	 * @param service
-	 * @return
+	 * @return nagios return message
 	 */
 	public String createNagiosMessage(Service service) {
-		//String message = "";
+		
 		StringBuffer message = new StringBuffer();
 		StringBuffer perfmessage = new StringBuffer();
 		
@@ -121,7 +121,6 @@ public class NagiosUtil {
 		}
 		message.append(" | ").append(perfmessage).append("avg-exec-time=").append(((totalexectime/count)+"ms"));
 		return message.toString();
-		//return message.toString() + " | " + perfmessage.toString() +"avg-exec-time=" + ((totalexectime/count)+"ms");
 	}
 
 }
