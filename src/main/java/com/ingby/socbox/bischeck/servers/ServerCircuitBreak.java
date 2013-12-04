@@ -36,6 +36,21 @@ import com.ingby.socbox.bischeck.service.Service;
  * }<br>
  * </code>  
  * This is instead of calling send(message) directly.<br>
+ * The following properties are valid for the class and should be set in the 
+ * server.xml in the server definition for each server:
+ * <ul>
+ * <li>
+ * cbEnable - enable circuit break, default is false.
+ * </li>
+ * <li>
+ * cbAttempts - the number of connection attempts before the circuit break is 
+ * set i OPEN state, default 5
+ * </li>
+ * <li>
+ * cbTimeout - the time in ms the circuit break will stay in the OPEN state 
+ * before going to HALF-OPEN, default is 60000
+ * </li>
+ * </ul>		 
  */
 public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 
