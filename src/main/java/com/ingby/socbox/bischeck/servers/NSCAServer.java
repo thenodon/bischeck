@@ -101,14 +101,16 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
     private NSCAServer(String name) {
     	marker = MarkerFactory.getMarker(name);
         instanceName=name;
-        cb = new ServerCircuitBreak(this);
+        //cb = new ServerCircuitBreak(this);
     }
     
     
     private void init(String name) {
         NagiosSettings settings = getNSCAConnection(name);
         sender = new NagiosPassiveCheckSender(settings);
+        cb = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
     }
+    
     
     private NagiosSettings getNSCAConnection(String name)  {
     	Properties defaultproperties = getServerProperties();
