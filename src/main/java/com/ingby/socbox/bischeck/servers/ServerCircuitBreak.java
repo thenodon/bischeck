@@ -2,6 +2,7 @@ package com.ingby.socbox.bischeck.servers;
 
 import java.lang.management.ManagementFactory;
 import java.util.Date;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -45,7 +46,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	private int exceptionThreshold = 5; 
 	
 	// The timeout when in OPEN state
-	private long timeout = 10000L;
+	private long timeout = 20000L;
 	
 	// The state of the circuit break, initial state CLOSED
 	private volatile State state = State.CLOSED;
@@ -69,14 +70,25 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	private volatile long lastStateChange = 0L;
 	private MBeanServer mbs;
 	
+	private volatile boolean isEnabled = false;
 	
 	/**
 	 * Constructor for the circuit break
 	 * @param server the server object that the circuit break should be used for
 	 */
 	public ServerCircuitBreak(Server server) {
+		this(server,null);
+	}
+	
+	
+	public ServerCircuitBreak(Server server,
+			Properties prop) {
 		this.server = server;
 		lastStateChange = System.currentTimeMillis();
+		
+		if (prop != null) {
+			setProperties(prop);
+		}
 		
 		// Set up the MBean for the circuit break
 		mbs = ManagementFactory.getPlatformMBeanServer();
@@ -100,14 +112,28 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
         } catch (NotCompliantMBeanException e) {
         	LOGGER.error("Mbean exception - " + e.getMessage());
         }
+		
 	}
-	
-	
+
+
+	private void setProperties(Properties prop) {
+		isEnabled = prop.getProperty("cbEnable","false").equalsIgnoreCase("true");
+		exceptionThreshold = Integer.parseInt(prop.getProperty("cbAttempts","5"));
+		timeout = Long.parseLong(prop.getProperty("cbTimeout","60000"));
+        		
+		
+	}
+
+
 	/**
 	 * Get the current state of the circuit break
 	 * @return current state
 	 */
-	public State getState() { 
+	public State getState() {
+		if (!isEnabled) {
+			return State.CLOSED;
+		}
+		
 		if (state == State.OPEN) {
 			if (System.currentTimeMillis() >= attemptResetAfter) { 
 				state = State.HALF_OPEN;
@@ -147,6 +173,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	 * @param service the service to execute the {@link Server#send(Service)} with
 	 */
 	public void execute(Service service) {
+
 		final State currState = getState(); 
 		switch (currState) {
 		case CLOSED:
@@ -154,7 +181,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 				server.send(service); 
 				exceptionCount.set(0); 
 			} catch (ServerException e) {
-				if (exceptionCount.incrementAndGet() >= exceptionThreshold) { 
+				if (isEnabled && exceptionCount.incrementAndGet() >= exceptionThreshold) { 
 					firstOpen = true;
 					trip(); 
 				} 
@@ -210,4 +237,22 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	public long getTotalOpenCount() {
 		return openCount.get();
 	}
+
+
+	@Override
+	public boolean isEnabled() {
+		return isEnabled;
+	}
+
+
+	@Override
+	public void Enable() {
+		isEnabled = true;
+	}
+	
+	@Override
+	public void Disable() {
+		isEnabled = false;
+	}
+	
 }

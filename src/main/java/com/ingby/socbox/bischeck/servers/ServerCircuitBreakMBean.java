@@ -33,4 +33,23 @@ public interface ServerCircuitBreakMBean {
 	 * @return the total number of times the circuit break been opened
 	 */
 	public long getTotalOpenCount();
+
+	
+	/**
+	 * Check if circuit break is enabled
+	 * @return true if enabled and false if disabled
+	 */
+	public boolean isEnabled();
+
+	
+	/**
+	 * Enable circuit break
+	 */
+	public void Enable();
+	
+	
+	/**
+	 * Disable circuit break
+	 */
+	public void Disable();
 }
