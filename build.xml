@@ -26,7 +26,8 @@
 	<property name="javac_target" value="6" />
     <property name="javac_src" value="6" />
     <property name="version.file" value="${basedir}/version.txt" />
-
+    
+	<property name="sonar.dynamicAnalysis" value="reuseReports" />
 
     <!--  === Compilation Control Options ================================ -->
     <property name="compile.debug" value="true" />
