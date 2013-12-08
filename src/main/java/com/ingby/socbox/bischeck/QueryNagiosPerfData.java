@@ -35,12 +35,15 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class QueryNagiosPerfData {
     
-    private final static Logger  LOGGER = LoggerFactory.getLogger(QueryNagiosPerfData.class);
+    private static final  Logger  LOGGER = LoggerFactory.getLogger(QueryNagiosPerfData.class);
 
     //Find label entry from start of line or space until =
-    private final static Pattern LABELMATCH = Pattern.compile("(^| )(.*?)=");
+    private static final Pattern LABELMATCH = Pattern.compile("(^| )(.*?)=");
     //Find data from = to ; or space or end of line
-    private final static Pattern DATAMATCH = Pattern.compile("=(.*?)(;|$)");
+    private static final Pattern DATAMATCH = Pattern.compile("=(.*?)(;|$)");
+    
+    private QueryNagiosPerfData() {}
+    
     
     /**
      * Take the full return string including the performance data from a Nagios 
@@ -56,8 +59,8 @@ public abstract class QueryNagiosPerfData {
      * If the label do not exist null is returned.
      */
     public static String parseByLabel(String label, String stdoutString) {
-    	String perfdata = getPerfdata(stdoutString);
-    	return parse(label, perfdata);
+        String perfdata = getPerfdata(stdoutString);
+        return parse(label, perfdata);
     }
     
     /**
@@ -92,24 +95,24 @@ public abstract class QueryNagiosPerfData {
         
         // Not hits
         String value = null;
-    	
+        
         if (labelfound) { 
-        	Pattern perfMatch = Pattern.compile(perflabel+"(.*?)( |$)");
+            Pattern perfMatch = Pattern.compile(perflabel+"(.*?)( |$)");
 
-        	mat = perfMatch.matcher(performanceData);
+            mat = perfMatch.matcher(performanceData);
 
-        	String perfdata = null;
-        	while (mat.find()) {
-        		perfdata = mat.group();
-        		LOGGER.debug("Performance data is: {}", perfdata);        
-        	}
+            String perfdata = null;
+            while (mat.find()) {
+                perfdata = mat.group();
+                LOGGER.debug("Performance data is: {}", perfdata);        
+            }
 
-        	mat = DATAMATCH.matcher(perfdata);
-        	//String value = null;
-        	while (mat.find()) {
-        		value = removeUOM(mat.group().replaceAll("=","").replaceAll(";", ""));
-        		LOGGER.debug("Performance data value is {}:", value);        
-        	}
+            mat = DATAMATCH.matcher(perfdata);
+
+            while (mat.find()) {
+                value = removeUOM(mat.group().replaceAll("=","").replaceAll(";", ""));
+                LOGGER.debug("Performance data value is {}:", value);        
+            }
         }
         return value;
     }
@@ -121,10 +124,10 @@ public abstract class QueryNagiosPerfData {
      * @return the performance data string, the right side of the | sign
      */
     private static String getPerfdata(String stdoutString) {
-		return  stdoutString.substring(stdoutString.indexOf('|')+1);
-	}
+        return  stdoutString.substring(stdoutString.indexOf('|')+1);
+    }
     
-    
+
     /**
      * Remove the UOM portion of the performance string
      * @param s

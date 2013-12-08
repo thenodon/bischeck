@@ -33,36 +33,38 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
  * {@link Calendar} getInstance.  
  *
  */
-public abstract class BisCalendar {
-	
-	
-	/**
-	 * Get an Calendar instance of a ISO 8601. The calendar can be controlled
-	 * with two properties in property.xml:
-	 * <ul>
-	 * <li>
-	 * firstdayofweek - default first day of the week is Monday
-	 * </li>
-	 * <li>
-	 * mindaysinfirstweek - define the minimum number of days in the first week
-	 * of the year, default is 4
-	 * </li>
-	 * </ul>
-	 *  
-	 * @return
-	 */
-	public static Calendar getInstance() {
-		Calendar now = GregorianCalendar.getInstance();
-		now.setFirstDayOfWeek(Integer.parseInt
-				(ConfigurationManager.getInstance().getProperties().
-						getProperty("firstdayofweek", 
-								String.valueOf(Calendar.MONDAY))));
+public final class BisCalendar {
 
-		now.setMinimalDaysInFirstWeek(Integer.parseInt
-				(ConfigurationManager.getInstance().getProperties().
-						getProperty("mindaysinfirstweek", 
-								String.valueOf(4))));
 
-		return now;
-	}
+    /**
+     * Get an Calendar instance of a ISO 8601. The calendar can be controlled
+     * with two properties in property.xml:
+     * <ul>
+     * <li>
+     * firstdayofweek - default first day of the week is Monday
+     * </li>
+     * <li>
+     * mindaysinfirstweek - define the minimum number of days in the first week
+     * of the year, default is 4
+     * </li>
+     * </ul>
+     *  
+     * @return
+     */
+    public static Calendar getInstance() {
+        Calendar now = GregorianCalendar.getInstance();
+        
+        String firstDayOfWeek = ConfigurationManager.getInstance().getProperties().
+                getProperty("firstdayofweek", String.valueOf(Calendar.MONDAY));
+
+        now.setFirstDayOfWeek(Integer.parseInt(firstDayOfWeek));
+
+        String minDaysInFirstWeek = ConfigurationManager.getInstance().getProperties().
+                getProperty("mindaysinfirstweek", 
+                        String.valueOf(4));
+        
+        now.setMinimalDaysInFirstWeek(Integer.parseInt(minDaysInFirstWeek));
+
+        return now;
+    }
 }

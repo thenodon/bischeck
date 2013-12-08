@@ -29,98 +29,102 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  * Common utilities to manage Nagios integration 
  */
 public class NagiosUtil {
-	
-	/**
-	 * Formatting to Nagios style return message
-	 * @param service
-	 * @return nagios return message
-	 */
-	public String createNagiosMessage(Service service) {
-		
-		StringBuffer message = new StringBuffer();
-		StringBuffer perfmessage = new StringBuffer();
-		
-		message.append(" ");
-		perfmessage.append(" ");
-		
-		int count = 0;
-		long totalexectime = 0;
+    
+    /**
+     * Formatting to Nagios style return message
+     * @param service
+     * @return nagios return message
+     */
+    public String createNagiosMessage(Service service) {
+        
+        StringBuffer message = new StringBuffer();
+        StringBuffer perfmessage = new StringBuffer();
+        
+        message.append(" ");
+        perfmessage.append(" ");
+        
+        int count = 0;
+        long totalexectime = 0;
 
-		for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
-			ServiceItem serviceItem = serviceItementry.getValue();
+        for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
+            ServiceItem serviceItem = serviceItementry.getValue();
 
-			BigDecimal warnValue = null;
-			BigDecimal critValue = null;
-			String method = "NA";;
+            BigDecimal warnValue = null;
+            BigDecimal critValue = null;
+            String method = "NA";
 
-			Float currentThreshold = Util.roundDecimals(serviceItem.getThreshold().getThreshold());
-			String currentMeasure = Util.fixExponetialFormat(serviceItem.getLatestExecuted());
-			
-			if (currentThreshold != null) {
+            Float currentThreshold = Util.roundDecimals(serviceItem.getThreshold().getThreshold());
+            String currentMeasure = Util.fixExponetialFormat(serviceItem.getLatestExecuted());
+            
+            if (currentThreshold != null) {
 
-				method = serviceItem.getThreshold().getCalcMethod();
+                method = serviceItem.getThreshold().getCalcMethod();
 
-				if (method.equalsIgnoreCase("=")) {
-					warnValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float ((1-serviceItem.getThreshold().getWarning())*currentThreshold)).toString().toString());
-					critValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float ((1-serviceItem.getThreshold().getCritical())*currentThreshold)).toString().toString());
-					
-					message.append(serviceItem.getServiceItemName()).
-					append(" = ").
-					append(currentMeasure).
-					append(" (").
-					append(new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString())).
-					append(" ").append(method).append(" ").
-					append(warnValue).append(" ").append(method).append(" ").append(" +-W ").append(method).append(" ").
-					append(critValue).append(" ").append(method).append(" ").append(" +-C ").append(method).append(" ) ");
-					
-				} else {
-					warnValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float (serviceItem.getThreshold().getWarning()*currentThreshold)).toString());
-					critValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float (serviceItem.getThreshold().getCritical()*currentThreshold)).toString());
-					
-					message.append(serviceItem.getServiceItemName()).
-					append(" = ").
-					append(currentMeasure).
-					append(" (").
-					append(new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString())).
-					append(" ").append(method).append(" ").
-					append(warnValue).append(" ").append(method).append(" ").append(" W ").append(method).append(" ").
-					append(critValue).append(" ").append(method).append(" ").append(" C ").append(method).append(" ) ");
-					
-				}
+                if (method.equalsIgnoreCase("=")) {
+                    warnValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float ((1-serviceItem.getThreshold().getWarning())*currentThreshold)).toString().toString());
+                    critValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float ((1-serviceItem.getThreshold().getCritical())*currentThreshold)).toString().toString());
+                    
+                    message.append(serviceItem.getServiceItemName()).
+                    append(" = ").
+                    append(currentMeasure).
+                    append(" (").
+                    append(new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString())).
+                    append(" ").append(method).append(" ").
+                    append(warnValue).append(" ").append(method).append(" ").append(" +-W ").append(method).append(" ").
+                    append(critValue).append(" ").append(method).append(" ").append(" +-C ").append(method).append(" ) ");
+                    
+                } else {
+                    warnValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float (serviceItem.getThreshold().getWarning()*currentThreshold)).toString());
+                    critValue = new BigDecimal(Util.roundByOtherString(currentMeasure, new Float (serviceItem.getThreshold().getCritical()*currentThreshold)).toString());
+                    
+                    message.append(serviceItem.getServiceItemName()).
+                    append(" = ").
+                    append(currentMeasure).
+                    append(" (").
+                    append(new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString())).
+                    append(" ").append(method).append(" ").
+                    append(warnValue).append(" ").append(method).append(" ").append(" W ").append(method).append(" ").
+                    append(critValue).append(" ").append(method).append(" ").append(" C ").append(method).append(" ) ");
+                    
+                }
 
-			} else {
-				message.append(serviceItem.getServiceItemName()).
-				append(" = ").
-				append(currentMeasure).
-				append(" (NA) ");
-				
-				currentThreshold=new Float(0); //This is so the perfdata will be correct.
-				
-			}
+            } else {
+                message.append(serviceItem.getServiceItemName()).
+                append(" = ").
+                append(currentMeasure).
+                append(" (NA) ");
+                
+                currentThreshold=new Float(0); //This is so the perfdata will be correct.
+                
+            }
 
-			// Building the performance string 
-			perfmessage.append(serviceItem.getServiceItemName()).append("=");
-			if (currentMeasure != null)
-				perfmessage.append(currentMeasure);
-			perfmessage.append(";");
-			if (warnValue != null)
-				perfmessage.append(warnValue);
-			perfmessage.append(";");
-			if (critValue != null)
-				perfmessage.append(critValue);
-			perfmessage.append(";0; ");
-			
-			perfmessage.append("threshold=");
-			BigDecimal threshold = new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString());
-			if (threshold != null)
-				perfmessage.append(threshold);
-			perfmessage.append(";0;0;0; ");
-				
-			totalexectime = (totalexectime + serviceItem.getExecutionTime());
-			count++;
-		}
-		message.append(" | ").append(perfmessage).append("avg-exec-time=").append(((totalexectime/count)+"ms"));
-		return message.toString();
-	}
+            // Building the performance string 
+            perfmessage.append(serviceItem.getServiceItemName()).append("=");
+            if (currentMeasure != null) {
+                perfmessage.append(currentMeasure);
+            }
+            perfmessage.append(";");
+            if (warnValue != null) {
+                perfmessage.append(warnValue);
+            }
+            perfmessage.append(";");
+            if (critValue != null) {
+                perfmessage.append(critValue);
+            }
+            perfmessage.append(";0; ");
+            
+            perfmessage.append("threshold=");
+            BigDecimal threshold = new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString());
+            if (threshold != null) {
+                perfmessage.append(threshold);
+            }
+            perfmessage.append(";0;0;0; ");
+                
+            totalexectime = (totalexectime + serviceItem.getExecutionTime());
+            count++;
+        }
+        message.append(" | ").append(perfmessage).append("avg-exec-time=").append(((totalexectime/count)+"ms"));
+        return message.toString();
+    }
 
 }

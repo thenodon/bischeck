@@ -47,7 +47,11 @@ public abstract class Util {
     private static Map<String,DecimalFormat> decFormatMapCache = new HashMap<String, DecimalFormat>();
     
     private final static DecimalFormatSymbols DECIMALSEP = new DecimalFormatSymbols(new Locale("us_US"));
-	/**
+	
+    private final static String QOUTED_DASH = "\\\\-";
+    private final static String DASH = "-";
+    
+    /**
      * Obfuscate a string including password= until none character or number. 
      * @param url typical a url string
      * @return Obfuscated string
@@ -114,9 +118,9 @@ public abstract class Util {
      * @return rounded to one decimal
      */
     public static Float roundDecimals(Float d) {
-        if (d != null) {
+        Float roundedFloat = null;
+    	if (d != null) {
         	int nrdec = getNumberOfDecimalPlace(d);
-            //DecimalFormat oneDForm = new DecimalFormat("#");
         	StringBuffer strbuf = new StringBuffer();
         	strbuf.append("#.");
             for (int i = 0; i< nrdec;i++) {
@@ -130,12 +134,10 @@ public abstract class Util {
     			decFormatMapCache.put(strbuf.toString(), decformatter);
     		}
             
-            //DecimalFormat oneDForm = new DecimalFormat(strbuf.toString(),DECIMALSEP);
-            
-            return Float.valueOf(decformatter.format(d));
-            //return Float.valueOf(oneDForm.format(d));
+            roundedFloat = Float.valueOf(decformatter.format(d));
         }
-        return null;
+    	
+        return roundedFloat;
     }
 
     
@@ -224,9 +226,9 @@ public abstract class Util {
     	    
     	StringBuffer strbuf = new StringBuffer();
     	
-    	strbuf.append(hostname.replaceAll("-", "\\\\-")).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(servicename.replaceAll("-", "\\\\-")).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(serviceitemname.replaceAll("-", "\\\\-"));
+    	strbuf.append(hostname.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
+    	strbuf.append(servicename.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
+    	strbuf.append(serviceitemname.replaceAll(DASH, QOUTED_DASH));
     	return strbuf.toString();	
     }
     
@@ -245,10 +247,10 @@ public abstract class Util {
 	    
     	StringBuffer strbuf = new StringBuffer();
     	
-    	strbuf.append(hostname.replaceAll("-", "\\\\-")).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(servicename.replaceAll("-", "\\\\-"));
+    	strbuf.append(hostname.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
+    	strbuf.append(servicename.replaceAll(DASH, QOUTED_DASH));
     	strbuf.append(insert).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(serviceitemname.replaceAll("-", "\\\\-"));
+    	strbuf.append(serviceitemname.replaceAll(DASH, QOUTED_DASH));
     	return strbuf.toString();	
     }
     

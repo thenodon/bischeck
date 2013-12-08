@@ -31,19 +31,25 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * The QueryDate parse a date specification and replace it with a valid date. 
- * The date specification must be in the format  
- * <code>%%<FORMAT>-+X%%</code> where FORMAT is the way that date 
- * should be presented like MM-DD-YY, YY/MM/DD, etc.
+ * The QueryDate parse a date specification and replace it with a valid date.
  */
 public abstract class QueryDate {
 
     
-    private final static Logger  LOOGER = LoggerFactory.getLogger(QueryDate.class);
+    private static final Logger  LOOGER = LoggerFactory.getLogger(QueryDate.class);
 
-    private final static Pattern DATEMARK = Pattern.compile("%%(.*?)%%");
-    private final static Pattern DATEINDICATOR = Pattern.compile("\\[([DMY].*?)\\]");
+    private static final Pattern DATEMARK = Pattern.compile("%%(.*?)%%");
+    private static final Pattern DATEINDICATOR = Pattern.compile("\\[([DMY].*?)\\]");
     
+    /**
+     * The QueryDate parse a date specification and replace it with a valid date. 
+     * The date specification must be in the format  
+     * <code>%%<FORMAT>-+X%%</code> where FORMAT is the way that date 
+     * should be presented like MM-DD-YY, YY/MM/DD, etc.
+     * @param strtoparse
+     * @return
+     * @throws IllegalArgumentException if the input is not correct formatted.
+     */
     public static String parse(String strtoparse) {
         LOOGER.debug("String to date parse - {}", strtoparse);
         Calendar now = null;
@@ -74,8 +80,9 @@ public abstract class QueryDate {
                 dateformat = dateformat.substring(0,dateformat.indexOf('%',3))+"%%";
                 String offset = calc.group();
                 
-                offsetType = offset.charAt(1); // After the [
+                offsetType = offset.charAt(1); 
                 
+                // After the [
                 if (offsetType == 'D' || 
                     offsetType == 'M' || 
                     offsetType =='Y') {
@@ -86,6 +93,7 @@ public abstract class QueryDate {
                         offsetValue = Integer.parseInt(offset);
                     } catch (NumberFormatException ne) {
                         LOOGER.warn("Value to calculate date is not valid " + calc.group());
+                        throw new IllegalArgumentException();
                     }
                 }
                 
@@ -100,6 +108,9 @@ public abstract class QueryDate {
                 case 'Y': 
                     now.add(Calendar.YEAR, offsetValue);
                     break;
+                default:
+                    LOOGER.warn("The the date specification must be D,M or Y");
+                    throw new IllegalArgumentException();
                 }
             }
         

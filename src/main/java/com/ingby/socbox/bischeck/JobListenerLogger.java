@@ -30,38 +30,43 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public class JobListenerLogger implements JobListener {
 
-    private final static Logger  LOOGER = LoggerFactory.getLogger(JobListenerLogger.class);
+    private  static final Logger  LOOGER = LoggerFactory.getLogger(JobListenerLogger.class);
+    
+    
     @Override
     public String getName() {
         return JobListenerLogger.class.getName();
     }
 
+    
     @Override
     public void jobExecutionVetoed(JobExecutionContext arg0) {
         if (arg0 instanceof Service) {    
             Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
             LOOGER.info("{}:{} to be executed vetoed",
-            		service.getHost().getHostname(), service.getServiceName());
+                    service.getHost().getHostname(), service.getServiceName());
         }
     }
 
+    
     @Override
     public void jobToBeExecuted(JobExecutionContext arg0) {
         if (arg0 instanceof Service) {
             Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
             LOOGER.info("{}:{} to be executed",
-            		service.getHost().getHostname(), service.getServiceName());
+                    service.getHost().getHostname(), service.getServiceName());
         }
 
     }
 
+    
     @Override
     public void jobWasExecuted(JobExecutionContext arg0,
             JobExecutionException arg1) {
         if (arg0 instanceof Service) {
             Service service = (Service) arg0.getJobDetail().getJobDataMap().get("service");
             LOOGER.info("{}:{} execution completed",
-            		service.getHost().getHostname(), service.getServiceName());
+                    service.getHost().getHostname(), service.getServiceName());
         }    
     }
 

@@ -66,7 +66,6 @@ import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.configuration.ConfigFileManager;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.internal.InternalSurveillance;
-import com.ingby.socbox.bischeck.servers.ServerExecutor;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
@@ -88,34 +87,32 @@ public final class Execute implements ExecuteMBean {
     private static ObjectName   mbeanname = null;
     
     private static final int RESTART = 1000;
-	private static final int OKAY = 0;
-	private static final int FAILED = 1;
-	
-	private static final long LOOPTIMEOUTDEF = 30000;
-	private static final long SHUTDOWNSLEEPDEF = 3000; 
+    private static final int OKAY = 0;
+    private static final int FAILED = 1;
+    private static final String XML_CONFIG_DIRECTORY = "xmlconfigdir";
+    private static final String BIS_HOME_DIRECTORY = "bishome";
     
-	private static long looptimeout = LOOPTIMEOUTDEF;
-	private static long shutdownsleep = SHUTDOWNSLEEPDEF; 
-	private static String bischeckversion;
-	private static Thread dumpthread; 
+    private static final long LOOPTIMEOUTDEF = 30000;
+    private static final long SHUTDOWNSLEEPDEF = 3000; 
+    
+    private static long looptimeout = LOOPTIMEOUTDEF;
+    private static long shutdownsleep = SHUTDOWNSLEEPDEF; 
+    private static String bischeckversion;
+    private static Thread dumpthread; 
 
-	/*
-	 * The admin jobs are:
-	 * - threshold cache depleted
-	 */
-	private static final int NUMOFADMINJOBS = 1;
+    /*
+     * The admin jobs are:
+     * - threshold cache depleted
+     */
+    private static final int NUMOFADMINJOBS = 1;
     
-    
-    //private ConfigurationManager confMgr = null;
-    
+     
     static {
         mbs = ManagementFactory.getPlatformMBeanServer();
 
         try {
             mbeanname = new ObjectName(ExecuteMBean.BEANNAME);
         } catch (MalformedObjectNameException e) {
-            LOGGER.error("MBean object name failed, {}",e.getMessage(), e);
-        } catch (NullPointerException e) {
             LOGGER.error("MBean object name failed, {}",e.getMessage(), e);
         }
 
@@ -124,15 +121,15 @@ public final class Execute implements ExecuteMBean {
         } catch (InstanceAlreadyExistsException e) {
             LOGGER.error("Mbean register exception - {}", e.getMessage(),e);
         } catch (MBeanRegistrationException e) {
-        	LOGGER.error("Mbean register exception - {}", e.getMessage(),e);
+            LOGGER.error("Mbean register exception - {}", e.getMessage(),e);
         } catch (NotCompliantMBeanException e) {
-        	LOGGER.error("Mbean register exception - {}", e.getMessage(),e);
+            LOGGER.error("Mbean register exception - {}", e.getMessage(),e);
         }
     }
     
     
     
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
         // create the command line parser
         CommandLineParser parser = new GnuParser();
@@ -160,11 +157,11 @@ public final class Execute implements ExecuteMBean {
         
         dumpthread = new Thread(){
             public void run(){
-            	try {
-					CacheFactory.destroy();
-				} catch (CacheException e) {
-					LOGGER.warn("Cache could not be destoryed", e);
-				}
+                try {
+                    CacheFactory.destroy();
+                } catch (CacheException e) {
+                    LOGGER.warn("Cache could not be destoryed", e);
+                }
               }
             };
             
@@ -172,20 +169,20 @@ public final class Execute implements ExecuteMBean {
         
         int retStat = OKAY;
         do {
-        	
-        	try {
-        		if (line.hasOption("deamon")) { 
-        			ConfigurationManager.init();
-        		} else {  
-        			ConfigurationManager.initonce();
-        		}
-        	} catch (Exception e) {
-        		LOGGER.error("Creating bischeck Configuration Manager failed with: {}" + e.getMessage(),e);
-        		System.exit(FAILED);
-        	}
+            
+            try {
+                if (line.hasOption("deamon")) { 
+                    ConfigurationManager.init();
+                } else {  
+                    ConfigurationManager.initonce();
+                }
+            } catch (Exception e) {
+                LOGGER.error("Creating bischeck Configuration Manager failed with: {}" + e.getMessage(),e);
+                System.exit(FAILED);
+            }
 
-        	retStat = Execute.getInstance().daemon();
-        	LOGGER.debug("Method Execute returned {}", retStat);
+            retStat = Execute.getInstance().deamon();
+            LOGGER.debug("Method Execute returned {}", retStat);
         } while (retStat == RESTART);
  
         dumpthread.start();
@@ -195,33 +192,33 @@ public final class Execute implements ExecuteMBean {
     
     
     
-	private Execute() {}
+    private Execute() {}
     
     private static Execute getInstance() {
-    	return exec;
+        return exec;
     }
     
     
-    private int daemon() {
-    	
-    	LOGGER.info("******************** Startup *******************");
+    private int deamon() {
+        
+        LOGGER.info("******************** Startup *******************");
 
-    	/*
-    	 * Stuff that should only be done on the first start and never on reload
-    	 */
+        /*
+         * Stuff that should only be done on the first start and never on reload
+         */
         if (!reloadRequested) {
-        	try {
-        		InternalSurveillance.init();
-        		deamonInit();
-        	} catch (Exception e) {
-        		LOGGER.error("Deamon init failed - exit",e);
-        		return FAILED;
-        	}	
-        	try {
-            	CacheFactory.init();
+            try {
+                InternalSurveillance.init();
+                deamonInit();
+            } catch (Exception e) {
+                LOGGER.error("Deamon init failed - exit",e);
+                return FAILED;
+            }    
+            try {
+                CacheFactory.init();
             } catch (CacheException ce) {
-            	LOGGER.error("Cache factory init failed - exit",ce);
-            	return FAILED;
+                LOGGER.error("Cache factory init failed - exit",ce);
+                return FAILED;
             }
         }
         
@@ -229,23 +226,23 @@ public final class Execute implements ExecuteMBean {
         /*
          * Reset the shutdown and reload flags
          */
-    	shutdownRequested = false;
-    	reloadRequested = false;
+        shutdownRequested = false;
+        reloadRequested = false;
         
                 
         Scheduler sched = null;     
         
         try {
-        	sched = initScheduler();
-			initTriggers(sched); 
+            sched = initScheduler();
+            initTriggers(sched); 
         } catch (SchedulerException e) {
-        	LOGGER.error("Scheduler init failed",e);
-        	return FAILED;
-		}
+            LOGGER.error("Scheduler init failed",e);
+            return FAILED;
+        }
         
         
         /* 
-         * Enter loop if daemonMode 
+         * Enter loop if deamonMode 
          */
         deamonLoop(); 
   
@@ -258,78 +255,78 @@ public final class Execute implements ExecuteMBean {
         
         ServerMessageExecutor.getInstance().unregisterAll();
        
-        //CacheFactory.close();
         LOGGER.info("******************* Shutdown ********************");
         
         if (reloadRequested) { 
-        	return RESTART;	
+            return RESTART;    
         } else {
-        	return OKAY;
+            return OKAY;
         }
     }
     
 
     /**
-     * The first time the daemon method is called this method will be invoked
-     * to setup specific task to become a daemon process. This include:
-     * Checking pid file so no other bischeck daemon exists.
+     * The first time the deamon method is called this method will be invoked
+     * to setup specific task to become a deamon process. This include:
+     * Checking pid file so no other bischeck deamon exists.
      * Setup pid file delete on exit.
      * Close all standard file - in, out and error.
      * Add shutdown hooks for OS signals to get controlled process exit.
      * @throws Exception if the pid file already exist.
      */
-	private void deamonInit() throws Exception {
-		if (ConfigurationManager.getInstance().getPidFile().exists()) {
-		    LOGGER.error("Pid file already exist - check if bischeck" + 
-		    " already running");
-		    throw new Exception("Pid file already exist - check if bischeck" + 
-		    " already running"); 
-		}
-		ConfigurationManager.getInstance().getPidFile().deleteOnExit();
+    private void deamonInit() throws Exception {
+        if (ConfigurationManager.getInstance().getPidFile().exists()) {
+            LOGGER.error("Pid file already exist - check if bischeck already running");
+            throw new Exception("Pid file already exist - check if bischeck already running"); 
+        }
+        
+        ConfigurationManager.getInstance().getPidFile().deleteOnExit();
 
-		setupProperties();
-		
-		try {
-		    System.in.close();
-		} catch (IOException ignore) {}
-	
-		System.out.close();
-		System.err.close();
+        setupProperties();
+        
+        try {
+            System.in.close();
+        } catch (IOException ignore) {}
+    
+        System.out.close();
+        System.err.close();
 
-		bischeckversion = readBischeckVersion();
-		addDaemonShutdownHook();
-	}
+        bischeckversion = readBischeckVersion();
+        addDeamonShutdownHook();
+    }
 
     
-	private void setupProperties() {
-		try {
-			looptimeout = Long.parseLong(
-					ConfigurationManager.getInstance().getProperties().
-					getProperty("loopTimeout",""+LOOPTIMEOUTDEF));
-		} catch (NumberFormatException ne) {
-			looptimeout = LOOPTIMEOUTDEF;
-		}
-		
-		try {
+    private void setupProperties() {
+        try {
+            looptimeout = Long.parseLong(
+                    ConfigurationManager.getInstance().getProperties().
+                    getProperty("loopTimeout",""+LOOPTIMEOUTDEF));
+        } catch (NumberFormatException ne) {
+            LOGGER.warn("Property loopTimeout was not a number. Set to {}", LOOPTIMEOUTDEF);
+            looptimeout = LOOPTIMEOUTDEF;
+        }
+        
+        try {
 
-			shutdownsleep = Long.parseLong(
-					ConfigurationManager.getInstance().getProperties().
-					getProperty("shutdownWait",""+SHUTDOWNSLEEPDEF));
-		} catch (NumberFormatException ne) {
-			shutdownsleep = SHUTDOWNSLEEPDEF; 
-		}
+            shutdownsleep = Long.parseLong(
+                    ConfigurationManager.getInstance().getProperties().
+                    getProperty("shutdownWait",""+SHUTDOWNSLEEPDEF));
+        } catch (NumberFormatException ne) {
+        	LOGGER.warn("Property shutdownWait no correctly set. Set to {}", SHUTDOWNSLEEPDEF);
+            shutdownsleep = SHUTDOWNSLEEPDEF; 
+        }
 
-	}
+    }
 
 
 
-	/**
+    /**
      * The loop to enter until shutdown or reload signal. If in DEBUG log level
      * each quartz trigger scheduled is printed every LOOPTIMEOUT ms. 
      */
-	private void deamonLoop() {
-		allowReload = true;
-		do {
+    private void deamonLoop() {
+        allowReload = true;
+        do {
             try {
                 synchronized(syncObj) {
                     syncObj.wait(looptimeout);
@@ -339,7 +336,7 @@ public final class Execute implements ExecuteMBean {
             // If no remaining triggers - shutdown
             if (getNumberOfTriggers() == 0) {
                 LOGGER.debug("Number of triggers zero");
-            	shutdown();
+                shutdown();
             }
             
             if (LOGGER.isDebugEnabled()) {
@@ -353,18 +350,18 @@ public final class Execute implements ExecuteMBean {
             } 
         
         } while (!isShutdownRequested());
-		
-		allowReload = false;
-	}
+        
+        allowReload = false;
+    }
 
-	
-	/**
-	 * Setup all the quartz job that is configured.
-	 * @param sched - the quartz scheduler 
-	 * @throws SchedulerException
-	 */
-	private void initTriggers(Scheduler sched) throws SchedulerException{
-		List<ServiceJobConfig> schedulejobs = 
+    
+    /**
+     * Setup all the quartz job that is configured.
+     * @param sched - the quartz scheduler 
+     * @throws SchedulerException
+     */
+    private void initTriggers(Scheduler sched) throws SchedulerException{
+        List<ServiceJobConfig> schedulejobs = 
             ConfigurationManager.getInstance().getScheduleJobConfigs();
         
         for (ServiceJobConfig jobentry: schedulejobs) {
@@ -373,45 +370,45 @@ public final class Execute implements ExecuteMBean {
             map.put("service", jobentry.getService());
             createJob(sched, jobentry, map);
         }
-	}
+    }
 
 
 
-	private void createJob(Scheduler sched, ServiceJobConfig jobentry,
-			Map<String, Object> map) throws SchedulerException {
-		JobDataMap jobmap = new JobDataMap(map);
-      	int jobid = 0;
-      		
-      	
-      	for (Trigger trigger: jobentry.getSchedules()) {
-      		if (trigger != null) {
-      			try {
-      				JobDetail job = newJob(ServiceJob.class)
-      				.withIdentity(jobentry.getService().getServiceName()+(jobid++), jobentry.getService().getHost().getHostname())
-      				.withDescription(jobentry.getService().getHost().getHostname()+"-"+jobentry.getService().getServiceName())
-      				.usingJobData(jobmap)
-      				.build();
+    private void createJob(Scheduler sched, ServiceJobConfig jobentry,
+            Map<String, Object> map) throws SchedulerException {
+        JobDataMap jobmap = new JobDataMap(map);
+          int jobid = 0;
+              
+          
+          for (Trigger trigger: jobentry.getSchedules()) {
+              if (trigger != null) {
+                  try {
+                      JobDetail job = newJob(ServiceJob.class)
+                      .withIdentity(jobentry.getService().getServiceName()+(jobid++), jobentry.getService().getHost().getHostname())
+                      .withDescription(jobentry.getService().getHost().getHostname()+"-"+jobentry.getService().getServiceName())
+                      .usingJobData(jobmap)
+                      .build();
 
-      				sched.scheduleJob(job, trigger);
-      				LOGGER.info("Adding trigger to job {}",trigger.toString());
-      			} catch (SchedulerException e) {
-      				LOGGER.warn("Scheduled job failed with exception {}", e.getMessage(), e);
-      				throw e;
-      			}
-      		}
-		}
-	}
+                      sched.scheduleJob(job, trigger);
+                      LOGGER.info("Adding trigger to job {}",trigger.toString());
+                  } catch (SchedulerException e) {
+                      LOGGER.warn("Scheduled job failed with exception {}", e.getMessage(), e);
+                      throw e;
+                  }
+              }
+        }
+    }
 
-	/**
-	 * Create and initialize the quartz scheduler to use. 
-	 * @param sched
-	 * @return the scheduler created
-	 * @throws SchedulerException if the scheduler can not be created or it can
-	 * not be started
-	 */
-	private Scheduler initScheduler() throws SchedulerException {
-		Scheduler sched = null;
-		
+    /**
+     * Create and initialize the quartz scheduler to use. 
+     * @param sched
+     * @return the scheduler created
+     * @throws SchedulerException if the scheduler can not be created or it can
+     * not be started
+     */
+    private Scheduler initScheduler() throws SchedulerException {
+        Scheduler sched = null;
+        
         try {
             LOGGER.info("Start scheduler");
             sched = StdSchedulerFactory.getDefaultScheduler();
@@ -429,8 +426,8 @@ public final class Execute implements ExecuteMBean {
             LOGGER.warn("Add listener failed with exception {}", e.getMessage(), e);
             throw e;    
         }
-		return sched;
-	}
+        return sched;
+    }
     
     
     /**
@@ -444,17 +441,17 @@ public final class Execute implements ExecuteMBean {
     /**
      * Setup a OS hook to catch a shutdown signal.
      */
-    protected void addDaemonShutdownHook(){
-    	Runtime.getRuntime().addShutdownHook( 
-    			new Thread() { 
-    				public void run() { 
-    					shutdown(); 
-    					try {
-    						dumpthread.join();
-						} catch (InterruptedException ignore) {}
-    				}
-    			}
-    		);
+    protected void addDeamonShutdownHook(){
+        Runtime.getRuntime().addShutdownHook( 
+                new Thread() { 
+                    public void run() { 
+                        shutdown(); 
+                        try {
+                            dumpthread.join();
+                        } catch (InterruptedException ignore) {}
+                    }
+                }
+            );
     }
 
     /*
@@ -469,30 +466,30 @@ public final class Execute implements ExecuteMBean {
         LOGGER.info("Shutdown request");        
         shutdownRequested = true;
         synchronized(syncObj) {
-        	syncObj.notify();
+            syncObj.notify();
         }
 
         try {
                 Thread.sleep(shutdownsleep);
         } catch(InterruptedException e) {
-            LOGGER.error("Interrupted which waiting on main daemon thread to complete");
+            LOGGER.error("Interrupted which waiting on main deamon thread to complete");
         }
     }
 
     
     @Override
     public boolean reload() {
-    	if (allowReload) { 
-    		LOGGER.info("Reload request");
-    		reloadcount++;
-    		reloadtime = System.currentTimeMillis();
-    		reloadRequested = true;
-    		shutdown();
-    		return true;
-    	} else {
-    		LOGGER.warn("Not allowed to reload");
-    		return false;
-    	}
+        if (allowReload) { 
+            LOGGER.info("Reload request");
+            reloadcount++;
+            reloadtime = System.currentTimeMillis();
+            reloadRequested = true;
+            shutdown();
+            return true;
+        } else {
+            LOGGER.warn("Not allowed to reload");
+            return false;
+        }
     }
     
     
@@ -500,48 +497,50 @@ public final class Execute implements ExecuteMBean {
     
     @Override
     public long getReloadTime() {
-    	return reloadtime;
+        return reloadtime;
     }
 
     
     @Override
     public int getReloadCount() {
-    	return reloadcount;
+        return reloadcount;
     }
 
     
     @Override
     public String getBischeckHome() {
-    	return System.getProperty("bishome");
+        return System.getProperty(BIS_HOME_DIRECTORY);
     }
     
     
     @Override
     public String getXmlConfigDir() {
-    	if (System.getProperty("xmlconfigdir") == null)
-    		return ConfigFileManager.DEFAULT_CONFIGDIR;
-    	else
-    		return System.getProperty("xmlconfigdir");   
+        if (System.getProperty(XML_CONFIG_DIRECTORY) == null) {
+            return ConfigFileManager.DEFAULT_CONFIGDIR;
+        }
+        else {
+            return System.getProperty(XML_CONFIG_DIRECTORY);
+        }
     }
     
     
     @Override 
     public String getBischeckVersion() {
-    	return bischeckversion;
+        return bischeckversion;
     }
 
     
     @Override 
     public int cacheClassHit() {
-    	return ClassCache.cacheHit();
+        return ClassCache.cacheHit();
     }
     
     
     @Override 
-	public int cacheClassMiss() {
-		return ClassCache.cacheMiss();
-	}
-	
+    public int cacheClassMiss() {
+        return ClassCache.cacheMiss();
+    }
+    
     
   
     @Override
@@ -580,7 +579,7 @@ public final class Execute implements ExecuteMBean {
      * @return number of service jobs
      */
     
-	public int getNumberOfTriggers() {
+    public int getNumberOfTriggers() {
         int numberoftriggers = 0;
         
         try {
@@ -588,7 +587,7 @@ public final class Execute implements ExecuteMBean {
             List<String> triggerGroups = sched.getTriggerGroupNames();
             for (String triggergroup: triggerGroups) {
                
-            	Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggergroup));
+                Set<TriggerKey> keys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggergroup));
                 
                 numberoftriggers += keys.size();
             }
@@ -599,43 +598,43 @@ public final class Execute implements ExecuteMBean {
         return numberoftriggers-NUMOFADMINJOBS;
     }
 
-	
-	private String readBischeckVersion() {
-		String bischeckversion;
-		FileInputStream fstream = null;
-		DataInputStream in = null;
-		BufferedReader br = null;
-		String path = null;
-		
-		if (System.getProperty("bishome") != null) {
-			path=System.getProperty("bishome");
-		} else {
-			LOGGER.error("System property bishome must be set");
-		}
+    
+    private String readBischeckVersion() {
+        String version;
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        String path = null;
+        
+        if (System.getProperty(BIS_HOME_DIRECTORY) != null) {
+            path=System.getProperty(BIS_HOME_DIRECTORY);
+        } else {
+            LOGGER.error("System property bishome must be set");
+        }
 
-		try {
-			fstream = new FileInputStream(path + File.separator + "version.txt");
+        try {
+            fstream = new FileInputStream(path + File.separator + "version.txt");
 
-			in = new DataInputStream(fstream);
-			br = new BufferedReader(new InputStreamReader(in));
-			bischeckversion = br.readLine();
-			LOGGER.info("Bisheck version is {}", bischeckversion);
-		} catch (Exception ioe) {
-			bischeckversion = "N/A";
-			LOGGER.warn("Can not determine the bischeck version");
-		} finally {
-			try {
-				br.close();
-			} catch (Exception ignore) {}
-			try {
-				in.close();
-			} catch (Exception ignore) {}
-			try {
-				fstream.close();
-			} catch (Exception ignore) {}	
-		}
-		return bischeckversion;
-	}
+            in = new DataInputStream(fstream);
+            br = new BufferedReader(new InputStreamReader(in));
+            version = br.readLine();
+            LOGGER.info("Bisheck version is {}", version);
+        } catch (Exception ioe) {
+            version = "N/A";
+            LOGGER.warn("Can not determine the bischeck version");
+        } finally {
+            try {
+                br.close();
+            } catch (Exception ignore) {}
+            try {
+                in.close();
+            } catch (Exception ignore) {}
+            try {
+                fstream.close();
+            } catch (Exception ignore) {}    
+        }
+        return version;
+    }
 
 }
 

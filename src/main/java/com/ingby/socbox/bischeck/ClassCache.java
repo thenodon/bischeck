@@ -19,9 +19,8 @@
 
 package com.ingby.socbox.bischeck;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -31,49 +30,53 @@ import java.util.Map;
  *
  */
 public class ClassCache {
-	private static Map<String,Class<?>> cache = Collections.synchronizedMap(new HashMap<String,Class<?>>());
-	private static int cachemiss;
-	private static int cachehit;
+    private static Map<String,Class<?>> cache = new ConcurrentHashMap<String,Class<?>>();
+    private static int cachemiss;
+    private static int cachehit;
 
-	/**
-	 * Get a class from the cache by class name. If the class does not exist in
-	 * the cache its loaded. 
-	 * @param clazzname name of the cache
-	 * @return
-	 * @throws ClassNotFoundException if the class can not be found
-	 */
-	public static Class<?> getClassByName(String clazzname) throws ClassNotFoundException {
-		Class<?> clazz = cache.get(clazzname);
-		
-		
-		if (clazz == null) {
-			cachemiss++;
-	        ClassLoader clx = ClassLoader.getSystemClassLoader();
-	        clazz = clx.loadClass(clazzname);
-	        cache.put(clazzname, clazz);
-	        
-		} else
-			cachehit++;
-		
-		return clazz;
-	}
-	
-	
-	/**
-	 * The number of hits in the cache
-	 * @return
-	 */
-	public static int cacheHit(){
-		return cachehit;
-	}
-	
-	
-	/**
-	 * The number of cache miss in the cache
-	 * @return
-	 */
-	public static int cacheMiss() {
-		return cachemiss;
-	}
+    private ClassCache() {}
+    
+    
+    /**
+     * Get a class from the cache by class name. If the class does not exist in
+     * the cache its loaded. 
+     * @param clazzname name of the cache
+     * @return
+     * @throws ClassNotFoundException if the class can not be found
+     */
+    public static Class<?> getClassByName(String clazzname) throws ClassNotFoundException {
+        Class<?> clazz = cache.get(clazzname);
+        
+        
+        if (clazz == null) {
+            cachemiss++;
+            ClassLoader clx = ClassLoader.getSystemClassLoader();
+            clazz = clx.loadClass(clazzname);
+            cache.put(clazzname, clazz);
+            
+        } else {
+            cachehit++;
+        }
+        
+        return clazz;
+    }
+    
+    
+    /**
+     * The number of hits in the cache
+     * @return
+     */
+    public static int cacheHit(){
+        return cachehit;
+    }
+    
+    
+    /**
+     * The number of cache miss in the cache
+     * @return
+     */
+    public static int cacheMiss() {
+        return cachemiss;
+    }
 
 }

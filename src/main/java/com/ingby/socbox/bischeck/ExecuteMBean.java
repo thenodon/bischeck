@@ -20,12 +20,14 @@
 package com.ingby.socbox.bischeck;
 
 
-
+/**
+ * The MBean interfaces for {@link Execute}
+ * 
+ */
 public interface ExecuteMBean {
-	
-	public static final String BEANNAME = "com.ingby.socbox.bischeck:name=Execute";
-	
-	
+    
+    public static final String BEANNAME = "com.ingby.socbox.bischeck:name=Execute";
+    
     
     /**
      * List the triggers to schedule
@@ -33,11 +35,13 @@ public interface ExecuteMBean {
      */
     public String[] getTriggers();
     
+    
     /**
      * Shutdown the execution
      */
     public void shutdown();
 
+    
     /**
      * Reload/restart bischeck with the configuration in the etc directory 
      */
@@ -85,12 +89,13 @@ public interface ExecuteMBean {
      * @return
      */
     public int cacheClassHit();
-	
+    
+    
     /**
      * The total number of bischeck related classes that is loaded and was
      * not in the class cache 
      * @return
      */
     public int cacheClassMiss();
-	
+    
 }
