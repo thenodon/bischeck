@@ -93,7 +93,7 @@ public abstract class QueryDate {
                         offsetValue = Integer.parseInt(offset);
                     } catch (NumberFormatException ne) {
                         LOOGER.warn("Value to calculate date is not valid " + calc.group());
-                        throw new IllegalArgumentException();
+                        throw new IllegalArgumentException(ne);
                     }
                 }
                 
