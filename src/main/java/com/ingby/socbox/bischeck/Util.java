@@ -38,7 +38,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 
 public abstract class Util {
-	private final static Logger LOGGER = LoggerFactory.getLogger(Util.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     
@@ -47,7 +47,7 @@ public abstract class Util {
     private static Map<String,DecimalFormat> decFormatMapCache = new HashMap<String, DecimalFormat>();
     
     private final static DecimalFormatSymbols DECIMALSEP = new DecimalFormatSymbols(new Locale("us_US"));
-	
+    
     private final static String QOUTED_DASH = "\\\\-";
     private final static String DASH = "-";
     
@@ -91,24 +91,24 @@ public abstract class Util {
      * @return the parameter d1 with the decimal in the string d1
      */
     public static Float roundByOtherString(String d1, Float d2) {
-    	if (d1 != null) {
-    		int nrdec = getNumberOfDecimalPlace(d1);
+        if (d1 != null) {
+            int nrdec = getNumberOfDecimalPlace(d1);
 
-    		StringBuffer strbuf = new StringBuffer();
-    		strbuf.append("#.");
-    		for (int i = 0; i< nrdec;i++) { 
-    			strbuf.append("#");
-    		}
-    		
-    		DecimalFormat decformatter = decFormatMapCache.get(strbuf.toString());
-    		
-    		if (decformatter == null) {
-    			decformatter = new DecimalFormat(strbuf.toString(),DECIMALSEP);
-    			decFormatMapCache.put(strbuf.toString(), decformatter);
-    		}
-    		return Float.valueOf(decformatter.format(d2));
-    	}
-    	return d2;
+            StringBuffer strbuf = new StringBuffer();
+            strbuf.append("#.");
+            for (int i = 0; i< nrdec;i++) { 
+                strbuf.append("#");
+            }
+            
+            DecimalFormat decformatter = decFormatMapCache.get(strbuf.toString());
+            
+            if (decformatter == null) {
+                decformatter = new DecimalFormat(strbuf.toString(),DECIMALSEP);
+                decFormatMapCache.put(strbuf.toString(), decformatter);
+            }
+            return Float.valueOf(decformatter.format(d2));
+        }
+        return d2;
     }
 
     
@@ -119,24 +119,24 @@ public abstract class Util {
      */
     public static Float roundDecimals(Float d) {
         Float roundedFloat = null;
-    	if (d != null) {
-        	int nrdec = getNumberOfDecimalPlace(d);
-        	StringBuffer strbuf = new StringBuffer();
-        	strbuf.append("#.");
-            for (int i = 0; i< nrdec;i++) {
-            	strbuf.append("#");         
+        if (d != null) {
+            int nrdec = getNumberOfDecimalPlace(d);
+            StringBuffer strbuf = new StringBuffer();
+            strbuf.append("#.");
+            for (int i = 0; i< nrdec; i++) {
+                strbuf.append("#");
             }
             
             DecimalFormat decformatter = decFormatMapCache.get(strbuf.toString());
             
             if (decformatter == null) {
-    			decformatter = new DecimalFormat(strbuf.toString(),DECIMALSEP);
-    			decFormatMapCache.put(strbuf.toString(), decformatter);
-    		}
+                decformatter = new DecimalFormat(strbuf.toString(),DECIMALSEP);
+                decFormatMapCache.put(strbuf.toString(), decformatter);
+            }
             
             roundedFloat = Float.valueOf(decformatter.format(d));
         }
-    	
+        
         return roundedFloat;
     }
 
@@ -167,8 +167,8 @@ public abstract class Util {
      * @return the host-service-serviceitem string
      */
     public static String fullName(Service service, ServiceItem serviceitem) {
-    	
-    	return fullName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName());
+        
+        return fullName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName());
     }
     
     
@@ -179,12 +179,12 @@ public abstract class Util {
      * @return the host-service-serviceitem string
      */
     public static String fullName(String hostname, String servicename , String serviceitemname) {
-    	StringBuffer strbuf = new StringBuffer();
-    	
-    	strbuf.append(hostname).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(servicename).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(serviceitemname);
-    	return strbuf.toString();
+        StringBuffer strbuf = new StringBuffer();
+        
+        strbuf.append(hostname).append(ObjectDefinitions.getCacheKeySep());
+        strbuf.append(servicename).append(ObjectDefinitions.getCacheKeySep());
+        strbuf.append(serviceitemname);
+        return strbuf.toString();
     }
 
     
@@ -196,7 +196,7 @@ public abstract class Util {
      * @return
      */
     public static String fullQoutedName(Service service, ServiceItem serviceitem) {
-    	return fullQoutedName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName());
+        return fullQoutedName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName());
     }
     
     
@@ -210,7 +210,7 @@ public abstract class Util {
      * @return
      */
     public static String fullQoutedName(Service service, ServiceItem serviceitem,String insert) {
-    	return fullQoutedName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName(),insert);
+        return fullQoutedName(service.getHost().getHostname(), service.getServiceName() , serviceitem.getServiceItemName(),insert);
     }
     
     
@@ -223,13 +223,13 @@ public abstract class Util {
      * @return
      */
     public static String fullQoutedName(String hostname, String servicename , String serviceitemname) {
-    	    
-    	StringBuffer strbuf = new StringBuffer();
-    	
-    	strbuf.append(hostname.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(servicename.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(serviceitemname.replaceAll(DASH, QOUTED_DASH));
-    	return strbuf.toString();	
+            
+        StringBuffer strbuf = new StringBuffer();
+        
+        strbuf.append(hostname.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
+        strbuf.append(servicename.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
+        strbuf.append(serviceitemname.replaceAll(DASH, QOUTED_DASH));
+        return strbuf.toString();
     }
     
     
@@ -244,14 +244,14 @@ public abstract class Util {
      * @return
      */
     public static String fullQoutedName(String hostname, String servicename , String serviceitemname, String insert) {
-	    
-    	StringBuffer strbuf = new StringBuffer();
-    	
-    	strbuf.append(hostname.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(servicename.replaceAll(DASH, QOUTED_DASH));
-    	strbuf.append(insert).append(ObjectDefinitions.getCacheKeySep());
-    	strbuf.append(serviceitemname.replaceAll(DASH, QOUTED_DASH));
-    	return strbuf.toString();	
+        
+        StringBuffer strbuf = new StringBuffer();
+        
+        strbuf.append(hostname.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
+        strbuf.append(servicename.replaceAll(DASH, QOUTED_DASH));
+        strbuf.append(insert).append(ObjectDefinitions.getCacheKeySep());
+        strbuf.append(serviceitemname.replaceAll(DASH, QOUTED_DASH));
+        return strbuf.toString();
     }
     
     
@@ -261,51 +261,53 @@ public abstract class Util {
      * @param latestExecuted
      * @return
      */
-	public static String fixExponetialFormat(String latestExecuted) {
-		if (latestExecuted == null) 
-			return latestExecuted;
-		
-		if (latestExecuted.contains("E")) {
-			return BigDecimal.valueOf(new Double(latestExecuted)).toPlainString();
-		}
-		
-		return latestExecuted;
-	}
-	
-	
-	/**
-	 * Extract the hour part of a format HH:MM 
-	 * @param hourAndMinute
-	 * @return
-	 * @throws IllegalArgumentException
-	 */
-	public static Integer getHourFromHourMinute(String hourAndMinute) throws IllegalArgumentException {
-		Matcher mat = FORMAT_HOUR_MINUTE.matcher(hourAndMinute);
+    public static String fixExponetialFormat(String latestExecuted) {
+        if (latestExecuted == null) { 
+            return latestExecuted;
+        }
+        
+        if (latestExecuted.contains("E")) {
+            return BigDecimal.valueOf(new Double(latestExecuted)).toPlainString();
+        }
+        
+        return latestExecuted;
+    }
+    
+    
+    /**
+     * Extract the hour part of a format HH:MM 
+     * @param hourAndMinute
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public static Integer getHourFromHourMinute(String hourAndMinute) throws IllegalArgumentException {
+        Matcher mat = FORMAT_HOUR_MINUTE.matcher(hourAndMinute);
 
-		if( mat.matches()) {
-			final String hour_minute = mat.group();
-			String[] arr = hour_minute.split(":");
-			
-			return Integer.parseInt(arr[0]);    
-			
-		} else
-			throw new IllegalArgumentException();
-		
-	}
-	
-	
-	/**
-	 * Check if the input string include the string "null"
-	 * @param isnullin
-	 * @return
-	 */
-	public static boolean hasStringNull(String isnullin){
-		Matcher mat = ISNULLIN.matcher(isnullin);
+        if( mat.matches()) {
+            final String hour_minute = mat.group();
+            String[] arr = hour_minute.split(":");
+            
+            return Integer.parseInt(arr[0]);
+            
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+    
+    
+    /**
+     * Check if the input string include the string "null"
+     * @param isnullin
+     * @return
+     */
+    public static boolean hasStringNull(String isnullin){
+        Matcher mat = ISNULLIN.matcher(isnullin);
 
-		if( mat.matches()) 	
-			return true;
-		else
-			return false;
-	}
-	
+        if( mat.matches()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
 }
