@@ -70,7 +70,10 @@ import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 
-
+/**
+ * The Execute class is the main class to start Bischeck. 
+ * 
+ */
 public final class Execute implements ExecuteMBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Execute.class);
@@ -99,12 +102,6 @@ public final class Execute implements ExecuteMBean {
     private static long shutdownsleep = SHUTDOWNSLEEPDEF; 
     private static String bischeckversion;
     private static Thread dumpthread; 
-
-    /*
-     * The admin jobs are:
-     * - threshold cache depleted
-     */
-    private static final int NUMOFADMINJOBS = 1;
     
      
     static {
@@ -575,7 +572,7 @@ public final class Execute implements ExecuteMBean {
 
     /**
      * Count the number of active quartz jobs running. The total count is
-     * subtracted with the number of admin jobs ADMINJOBS. 
+     * subtracted with the number of admin jobs started by {@link ConfigurationManager}. 
      * @return number of service jobs
      */
     
@@ -595,7 +592,7 @@ public final class Execute implements ExecuteMBean {
             LOGGER.error("Build trigger list failed with exception - {}", se.getMessage(), se);
         }
         
-        return numberoftriggers-NUMOFADMINJOBS;
+        return numberoftriggers - ConfigurationManager.getInstance().numberOfAdminJobs();
     }
 
     

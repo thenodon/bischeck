@@ -117,6 +117,8 @@ public final class ConfigurationManager  {
     private Map<String,XMLServiceitemtemplate> serviceItemTemplateMap = null;
     
     private Map<String,String> purgeMap = null;
+
+    private int adminJobsCount = 0;
     
     public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
@@ -283,6 +285,7 @@ public final class ConfigurationManager  {
         try {
         	CachePurgeJob.init(this);
             ThresholdCacheClearJob.init(this);
+            adminJobsCount =2;
         } catch (SchedulerException e) {
             LOGGER.error("Quartz scheduler failed with exception {}", e.getMessage(), e);
             throw new ConfigurationException(e);
@@ -844,6 +847,10 @@ public final class ConfigurationManager  {
         
     public Map<String,String> getPurgeMap() {
     	return purgeMap;
+    }
+    
+    public int numberOfAdminJobs() {
+        return adminJobsCount;
     }
     
     public  File getPidFile() {
