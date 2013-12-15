@@ -12,24 +12,28 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 /**
  * The factory class select which cache provider to use based on properties
  * <i>cacheProvider</i>
+ * <br>
+ * Initialized 
+ *  
  */
 public class CacheFactory {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(CacheFactory.class);
 
-	static CacheInf cache = null;
+	private static CacheInf cache = null;
 
 	private static String classCacheName;
 
 	/**
 	 * Get the cache instance 
 	 * @return the cache object. If the cache has not been initialized return 
-	 * null.
+	 * @throws  IllegalStateException If the cache factory has not been initialized
 	 */
-	public static CacheInf getInstance(){
+	public static CacheInf getInstance() {
 
 		if (cache == null) {
-			LOGGER.error("Cache factory has not been opened"); 
+			LOGGER.error("Cache factory has not been initialized"); 
+			throw new IllegalStateException("Cache factory has not been initialized");
 		}
 		return cache;
 	}
@@ -39,8 +43,10 @@ public class CacheFactory {
 	 * Initialize the default cache defined by the property cacheProvider.
 	 * If the property cacheProvider is not set the default implementation is 
 	 * {@link com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache} 
-	 * The init method must be called before the cache is used. 
-	 * @throws CacheException
+	 * The init method must be called before any calls to 
+	 * {@link #getInstance() getInstance} can be made. 
+	 * @throws CacheException if the cache could not be created by any reason. 
+	 * The source exception is included in the CacheException.
 	 */
 	public synchronized static void init()  throws CacheException {
 		String className = ConfigurationManager.getInstance().getProperties().
@@ -51,9 +57,11 @@ public class CacheFactory {
 	
 	/**
 	 * Initialize a specific named implementation.
-	 * @param className name of the cache class to use.
-	 * @throws CacheException if the the class name do not exist or can not be
-	 * Instantiated.
+     * The init method must be called before any calls to 
+     * {@link #getInstance() getInstance} can be made. 
+  	 * @param className name of the cache class to use.
+     * @throws CacheException if the cache could not be created by any reason. 
+     * The source exception is included in the CacheException.
 	 */
 	@SuppressWarnings("unchecked")
 	public synchronized static void init(String className)  throws CacheException {
@@ -63,7 +71,9 @@ public class CacheFactory {
 			try {
 				clazz = (Class<CacheInf>) ClassCache.getClassByName(className);
 				(clazz.getMethod("init")).invoke(null);
+				
 				cache = (CacheInf) (clazz.getMethod("getInstance")).invoke(null);
+		
 			} catch (ClassNotFoundException e) {
 				throw new CacheException(e);
 			}catch (IllegalArgumentException e) {
@@ -83,8 +93,9 @@ public class CacheFactory {
 	}
 
 	/**
-	 * 
-	 * @throws CacheException
+	 * This 
+	 * @throws CacheException if the cache could not be destroyed by any reason. 
+     * The source exception is included in the CacheException.
 	 */
 	@SuppressWarnings("unchecked")
 	public synchronized static void destroy()  throws CacheException {
@@ -92,6 +103,7 @@ public class CacheFactory {
 		try {
 			clazz = (Class<CacheInf>) ClassCache.getClassByName(classCacheName);
 			(clazz.getMethod("destroy")).invoke(null);
+		
 		} catch (ClassNotFoundException e) {
 			throw new CacheException(e);
 		}catch (IllegalArgumentException e) {
@@ -104,12 +116,13 @@ public class CacheFactory {
 			throw new CacheException(e);
 		} catch (NoSuchMethodException e) {
 			throw new CacheException(e);
+		} finally {
+		    if (cache != null) {
+	            cache = null;
+		    }
 		}
 	
-		if (cache != null) {
-			cache = null;
-		}
-	
+		
 		LOGGER.info("Cache provider destroyed {}", classCacheName);
 	}
 	
