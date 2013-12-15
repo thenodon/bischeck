@@ -19,7 +19,6 @@
 
 package com.ingby.socbox.bischeck;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -30,9 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class ClassCache {
-    private static Map<String,Class<?>> cache = new ConcurrentHashMap<String,Class<?>>();
-    private static int cachemiss;
-    private static int cachehit;
+    private static ConcurrentHashMap<String,Class<?>> cache = new ConcurrentHashMap<String,Class<?>>();
+    private static volatile int cachemiss;
+    private static volatile int cachehit;
 
     private ClassCache() {}
     
@@ -52,7 +51,7 @@ public class ClassCache {
             cachemiss++;
             ClassLoader clx = ClassLoader.getSystemClassLoader();
             clazz = clx.loadClass(clazzname);
-            cache.put(clazzname, clazz);
+            cache.putIfAbsent(clazzname, clazz);
             
         } else {
             cachehit++;
