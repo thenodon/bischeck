@@ -22,9 +22,7 @@ package com.ingby.socbox.bischeck.service;
 import java.sql.Connection;
 
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.dbcp.ManagedBasicDataSource;
 
@@ -36,7 +34,7 @@ public class JDBCPoolServiceUtil {
 
   
     
-    private static Map<String,ManagedBasicDataSource> poolmap= Collections.synchronizedMap(new HashMap<String,ManagedBasicDataSource>());
+    private static ConcurrentHashMap<String,ManagedBasicDataSource> poolmap = new ConcurrentHashMap<String,ManagedBasicDataSource>();
     
     static public Connection getConnection(String connectionurl) throws SQLException {
     	
@@ -48,7 +46,7 @@ public class JDBCPoolServiceUtil {
     	} else {
     		ManagedBasicDataSource bds = new ManagedBasicDataSource();
             bds.setUrl(connectionurl);
-            poolmap.put(connectionurl, bds);
+            poolmap.putIfAbsent(connectionurl, bds);
             jdbccon = bds.getConnection();		
     	}
     	
