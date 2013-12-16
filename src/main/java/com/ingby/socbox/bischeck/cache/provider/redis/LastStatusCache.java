@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -86,15 +87,11 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	
 	private static int fastCacheSize = 0;
 	
-	//private static boolean notFullListParse = false;
-	private static LastStatusCache lsc; // = new LastStatusCache();
+	private static LastStatusCache lsc; 
+	
 	private static MBeanServer mbs = null;
 	private final static String BEANNAME = "com.ingby.socbox.bischeck:name=Cache";
-
-	//private static final String JEPLISTSEP = ",";
-	
 	private static ObjectName   mbeanname = null;
-
 	
 	private static String redisserver;
 	private static int redisport;
@@ -106,9 +103,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	
 	private Lookup lu = null;
 
-	private long fastcachehitcount = 0L;
-	private long rediscachehitcount = 0L;
-
+	private AtomicLong fastcachehitcount = new AtomicLong();
+	private AtomicLong rediscachehitcount = new AtomicLong();
 	private boolean fastCacheEnable = true;
 	
 	private LastStatusCache() {
@@ -348,8 +344,13 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			jedis = jedispool.getResource();
 			
 			if (fastCache.get(key) == null) {
-				fifo = new CacheQueue<LastStatus>(fastCacheSize);
-				fastCache.put(key, fifo);
+			    synchronized (fastCache) {
+			        if (fastCache.get(key) == null) {
+			            fifo = new CacheQueue<LastStatus>(fastCacheSize);
+			            fastCache.put(key, fifo);
+			        }
+                }
+				
 			} else {
 				fifo = fastCache.get(key);
 			}
@@ -783,7 +784,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	 */
 	@Override
 	public long getFastCacheCount() {
-		return fastcachehitcount;
+		return fastcachehitcount.get();
 	}
 
 	/*
@@ -792,7 +793,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	 */
 	@Override
 	public long getRedisCacheCount() {
-		return rediscachehitcount;
+		return rediscachehitcount.get();
 	}
 
 	/*
@@ -801,10 +802,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	 */
 	@Override
 	public int getCacheRatio() {
-		if(rediscachehitcount == 0L)
+		if(rediscachehitcount.get() == 0L)
 			return 100;
 		else
-			return (int) (fastcachehitcount*100/(rediscachehitcount+fastcachehitcount));
+			return (int) (fastcachehitcount.get()*100/(rediscachehitcount.get()+fastcachehitcount.get()));
 	}
 	
 	/*
@@ -1167,12 +1168,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		return index;
 	}
 
-	private synchronized void incFastCacheCount(long inc){
-		fastcachehitcount += inc;
-		if (fastcachehitcount == Long.MAX_VALUE) {
-			fastcachehitcount = 0L;
-			rediscachehitcount = 0L;
-		}
+	private void incFastCacheCount(long inc){
+		fastcachehitcount.getAndAdd(inc);
 	}
 	
 	private void incFastCacheCount(){
@@ -1180,12 +1177,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	}
 	
 	
-	private synchronized void incRedisCacheCount(long inc){
-		rediscachehitcount += inc;
-		if (rediscachehitcount == Long.MAX_VALUE) {
-			rediscachehitcount = 0L;
-			fastcachehitcount = 0L;
-		}
+	private void incRedisCacheCount(long inc){
+		rediscachehitcount.getAndAdd(inc);
 	}
 
 	private  void incRedisCacheCount(){
