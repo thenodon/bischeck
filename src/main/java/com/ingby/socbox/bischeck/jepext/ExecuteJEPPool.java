@@ -1,6 +1,5 @@
 package com.ingby.socbox.bischeck.jepext;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,8 +46,8 @@ public final class ExecuteJEPPool {
 	
 	
 	private ExecuteJEPPool() {
-		locked = Collections.synchronizedMap(new HashMap<ExecuteJEP,Long>());
-		unlocked = Collections.synchronizedMap(new HashMap<ExecuteJEP,Long>());
+		locked = new HashMap<ExecuteJEP,Long>();
+		unlocked = new HashMap<ExecuteJEP,Long>();
 	}
 
 	
@@ -66,7 +65,6 @@ public final class ExecuteJEPPool {
 		ExecuteJEP jep;
 		
 		if (unlocked.size() > 0) {
-			
 			LOGGER.debug("Free JEP obj: {}", unlocked.size());
 			
 			Iterator<ExecuteJEP> iter = unlocked.keySet().iterator();
@@ -74,7 +72,6 @@ public final class ExecuteJEPPool {
 			count=unlocked.get(jep);
 			unlocked.remove(jep);
 		} else {
-			
 			LOGGER.debug("No Free JEP obj: {}", unlocked.size());
 			
 			jep = create();	
