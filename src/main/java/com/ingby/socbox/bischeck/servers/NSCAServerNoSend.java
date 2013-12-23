@@ -204,5 +204,7 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
 	public void onMessage(Service message) {
 		send(message);
 	}
-
+	@Override
+    synchronized public void unregister() {
+    }
 }

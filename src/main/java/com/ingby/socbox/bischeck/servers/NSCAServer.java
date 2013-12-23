@@ -230,8 +230,10 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
 	@Override
 	public void onMessage(Service message) {
 		//send(message);
-		cb.execute(message);
+		//cb.execute(message);
 	}
 
-
+	@Override
+    synchronized public void unregister() {
+    }
 }

@@ -227,4 +227,8 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 	public void onMessage(Service message) {
 		send(message);
 	}
+	
+	@Override
+	synchronized public void unregister() {
+    }
 }

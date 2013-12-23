@@ -299,4 +299,8 @@ public final class GraphiteServer implements Server, MessageServerInf {
 	public void onMessage(Service message) {
 		send(message);
 	}
+    
+    @Override
+    synchronized public void unregister() {
+    }
 }
