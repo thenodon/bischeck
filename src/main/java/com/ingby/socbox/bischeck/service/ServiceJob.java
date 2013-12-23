@@ -118,7 +118,7 @@ public class ServiceJob implements Job {
 			}
 		} finally {
 			long executetime = timercontext.stop()/1000000;         	
-			if (LOGGER.isInfoEnabled()){
+			if (LOGGER.isDebugEnabled()){
 				StringBuffer strbuf = new StringBuffer();
 				strbuf.append("Execution time service job ").
 					append(service.getHost().getHostname()).
@@ -127,7 +127,7 @@ public class ServiceJob implements Job {
 					append(" : ").
 					append(executetime).
 					append(" ms");
-				LOGGER.info(strbuf.toString());
+				LOGGER.debug(strbuf.toString());
 			}
 		}
 	}
