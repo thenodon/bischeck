@@ -1,3 +1,21 @@
+/*
+#
+# Copyright (C) 2010-2013 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+*/
 package com.ingby.socbox.bischeck.servers;
 
 import java.lang.management.ManagementFactory;
@@ -7,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -58,10 +77,10 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	public enum State { CLOSED, OPEN, HALF_OPEN };
 	
 	// The max number of times an exception can happen before a CLOSED goes to OPEN  
-	private int exceptionThreshold = 5; 
+	private volatile int exceptionThreshold = 5; 
 	
 	// The timeout when in OPEN state
-	private long timeout = 20000L;
+	private volatile long timeout = 20000L;
 	
 	// The state of the circuit break, initial state CLOSED
 	private volatile State state = State.CLOSED;
@@ -75,7 +94,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	private Server server;
 	
 	// An indicator that OPEN state is entered. Used for logging the first occurrence
-	private boolean firstOpen;
+	private volatile boolean firstOpen;
 	
 	// Counting the total number of failed send operation due to exception in send and
 	// not send because in OPEN state
@@ -84,6 +103,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	// The timestamp when the last state change happen 
 	private volatile long lastStateChange = 0L;
 	private MBeanServer mbs;
+	ObjectName mbeanname;
 	
 	private volatile boolean isEnabled = false;
 	
@@ -108,7 +128,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 		// Set up the MBean for the circuit break
 		mbs = ManagementFactory.getPlatformMBeanServer();
 
-        ObjectName mbeanname = null;
+        mbeanname = null;
 		
         try {
             mbeanname = new ObjectName("com.ingby.socbox.bischeck.servers:name=" + this.server.getInstanceName() + ",type=CircuitBreak");
@@ -135,8 +155,6 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 		isEnabled = prop.getProperty("cbEnable","false").equalsIgnoreCase("true");
 		exceptionThreshold = Integer.parseInt(prop.getProperty("cbAttempts","5"));
 		timeout = Long.parseLong(prop.getProperty("cbTimeout","60000"));
-        		
-		
 	}
 
 
@@ -184,16 +202,17 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	
 	
 	/**
-	 * Execute the {@link Server#send(Service)} method through the circuit break.
-	 * @param service the service to execute the {@link Server#send(Service)} with
+	 * Execute the {@link WorkerInfr#send(Service)} method through the circuit break.
+	 * @param worker the worker to execute {@link WorkerInf}
+     * @param service the service object to be sent 
 	 */
-	public void execute(Service service) {
+	public void execute(WorkerInf worker, Service service) {
 
 		final State currState = getState(); 
 		switch (currState) {
 		case CLOSED:
 			try {
-				server.send(service); 
+				worker.send(service); 
 				exceptionCount.set(0); 
 			} catch (ServerException e) {
 				if (isEnabled && exceptionCount.incrementAndGet() >= exceptionThreshold) { 
@@ -207,7 +226,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 			totalFailed.incrementAndGet();
 			if (firstOpen) {
 				firstOpen = false;
-				LOGGER.info("Open circut break for - {}",server.getInstanceName());
+				LOGGER.info("Open   for - {}",server.getInstanceName());
 			}
 			break;
 		
@@ -228,6 +247,64 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	}
 	
 	
+	/**
+     * Execute the {@link Server#send(Service)} method through the circuit break.
+     * @param service the service object to be sent 
+     */
+    public void execute( Service service) {
+
+        final State currState = getState(); 
+        switch (currState) {
+        case CLOSED:
+            try {
+                server.send(service); 
+                exceptionCount.set(0); 
+            } catch (ServerException e) {
+                if (isEnabled && exceptionCount.incrementAndGet() >= exceptionThreshold) { 
+                    firstOpen = true;
+                    trip(); 
+                } 
+            }
+            break;
+            
+        case OPEN: 
+            totalFailed.incrementAndGet();
+            if (firstOpen) {
+                firstOpen = false;
+                LOGGER.info("Open   for - {}",server.getInstanceName());
+            }
+            break;
+        
+        case HALF_OPEN:
+            LOGGER.info("Half open circut break for - {}", server.getInstanceName());
+            try {
+                server.send(service); 
+                reset(); 
+            } catch (ServerException e) {
+                totalFailed.incrementAndGet();
+                firstOpen = true;
+                trip();
+            }
+            break;
+        
+        default: throw new IllegalStateException("Unknown state: " + currState);
+        }
+    }
+	
+
+    /**
+     * Remove all mbean stuff, used at reload
+     */
+    public synchronized void destroy() {
+
+        try {
+            mbs.unregisterMBean(mbeanname);
+        } catch (MBeanRegistrationException e) {
+            LOGGER.warn("Mbean {} could not be unregistered", mbeanname, e);
+        } catch (InstanceNotFoundException e) {
+            LOGGER.warn("Mbean {} instance could not be found", mbeanname, e);
+        } 
+    }
 	// JMX exposed methods
 	
 	@Override
@@ -269,5 +346,23 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	public void Disable() {
 		isEnabled = false;
 	}
+
+
+    @Override
+    public long getOpenTimeout() {
+        return timeout;
+    }
+
+
+    @Override
+    public long getExceptionThreshold() {
+        return exceptionThreshold;
+    }
+
+
+    @Override
+    public String getAttemptResetAfter() {
+        return new Date(attemptResetAfter).toString();
+    }
 	
 }
