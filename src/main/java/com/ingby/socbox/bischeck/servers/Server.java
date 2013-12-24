@@ -31,6 +31,8 @@ public interface Server {
      * Send the Service information to the server. Implementation is responsible
      * to manage protocol and formatting of message data.
      * @param service
+     * @throws ServerException if any communication exception occur. 
+     * If {@ ServerCircuitBreak} is used it will be triggered by the exception.
      */
     public void send(Service service) throws ServerException;
     
@@ -44,5 +46,11 @@ public interface Server {
      * @return the name of the server instance
      */
     public String getInstanceName();
+    
+    
+    /**
+     * Unregister all resources related to the server instance
+     */
+    public void unregister();
 
 }
