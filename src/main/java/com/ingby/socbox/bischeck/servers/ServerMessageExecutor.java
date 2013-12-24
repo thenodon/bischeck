@@ -57,7 +57,7 @@ public final class ServerMessageExecutor {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ServerMessageExecutor.class);
 
-	private static ServerMessageExecutor serverexecutor= null;
+	private static ServerMessageExecutor serverexecutor = null;
 	/**
 	 * The serverSet holds all server configuration from servers.xml where 
 	 * the key is the name of the configuration, server name="NSCA">, the 
@@ -72,7 +72,7 @@ public final class ServerMessageExecutor {
 	//private Fiber fiber = null;
 	private Channel<Service> channel = null;
 	private ExecutorService execService = null;
-    private PoolFiberFactory fact = null;
+    private PoolFiberFactory poolFactory = null;
 
    
     /**
@@ -83,27 +83,32 @@ public final class ServerMessageExecutor {
 		serverSet = ConfigurationManager.getInstance().getServerClassMap();
 		
 		// TODO - check how the pool size of this is managed compared to fixed
-		execService = Executors.newCachedThreadPool();
+		//execService = Executors.newCachedThreadPool();
 		// Create a pool with the size of the number of server instances
-		//execService = Executors.newFixedThreadPool(serverSet.size());
-        fact = new PoolFiberFactory(execService);
+		execService = Executors.newFixedThreadPool(serverSet.size()*10);
+        poolFactory = new PoolFiberFactory(execService);
         channel = new MemoryChannel<Service>();
 
 		Iterator<String> iter = serverSet.keySet().iterator();
 
+		// Create on jetlang fiber for each Server
 		while (iter.hasNext()) {    
-			String name = iter.next();
+			String instanceName = iter.next();
 			try {    
 
-				Method method = serverSet.get(name).getMethod(GETINSTANCE,String.class);
-				Server server = (Server) method.invoke(null,name);
+				Method method = serverSet.get(instanceName).getMethod(GETINSTANCE,String.class);
+				// invoke the getinstance() for each server
+				Server server = (Server) method.invoke(null,instanceName);
 				
 				if (server instanceof Callback) {
 					
-					Fiber fiber = fact.create();
+					Fiber fiber = poolFactory.create();
 			        fiber.start();
 			        
-					serverUnSub.put(name, channel.subscribe(fiber, (Callback<Service>) server));
+			        //add subscription for message on receiver thread
+			        Disposable disposable = channel.subscribe(fiber, (Callback<Service>) server);
+			        // Add the disposable so it can be removed when shutdown
+			        serverUnSub.put(instanceName, disposable);
 				}
 
 			} catch (IllegalArgumentException e) {
@@ -149,9 +154,8 @@ public final class ServerMessageExecutor {
 			
 			// unsubscribe from the queue
 			serverUnSub.get(name).dispose();
-			fact.dispose();
-			execService.shutdown();
 			try {    
+			    LOGGER.info("Unregister server {}", name);
 				Method method = serverSet.get(name).getMethod(UNREGISTER,String.class);
 				method.invoke(null,name);
 			} catch (IllegalArgumentException e) {
@@ -166,6 +170,10 @@ public final class ServerMessageExecutor {
 				LOGGER.error(e.toString(), e);
 			}
 		}
+		
+		poolFactory.dispose();
+        execService.shutdown();
+        
 		serverexecutor = null;
 	}
 
@@ -178,7 +186,6 @@ public final class ServerMessageExecutor {
 	 * @param service the Service object that contain data to be send to the 
 	 * servers.
 	 */
-	//synchronized 
 	public void execute(Service service) {
 
 		
