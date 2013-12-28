@@ -19,55 +19,48 @@
 
 package com.ingby.socbox.bischeck.servers;
 
-import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
-import com.googlecode.jsendnsca.MessagePayload;
-import com.googlecode.jsendnsca.NagiosException;
-import com.googlecode.jsendnsca.NagiosPassiveCheckSender;
 import com.googlecode.jsendnsca.NagiosSettings;
-import com.googlecode.jsendnsca.builders.MessagePayloadBuilder;
 import com.googlecode.jsendnsca.builders.NagiosSettingsBuilder;
 import com.googlecode.jsendnsca.encryption.Encryption;
-import com.ingby.socbox.bischeck.NagiosUtil;
-import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+
 /**
  * Nagios server integration over NSCA protocol, using the jnscasend package.
  *
  */
-public final class NSCAServer implements Server, ServerInternal, MessageServerInf {
+public final class NSCAServer implements Server, MessageServerInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NSCAServer.class);
+    private final int MAX_QUEUE = 10;
+    private NagiosSettings settings;
     
+    private LinkedBlockingQueue<Service> subTaskQueue;
+    private ExecutorService execService;
     /**
      * The server map is used to manage multiple configuration based on the 
      * same NSCAServer class.
      */
     static Map<String,NSCAServer> servers = new HashMap<String,NSCAServer>();
     
-    private NagiosPassiveCheckSender sender = null;
     private String instanceName;
-	private NagiosUtil nagutil = new NagiosUtil();
-	private ServerCircuitBreak cb;
+    private ServerCircuitBreak circuitBreak;
 
-	private final Marker marker;
-
-    
-    /**
+	
+	/**
      * Retrieve the Server object. The method is invoked from class ServerExecutor
      * execute method. The created Server object is placed in the class internal 
      * Server object list.
@@ -90,25 +83,52 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
      * @param name of the server instance
      */
     synchronized public static void unregister(String name) {
-    	servers.remove(name);
+        getInstance(name).unregister();
+        servers.remove(name);
     }
     
+    
+    synchronized public void unregister() {
+        // check queue
+        LOGGER.info("Unregister called for {}", instanceName);
+       
+        execService.shutdown();
+        
+        execService.shutdownNow();
+        
+        
+        LOGGER.info("Shutdown is done {}", instanceName);
+        
+        for (int waitCount=0;waitCount < 3; waitCount++) {
+            try {
+                if (execService.awaitTermination(10000, TimeUnit.MILLISECONDS) && execService.isTerminated()) {
+                    LOGGER.info("ExecutorService and all workers terminated {}", instanceName);
+                    break;
+                }
+            } catch (InterruptedException e) {}            
+        }
+        LOGGER.info("All workers stopped {}",instanceName);
+        circuitBreak.destroy();
+        circuitBreak = null;
+    }
     
     /**
      * Constructor 
      * @param name
      */
     private NSCAServer(String name) {
-    	marker = MarkerFactory.getMarker(name);
         instanceName=name;
-        //cb = new ServerCircuitBreak(this);
+        subTaskQueue = new LinkedBlockingQueue<Service>();
+        execService = Executors.newCachedThreadPool();
     }
     
     
+    
     private void init(String name) {
-        NagiosSettings settings = getNSCAConnection(name);
-        sender = new NagiosPassiveCheckSender(settings);
-        cb = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
+        settings = getNSCAConnection(name);
+        circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
+        execService.execute(new NSCAWorker(name, settings,subTaskQueue,circuitBreak));
+       
     }
     
     
@@ -130,29 +150,6 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
     }
     
     
-    @Override
-    synchronized public void sendInternal(String host, String service, NAGIOSSTAT level, String message) {
-    	MessagePayload payload = new MessagePayloadBuilder()
-    	.withHostname(host)
-    	.withServiceName(service)
-    	.create();
-
-    	payload.setMessage(level +"|"+ message);
-    	payload.setLevel(level.toString());
-
-    	if (LOGGER.isInfoEnabled()) {
-    		LOGGER.info(marker, ServerUtil.logFormat(instanceName, host, service, payload.getMessage()));
-    	}
-    	
-    	try {
-    		sender.send(payload);
-    	} catch (NagiosException e) {
-    		LOGGER.warn(marker, "Nsca server error", e);
-    	} catch (IOException e) {
-    		LOGGER.error(marker, "Network error - check nsca server and that service is started", e);
-    	}	    
-    }
-
     
     @Override
     public String getInstanceName() {
@@ -160,60 +157,16 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
     }
     
     @Override
-    //synchronized 
     public void send(Service service) throws ServerException {
-        NAGIOSSTAT level;
-    
-        MessagePayload payload = new MessagePayloadBuilder()
-        .withHostname(service.getHost().getHostname())
-        .withServiceName(service.getServiceName())
-        .create();
-        
         /*
-         * Check the last connection status for the Service
+         * Use the Worker send instead
          */
-        if ( service.isConnectionEstablished() ) {
-            //try {
-                level = service.getLevel();
-                payload.setMessage(level + nagutil.createNagiosMessage(service));
-            /*} catch (Exception e) {
-                level=NAGIOSSTAT.CRITICAL;
-                payload.setMessage(level + " " + e.getMessage());
-            }*/
-        } else {
-            // If no connection is established still write a value 
-            // of null value=null;
-            level=NAGIOSSTAT.CRITICAL;
-            payload.setMessage(level + " " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
-        }
-        
-        payload.setLevel(level.toString());
-        
-        if (LOGGER.isInfoEnabled())
-        	LOGGER.info(marker, ServerUtil.logFormat(instanceName, service, payload.getMessage()));
-        
-        final String timerName = instanceName+"_execute";
-
-    	final Timer timer = Metrics.newTimer(NSCAServer.class, 
-    			timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-    	final TimerContext context = timer.time();
-
-        try {
-        	sender.send(payload);
-        }catch (NagiosException e) {
-        	LOGGER.warn(marker, "Nsca server error", e);
-        	throw new ServerException(e);
-        } catch (IOException e) {
-        	LOGGER.error(marker, "Network error - check nsca server and that service is started", e);
-        	throw new ServerException(e);
-        } finally { 
-        	long duration = context.stop()/1000000;
-			if (LOGGER.isDebugEnabled())
-            	LOGGER.debug(marker, "Nsca send execute: {} ms", duration);
-        }	    
     }
     
-    
+    /**
+     * Get the default properties
+     * @return default properties
+     */
 	public static Properties getServerProperties() {
 		Properties defaultproperties = new Properties();
 	    
@@ -229,11 +182,15 @@ public final class NSCAServer implements Server, ServerInternal, MessageServerIn
 
 	@Override
 	public void onMessage(Service message) {
-		//send(message);
-		//cb.execute(message);
+		subTaskQueue.offer(message);
+		
+		LOGGER.debug("Worker pool size {} and queue size {}", ((ThreadPoolExecutor) execService).getPoolSize(),subTaskQueue.size());
+		
+		/* If the queue is larger then 10 start new workers */
+		if (subTaskQueue.size() > MAX_QUEUE) {
+		    execService.execute(new NSCAWorker(instanceName, settings,subTaskQueue,circuitBreak));
+		    LOGGER.info("Increase worker pool size {}", ((ThreadPoolExecutor) execService).getPoolSize());
+		}
 	}
-
-	@Override
-    synchronized public void unregister() {
-    }
 }
+
