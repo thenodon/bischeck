@@ -22,9 +22,7 @@ package com.ingby.socbox.bischeck.configuration;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -54,7 +52,7 @@ public class ConfigFileManager {
     public static final String DEFAULT_CONFIGDIR = "etc";
 	
 	// A cache of JAXBContext object used so they are not created on every reload
-	private static Map<String,JAXBContext> jccache = Collections.synchronizedMap(new HashMap<String,JAXBContext>());
+	private static ConcurrentHashMap<String,JAXBContext> jccache = new ConcurrentHashMap<String,JAXBContext>();
 
 
 	/**
@@ -145,14 +143,13 @@ public class ConfigFileManager {
 	private Object createXMLConfig(XMLCONFIG xmlconf, String directory) throws ConfigurationException {
 		Object xmlobj = null;
 		File configfile = new File(directory,xmlconf.xml());
-		JAXBContext jc;
-
+		JAXBContext jc = null;
 
 		jc = jccache.get(xmlconf.instance());
 		if (jc == null) {
 			try {
 				jc = JAXBContext.newInstance(xmlconf.instance());
-				jccache.put(xmlconf.instance(),jc);
+				jccache.putIfAbsent(xmlconf.instance(),jc);
 			} catch (JAXBException e) {
 				LOGGER.error("Could not get JAXB context for {}", xmlconf.instance(), e);
 				throw new ConfigurationException(e);
@@ -229,13 +226,13 @@ public class ConfigFileManager {
 	 */
 	public void createXMLFile(Object xmlobj, XMLCONFIG xmlconf, String directory) throws Exception {
 
-		JAXBContext jc;
+		JAXBContext jc = null;
 
 		jc = jccache.get(xmlconf.instance());
 		if (jc == null) {
 			try {
 				jc = JAXBContext.newInstance(xmlconf.instance());
-				jccache.put(xmlconf.instance(),jc);
+				jccache.putIfAbsent(xmlconf.instance(),jc);
 			} catch (JAXBException e) {
 				LOGGER.error("Could not get JAXB context from class");
 				throw new Exception(e.getMessage());
