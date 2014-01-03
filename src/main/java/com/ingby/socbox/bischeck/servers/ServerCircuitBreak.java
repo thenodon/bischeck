@@ -226,7 +226,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 			totalFailed.incrementAndGet();
 			if (firstOpen) {
 				firstOpen = false;
-				LOGGER.info("Open   for - {}",server.getInstanceName());
+				LOGGER.info("Open for - {}",server.getInstanceName());
 			}
 			break;
 		
@@ -271,7 +271,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
             totalFailed.incrementAndGet();
             if (firstOpen) {
                 firstOpen = false;
-                LOGGER.info("Open   for - {}",server.getInstanceName());
+                LOGGER.info("Open for - {}",server.getInstanceName());
             }
             break;
         
