@@ -45,20 +45,22 @@ import com.ingby.socbox.bischeck.service.Service;
 public final class NSCAServer implements Server, MessageServerInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NSCAServer.class);
-    private final int MAX_QUEUE = 10;
-    private NagiosSettings settings;
+    private String instanceName;
+    private ServerCircuitBreak circuitBreak;
     
+    private final int MAX_QUEUE = 10;
     private LinkedBlockingQueue<Service> subTaskQueue;
+    
     private ExecutorService execService;
+    
     /**
      * The server map is used to manage multiple configuration based on the 
      * same NSCAServer class.
      */
     static Map<String,NSCAServer> servers = new HashMap<String,NSCAServer>();
+    private NagiosSettings settings;
     
-    private String instanceName;
-    private ServerCircuitBreak circuitBreak;
-
+    
 	
 	/**
      * Retrieve the Server object. The method is invoked from class ServerExecutor
@@ -87,27 +89,27 @@ public final class NSCAServer implements Server, MessageServerInf {
         servers.remove(name);
     }
     
-    
+    @Override
     synchronized public void unregister() {
         // check queue
-        LOGGER.info("Unregister called for {}", instanceName);
+        LOGGER.info("{} - Unregister called", instanceName);
        
         execService.shutdown();
         
         execService.shutdownNow();
         
         
-        LOGGER.info("Shutdown is done {}", instanceName);
+        LOGGER.info("{} - Shutdown is done", instanceName);
         
         for (int waitCount=0;waitCount < 3; waitCount++) {
             try {
                 if (execService.awaitTermination(10000, TimeUnit.MILLISECONDS) && execService.isTerminated()) {
-                    LOGGER.info("ExecutorService and all workers terminated {}", instanceName);
+                    LOGGER.info("{} - ExecutorService and all workers terminated", instanceName);
                     break;
                 }
             } catch (InterruptedException e) {}            
         }
-        LOGGER.info("All workers stopped {}",instanceName);
+        LOGGER.info("{} - All workers stopped",instanceName);
         circuitBreak.destroy();
         circuitBreak = null;
     }
@@ -127,7 +129,7 @@ public final class NSCAServer implements Server, MessageServerInf {
     private void init(String name) {
         settings = getNSCAConnection(name);
         circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
-        execService.execute(new NSCAWorker(name, settings,subTaskQueue,circuitBreak));
+        execService.execute(new NSCAWorker(name, subTaskQueue,circuitBreak, settings));
        
     }
     
@@ -184,12 +186,12 @@ public final class NSCAServer implements Server, MessageServerInf {
 	public void onMessage(Service message) {
 		subTaskQueue.offer(message);
 		
-		LOGGER.debug("Worker pool size {} and queue size {}", ((ThreadPoolExecutor) execService).getPoolSize(),subTaskQueue.size());
+		LOGGER.debug("{} - Worker pool size {} and queue size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize(),subTaskQueue.size());
 		
 		/* If the queue is larger then 10 start new workers */
 		if (subTaskQueue.size() > MAX_QUEUE) {
-		    execService.execute(new NSCAWorker(instanceName, settings,subTaskQueue,circuitBreak));
-		    LOGGER.info("Increase worker pool size {}", ((ThreadPoolExecutor) execService).getPoolSize());
+		    execService.execute(new NSCAWorker(instanceName, subTaskQueue, circuitBreak, settings));
+		    LOGGER.info("{} - Increase worker pool size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize());
 		}
 	}
 }
