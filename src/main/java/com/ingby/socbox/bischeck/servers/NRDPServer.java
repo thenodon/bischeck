@@ -212,7 +212,7 @@ public final class NRDPServer implements Server, MessageServerInf {
 		OutputStreamWriter wr = null;
 	
 		try {
-			LOGGER.debug(urlstr);
+			LOGGER.debug("Url: {}",urlstr);
 			String payload = cmd+xml;
 			conn = createHTTPConnection(payload);
 			
@@ -286,6 +286,7 @@ public final class NRDPServer implements Server, MessageServerInf {
 	private HttpURLConnection createHTTPConnection(String payload)
 			throws IOException {
 	
+	    LOGGER.debug("Message: {}", payload);
 		HttpURLConnection conn;
 		conn = (HttpURLConnection) url.openConnection();
 
