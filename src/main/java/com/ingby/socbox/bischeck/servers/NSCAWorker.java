@@ -40,14 +40,14 @@ import com.yammer.metrics.core.TimerContext;
 
 public class NSCAWorker implements WorkerInf, Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(NSCAWorker.class);
-    private final int MAX_RUNS_BEFORE_END = 100;
+    
     private NagiosUtil nagutil;
     private NagiosPassiveCheckSender sender;
     private String instanceName;
     private BlockingQueue<Service> bq;
     private ServerCircuitBreak circuitBreak;
     
-    public NSCAWorker(String instanceName, NagiosSettings settings, BlockingQueue<Service> bq, ServerCircuitBreak circuitBreak) {
+    public NSCAWorker(String instanceName, BlockingQueue<Service> bq, ServerCircuitBreak circuitBreak, NagiosSettings settings) {
         
         sender = new NagiosPassiveCheckSender(settings);
         this.nagutil = new NagiosUtil();
@@ -111,7 +111,7 @@ public class NSCAWorker implements WorkerInf, Runnable {
 
         final String timerName = instanceName+"_execute";
 
-        final Timer timer = Metrics.newTimer(NSCAServerThreaded.class, 
+        final Timer timer = Metrics.newTimer(NSCAServer.class, 
                 timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
         final TimerContext context = timer.time();
 
