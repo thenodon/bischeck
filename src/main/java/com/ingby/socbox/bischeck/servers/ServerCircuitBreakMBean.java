@@ -77,11 +77,14 @@ public interface ServerCircuitBreakMBean {
 	 */
 	public long getOpenTimeout();
     
-
+	public void setOpenTimeout(long timeout);
+    
     /**
      * Get the CLOSE to OPEN count 
      */
-    public long getExceptionThreshold();
+    public int getExceptionThreshold();
+    
+    public void setExceptionThreshold(int exceptionThreshold);
     
     /**
      * Get the time remaining until reset

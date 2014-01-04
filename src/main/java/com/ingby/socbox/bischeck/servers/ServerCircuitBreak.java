@@ -189,7 +189,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	/**
 	 * Set the state to OPEN and the time out time until test circuit break again
 	 */
-	public void trip() {
+	synchronized public void trip() {
 		lastStateChange = System.currentTimeMillis();
 		
 		// Only update if the state was from CLOSED and not from HALF-OPEN
@@ -226,14 +226,14 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 			totalFailed.incrementAndGet();
 			if (firstOpen) {
 				firstOpen = false;
-				LOGGER.info("Open for - {}",server.getInstanceName());
+				LOGGER.info("{} - Opened circut break", server.getInstanceName());
 			}
 			break;
 		
 		case HALF_OPEN:
-			LOGGER.info("Half open circut break for - {}", server.getInstanceName());
+			LOGGER.info("{} - Half opened circut break", server.getInstanceName());
 			try {
-				server.send(service); 
+				worker.send(service); 
 				reset(); 
 			} catch (ServerException e) {
 				totalFailed.incrementAndGet();
@@ -242,7 +242,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 			}
 			break;
 		
-		default: throw new IllegalStateException("Unknown state: " + currState);
+		default: throw new IllegalStateException(server.getInstanceName() + " - Unknown state: " + currState);
 		}
 	}
 	
@@ -251,7 +251,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
      * Execute the {@link Server#send(Service)} method through the circuit break.
      * @param service the service object to be sent 
      */
-    public void execute( Service service) {
+    public void execute(Service service) {
 
         final State currState = getState(); 
         switch (currState) {
@@ -271,12 +271,12 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
             totalFailed.incrementAndGet();
             if (firstOpen) {
                 firstOpen = false;
-                LOGGER.info("Open for - {}",server.getInstanceName());
+                LOGGER.info("{} - Opened circut break", server.getInstanceName());
             }
             break;
         
         case HALF_OPEN:
-            LOGGER.info("Half open circut break for - {}", server.getInstanceName());
+            LOGGER.info("{} - Half opened circut break", server.getInstanceName());
             try {
                 server.send(service); 
                 reset(); 
@@ -352,11 +352,22 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
     public long getOpenTimeout() {
         return timeout;
     }
+    
+    
+    @Override
+    public void setOpenTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+    @Override
+    public int getExceptionThreshold() {
+        return exceptionThreshold;
+    }
 
 
     @Override
-    public long getExceptionThreshold() {
-        return exceptionThreshold;
+    public void setExceptionThreshold(int exceptionThreshold) {
+       this.exceptionThreshold = exceptionThreshold;
     }
 
 
