@@ -140,9 +140,9 @@ public class NRDPWorker implements WorkerInf, Runnable {
     
     private void connectAndSend(String xml) throws ServerException {
         
-        final String timerName = instanceName+"_execute";
+        final String timerName = instanceName+"_send";
 
-        final Timer timer = Metrics.newTimer(XNRDPServer.class, 
+        final Timer timer = Metrics.newTimer(NRDPServer.class, 
                 timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
         final TimerContext context = timer.time();
 

@@ -159,7 +159,7 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 
 	private void connectAndSend(String xml) {
 		
-		final String timerName = instanceName+"_execute";
+		final String timerName = instanceName+"_send";
         
 		final Timer timer = Metrics.newTimer(LiveStatusServer.class, 
 				timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);

@@ -109,7 +109,7 @@ public class NSCAWorker implements WorkerInf, Runnable {
         if (LOGGER.isInfoEnabled())
             LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
 
-        final String timerName = instanceName+"_execute";
+        final String timerName = instanceName+"_send";
 
         final Timer timer = Metrics.newTimer(NSCAServer.class, 
                 timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);

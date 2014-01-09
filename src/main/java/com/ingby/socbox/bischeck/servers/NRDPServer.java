@@ -53,7 +53,7 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public final class NRDPServer implements Server, MessageServerInf {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(XNRDPServer.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(NRDPServer.class);
 	private String instanceName;
     private ServerCircuitBreak circuitBreak;
     

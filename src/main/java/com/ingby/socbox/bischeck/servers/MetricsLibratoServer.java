@@ -180,8 +180,9 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 
 	private void connectAndSend(String source) {
 		Long duration = null;
+		final String timerName = instanceName+"_send";
 		final Timer timer = Metrics.newTimer(MetricsLibratoServer.class, 
-				instanceName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 
 		long currentTimeInSec = System.currentTimeMillis()/1000;

@@ -171,7 +171,7 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
         //if (LOGGER.isInfoEnabled())
         	LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
         
-        final String timerName = instanceName+"_execute";
+        final String timerName = instanceName+"_send";
 
     	final Timer timer = Metrics.newTimer(NSCAServerNoSend.class, 
     			timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
