@@ -24,9 +24,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  */
 public class ThresholdFactory {
 
-	private static Map<String,Threshold> cache = Collections.synchronizedMap(new HashMap<String,Threshold>());
+	private static ConcurrentHashMap<String,Threshold> cache = new ConcurrentHashMap<String,Threshold>();
 	private static List<Class<?>> unregistercache = Collections.synchronizedList(new ArrayList<Class<?>>());
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ThresholdFactory.class);
@@ -98,12 +97,13 @@ public class ThresholdFactory {
 
 			current.init();
 
-			cache.put(service.getHost().getHostname()+"-"+service.getServiceName()+"-"+serviceItem.getServiceItemName(),current);
+			cache.putIfAbsent(service.getHost().getHostname()+"-"+service.getServiceName()+"-"+serviceItem.getServiceItemName(),current);
 			
-			if (!unregistercache.contains(current.getClass())) {
-				unregistercache.add(current.getClass());
+			synchronized (unregistercache) {
+			    if (!unregistercache.contains(current.getClass())) {
+			        unregistercache.add(current.getClass());
+			    }
 			}
-
 		} else {
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("Threshold for " + 
@@ -173,27 +173,28 @@ public class ThresholdFactory {
 	}
 
 
-	public static void clearCache() {
+	synchronized public static void clearCache() {
 
 		LOGGER.info("Clear threshold cache");
 		cache.clear();
-		for (Class<?> clazz: unregistercache) {
-			Method method = null;
-			try {
-				method = clazz.getMethod(UNREGISTER);				
-				method.invoke(null);
-			} catch (IllegalArgumentException e) {
-				LOGGER.error(e.toString(),e);
-			} catch (IllegalAccessException e) {
-				LOGGER.error(e.toString(),e);
-			} catch (InvocationTargetException e) {
-				LOGGER.error(e.toString(),e);
-			} catch (SecurityException e) {
-				LOGGER.error(e.toString(),e);
-			} catch (NoSuchMethodException e) {
-				LOGGER.error(e.toString(),e);
-			}
-
+		synchronized (unregistercache) {
+		    for (Class<?> clazz: unregistercache) {
+		        Method method = null;
+		        try {
+		            method = clazz.getMethod(UNREGISTER);				
+		            method.invoke(null);
+		        } catch (IllegalArgumentException e) {
+		            LOGGER.error(e.toString(),e);
+		        } catch (IllegalAccessException e) {
+		            LOGGER.error(e.toString(),e);
+		        } catch (InvocationTargetException e) {
+		            LOGGER.error(e.toString(),e);
+		        } catch (SecurityException e) {
+		            LOGGER.error(e.toString(),e);
+		        } catch (NoSuchMethodException e) {
+		            LOGGER.error(e.toString(),e);
+		        }
+		    }
 		}
 	}
 }
