@@ -799,7 +799,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     	}
 	}
 
-    public static void unregister() {
+    synchronized public static void unregister() {
     	twenty4hourconfig = null;
     }
     
