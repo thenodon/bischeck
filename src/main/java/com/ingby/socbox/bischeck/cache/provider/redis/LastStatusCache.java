@@ -90,7 +90,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	private static LastStatusCache lsc; 
 	
 	private static MBeanServer mbs = null;
-	private final static String BEANNAME = "com.ingby.socbox.bischeck:name=Cache";
+	private final static String BEANNAME = "com.ingby.socbox.bischeck.cache:name=Redis";
 	private static ObjectName   mbeanname = null;
 	
 	private static String redisserver;
