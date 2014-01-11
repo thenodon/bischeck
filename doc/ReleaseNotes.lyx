@@ -1,0 +1,1382 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass scrartcl
+\begin_preamble
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyfoot[C]{All rights reserved Ingengörsbyn AB 2013}
+\fancyfoot[LE,RO]{\thepage}
+\fancyhead[LE,RO]{Bischeck - Release Notes}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% \lhead{\nouppercase{\rightmark} (\nouppercase{\leftmark})}
+% \lhead{\nouppercase{\leftmark}}  
+% \chead{}
+%   \rhead{}
+%   \lfoot{2011}
+%   \cfoot{bischeck}
+%   \rfoot{\thepage}
+%   \renewcommand{\headrulewidth}{0.4pt}
+%   \renewcommand{\footrulewidth}{0.4pt}
+
+%  \renewcommand{\chaptermark}[1]{%
+ % \markboth{#1}{}}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans helvet
+\font_typewriter lmtt
+\font_default_family sfdefault
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Bischeck 
+\begin_inset Newline newline
+\end_inset
+
+-
+\begin_inset Newline newline
+\end_inset
+
+Release Notes
+\end_layout
+
+\begin_layout Date
+2014-01-XX
+\end_layout
+
+\begin_layout Standard
+Legal Notice Copyright 
+\end_layout
+
+\begin_layout Standard
+© 2013 Ingenjörsbyn AB.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This document is licensed by Ingenjörsbyn AB under the Creative Commons
+ Attribution-ShareAlike 3.0 Unported License,
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://creativecommons.org/licenses/by-sa/3.0/
+\end_layout
+
+\end_inset
+
+.
+ If you distribute this document, or a modified version of it, you must
+ provide attribution to Ingenjörsbyn AB.
+ and provide a link to the original.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Linux® is the registered trademark of Linus Torvalds in the United States
+ and other countries.
+ 
+\end_layout
+
+\begin_layout Standard
+\noindent
+Java® is a registered trademark of Oracle and/or its affiliates.
+ 
+\end_layout
+
+\begin_layout Standard
+\noindent
+Nagios® is an official trademark of Nagios Enterprise Inc.
+ 
+\end_layout
+
+\begin_layout Standard
+\noindent
+All other trademarks are the property of their respective owners.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+
+\series bold
+Abstract
+\end_layout
+
+\begin_layout Abstract
+This document describe the release history of Bischeck.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Release 1.0.0 - 2014-
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Section
+Release 0.4.3 - 2013-03-27
+\end_layout
+
+\begin_layout Standard
+This release is a minor upgrade.
+ 
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+[FR-231] 
+\begin_inset Quotes eld
+\end_inset
+
+Add Livestatus as a new server integration alongside nsca and nrdp
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+[FR-236] 
+\begin_inset Quotes eld
+\end_inset
+
+Extended configuration of threshold for threshold class Twenty4HourThreshold
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This include the new hours format with to-from definition 
+\end_layout
+
+\begin_layout Itemize
+The installer script was updated to manage configuration of JMX.
+ The installer add switches for which JMX port to use (-p), which JMX RMI
+ server IP address to bind the port to (-i) and if authentication should
+ be enforced or not (-a).
+ This is related to the [TR-238].
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+If Bisconf will be used its required to configure JMX RMI support by defining
+ hostname/IP and port.
+\end_layout
+
+\begin_layout Itemize
+The internal surveillance of Bischeck that is based on JMX Mbeans was cleaned
+ up.
+\end_layout
+
+\begin_layout Itemize
+The initial configuration files have changed to an example using a Nagios
+ check command instead of the previous example that used a database connection
+ to mysql.
+ This will be easier to get started with since no JDBC drivers for mysql
+ is required.
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-235] 
+\begin_inset Quotes eld
+\end_inset
+
+NullPointer in management of exponential data
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+[TR-237] 
+\begin_inset Quotes eld
+\end_inset
+
+Faulty behavior for property lastStatusCacheDumpDir
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+[TR-238] 
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck will not start without hostname in /etc/hosts
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This is not a bug in Bischeck, but more a configuration of JMX to work
+ with remote connections.
+ The install script how been updated to manage the this in a better way.
+ 
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.4.3 support upgrade from release 0.4.2.
+\end_layout
+
+\begin_layout Section
+Release 0.4.2 - 2012-12-21
+\end_layout
+
+\begin_layout Standard
+Except for the new features introduced and bugs that has been fixed in 0.4.2,
+ there has also been some major work in making Bischeck more stable and
+ performance enhancements running many host, service and service items configura
+tions.
+ Our goal has been to secure a stable resource utilization of the Java virtual
+ machine (jvm) when running Bischeck over a long period of time.
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+[FR-234] Distribute the start time when running interval based scheduling.
+ This will increase the distribution of service executions especially if
+ Bischeck is configured with many services that is executed on the same
+ interval.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-233] Support for server integration with Graphite.
+ See section.
+\end_layout
+
+\begin_layout Itemize
+[FR-232] Support for executing check commands.
+ The check commands that can be used must support an output of performance
+ data.
+ Bischeck will not care about the status that comes from a check command.
+ Instead it will only use the performance data to evaluate its own threshold.
+ This include the new service class 
+\emph on
+ShellService
+\emph default
+ and serviceitem class 
+\emph on
+CheckCommandServiceItem
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+[FR-224] Support for NRDP through the new server class NRDPServer.
+\end_layout
+
+\begin_layout Itemize
+Related to bug [TR-227 ] the naming of host, service and serviceitem names
+ has been improved.
+ This include quoting of dash (-) if used in a name of a host, service or
+ serviceitem.
+\end_layout
+
+\begin_layout Itemize
+Execution statements and thresholds hour specification where cache data
+ is retrieved as a list, like in a function as avg(x-y-z[4:10]) and max(x-y-z[-5
+M:-15M]), can now be configured to return a value as long as at least one
+ index in the range is not null.
+ To support backwards capability the new functionality will only be used
+ if the property 
+\emph on
+notFullListParse
+\emph default
+ is set to true in the properties.xml.
+ The default value is false.
+\end_layout
+
+\begin_layout Itemize
+There has been some discussion about what Nagios state should be sent if
+ the a the returned execute statement of a service item is null.
+ In previous releases this has been hard coded to OK, but now its possible
+ to define it by setting the property 
+\emph on
+stateOnNull
+\emph default
+.
+ The property can be set to an integer 0,1,2 or 3 or to a string OK, WARNING,
+ CRITICAL or UNKNOWN.
+ The default is UNKNOWN.
+\end_layout
+
+\begin_layout Itemize
+When a service class get an exception when creating a connection the previous
+ versions did not save any data to the cache.
+ If the property 
+\emph on
+saveNullOnConnectionError
+\emph default
+ you will now get a null value inserted into the cache when a connection
+ exception is thrown.
+ For backwards compatibility the default value of the property is false.
+ 
+\end_layout
+
+\begin_layout Itemize
+More mathematical functions like multNull and divNull that support null
+ value as part of the calculation and can be used with functions that take
+ a list of numbers to manage calculation where cache data may be null.
+ 
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-227] 
+\begin_inset Quotes eld
+\end_inset
+
+Cache parser do not work for host, service or serviceitems if the name include
+ 0 (zero)
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+[TR-228] 
+\begin_inset Quotes eld
+\end_inset
+
+Threshold factory return wrong threshold definition if service and serviceitem
+ name is the same for different hosts
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+[TR-229] 
+\begin_inset Quotes eld
+\end_inset
+
+When using service ShellService the number of open files limit will be reached
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+[TR-230] 
+\begin_inset Quotes eld
+\end_inset
+
+NRDP submissions all come in as OK
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+Fixed migration script from 0.4.0 to copy 
+\emph on
+etc
+\emph default
+ directory content correctly.
+ Changes in the file 
+\emph on
+urlservices.xm
+\emph default
+l will be overwritten.
+ Existing 0.4.0 configuration will still be available in the previous version
+ backup directory, bischeck_0.4.0.
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.3.3, 0.4.0 and 0.4.1 is supported for upgrade to 0.4.2.
+ The upgrading is NOT applicable for release candidate.
+\end_layout
+
+\begin_layout Section
+Release 0.4.1 - 2012-10-01
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+[FR-224] 
+\series bold
+Beta
+\series default
+ support for NRDP through the new server class NRDPServer.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Beta
+\series default
+ support for executing check commands.
+ The check commands that can be used must support an output of performance
+ data.
+ Bischeck will not care about the status that comes from a check command.
+ Instead it will only use the performance data to evaluate its own threshold.
+ This include the new service class 
+\emph on
+ShellService
+\emph default
+ and serviceitem class 
+\emph on
+CheckCommandServiceItem
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+[FR-223] Instrumentation metrics provided by 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://metrics.codahale.com/"
+
+\end_inset
+
+ has been implemented to enable fine grain real time process measuring through
+ JMX.
+ This is implemented for 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+All external interfaces to measure response time
+\end_layout
+
+\begin_layout Itemize
+Service execution time
+\end_layout
+
+\begin_layout Itemize
+Threshold processing time, etc.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-225] 
+\begin_inset Quotes eld
+\end_inset
+
+A service url that has no equivalent in urlservices.xml generate a NullPointerExc
+eption
+\begin_inset Quotes erd
+\end_inset
+
+ has been resolved.
+\end_layout
+
+\begin_layout Itemize
+[TR-226] 
+\begin_inset Quotes eld
+\end_inset
+
+For thresholds with more the two decimals will not be correctly validated
+\begin_inset Quotes erd
+\end_inset
+
+ has been fixed.
+ The bug was related to when Bischeck was used with data points with many
+ decimals, like the result from a ping.
+ Bischeck would strip of all decimals except 2 with caused small values
+ to become 0.
+ Now Bischeck will determine the number of decimals used by the collected
+ data point and use it when formatting the calculated threshold, warning
+ and critical value.
+ This will hopefully make data presented in Nagios UIs and graphs like pnp4nagio
+s look better.
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.4.0 is supported for upgrade to 0.4.1.
+\end_layout
+
+\begin_layout Section
+Release 0.4.0 - 2012-08-31
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+[FR-197] Support for different and multiple integration with different surveilla
+nce and monitoring systems.
+ With version 0.4.0 Bischeck is not limited to send data to Nagios.
+ It can now send the data to multiple Nagios servers and to other servers
+ like OpenTSB.
+ This is done by moving server formatting and protocol to server integration
+ classes that implements the interface com.ingby.socbox.bischeck.servers.Server.
+ The server integration is described in the xml configuration file servers.xml.
+ This also means that that some Nagios NSCA specific properties previous
+ configured in properties.xml has been moved to the servers.xml file in the
+ NSCA section.
+ The OpenTSDB server class should be regarded as beta.
+\end_layout
+
+\begin_layout Itemize
+[FR-204] The bischeck cache will be saved when the bischeck daemon is shutdown
+ and reloaded on bischeck startup.
+ Keeping the cache persistent between restarts is important since 0.4.0 support
+ time based cache retrieval.
+ The limitations is currently that if the Bischeck daemon is killed by a
+ signal that can not be caught or the daemon crash the data will not be
+ saved.
+ This will be improved in future versions.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-202] The implementation of running bischeck once, in a none daemon mode,
+ is changed so the same code is used as running in daemon mode.
+ The only difference is that the initialization of triggers are different
+ so all service items are just ran directly and and just once.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-218] The bischeck daemon can now reload the configuration without a
+ process restart.
+ This is support through the JMX operation 
+\begin_inset Quotes eld
+\end_inset
+
+reload
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The feature will limit the need of operating system access and authorization.
+\end_layout
+
+\begin_layout Itemize
+[FR-219] Bischeck can now retrieve state and performance data from a Nagios
+ server supporting livestatus.
+ With the service class LivestatusService a connection is set up over livestatus
+ and with the and serviceitem class LivestatusServiceItem state and/or performan
+ce data can be retrieved from the a Nagios service.
+ This can be useful when when creating virtual services in Bischeck or used
+ in complex thresholds.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-220] Bischeck now support one additional scheduling method where scheduling
+ can be defined to run a service after a different service has executed.
+ This can be useful when a service is depending on data for another service
+ for its thresholds or execution statement.
+ 
+\end_layout
+
+\begin_layout Itemize
+[FR-221] Cache retrieval is now support by using a time offset to find the
+ nearest cache element to the time offset.
+ 
+\end_layout
+
+\begin_layout Itemize
+Cache data can be retrieved as a list of elements based both on index and
+ time.
+\end_layout
+
+\begin_layout Itemize
+Support for additional mathematical functions like average, min and max
+ calculations on list of elements.
+\end_layout
+
+\begin_layout Itemize
+Bischeck can now support the usage of cached data in an execution statement
+ of a serviceitem.
+ This is typical useful when a serviceitem execute statement is depending
+ on other service data.
+ For example in a SQL query string:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+select value from table1 where id = host1-web-state[0] and createdate =
+ '%%yyyy-MM-dd%%'");
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Added support for other Linux distributions then Redhat based.
+ Bischeck should now install on Debian 6 and Ubuntu 10/11.
+ 
+\end_layout
+
+\begin_layout Itemize
+Configuration listing.
+ The configuration listing has been moved from the ConfigurationManager
+ class to the DocManager class.
+ Currently html and text listing is supported.
+ The generated configuration data will by default placed in the 
+\emph on
+bischeckdoc
+\emph default
+ directory.
+ 
+\end_layout
+
+\begin_layout Itemize
+A configured service can be configured not to send its data to a the configured
+ monitoring servers like Nagios.
+ This can be useful if the service is just to be used to create virtual
+ services or just to be used as thresholds.
+ 
+\end_layout
+
+\begin_layout Itemize
+The bischeck script now support JMX authentication.
+ The authentication files are located in the etc directory and named jmxremote.pa
+ssword and jmxremote.access.
+ Default is to that authentication is disabled by the system property
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Quotes eld
+\end_inset
+
+-Dcom.sun.management.jmxremote.authenticate=false
+\begin_inset Quotes erd
+\end_inset
+
+.
+ To enable authentication set the property to true.
+ For more info about JMX see 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+The Twenty4Thresholds class was in previous version not doing a correct
+ linear equation calculation if a expression based threshold was defined.
+ Lets illustrate the errors with this example from the 24thresholds.xml configura
+tion file having a mix with static and expression based thresholds.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+....
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 12:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>7000</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 13:00 -->     
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>testhost-testservice-testitem[1] / 3</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 14:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>testhost-testservice-testitem[1] / 2</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 15:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>testhost-testservice-testitem[1] + 1000 </hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+<!-- 16:00 -->
+\end_layout
+
+\begin_layout Plain Layout
+
+<hour>12000</hour>
+\end_layout
+
+\begin_layout Plain Layout
+
+....
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the previous version the threshold value between 12:00 and 13:00 would
+ be null since it was a mix of static and expression based thresholds.
+ And between 15:00 and 16:00 the threshold would have been calculated as
+ 
+\begin_inset Quotes eld
+\end_inset
+
+testhost-testservice-testitem[1] + 1000
+\begin_inset Quotes erd
+\end_inset
+
+ independent of the time between 15:00 and 16:00.
+\end_layout
+
+\begin_layout Standard
+Now the linear equation will correctly be calculated with any mix of static
+ and expression based definitions.
+ In the above example the calculated threshold for 12:20 will now be:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+20*((testhost-testservice-testitem[1]/3) - 7000)/60 + 7000
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This fix will improve the correctness and also the capability of threshold
+ adaptivity.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The Service interface has a number of new methods that should been there
+ from the beginning.
+ If you developed any service class you need to add these, but if you just
+ inherited ServiceAbstract its fixed for you.
+ The new methods are:
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+public NAGIOSSTAT getLevel(); 
+\end_layout
+
+\begin_layout Plain Layout
+
+public void setLevel(NAGIOSSTAT level); 
+\end_layout
+
+\begin_layout Plain Layout
+
+public boolean isConnectionEstablished(); 
+\end_layout
+
+\begin_layout Plain Layout
+
+public void setConnectionEstablished(boolean connected); 
+\end_layout
+
+\begin_layout Plain Layout
+
+public Boolean isSendServiceData(); 
+\end_layout
+
+\begin_layout Plain Layout
+
+public setSendServiceData(Boolean sendServiceData);
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Property 
+\emph on
+cacheclear
+\emph default
+ is renamed to 
+\emph on
+thresholdCacheClear
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+All the nsca related properties has been moved from properties.xml to servers.xml
+ when used for the NSCAServer class.
+ The new property names has also gone through some minor changes.
+ When upgrading a manual update is needed of the servers.xml file with the
+ current setting of nsca related properties in properties.xml.
+ Recommended that these are later removed.
+\end_layout
+
+\begin_layout Itemize
+All JAXB generated configuration classes now support serialization.
+ 
+\end_layout
+
+\begin_layout Itemize
+Quartz jar is upgraded from 2.0.1 to 2.1.5.
+\end_layout
+
+\begin_layout Itemize
+[TR-216] 
+\begin_inset Quotes eld
+\end_inset
+
+Shutdown is automatic triggered
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+[TR-217] 
+\begin_inset Quotes eld
+\end_inset
+
+Configuration Manager initialization failed with java.lang.NullPointerException
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+[TR-207] 
+\begin_inset Quotes eld
+\end_inset
+
+sudo in bischeckd script cause problem at boot
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 0.3.3 and 0.4.0_RC2 are supported for upgrade to 0.4.0.
+\end_layout
+
+\begin_layout Section
+Release 0.3.3 - 2011-11-14
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+Bischeck are no longer limited to just be integrated with a single Nagios
+ server over the NSCA protocol.
+ Now is it possible to integrate with multiple monitoring servers over different
+ protocols.
+ Currently Nagios/NSCA and OpenTSDB is support.
+ To enable this a new class component called Server has been introduced.
+ The class is responsible for communication and formatting for the specific
+ monitoring server it integrate against.
+ A new configuration file, server.xml is used for configuration of server
+ integration.
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-207] 
+\begin_inset Quotes eld
+\end_inset
+
+sudo in bischeckd script cause problem at boot
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+[TR-214] 
+\begin_inset Quotes eld
+\end_inset
+
+Threshold object cache is no cleared
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Release 0.3.2 - 2011-07-29
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+The configuration system has been completely rewritten and now us xml based
+ configuration files.
+ Each configuration file has a corresponding xsd file that can be used for
+ verifications.
+ The dependencies to sqlite3 has been deprecated and is just part of this
+ release to support upgrade.
+ 
+\end_layout
+
+\begin_layout Itemize
+The scheduling of services and its related serviceitem(s) has been rewritten
+ to support different scheduling polices per service instead of earlier
+ versions of fixed interval scheduling.
+ With 0.3.2 each service can have one to many schedule tags in bischeck.xml
+ configuration file.
+ For more info please see the chapter 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "label:Service-scheduling"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+The active attribute on Hosts, Services and Serviceitem has been removed.
+\end_layout
+
+\begin_layout Itemize
+The interface com.ingby.socbox.bischeck.threshold.Threshold has a new signature
+ on the method init().
+ This method now throws Exception.
+ 
+\end_layout
+
+\begin_layout Itemize
+The Service interface has two additional methods, setSchedules() and getSchedule
+s().
+ 
+\end_layout
+
+\begin_layout Itemize
+The Service interface has changed the signature of getServicesItems() to
+ return Map instead of HashMap.
+ 
+\end_layout
+
+\begin_layout Itemize
+buildr has been replaced by ant as the build management system.
+\end_layout
+
+\begin_layout Section
+Release 0.3.1 - 2011-04-08 
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+The ServiceFactory class now use a property table, urlservice, to map what
+ Service class should be instantiate for a specific url schema.
+ The url schema is the key.
+ The current default mapping are: 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+jdbc -> JDBCService 
+\end_layout
+
+\begin_layout Itemize
+bischeck -> LastCacheService
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The ServiceItemFactory class use an additional field, serviceitemclass,
+ in the items configuration table to determine what ServiceItem class to
+ instantiate.
+\end_layout
+
+\begin_layout Itemize
+Calendar in Bischeck follows the ISO 8601 date standard by default.
+ This means that the first day in the week is Monday, day 2 according to
+ java.utilCalendar, and that the first week of the year must have a minimum
+ of 4 days.
+ The importance of this is to get the week numbering correct that is used
+ in the configuration in Twenty4HourThreshold class, but day one (1) in
+ the week is still Sunday when defining the tag dayofweek in 24threshols.xml.
+ The setting can be overidden by setting the properties 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+mindaysinfirstweek
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ (default 4) and 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+firstdayofweek
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ (default 2) in the properties.xml file.
+ 
+\end_layout
+
+\begin_layout Itemize
+If no threshold class has been specified, null in the thresholdclass field
+ in the items table, Bischeck will instantiate the “empty” class DummyThreshold.
+\end_layout
+
+\begin_layout Itemize
+For all class configuration of Service, ServiceItem and Threshold its now
+ possible to specify the class name without the package path if the class
+ is part of the Bischeck distribution.
+ 
+\end_layout
+
+\begin_layout Itemize
+Clean up of the exception handling process when starting Bischeck.
+ Now the execution should not start if there are configuration issues with
+ missing classes for Service, ServiceItem and Threshold.
+ 
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues 
+\end_layout
+
+\begin_layout Itemize
+N/A
+\end_layout
+
+\begin_layout Subsection
+Upgrade issues 
+\end_layout
+
+\begin_layout Itemize
+Upgrade by doing a fresh installation, but first save the old installation
+ directory.
+ After saving the old installation do a new install.
+ Then copy the files bischeck.conf and 24threshold.conf from old to new installati
+on dir.
+\end_layout
+
+\begin_layout Itemize
+The field serviceitemclass (varchar(256)) in table items in configuration
+ database bischeck.conf must be manual added and populated with the right
+ Service class name.
+ If corresponding service is jdbc:// set the field serviceitemclass to SQLServic
+eItem and if the service is bischeck:// set the field to CalculateOnCache.
+\end_layout
+
+\begin_layout Itemize
+To add the column:
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ sqlite3 bischeck.conf sqlite> ALTER TABLE items ADD COLUMN serviceitemclass
+ varchar(256);
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Update the serviceitemclass for all rows in items: 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+sqlite> update items set serviceitemclass='SQLServiceItem' where ....
+ ....
+ 
+\end_layout
+
+\begin_layout Itemize
+sqlite> update items set serviceitemclass='CalculateOnCache' where .....
+ ....
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Add the new table url2service in database bischeck.conf.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ cat << EOF | sqlite3 bischeck.conf 
+\end_layout
+
+\begin_layout Plain Layout
+
+drop table IF EXISTS urlservice; 
+\end_layout
+
+\begin_layout Plain Layout
+
+create table urlservice(key varchar(128), value varchar(256)); 
+\end_layout
+
+\begin_layout Plain Layout
+
+insert into urlservice values ("jdbc","JDBCService"); 
+\end_layout
+
+\begin_layout Plain Layout
+
+insert into urlservice values ("bischeck","LastCacheService"); 
+\end_layout
+
+\begin_layout Plain Layout
+
+EOF
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Copy all file located in the old installation customlib directory to the
+ customlib directory in the new installation.
+\end_layout
+
+\begin_layout Section
+Release 0.3.0 - 2011-03-03 
+\end_layout
+
+\begin_layout Subsection
+New features 
+\end_layout
+
+\begin_layout Itemize
+This is the first binary distribution, but should be regarded as a beta
+ version.
+ 
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+N/A
+\end_layout
+
+\end_body
+\end_document
