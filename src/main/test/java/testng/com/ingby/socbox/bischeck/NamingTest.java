@@ -58,6 +58,12 @@ public class NamingTest {
 		Assert.assertEquals(Util.fullQoutedName("local-host", "service-1","serviceitem-1"),"local\\-host-service\\-1-serviceitem\\-1");
 	}
 	
+	@Test (groups = { "Naming" })
+    public void verifyAll() {
+        Assert.assertEquals(Util.fullQoutedName("local-host", "serv/ic/e-1","service/it/em-1"),"local\\-host-serv/ic/e\\-1-service/it/em\\-1");
+        Assert.assertEquals(Util.fullQoutedName("local-host", "serv/i c/e-1","serv ice/it/em-1"),"local\\-host-serv/i c/e\\-1-serv ice/it/em\\-1");
+        Assert.assertEquals(Util.fullQoutedName("local-host", "serv/i  c/e-1","serv  ice/it/em-1"),"local\\-host-serv/i  c/e\\-1-serv  ice/it/em\\-1");
+    }
 }
 
 
