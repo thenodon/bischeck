@@ -14,7 +14,7 @@ public abstract class ObjectDefinitions {
     private static final String ILLEGAL_OBJECT_NAME_CHARS = "`+~!$%^&*|'\"<>?,()=";
 
     private static final String OBJECT_HOSTNAME ="[a-zA-Z0-9]{1}[a-zA-Z0-9_.\\\\-]*[a-zA-Z0-9]{1}";
-    private static final String OBJECT_REGEXP = "[a-zA-Z0-9_.@]{1}[a-zA-Z0-9 _.@\\\\-]*[a-zA-Z0-9/_.@]{1}";
+    private static final String OBJECT_REGEXP = "[a-zA-Z0-9_.@]{1}[a-zA-Z0-9/ _.@\\\\-]*[a-zA-Z0-9/_.@]{1}";
     private static final String HOST_SERVICE_ITEM_REGEXP = OBJECT_HOSTNAME +"-" +
         OBJECT_REGEXP + "-" +
         OBJECT_REGEXP +
