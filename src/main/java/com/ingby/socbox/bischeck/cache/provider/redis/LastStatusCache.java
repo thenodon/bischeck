@@ -120,8 +120,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	 * @return
 	 */
 	public static LastStatusCache getInstance() {
-		if (lsc == null)
+		if (lsc == null) {
 			LOGGER.error("Cache has not been initilized, must call init() first");
+		}
 		return lsc;
 	}
 	
@@ -136,6 +137,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 						ConfigurationManager.getInstance().getProperties().
 						getProperty("cache.provider.redis.port","6379"));
 			} catch (NumberFormatException ne) {
+			    LOGGER.warn("Configuration of redis port is not a valid number {}. Set to default 6379",
+			            ConfigurationManager.getInstance().getProperties().getProperty("cache.provider.redis.port","6379"),ne);
 				redisport = 6379;
 			}
 
@@ -152,6 +155,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 						ConfigurationManager.getInstance().getProperties().
 						getProperty("cache.provider.redis.db","0"));
 			} catch (NumberFormatException ne) {
+                LOGGER.warn("Configuration of redis db is not a valid number {}. Set to default 0",
+                        ConfigurationManager.getInstance().getProperties().getProperty("cache.provider.redis.db","0"),ne);
 				redisdb=0;
 			}
 			
@@ -160,6 +165,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 						ConfigurationManager.getInstance().getProperties().
 						getProperty("cache.provider.redis.timeout","2000"));
 			} catch (NumberFormatException ne) {
+                LOGGER.warn("Configuration of redis connection timeout is not a valid number {}. Set to default 2000",
+                        ConfigurationManager.getInstance().getProperties().getProperty("cache.provider.redis.timeout","2000"),ne);
 				redistimeout=2000;
 			}
 			
@@ -281,7 +288,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 						List<LastStatus> lslist = (ArrayList<LastStatus>) getLastStatusListByIndex(host.getHostname(), service.getServiceName(), serviceitem.getServiceItemName(), 0L, fastCacheSize-1); 
 						CacheQueue<LastStatus> fifo = new CacheQueue<LastStatus>(fastCacheSize);
 
-						if (lslist.size()  > 0) {
+						if (!lslist.isEmpty()) {
 							int count = 0;
 							for (int i = lslist.size()-1; i >= 0;i--){
 								LastStatus ls = lslist.get(i);
@@ -380,7 +387,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			String serviceitem, long timestamp) {
 		String key = Util.fullName( host, service, serviceitem);
 		
-		LOGGER.debug("Find cache data for key {} at time {}", key, new java.util.Date(timestamp));
+		if (LOGGER.isDebugEnabled()) {
+		    LOGGER.debug("Find cache data for key {} at time {}", key, new java.util.Date(timestamp));
+		}
 		
 		LastStatus ls = null;
 
@@ -388,8 +397,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		try {	
 			jedis = jedispool.getResource();
 			
-			if (jedis.llen(key) == 0)
+			if (jedis.llen(key) == 0) {
 				return null;
+			}
 
 			ls = nearest(timestamp, key);
 
@@ -399,10 +409,11 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			jedispool.returnResource(jedis);
 		}
 		
-		if (ls == null) 
+		if (ls == null) { 
 			return null;
-		else
-			return ls;    
+		} else {
+			return ls;
+		}
 	}
 
 	@Override
@@ -431,9 +442,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 				LOGGER.debug("Redis cache used for key {} at index {}", key, index);
 				String redstr = jedis.lindex(key, index);
 
-				if (redstr == null)
+				if (redstr == null) {
 					return null;
-				else {
+				} else {
 					incRedisCacheCount();	
 					ls = new LastStatus(redstr);
 				}
@@ -567,11 +578,11 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			long index) {
 		
 		LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
-		if (ls == null) 
+		if (ls == null) {
 			return null;
-		else
+		} else {
 			return ls.getValue();
-		
+		}
 	}
 
 
@@ -583,11 +594,13 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			String separator) {
 		List<LastStatus> lslist = getLastStatusListByIndex(hostName, serviceName, serviceItemName, fromIndex, toIndex);
 		
-		if (lslist == null)
+		if (lslist == null) {
 			return null;
+		}
 		
-		if (lslist.isEmpty())
+		if (lslist.isEmpty()) {
 			return null;
+		}
 		
 		StringBuffer strbuf = new StringBuffer();
 		for (LastStatus ls : lslist) {
@@ -604,10 +617,12 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			long timestamp) {
 		
 		LastStatus ls = getLastStatusByTime(hostName, serviceName, serviceItemName, timestamp);
-		if (ls == null) 
+		
+		if (ls == null) { 
 			return null;
-		else
+		} else {
 			return ls.getValue();
+		}
 	}	
 
 	@Override
@@ -619,13 +634,15 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		
 		List<LastStatus> lslist = getLastStatusListByTime(hostName, serviceName, serviceItemName, from, to);
 		
-		if (lslist == null)
+		if (lslist == null) {
 			return null;
+		}
 		
 		StringBuffer strbuf = new StringBuffer();
 		for (LastStatus ls : lslist) {
 			strbuf.append(ls.getValue()).append(separator);
 		}
+		
 		String str = strbuf.toString();
 
 		return str.substring(0, str.lastIndexOf(separator));
@@ -641,13 +658,15 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 		List<LastStatus> lslist = getLastStatusListAll(hostName, serviceName, serviceItemName);
 		
-		if (lslist.isEmpty())
+		if (lslist.isEmpty()) {
 			return null;
+		}
 		
 		StringBuffer strbuf = new StringBuffer();
 		for (LastStatus ls : lslist) {
 			strbuf.append(ls.getValue()).append(separator);
 		}
+		
 		String str = strbuf.toString();
 
 		return str.substring(0, str.lastIndexOf(separator));
@@ -701,10 +720,11 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		} finally {
 			jedispool.returnResource(jedis);
 		}
-		if (index == null) 
+		if (index == null) { 
 			return null;
-		else
-			return index;    
+		} else {
+			return index;
+		}
 	}
 	
 	
@@ -802,12 +822,12 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	 */
 	@Override
 	public int getCacheRatio() {
-		if(rediscachehitcount.get() == 0L)
+		if(rediscachehitcount.get() == 0L) {
 			return 100;
-		else
+		} else {
 			return (int) (fastcachehitcount.get()*100/(rediscachehitcount.get()+fastcachehitcount.get()));
+		}
 	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#dump2file()
@@ -947,8 +967,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	
 	private LastStatus nearest(long time,  String id) {
 		
-		LOGGER.debug("Find value for key {} at nearest timestamp {}", id, new java.util.Date(time));
-		
+	    if (LOGGER.isDebugEnabled()) {
+	        LOGGER.debug("Find value for key {} at nearest timestamp {}", id, new java.util.Date(time));
+	    }
+	    
 		LastStatus nearest = null;
 		
 		// Search the fast cache first. If a hit is in the fast cache return 
@@ -974,12 +996,14 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	 * @return the LastStatus object closes to the time
 	 */
 	private LastStatus nearestFast(long time, String key) {
-		if (!fastCacheEnable)
+		if (!fastCacheEnable) {
 			return null;
+		}
 		
 		LinkedList<LastStatus> listtosearch = fastCache.get(key);
-		if (listtosearch == null)
+		if (listtosearch == null) {
 			return null;
+		}
 		
 		if (time > listtosearch.getFirst().getTimestamp() || 
 			time < listtosearch.getLast().getTimestamp() ) {
@@ -1082,11 +1106,12 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		for (long i = 0; i < listtosearch.size(); i++) {
 			long d1 = Math.abs(time - listtosearch.get((int) i).getTimestamp());
 			long d2;
-			if (i+1 < listtosearch.size())
+			if (i+1 < listtosearch.size()) {
 				d2 = Math.abs(time - listtosearch.get((int) i+1).getTimestamp());
-			else 
+			} else { 
 				d2 = Long.MAX_VALUE;
-
+			}
+			
 			if ( d1 < bestDistanceFoundYet ) {
 
 				// For the moment, this value is the nearest to the desired number...
@@ -1111,9 +1136,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			if (time > new LastStatus(jedis.lindex(key, 0L)).getTimestamp() || 
 					time < new LastStatus(jedis.lindex(key, jedis.llen(key)-1)).getTimestamp() ) {
 				
-				if (LOGGER.isDebugEnabled())
+				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Out of bounds");
-						
+				}
+				
 				return null;
 			}
 
@@ -1123,11 +1149,12 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			for (long i = 0; i < size; i++) {
 				long d1 = Math.abs(time - new LastStatus(jedis.lindex(key, i)).getTimestamp());
 				long d2;
-				if (i+1 < size)
-					d2 = Math.abs(time - new LastStatus(jedis.lindex(key, i+1)).getTimestamp());
-				else 
+				if (i+1 < size) {
+					d2 = Math.abs(time - new LastStatus(jedis.lindex(key, i+1)).getTimestamp()); 
+				} else { 
 					d2 = Long.MAX_VALUE;
-
+				}
+				
 				if ( d1 < bestDistanceFoundYet ) {
 
 					// For the moment, this value is the nearest to the desired number...
@@ -1149,8 +1176,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 	
 	private Long nearestByIndex(long time, String key) {
-		LOGGER.debug("For key {} find value in cache at index {}", key, new java.util.Date(time));
-		
+	    if (LOGGER.isDebugEnabled()) {
+	        LOGGER.debug("For key {} find value in cache at index {}", key, new java.util.Date(time));
+	    }
+	    
 		Long index = null;
 		
 		// Search the fast cache first. If a hit is in the fast cache return 
@@ -1158,8 +1187,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		
 		if (index != null) {
 			incFastCacheCount();
-		}
-		else {
+		} else {
 			// Search slow cache if no hit
 			index = nearestByIndexSlow(time, key);
 			incRedisCacheCount();
