@@ -88,7 +88,7 @@ public interface ExecuteMBean {
      * The number of bischeck classes found in the class cache 
      * @return
      */
-    public int cacheClassHit();
+    public int getCacheClassHit();
     
     
     /**
@@ -96,6 +96,6 @@ public interface ExecuteMBean {
      * not in the class cache 
      * @return
      */
-    public int cacheClassMiss();
+    public int getCacheClassMiss();
     
 }
