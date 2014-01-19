@@ -19,6 +19,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactoryException;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLAggregate;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLCache;
+import com.ingby.socbox.bischeck.xsd.bischeck.XMLCachetemplate;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLRetention;
 
 /**
@@ -157,6 +158,25 @@ public class Aggregation {
 	}
 
 	/**
+	 * Constructor for cache template
+	 * @param xmlCachetemplate
+	 * @param service
+	 * @param serviceitem
+	 */
+	public Aggregation(XMLCachetemplate xmlCachetemplate, Service service,
+            ServiceItem serviceitem) {
+	    xmlconfig = new XMLCache();
+	    xmlconfig.setPurge(xmlCachetemplate.getPurge());
+	    
+	    for(XMLAggregate aggregate: xmlCachetemplate.getAggregate()) {
+	        xmlconfig.getAggregate().add(aggregate);
+	    }
+	    
+	    this.baseService = service;
+        this.baseServiceitem = serviceitem;
+    }
+
+    /**
 	 * Configure the Aggregation object for a {@link ServiceItem} set in the 
 	 * constructor and link it to the specific {@link Service} set in the 
 	 * constructor
