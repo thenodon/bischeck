@@ -25,6 +25,7 @@ package com.ingby.socbox.bischeck.cache.provider.redis;
  */
 public interface LastStatusCacheMBean {
 
+    public final static String BEANNAME = "com.ingby.socbox.bischeck.cache:name=Redis";
 	/**
 	 * Get the number of unique keys managed by the cache
 	 * @return

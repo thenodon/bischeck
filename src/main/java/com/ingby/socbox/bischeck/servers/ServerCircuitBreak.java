@@ -18,23 +18,17 @@
 */
 package com.ingby.socbox.bischeck.servers;
 
-import java.lang.management.ManagementFactory;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ingby.socbox.bischeck.MBeanManager;
 import com.ingby.socbox.bischeck.service.Service;
 
 /**
@@ -102,9 +96,9 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 	
 	// The timestamp when the last state change happen 
 	private volatile long lastStateChange = 0L;
-	private MBeanServer mbs;
-	ObjectName mbeanname;
 	
+	private MBeanManager mbsMgr = null;
+    
 	private volatile boolean isEnabled = false;
 	
 	/**
@@ -125,29 +119,9 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 			setProperties(prop);
 		}
 		
-		// Set up the MBean for the circuit break
-		mbs = ManagementFactory.getPlatformMBeanServer();
-
-        mbeanname = null;
-		
-        try {
-            mbeanname = new ObjectName("com.ingby.socbox.bischeck.servers:name=" + this.server.getInstanceName() + ",type=CircuitBreak");
-        } catch (MalformedObjectNameException e) {
-            LOGGER.error("MBean object name failed, " + e);
-        } catch (NullPointerException e) {
-            LOGGER.error("MBean object name failed, " + e);
-        }
-
-        try {
-            mbs.registerMBean(this, mbeanname);
-        } catch (InstanceAlreadyExistsException e) {
-            LOGGER.error("Mbean exception - " + e.getMessage());
-        } catch (MBeanRegistrationException e) {
-        	LOGGER.error("Mbean exception - " + e.getMessage());
-        } catch (NotCompliantMBeanException e) {
-        	LOGGER.error("Mbean exception - " + e.getMessage());
-        }
-		
+		mbsMgr = new MBeanManager(this, "com.ingby.socbox.bischeck.servers:name=" + this.server.getInstanceName() + ",type=CircuitBreak");
+		mbsMgr.registerMBeanserver();
+			
 	}
 
 
@@ -296,15 +270,14 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
      * Remove all mbean stuff, used at reload
      */
     public synchronized void destroy() {
-
         try {
-            mbs.unregisterMBean(mbeanname);
-        } catch (MBeanRegistrationException e) {
-            LOGGER.warn("Mbean {} could not be unregistered", mbeanname, e);
-        } catch (InstanceNotFoundException e) {
-            LOGGER.warn("Mbean {} instance could not be found", mbeanname, e);
-        } 
+            mbsMgr.unRegisterMBeanserver();
+        } finally {
+          mbsMgr = null;  
+        }
     }
+    
+    
 	// JMX exposed methods
 	
 	@Override

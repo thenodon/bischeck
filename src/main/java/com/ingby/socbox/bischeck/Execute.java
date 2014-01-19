@@ -85,9 +85,10 @@ public final class Execute implements ExecuteMBean {
 
     private static Execute exec = new Execute();
 
-    private static MBeanServer mbs = null;
-    private static ObjectName mbeanname = null;
-
+    //private static MBeanServer mbs = null;
+    //private static ObjectName mbeanname = null;
+    private MBeanManager mbsMgr = null;
+    
     private static final int RESTART = 1000;
     private static final int OKAY = 0;
     private static final int FAILED = 1;
@@ -102,6 +103,7 @@ public final class Execute implements ExecuteMBean {
     private static String bischeckversion;
     private static Thread dumpthread;
 
+    /*
     static {
         mbs = ManagementFactory.getPlatformMBeanServer();
 
@@ -121,7 +123,7 @@ public final class Execute implements ExecuteMBean {
             LOGGER.error("Mbean register exception - {}", e.getMessage(), e);
         }
     }
-
+*/
     public static void main(String[] args) {
 
         // create the command line parser
@@ -188,6 +190,8 @@ public final class Execute implements ExecuteMBean {
     }
 
     private Execute() {
+        mbsMgr = new MBeanManager(this,ExecuteMBean.BEANNAME);
+        mbsMgr.registerMBeanserver();
     }
 
     private static Execute getInstance() {

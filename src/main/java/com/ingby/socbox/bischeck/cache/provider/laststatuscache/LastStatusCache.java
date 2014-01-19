@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import com.ingby.socbox.bischeck.MBeanManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheInf;
@@ -92,11 +93,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private static int fifosize = 500;
 	//private static boolean notFullListParse = false;
 	private static LastStatusCache lsc; // = new LastStatusCache();
-	private static MBeanServer mbs = null;
-	private final static String BEANNAME = "com.ingby.socbox.bischeck:name=Cache";
+	private static MBeanManager mbsMgr = null;
 
-	private static ObjectName   mbeanname = null;
-
+	
 	private final static String LASTSTATUSCACHE_DUMP_FILE = "lastStatusCacheDump";
 
 	private static String lastStatusCacheDumpDir;
@@ -125,29 +124,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			
 			lsc = new LastStatusCache();
 			
-			
-			
-			mbs = ManagementFactory.getPlatformMBeanServer();
 
-			try {
-				mbeanname = new ObjectName(BEANNAME);
-			} catch (MalformedObjectNameException e) {
-				LOGGER.error("MBean object name failed, {}",e.getMessage(), e);
-			} catch (NullPointerException e) {
-				LOGGER.error("MBean object name failed, {}",e.getMessage(), e);
-			}
-
-
-			try {
-				mbs.registerMBean(lsc, mbeanname);
-			} catch (InstanceAlreadyExistsException e) {
-				LOGGER.error("Mbean exception - {}", e.getMessage(), e);
-			} catch (MBeanRegistrationException e) {
-				LOGGER.error("Mbean exception - {}", e.getMessage(), e);
-			} catch (NotCompliantMBeanException e) {
-				LOGGER.error("Mbean exception - {}", e.getMessage(), e);
-			}
-
+            mbsMgr = new MBeanManager(lsc, BEANNAME);
+            mbsMgr.registerMBeanserver();     
+    
 			lastStatusCacheDumpDir = ConfigurationManager.getInstance().getProperties().
 					getProperty("lastStatusCacheDumpDir","/var/tmp/");
 			try {
@@ -170,13 +150,13 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 	public static synchronized void destroy() {
 		lsc.close();
+		
 		try {
-			mbs.unregisterMBean(mbeanname);
-		} catch (MBeanRegistrationException e) {
-			LOGGER.warn("Mbean {} could not be unregistered", mbeanname , e);
-		} catch (InstanceNotFoundException e) {
-			LOGGER.warn("Mbean {} instance could not be found", mbeanname , e);
-		}
+            mbsMgr.unRegisterMBeanserver();
+        } finally {
+          mbsMgr = null;  
+        }
+		
 		lsc = null;
 	}
 	

@@ -20,6 +20,9 @@
 package com.ingby.socbox.bischeck.cache.provider.laststatuscache;
 
 public interface LastStatusCacheMBean {
+    
+    public final static String BEANNAME = "com.ingby.socbox.bischeck:name=Cache";
+    
     public int getLastStatusCacheCount();
     public String[] getCacheKeys();
     
