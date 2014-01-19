@@ -23,6 +23,7 @@ import java.text.ParseException;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -68,8 +69,15 @@ public class CachePurgeJob implements Job {
     private final static Logger  LOGGER = LoggerFactory.getLogger(CachePurgeJob.class);
 
     private static Scheduler sched;
-
-    public static void init(ConfigurationManager configMgr) throws SchedulerException, ParseException {
+    
+    
+    /**
+     * Initialize the purge job
+     * @param prop the properties used for the purge job
+     * @throws SchedulerException
+     * @throws ParseException
+     */
+    public static void init(Properties prop) throws SchedulerException, ParseException {
     	
     	
     	sched = StdSchedulerFactory.getDefaultScheduler();
@@ -86,7 +94,7 @@ public class CachePurgeJob implements Job {
         // Every minute TODO MAKE A PROPERTY
         CronTrigger trigger = newTrigger()
         .withIdentity("CachePurgeTrigger", "DailyMaintenance")
-        .withSchedule(cronSchedule(configMgr.getProperties().getProperty("cachePurgeJobCron","0 0 0/1 * * ? *")))
+        .withSchedule(cronSchedule(prop.getProperty("cachePurgeJobCron","0 0 0/1 * * ? *")))
         .forJob("CachePurge", "DailyMaintenance")
         .build();
         

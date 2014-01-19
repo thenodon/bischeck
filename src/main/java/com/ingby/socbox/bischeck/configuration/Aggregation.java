@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,8 @@ public class Aggregation {
 	private final static Logger LOGGER = LoggerFactory.getLogger(Aggregation.class);
 
 	private static final String WEEKEND = "/weekend";
-
+	private static final String URL_SERVICE = "bischeck://cache";
+	
 	enum AGGREGATION  { 
 		HOUR { 
 			public String toString() {
@@ -180,13 +182,15 @@ public class Aggregation {
 	 * Configure the Aggregation object for a {@link ServiceItem} set in the 
 	 * constructor and link it to the specific {@link Service} set in the 
 	 * constructor
+	 * @param urlPropeties the properties to to map the schema to a class using uri
+	 * <code>bischeck://cache</code>
 	 * @throws ServiceFactoryException if the Service used for aggregations 
 	 * can not be found  
 	 * @throws ServiceItemFactoryException if the ServiceItem used for 
 	 * aggregations can not be found   
 	 * 
 	 */
-	void setAggregate() throws ServiceFactoryException, ServiceItemFactoryException  {
+	void setAggregate(Properties urlPropeties) throws ServiceFactoryException, ServiceItemFactoryException  {
 		if (xmlconfig == null)
 			return;
 
@@ -206,7 +210,7 @@ public class Aggregation {
 													period.prefix() + "/" + 
 													aggregated.getMethod() + WEEKEND;
 					try {
-						service = ServiceFactory.createService(aggregationServiceName, "bischeck://cache");
+						service = ServiceFactory.createService(aggregationServiceName, URL_SERVICE,urlPropeties);
 					} catch (ServiceFactoryException e) {
 						LOGGER.error("Could not create service for {}", aggregationServiceName, e);
 						throw e;
@@ -216,7 +220,7 @@ public class Aggregation {
 													period.prefix()  + "/" + 
 													aggregated.getMethod();
 					try {
-						service = ServiceFactory.createService(aggregationServiceName, "bischeck://cache");
+						service = ServiceFactory.createService(aggregationServiceName, URL_SERVICE, urlPropeties);
 					} catch (ServiceFactoryException e) {
 						LOGGER.error("Could not create service for {}", aggregationServiceName, e);
 						throw e;
@@ -227,7 +231,7 @@ public class Aggregation {
 				service.setHost(baseService.getHost());
 				service.setDecscription("");
 				service.setSchedules(getAggregatedSchedule(period,aggregated.isUseweekend()));
-				service.setConnectionUrl("bischeck://cache");
+				service.setConnectionUrl(URL_SERVICE);
 				service.setSendServiceData(false);
 
 				ServiceItem serviceItem = null;

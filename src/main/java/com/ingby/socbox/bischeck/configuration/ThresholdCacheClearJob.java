@@ -22,6 +22,8 @@ package com.ingby.socbox.bischeck.configuration;
 import java.text.ParseException;
 
 import java.util.Date;
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +51,7 @@ public class ThresholdCacheClearJob implements Job {
 
     private static Scheduler sched;
 
-    public static void init(ConfigurationManager configMgr) throws SchedulerException, ParseException {
+    public static void init(Properties prop) throws SchedulerException, ParseException {
     	
     	
     	sched = StdSchedulerFactory.getDefaultScheduler();
@@ -66,7 +68,7 @@ public class ThresholdCacheClearJob implements Job {
         // Every day at 10 sec past midnight
         CronTrigger trigger = newTrigger()
         .withIdentity("DepleteThresholdCacheTrigger", "DailyMaintenance")
-        .withSchedule(cronSchedule(configMgr.getProperties().getProperty("thresholdCacheClear","10 0 00 * * ? *")))
+        .withSchedule(cronSchedule(prop.getProperty("thresholdCacheClear","10 0 00 * * ? *")))
         .forJob("DepleteThresholdCache", "DailyMaintenance")
         .build();
         

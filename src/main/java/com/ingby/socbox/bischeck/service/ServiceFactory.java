@@ -23,6 +23,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,13 +44,14 @@ public class ServiceFactory {
      * Create the service based on the uri
      * @param serviceName the name of the service
      * @param url the service url
+     * @param urlProperties the properties to to map the schema to a class
      * @return
      * @throws Exception if the service url is not available, the class do 
      * not exists, a constructor is not existing or if a constructor that 
      * take a the service name as a parameter do not exists
      */
     @SuppressWarnings("unchecked")
-    public static Service createService(String serviceName, String url) throws ServiceFactoryException 
+    public static Service createService(String serviceName, String url, Properties urlProperties) throws ServiceFactoryException 
     {
         
         URI uri = null;
@@ -62,7 +65,7 @@ public class ServiceFactory {
             throw sfe;
         }
         
-        String clazzname = ConfigurationManager.getInstance().getURL2Service().getProperty(uri.getScheme());
+        String clazzname = urlProperties.getProperty(uri.getScheme());
         
         if (clazzname == null) {
             LOGGER.error("Service uri {} is not matched in the urlservice.xml configuration file.", Util.obfuscatePassword(uri.toString()));
