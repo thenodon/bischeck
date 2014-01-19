@@ -338,12 +338,12 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 
 
 	@Override
-	public void Enable() {
+	public void enable() {
 		isEnabled = true;
 	}
 	
 	@Override
-	public void Disable() {
+	public void disable() {
 		isEnabled = false;
 	}
 

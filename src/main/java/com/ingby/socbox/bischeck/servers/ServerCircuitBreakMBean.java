@@ -63,27 +63,38 @@ public interface ServerCircuitBreakMBean {
 	/**
 	 * Enable circuit break
 	 */
-	public void Enable();
+	public void enable();
 	
 	
 	/**
 	 * Disable circuit break
 	 */
-	public void Disable();
+	public void disable();
 	
 	
 	/**
-	 * Get the OPEN timeout time in seconds 
+	 * Get the OPEN timeout time in milliseconds 
 	 */
 	public long getOpenTimeout();
-    
+   
+	
+	/**
+	 * Set the OPEN timeout time in milliseconds
+	 * @param timeout
+	 */
 	public void setOpenTimeout(long timeout);
     
+	
     /**
      * Get the CLOSE to OPEN count 
      */
     public int getExceptionThreshold();
     
+    
+    /**
+     * Set the exception count before going to OPEN state
+     * @param exceptionThreshold
+     */
     public void setExceptionThreshold(int exceptionThreshold);
     
     /**
