@@ -75,7 +75,7 @@ public class NRDPWorker implements WorkerInf, Runnable {
         try {
             url = new URL(urlstr);
         } catch (MalformedURLException e) {
-            LOGGER.error("{} - The url {} is not correctly formated", instanceName, urlstr);
+            LOGGER.error("{} - The url {} is not correctly formated", instanceName, urlstr, e);
             throw new IllegalArgumentException(e);
         }
     }
