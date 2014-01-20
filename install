@@ -67,21 +67,25 @@ function end () {
 }
 
 function getout {
-  echo "Fix your installation errors and re-run $0"
+  bold "Fix your installation errors and re-run $0"
+  echo
   #cleanup
   exit
 }
 
 function errormsg () {
-  echo $1 "... Error"
+  bold "Error -> "
+  echo " $@"
 }
 
 function warnmsg () {
-  echo " $1" "... Warning"
+  bold "Warning -> "
+  echo " $@"
 }
 
 function progress () {
-  echo $1 "... OK"
+  bold "OK -> "
+  echo " $@"
 }
 
 function headline() {
@@ -97,6 +101,12 @@ function headline() {
   done
   echo -en "\\033[0;39m"
   echo
+}
+
+function bold() {
+  echo -en "\\033[1;34m"
+  echo -n $@
+  echo -en "\\033[0;39m"
 }
 
 function getdate() {
@@ -152,17 +162,9 @@ scriptname=`basename $0`
 tempdir=`mktemp -d`
 
 #
-# Setup environment
+# Setup default environment
 #
-
-
-#
-# Read command line options
-#
-# Default - do nothing
-#
-
-USERINIT=nagios
+INSTALL_USER=nagios
 NAGIOSHOST=localhost
 BISHOME="/opt/socbox/addons/bischeck"
 JAVA_HOME=""
@@ -174,17 +176,18 @@ JMXAUTH=false
 
 VERSION=$(basename `pwd` | sed -e "s/^.*-//")
 
+#Set effective user id for the installing user
+eid=$(id -un)
+    
 
-echo "Welcome to bischeck $VERSION installer"
-echo "===================================="
+headline "Welcome to bischeck $VERSION installer"
 echo "Copyright Anders Håål, Ingenjörsbyn AB 2011-2013"
 echo "Licensed under GPL version 2"
-echo 
 
 while getopts U:I:J:uRXd:p:i:a name
 do
   case $name in
-    U)  USERINIT="$OPTARG";;
+    U)  INSTALL_USER="$OPTARG";;
     I)  BISHOME="$OPTARG";;
     J)  JAVA_HOME="$OPTARG";;
     X)  upgrade=true;;
@@ -203,6 +206,7 @@ shift $(($OPTIND - 1))
 #########################
 ## Check distribution
 #########################
+headline "Check supported distributions"
 # Need to find a way to determine and pass on.
 if [ "x$DISTRO" = "x" ] ; then
   DISTRO=$(distrocheck | cut -f1 -d:)
@@ -228,55 +232,70 @@ case ${DISTRO} in
 esac;
 
 
-
-
 #########################
 ## Uninstall
 #########################
 if [ "x$uninstall" = "xtrue" ] ; then
-  echo "Uninstall bischeck"
-  echo "Remove $BISHOME"
-  rm -rf $BISHOME
-  echo "Remove bischeckd from /etc/init.d"
-  if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "redhatenterpriseserver" -o "$DISTRO" = "centos" ] ; then
-    chkconfig --del bischeckd
-  elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
-    update-rc.d bischeckd remove
+  headline "Uninstall bischeck"
+  if [ -w $BISHOME ] ; then
+    rm -rf $BISHOME
+    progress "Remove $BISHOME"
+    if [ "$eid" = "root" ] ; then 
+      if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "redhatenterpriseserver" -o "$DISTRO" = "centos" ] ; then
+        chkconfig --del bischeckd
+      elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+        update-rc.d -f bischeckd remove
+      fi
+      rm -f /etc/init.d/bischeckd
+      progress "Remove bischeckd from /etc/init.d"
+    fi
+    exit 0
+  else
+    errormsg "No permission to remove $BISHOME"
+    exit 1
   fi
-  rm -f /etc/init.d/bischeckd
-  exit 0
 fi
 
 headline "Pre-installation verification"
 
-echo "Checking software dependencies"
+#echo "Checking software dependencies"
 
 #if [ "x$upgrade" = "xtrue" ] ; then
 #  checkpackage redhat-lsb
 #  checkpackage javasqlite
 #fi
 
-echo "All requiered software installed"
+#echo "All requiered software installed"
 
 
-id $USERINIT > /dev/null 2>&1
-if [ $? -ne 0 ] ; then
-  errormsg "User $USERINIT do not exists"
-  initerror=true
-else 
-  echo User "$USERINIT exists"
+if [ "$eid" = "root" ] ; then 
+
+  id $INSTALL_USER > /dev/null 2>&1
+  if [ $? -ne 0 ] ; then
+    errormsg "User $INSTALL_USER do not exists"
+    initerror=true
+  else 
+    progress User "$INSTALL_USER exists"
+  fi
+else
+    INSTALL_USER=$eid
+    warnmsg "Bischeck will be installed as user $eid since you not installing as root"
 fi
 
 #########################
 ## Pre install 
 #########################
 # Check that BISHOME directory do not exist
+dirpath=$(dirname $BISHOME)
 if [ "$upgrade" = "false" ] ; then
   if [ -d $BISHOME ] ; then
     errormsg "Directory $BISHOME already exists"
     initerror=true
+  elif [ ! -w $dirpath ] ; then
+    errormsg "Directory $dirpath are not allowed for writing"
+    initerror=true
   else 
-    echo "Directory $BISHOME do not exists, will be created"
+     progress "Directory $BISHOME do not exists, will be created"
   fi
 fi
 
@@ -286,6 +305,14 @@ if [ "x$JAVA_HOME" = "x" ] ; then
   if [ $? != 0 ] ; then
     errormsg "Java do not exists in path $PATH"
     initerror=true
+  else 
+    jver=$(java -version 2>&1 | awk '/version/ {print $3}' | awk -F . '{print $2}')
+    if [ $jver -eq 6 ] ; then 
+      progress "Java runtime exists with jdk version $jver"
+    else
+      errormsg "Java version is must be 6 or higher."
+      initerror=true
+    fi
   fi
 elif [ ! -f $JAVA_HOME/bin/java ] ; then
   errormsg "Java do not exists in $JAVA_HOME/bin"
@@ -293,12 +320,13 @@ elif [ ! -f $JAVA_HOME/bin/java ] ; then
 else 
   jver=$(java -version 2>&1 | awk '/version/ {print $3}' | awk -F . '{print $2}')
   if [ $jver -eq 6 ] ; then 
-    echo "Java runtime exists"
+    progress "Java runtime exists"
   else
     errormsg "Java version is must be 6 or higher."
     initerror=true
   fi
 fi
+
 # Check if any JMX setting is defined, then all must be set   
 if [ "x$JMXPORT" != "x" -o  "x$JMXSERVERIP" != "x" ] ; then
   
@@ -311,35 +339,46 @@ if [ "x$JMXPORT" != "x" -o  "x$JMXSERVERIP" != "x" ] ; then
     errormsg "The JMX server IP must be set, -i 127.0.0.1"
     initerror=true
   fi  
-
 fi
+
+
 
 #########################
 ## Upgrade check
 #########################
 if [ "$upgrade" = "true" ] ; then
-
+  dirowner=$(stat -c %U $BISHOME)
+   
   #Check if the current version can be upgraded
-  oldversion=$(head -1 $BISHOME/version.txt)
-  newversion=$(basename `pwd` | cut -d"-" -f2)
+  if [ "$INSTALL_USER" = "$dirowner" -a -f $BISHOME/version.txt ] ; then 
+    oldversion=$(head -1 $BISHOME/version.txt)
+    newversion=$(basename `pwd` | cut -d"-" -f2)
   
-  upgradedir=${BISHOME}_$oldversion  
-  if [ -d $upgradedir ] ; then
-    errormsg "Copy directory $upgradedir exists, must be removed to upgrade bischeck"
-    initerror=true
-  fi
+    upgradedir=${BISHOME}_$oldversion  
+    if [ -d $upgradedir ] ; then
+      errormsg "Copy directory $upgradedir exists, must be removed to upgrade bischeck"
+      initerror=true
+    fi
     
-  migline=$(grep $oldversion:$newversion: migrationpath.txt 2>&1)
-  migoldver=$(echo $migline | cut -d":" -f1)
-  mignewver=$(echo $migline | cut -d":" -f2)
+    migline=$(grep $oldversion:$newversion: migrationpath.txt 2>&1)
+    migoldver=$(echo $migline | cut -d":" -f1)
+    mignewver=$(echo $migline | cut -d":" -f2)
 
-  if [ "x$migoldver" = "x$oldversion" -a "x$mignewver" = "x$newversion" ] ; then
-    echo "Upgrading bischeck from $oldversion to $newversion"
+    if [ "x$migoldver" = "x$oldversion" -a "x$mignewver" = "x$newversion" ] ; then
+      progress "Upgrading bischeck from $oldversion to $newversion"
+    else
+      errormsg "Upgrading bischeck from $oldversion to $newversion is not supported"
+      initerror=true
+    fi
+    migscript=$(echo $migline | cut -d":" -f3)
   else
-    errormsg "Upgrading bischeck from $oldversion to $newversion is not supported"
+    if [ "$INSTALL_USER" != "$dirowner" ] ; then
+      errormsg "Directory $BISHOME is owned by $dirowner and not by $INSTALL_USER"
+    else
+      errormsg "Directory $BISHOME is not a Bischeck installation"
+    fi
     initerror=true
   fi
-  migscript=$(echo $migline | cut -d":" -f3)
 fi
 
 
@@ -348,8 +387,6 @@ fi
 #########################
 if [ "$initerror" = "true" ] ; then
   getout
-else 
-  echo "Pre-installation completed successful"
 fi
 
 
@@ -357,9 +394,14 @@ fi
 ## Backup old install 
 #########################
 # Create a backup directory of old bischeck installation
+
 if [ "$upgrade" = "true" ] ; then
-  service bischeckd stop
-  echo "Moving old installation to $upgradedir"
+  headline "Prepare for upgrade"
+  if [ "$eid" = "root" ] ; then
+    progress "Stopping running Bischeck"
+    service bischeckd stop
+  fi
+  progress "Moving old installation to $upgradedir"
   mv $BISHOME $upgradedir 
 fi
 
@@ -369,28 +411,27 @@ fi
 #########################
 headline "Do installation of bischeck $newversion"
 if [ ! -d $BISHOME ] ; then
-    echo "Create installation directory $BISHOME"
     mkdir -p $BISHOME
     mkdir $BISHOME/bin
     mkdir $BISHOME/customlib
     mkdir $BISHOME/etc
     mkdir $BISHOME/examples
-  
-    echo "Copy files to installation directory"
+    progress "Created installation directory $BISHOME"
+    
     cp -a lib $BISHOME
     cp -a resources $BISHOME
     cp -a etc $BISHOME
     cp -a examples $BISHOME
     cp svninfo.txt $BISHOME
+    progress "Copy files to installation directory"
     
     echo $VERSION > $BISHOME/version.txt
     
-    echo "Parse all script files"
     # Parse all shell scripts
     for i in `ls scripts/*.template` ; do
       cat  $i| sed -e "s#%BISHOME%#$BISHOME#g" \
         -e "s#%VERSION%#$VERSION#g" \
-        -e "s#%USERINIT%#$USERINIT#g" \
+        -e "s#%INSTALL_USER%#$INSTALL_USER#g" \
         -e "s#%JAVA_HOME%#$JAVA_HOME#g" \
         -e "s#%DISTRO%#$DISTRO#g" \
         -e "s#%JMXPORT%#$JMXPORT#g" \
@@ -398,26 +439,44 @@ if [ ! -d $BISHOME ] ; then
         -e "s#%JMXAUTH%#$JMXAUTH#g" \
         > $BISHOME/bin/`basename ${i%\.template}`
     done
+    progress "All script files parsed"
     chmod 750 $BISHOME/bin/* 
 
-    echo "Install init.d script bischeckd in /etc/init.d"
-    cp $BISHOME/bin/bischeckd /etc/init.d
-    chmod 755 /etc/init.d/bischeckd
-  
-    if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
-        chkconfig --add bischeckd
-    elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
-        update-rc.d bischeckd defaults
+    if [ "$eid" = "root" ] ; then
+        progress "Install init.d script bischeckd in /etc/init.d"
+        cp $BISHOME/bin/bischeckd /etc/init.d
+        chmod 755 /etc/init.d/bischeckd
+    
+        if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+            chkconfig --add bischeckd
+        elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+            update-rc.d bischeckd defaults
+        fi
+        progress "Installed init script bischeckd"
+    else
+        bold INFO
+        echo
+        echo "Installation of the bischeckd init.d script is not done since"
+        echo "installing user is not root"
+        echo "You can install bischeckd later by running:"
+        echo "# cp $BISHOME/bin/bischeckd /etc/init.d"
+        echo "# chmod 755 /etc/init.d/bischeckd"
+        if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+            echo "# chkconfig --add bischeckd"
+        elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+            echo "# update-rc.d bischeckd defaults"
+        fi
     fi
     
-    echo "Change ownership and permissions to install user $USERINIT"
-    chown -R $USERINIT:`id -gn $USERINIT` $BISHOME
+    
+    chown -R $INSTALL_USER:`id -gn $INSTALL_USER` $BISHOME
     # Make all files in etc readable only for group nagios
     chmod 640 $BISHOME/etc/*
     # Jmx password files must be read only by user
     chmod 600 $BISHOME/etc/jmxremote.*
+    progress "Change ownership and permissions to install user $INSTALL_USER"
     
-    echo "Installations complete"
+    echo "Installations completed"
 else
    errormsg "Directory $BISHOME already exists"
    initerror=true
@@ -430,10 +489,11 @@ fi
 #########################
 if [ "$upgrade" = "true" ] ; then
   headline "Upgrade of bischeck $newversion with $oldversion"
-  echo "Copy customlib jars"
   cp -a $upgradedir/customlib/* $BISHOME/customlib/  2>/dev/null
-  echo "Running migrations scripts"    
+  progress "Copy existing customlib jars"    
   sh ./migscripts/$migscript $BISHOME $upgradedir
+  progress "Migrations scripts has been executed"
+  echo "Upgrade completed"
 fi
 
 
