@@ -24,7 +24,7 @@
 # Required-Start:    $syslog $network
 # Required-Stop:     $syslog $network
 # Default-Start:     3 4 5
-# Default-Stop:      0 1 6
+# Default-Stop:      0 1 2 6
 # Short-Description: Start bischeck daemon at boot time
 ### END INIT INFO
 
@@ -32,7 +32,7 @@ JAVA_HOME=%JAVA_HOME%
 PATH=$JAVA_HOME/bin:$PATH
 
 bishome=%BISHOME%
-user=%USERINIT%
+user=%INSTALL_USER%
 DISTRO=%DISTRO%
 
 processName=com.ingby.socbox.bischeck.Execute
@@ -164,7 +164,7 @@ case "$1" in
         start
         ;;
     *)
-        echo $"Usage: $0 {start|stop|status|pidstatus|restart}"
+        echo "Usage: $0 {start|stop|status|pidstatus|restart}"
         exit 1
 esac
 
