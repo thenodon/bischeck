@@ -399,7 +399,16 @@ public final class ConfigurationManager  {
         while (iterhost.hasNext() ) {
             XMLHost hostconfig = iterhost.next(); 
 
-            Host host= null;
+            Host host = null;
+            
+            if (hostconfig.isInactive() != null) {
+                // If host is set to inactive break and take next
+                if (hostconfig.isInactive()) {
+                    LOGGER.debug("Host {} is set to inactive - break", hostconfig.getName());
+                    continue;
+                }
+            }
+            
             if (hostsMap.containsKey(hostconfig.getName())) {
                 host = hostsMap.get(hostconfig.getName());
             }
@@ -432,11 +441,26 @@ public final class ConfigurationManager  {
             
             Service service = null;
             
+                     
             // If a template is detected
-            if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) { 
+            if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) {
+                if (serviceconfig.getServiceoverride() != null && serviceconfig.getServiceoverride().isInactive() != null ){
+                    if (serviceconfig.getServiceoverride().isInactive()) {
+                        LOGGER.debug("Service {} for host {} is set to inactive - break", 
+                                serviceconfig.getName(), host.getHostname());
+                        continue;
+                    }
+                }
             	service = createServiceByTemplate(host, serviceconfig);
             } else {
                 // If a normal service configuration is detected
+                if (serviceconfig.isInactive() != null ){
+                    if (serviceconfig.isInactive()) {
+                        LOGGER.debug("Service {} for host {} is set to inactive - break", 
+                                serviceconfig.getName(), host.getHostname());
+                        continue;
+                    }
+                }
             	service = createServiceByClassic(host, serviceconfig);
 
             }
@@ -594,7 +618,7 @@ public final class ConfigurationManager  {
         	
         	// If a normal service configuration is detected
         	XMLServiceitem serviceitemconfig = iterserviceitem.next();
-        	Aggregation aggregation = null;
+        	
         	if (serviceItemTemplateMap.containsKey(serviceitemconfig.getTemplate())){
         		serviceitem = createServiceItemByTemplate(service,
                         serviceitemconfig);

@@ -23,6 +23,7 @@
         <xsd:complexType>
             <xsd:sequence>
                 <xsd:element ref="name"/>
+                <xsd:element ref="inactive" minOccurs="0" maxOccurs="1"/>
                 <xsd:element ref="alias" minOccurs="0" maxOccurs="1"/>
                 <xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
                 <xsd:element ref="service" minOccurs="1" maxOccurs="unbounded"/>
@@ -47,6 +48,7 @@
     <xsd:group name="serviceGroup">
         <xsd:sequence>
             <xsd:element ref="name"/>
+            <xsd:element ref="inactive" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="alias" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="schedule" minOccurs="1" maxOccurs="unbounded"/>
@@ -62,6 +64,7 @@
         <xsd:complexType>
         <xsd:sequence>
             <xsd:element ref="name" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="inactive" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="alias" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="schedule" minOccurs="0" maxOccurs="unbounded"/>
@@ -181,6 +184,7 @@
     <xsd:element name="template" type="xsd:normalizedString"/>
     
     <xsd:element name="name" type="xsd:normalizedString"/>
+    <xsd:element name="inactive" type="xsd:boolean" default="false" />
     <xsd:element name="alias" type="xsd:normalizedString" />
     <xsd:element name="desc" type="xsd:normalizedString"/>
     <xsd:element name="schedule" type="xsd:normalizedString"/>
