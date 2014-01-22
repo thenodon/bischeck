@@ -165,8 +165,8 @@ public final class Execute implements ExecuteMBean {
                 }
             } catch (Exception e) {
                 LOGGER.error(
-                        "Creating bischeck Configuration Manager failed with: {}"
-                                + e.getMessage(), e);
+                        "Creating bischeck Configuration Manager failed with: {}",
+                        e.getMessage(), e);
                 System.exit(FAILED);
             }
 
