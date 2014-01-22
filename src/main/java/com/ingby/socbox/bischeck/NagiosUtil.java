@@ -22,6 +22,7 @@ package com.ingby.socbox.bischeck;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
@@ -29,6 +30,21 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  * Common utilities to manage Nagios integration 
  */
 public class NagiosUtil {
+    
+    private boolean formatWarnCrit = false;
+
+        
+    public NagiosUtil() {
+        
+        String extendFormat = null;
+        try {
+            extendFormat = ConfigurationManager.getInstance().getProperties().getProperty("NagiosUtil.extendedformat");
+        } catch (NumberFormatException ne ) {
+            this.formatWarnCrit = false;
+        }
+        
+        this.formatWarnCrit = new Boolean(extendFormat);
+    }
     
     /**
      * Formatting to Nagios style return message
@@ -95,36 +111,54 @@ public class NagiosUtil {
                 append(" (NA) ");
                 
                 currentThreshold=new Float(0); //This is so the perfdata will be correct.
-                
             }
 
             // Building the performance string 
-            perfmessage.append(serviceItem.getServiceItemName()).append("=");
-            if (currentMeasure != null) {
-                perfmessage.append(currentMeasure);
-            }
-            perfmessage.append(";");
-            if (warnValue != null) {
-                perfmessage.append(warnValue);
-            }
-            perfmessage.append(";");
-            if (critValue != null) {
-                perfmessage.append(critValue);
-            }
-            perfmessage.append(";0; ");
-            
-            perfmessage.append("threshold=");
-            BigDecimal threshold = new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString());
-            if (threshold != null) {
-                perfmessage.append(threshold);
-            }
-            perfmessage.append(";0;0;0; ");
+            perfmessage.append(performanceMessage(serviceItem, warnValue, critValue,
+                    currentThreshold, currentMeasure));
                 
             totalexectime = (totalexectime + serviceItem.getExecutionTime());
             count++;
         }
         message.append(" | ").append(perfmessage).append("avg-exec-time=").append(((totalexectime/count)+"ms"));
         return message.toString();
+    }
+
+    private StringBuffer performanceMessage(
+            ServiceItem serviceItem, BigDecimal warnValue,
+            BigDecimal critValue, Float currentThreshold, String currentMeasure) {
+        StringBuffer perfmessage = new StringBuffer();
+        
+        perfmessage.append(serviceItem.getServiceItemName()).append("=");
+        if (currentMeasure != null) {
+            perfmessage.append(currentMeasure);
+        }
+        perfmessage.append(";");
+        if (warnValue != null) {
+            perfmessage.append(warnValue);
+        }
+        perfmessage.append(";");
+        if (critValue != null) {
+            perfmessage.append(critValue);
+        }
+        perfmessage.append(";0; ");
+        
+        perfmessage.append("threshold=");
+        BigDecimal threshold = new BigDecimal(Util.roundByOtherString(currentMeasure,currentThreshold).toString());
+        if (threshold != null) {
+            perfmessage.append(threshold);
+        }
+        perfmessage.append(";0;0;0; ");
+        
+        if (formatWarnCrit && currentThreshold != null) {
+            perfmessage.append("warning=");
+            perfmessage.append(warnValue);
+            perfmessage.append(";0;0;0; ");
+            perfmessage.append("critical=");
+            perfmessage.append(critValue);
+            perfmessage.append(";0;0;0; ");
+        }
+        return perfmessage;
     }
 
 }
