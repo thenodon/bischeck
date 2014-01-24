@@ -59,6 +59,9 @@ public class Aggregation {
 			public String schedule() {
 				return "0 0 * ? * MON-FRI";
 			}
+			public String minRetention() {
+                return "25";
+            }
 		}, 
 		DAY { 
 			public String toString() {
@@ -82,6 +85,9 @@ public class Aggregation {
 			public String schedule() {
 				return "0 59 23 ? * MON-FRI";
 			}
+			public String minRetention() {
+                return "7";
+            }
 		}, 
 		WEEK { 
 			public String toString() {
@@ -105,6 +111,9 @@ public class Aggregation {
 			public String schedule() {
 				return "0 59 23 ? * FRI";
 			}
+			public String minRetention() {
+                return "5";
+            }
 		}, 
 
 		MONTH {         	 
@@ -129,6 +138,9 @@ public class Aggregation {
 			public String schedule() {
 				return "0 59 23 L * ?";
 			}
+			public String minRetention() {
+                return "1";
+            }
 		};
 
 		public abstract String prefix();
@@ -137,6 +149,7 @@ public class Aggregation {
 		public abstract String execPrefix();
 		public abstract String schedule();
 		public abstract String scheduleInclWeekend();
+        public abstract String minRetention();
 
 	}
 
@@ -253,7 +266,6 @@ public class Aggregation {
 				serviceItem.setService(service);
 				service.addServiceItem(serviceItem);
 				baseService.getHost().addService(service);
-
 				setRetention(period, aggregated, service, serviceItem);
 			}
 		}
@@ -264,7 +276,14 @@ public class Aggregation {
 		// Calculate the retention if it exists
 		for (XMLRetention retention: aggregated.getRetention()){
 			if (retention.getPeriod().equals(period.prefix())) {
-				retentionMap .put(Util.fullName(service, serviceItem),String.valueOf(retention.getOffset()));
+			    
+			
+			    if (retention.getOffset() >= new Integer(period.minRetention())) {
+			        retentionMap.put(Util.fullName(service, serviceItem),String.valueOf(retention.getOffset()));
+			    } else {
+			        retentionMap.put(Util.fullName(service, serviceItem), period.minRetention());
+			    }
+			    
 			}
 		}
 	}
