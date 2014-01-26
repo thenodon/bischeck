@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<properties>
+    <property>
+        <key>pidfile</key>
+        <value>/var/tmp/bischeck.pid</value>
+    </property>
+    <property>
+        <key>thresholdCacheClear</key>
+        <value>10 0 00 * * ? *</value>
+    </property>
+    <property>
+        <key>JDBCSerivce.querytimeout</key>
+        <value>5</value>
+    </property>
+    <property>
+        <key>mindaysinfirstweek</key>
+        <value>4</value>
+    </property>
+    <property>
+        <key>firstdayofweek</key>
+        <value>2</value>
+    </property>
+    <property>
+        <key>stateOnNull</key>
+        <value>3</value>
+    </property>
+    <property>
+        <key>notFullListParse</key>
+        <value>false</value>
+    </property>
+    
+    <property>
+        <key>sendInternal</key>
+        <value>true</value>
+    </property>
+    <property>
+        <key>sendInternalInterval</key>
+        <value>0 */1 * * * ? *</value>
+    </property>
+    <property>
+        <key>cache.provider.redis.fastCacheSize</key>
+        <value>0</value>
+    </property>
+    <property>
+        <key>cache.provider.redis.auth</key>
+        <value></value>
+    </property>
+    
+  
+      
+    
+</properties>
