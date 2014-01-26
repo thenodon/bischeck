@@ -77,8 +77,6 @@ public final class Execute implements ExecuteMBean {
 
     private static Execute exec = new Execute();
 
-    //private static MBeanServer mbs = null;
-    //private static ObjectName mbeanname = null;
     private MBeanManager mbsMgr = null;
     
     private static final int RESTART = 1000;
@@ -95,27 +93,7 @@ public final class Execute implements ExecuteMBean {
     private static String bischeckversion;
     private static Thread dumpthread;
 
-    /*
-    static {
-        mbs = ManagementFactory.getPlatformMBeanServer();
-
-        try {
-            mbeanname = new ObjectName(ExecuteMBean.BEANNAME);
-        } catch (MalformedObjectNameException e) {
-            LOGGER.error("MBean object name failed, {}", e.getMessage(), e);
-        }
-
-        try {
-            mbs.registerMBean(exec, mbeanname);
-        } catch (InstanceAlreadyExistsException e) {
-            LOGGER.error("Mbean register exception - {}", e.getMessage(), e);
-        } catch (MBeanRegistrationException e) {
-            LOGGER.error("Mbean register exception - {}", e.getMessage(), e);
-        } catch (NotCompliantMBeanException e) {
-            LOGGER.error("Mbean register exception - {}", e.getMessage(), e);
-        }
-    }
-*/
+    
     public static void main(String[] args) {
 
         // create the command line parser
@@ -564,6 +542,7 @@ public final class Execute implements ExecuteMBean {
         return arr;
     }
 
+    
     /**
      * Count the number of active quartz jobs running. The total count is
      * subtracted with the number of admin jobs started by
