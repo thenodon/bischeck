@@ -35,7 +35,7 @@ public class Aggregation {
 
 	private static final String WEEKEND = "/weekend";
 	private static final String URL_SERVICE = "bischeck://cache";
-	
+	private static final String SERVICEITEM_CLASS = "CalculateOnCache";
 	enum AGGREGATION  { 
 		HOUR { 
 			public String toString() {
@@ -253,13 +253,13 @@ public class Aggregation {
 				try {
 					serviceItem = ServiceItemFactory.createServiceItem(
 							baseServiceitem.getServiceItemName(),
-							"CalculateOnCache");
+							SERVICEITEM_CLASS);
 				} catch (ServiceItemFactoryException e) {
 					LOGGER.error("Could not create serviceitem for {}",baseServiceitem.getServiceItemName(), e);
 					throw e;
 				}
 
-				serviceItem.setClassName("CalculateonCache");
+				serviceItem.setClassName(SERVICEITEM_CLASS);
 				serviceItem.setExecution(getAggregatedExecution(period, aggregated,baseService,baseServiceitem));
 
 
