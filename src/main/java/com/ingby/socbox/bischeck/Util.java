@@ -85,34 +85,6 @@ public abstract class Util {
     
     
     /**
-     * Round the float d1 to the to the format of the string d2 
-     * @param d1 
-     * @param d2
-     * @return the parameter d1 with the decimal in the string d1
-     */
-    public static Float roundByOtherString(String d1, Float d2) {
-        if (d1 != null) {
-            int nrdec = getNumberOfDecimalPlace(d1);
-
-            StringBuffer strbuf = new StringBuffer();
-            strbuf.append("#.");
-            for (int i = 0; i< nrdec;i++) { 
-                strbuf.append("#");
-            }
-            
-            DecimalFormat decformatter = decFormatMapCache.get(strbuf.toString());
-            
-            if (decformatter == null) {
-                decformatter = new DecimalFormat(strbuf.toString(),DECIMALSEP);
-                decFormatMapCache.put(strbuf.toString(), decformatter);
-            }
-            return Float.valueOf(decformatter.format(d2));
-        }
-        return d2;
-    }
-
-    
-    /**
      * Round a float to decimal
      * @param d  
      * @return rounded to one decimal
@@ -159,6 +131,8 @@ public abstract class Util {
         }
         return value.length() - 1 - index;
     }
+    
+    
     
     /**
      * Create a host, service and service item name with - separator
@@ -310,4 +284,7 @@ public abstract class Util {
         }
     }
     
+    
 }
+
+
