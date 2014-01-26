@@ -53,6 +53,8 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import ch.qos.logback.classic.Level;
 
+import com.ingby.socbox.bischeck.ExecuteMBean;
+import com.ingby.socbox.bischeck.MBeanManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.servers.Server;
@@ -69,6 +71,7 @@ import com.ingby.socbox.bischeck.xsd.bischeck.XMLBischeck;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLCache;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLCachetemplate;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLHost;
+import com.ingby.socbox.bischeck.xsd.bischeck.XMLPurge;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLService;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLServiceitem;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLServiceitemtemplate;
@@ -93,7 +96,7 @@ import com.yammer.metrics.core.TimerContext;
  *
  */
 
-public final class ConfigurationManager  {
+public final class ConfigurationManager  implements ConfigurationManagerMBean {
     
     private static final String DEFAULT_TRESHOLD = "DummyThreshold";
 
@@ -125,6 +128,8 @@ public final class ConfigurationManager  {
     private int adminJobsCount = 0;
 
     private AtomicBoolean initDone = new AtomicBoolean(false);
+    
+    private MBeanManager mbsMgr = null;
     
     public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
@@ -169,7 +174,10 @@ public final class ConfigurationManager  {
     }
 
     
-    private ConfigurationManager() {}    
+    private ConfigurationManager() {
+        mbsMgr = new MBeanManager(this,ConfigurationManagerMBean.BEANNAME);
+        mbsMgr.registerMBeanserver();
+    }    
     
     /**
      * Allocate all configuration data structures
@@ -235,7 +243,7 @@ public final class ConfigurationManager  {
             configMgr = new ConfigurationManager();
 
     	final Timer timer = Metrics.newTimer(ConfigurationManager.class, 
-				"ConfigurationInit" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				"init" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 
         configMgr.allocateDataStructs();
@@ -661,17 +669,20 @@ public final class ConfigurationManager  {
         /*
          * Check for cache directive
          */
+        XMLPurge xmlPurge = null;
         if (serviceitemconfig.getCache() != null) {
             if (serviceitemconfig.getCache().getTemplate() == null) {
                 // No template based
+                xmlPurge = serviceitemconfig.getCache().getPurge();
                 aggregation = new Aggregation(serviceitemconfig.getCache(),service,serviceitem);
             } else {
                 // Template based
+                xmlPurge = cacheTemplateMap.get(serviceitemconfig.getCache().getTemplate()).getPurge();
                 aggregation = new Aggregation(cacheTemplateMap.get(serviceitemconfig.getCache().getTemplate()),service,serviceitem);    
             }
             aggregation.setAggregate(url2service);
             setPurgeMap(aggregation.getRetentionMap());
-            setPurge(serviceitemconfig.getCache(),service,serviceitem);
+            setPurge(xmlPurge,service,serviceitem);
         }
         return serviceitem;
     }
@@ -734,23 +745,28 @@ public final class ConfigurationManager  {
         /*
          * Check for cache directive
          */
+        XMLCache xmlCache = null;
+        XMLPurge xmlPurge = null;
+        
         if (template.getCache() != null) {
             if (template.getCache().getTemplate() == null) { 
-                // No template based
-                aggregation = new Aggregation(template.getCache(),service,serviceitem);
+                // Not template based
+                xmlCache = template.getCache();
+                xmlPurge = xmlCache.getPurge();
+                aggregation = new Aggregation(xmlCache,service,serviceitem);
             } else {
                 // Template based
+                xmlPurge = cacheTemplateMap.get(template.getCache().getTemplate()).getPurge();
                 aggregation = new Aggregation(cacheTemplateMap.get(template.getCache().getTemplate()),service,serviceitem); 
             }    
             aggregation.setAggregate(url2service);
             setPurgeMap(aggregation.getRetentionMap());
-            setPurge(template.getCache(),service,serviceitem);
+            setPurge(xmlPurge,service,serviceitem);
         }
         return serviceitem;
     }
     
     
-
     /**
      * A Map with the key servicedefs and the value of the max number in the 
      * cache before purging. 
@@ -764,25 +780,23 @@ public final class ConfigurationManager  {
 	/**
      * For serviceitem that has <purge> defined the purging will be set up.
      * Currently supporting only <maxcount>
-     * @param xmlconfig
+     * @param xmlPurge
      * @param service
      * @param serviceitem
      */
-	private void setPurge(XMLCache xmlconfig, Service service, ServiceItem serviceitem) {
-		if (xmlconfig == null)
-			return;
-		
-		if (xmlconfig.getPurge() != null) {
-			String key = Util.fullName(service, serviceitem);
-			if(xmlconfig.getPurge().getMaxcount() != null) {
-				purgeMap.put(key, String.valueOf(xmlconfig.getPurge().getMaxcount()));
-			} else if (xmlconfig.getPurge().getOffset() != null && xmlconfig.getPurge().getPeriod() != null) {
-				purgeMap.put(key, "-" + xmlconfig.getPurge().getOffset() + xmlconfig.getPurge().getPeriod());
-			}
-		}
-	}
+	private void setPurge(XMLPurge xmlPurge, Service service, ServiceItem serviceitem) {
+        if (xmlPurge == null)
+            return;
+        
+        String key = Util.fullName(service, serviceitem);
+        if(xmlPurge.getMaxcount() != null) {
+            purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
+        } else if (xmlPurge.getOffset() != null && xmlPurge.getPeriod() != null) {
+            purgeMap.put(key, "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
+        }
+    }
     
-
+	
 	private void initServers() throws ConfigurationException {
         XMLServers serversconfig = (XMLServers) xmlFileMgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.SERVERS);
 
@@ -1205,4 +1219,21 @@ public final class ConfigurationManager  {
         }
     }
 
+    @Override
+    public String getHostConfiguration(String hostname) {
+        Host host = getHostConfig().get(hostname);
+        return ConfigMacroUtil.dump(host).toString();
+    }
+    
+    
+    @Override
+    public String getPurgeConfiguration() {
+        
+        StringBuffer strbuf = new StringBuffer();
+        Map<String,String> map = getPurgeMap();
+        for (String fullname: map.keySet()) {
+            strbuf.append(fullname).append(":").append(map.get(fullname)).append("\n");
+        }
+        return strbuf.toString();
+    }
 }
