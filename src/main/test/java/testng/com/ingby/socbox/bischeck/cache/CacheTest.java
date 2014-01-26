@@ -29,6 +29,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 import com.ingby.socbox.bischeck.cache.CacheException;
@@ -53,14 +54,16 @@ public class CacheTest {
 	@BeforeClass
 	public void beforeTest() throws Exception {
 
-		confMgmr = ConfigurationManager.getInstance();
-
-		if (confMgmr == null) {
-			System.setProperty("bishome", ".");
-			ConfigurationManager.init();
-			confMgmr = ConfigurationManager.getInstance();	
-		}
-
+	    try {
+            confMgmr = ConfigurationManager.getInstance();
+        } catch (java.lang.IllegalStateException e) {
+            System.setProperty("bishome", ".");
+            System.setProperty("xmlconfigdir","testetc");
+            
+            ConfigurationManager.init();
+            confMgmr = ConfigurationManager.getInstance();  
+        }    
+    
 		if (ConfigurationManager.getInstance().getProperties().
 				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
 			supportNull = true;

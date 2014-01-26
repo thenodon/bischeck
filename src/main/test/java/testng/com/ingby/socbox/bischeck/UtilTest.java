@@ -34,16 +34,19 @@ import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class UtilTest {
-	
+    ConfigurationManager confMgmr = null;
 	@BeforeTest
     public void beforeTest() throws Exception {
-		ConfigurationManager confMgmr = ConfigurationManager.getInstance();
-		
-		if (confMgmr == null) {
-			System.setProperty("bishome", ".");
-			ConfigurationManager.init();
-			confMgmr = ConfigurationManager.getInstance();
-		}	
+	    try {
+            confMgmr = ConfigurationManager.getInstance();
+        } catch (java.lang.IllegalStateException e) {
+            System.setProperty("bishome", ".");
+            System.setProperty("xmlconfigdir","testetc");
+            
+            ConfigurationManager.init();
+            confMgmr = ConfigurationManager.getInstance();  
+        }
+
 	}
 	
     @Test (groups = { "Util" })
@@ -88,13 +91,10 @@ public class UtilTest {
     	Assert.assertEquals(Util.obfuscatePassword("fdsfspassword=ksfdlf;fds"),"fdsfspassword=xxxxx;fds");
     }
 
-    @Test (groups = { "Util" })
-    public void roundByOtherString() {
-    	Assert.assertEquals(Util.roundByOtherString("11.102", new Float ("10.1031")),new Float("10.103"));
-    }
-
+    
     @Test (groups = { "Util" })
     public void roundDecimals() {
     	Assert.assertEquals(Util.roundDecimals(new Float("10.103000001")),new Float("10.103"));
+    	Assert.assertEquals(Util.roundDecimals(new Float("0.00000001")),new Float("1E-8"));
     }
 }

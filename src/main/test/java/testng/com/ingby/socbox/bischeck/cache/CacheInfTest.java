@@ -54,14 +54,15 @@ public class CacheInfTest {
 	@BeforeClass
 	public void beforeTest() throws Exception {
 
-		confMgmr = ConfigurationManager.getInstance();
-
-		if (confMgmr == null) {
-			System.setProperty("bishome", ".");
-			ConfigurationManager.init();
-			confMgmr = ConfigurationManager.getInstance();	
-		}
-		
+	    try {
+            confMgmr = ConfigurationManager.getInstance();
+        } catch (java.lang.IllegalStateException e) {
+            System.setProperty("bishome", ".");
+            System.setProperty("xmlconfigdir","testetc");
+            
+            ConfigurationManager.init();
+            confMgmr = ConfigurationManager.getInstance();  
+        }    		
 		//caches.put("LastStatusCache", new com.ingby.socbox.bischeck.cache.provider.laststatuscache.)
 		
 	}

@@ -30,6 +30,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 
+import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
@@ -53,14 +54,16 @@ public class SQLServiceitemTest {
 	public void beforeTest() throws Exception {
 
 		System.out.println("======== BeforeClass " + SQLServiceitemTest.class.getName());
-		confMgmr = ConfigurationManager.getInstance();
-
-		if (confMgmr == null) {
-			System.setProperty("bishome", ".");
-			ConfigurationManager.init();
-			confMgmr = ConfigurationManager.getInstance();
-		}
-
+		try {
+            confMgmr = ConfigurationManager.getInstance();
+        } catch (java.lang.IllegalStateException e) {
+            System.setProperty("bishome", ".");
+            System.setProperty("xmlconfigdir","testetc");
+            
+            ConfigurationManager.init();
+            confMgmr = ConfigurationManager.getInstance();  
+        }    
+    
 
 		jdbc = new JDBCService("test");
 		jdbc.setConnectionUrl("jdbc:derby:memory:myDB;create=true");

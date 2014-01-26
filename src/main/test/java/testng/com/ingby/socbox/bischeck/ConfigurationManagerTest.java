@@ -37,9 +37,9 @@ public class ConfigurationManagerTest {
 	@BeforeTest
     public void beforeTest() throws Exception {
 
-		confMgmr = ConfigurationManager.getInstance();
-
-		if (confMgmr == null) {
+	    try {
+	        confMgmr = ConfigurationManager.getInstance();
+	    } catch (java.lang.IllegalStateException e) {
 			System.setProperty("bishome", ".");
 			System.setProperty("xmlconfigdir","testetc");
 			

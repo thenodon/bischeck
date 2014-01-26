@@ -32,12 +32,21 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 public class QueryDateTest {
 	
-	Calendar now;
+	private Calendar now;
+	private ConfigurationManager confMgmr;
+	
 	@BeforeTest
     public void beforeTest() throws Exception {
-            System.setProperty("bishome",".");
+        try {
+            confMgmr = ConfigurationManager.getInstance();
+        } catch (java.lang.IllegalStateException e) {
+            System.setProperty("bishome", ".");
+            System.setProperty("xmlconfigdir","testetc");
+            
             ConfigurationManager.initonce();
-            now = BisCalendar.getInstance();	
+            confMgmr = ConfigurationManager.getInstance();  
+        }    
+        now = BisCalendar.getInstance();	
     }
     
     @Test (groups = { "QueryDate" })

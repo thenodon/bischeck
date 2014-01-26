@@ -25,6 +25,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 
+import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
@@ -46,14 +47,17 @@ public class CheckCommandServiceitemTest {
 	public void beforeTest() throws Exception {
 
 		System.out.println("======== BeforeClass " + CheckCommandServiceitemTest.class.getName());
-		confMgmr = ConfigurationManager.getInstance();
-
-		if (confMgmr == null) {
-			System.setProperty("bishome", ".");
-			ConfigurationManager.init();
-			confMgmr = ConfigurationManager.getInstance();
-		}
-
+		
+		try {
+            confMgmr = ConfigurationManager.getInstance();
+        } catch (java.lang.IllegalStateException e) {
+            System.setProperty("bishome", ".");
+            System.setProperty("xmlconfigdir","testetc");
+            
+            ConfigurationManager.init();
+            confMgmr = ConfigurationManager.getInstance();  
+        }    
+    
 		shell = new ShellService("serviceName");
 
 		CacheFactory.init();
