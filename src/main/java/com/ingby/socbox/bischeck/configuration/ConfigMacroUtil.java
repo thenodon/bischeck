@@ -37,8 +37,6 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  * </li>
  * </ul>
  * 
- * @author andersh
- *
  */
 public class ConfigMacroUtil {
 	private final static Logger  LOOGER = LoggerFactory.getLogger(ConfigMacroUtil.class);
@@ -50,59 +48,76 @@ public class ConfigMacroUtil {
     private final static String SERVICE_ALIAS_MACRO = "\\$\\$SERVICEALIAS\\$\\$";
     private final static String SERVICEITEM_ALIAS_MACRO = "\\$\\$SERVICEITEMALIAS\\$\\$";
     
+    
+    /**
+     * Dump the configuration for a specific host
+     * @param host
+     * @return the full configuration
+     */
     public static StringBuffer dump(Host host) {
+        
+        if (host == null) {
+            return new StringBuffer().append("");
+        }
+        
     	StringBuffer strbuf = new StringBuffer();
     	
-    	strbuf.append("#Host#").append("\n");
-    	strbuf.append("name# ");
-    	strbuf.append(host.getHostname()).append("\n");
-    	strbuf.append("alias# ");
+    	strbuf.append("Host> ").append(host.getHostname()).append("\n");
+    	//strbuf.append("name: ");
+    	//strbuf.append(host.getHostname()).append("\n");
+    	strbuf.append("alias: ");
 		strbuf.append(host.getAlias()).append("\n");
-		strbuf.append("desc# ");
+		strbuf.append("desc: ");
     	strbuf.append(host.getDecscription()).append("\n");
     	
     	for (String serviceName: host.getServices().keySet()) {
     		Service service = host.getServiceByName(serviceName);
-    		strbuf.append("#Service#").append("\n");
-    		strbuf.append("name# ");
-    		strbuf.append(service.getServiceName()).append("\n");
-    		strbuf.append("alias# ");
+    		strbuf.append("Service> ").append(service.getServiceName()).append("\n");
+    		//strbuf.append("  name: ");
+    		//strbuf.append(service.getServiceName()).append("\n");
+    		strbuf.append("  alias: ");
     		strbuf.append(service.getAlias()).append("\n");
-    		strbuf.append("desc# ");
+    		strbuf.append("  desc: ");
     		strbuf.append(service.getDecscription()).append("\n");
     		
     		if (service.getSchedules() != null) {
     			for (String str: service.getSchedules()) {
-    				strbuf.append("sched# ");
+    				strbuf.append("  sched: ");
     				strbuf.append(str).append("\n");
     			}
     		}
     		else {
-    			strbuf.append("sched# null");
+    			strbuf.append("  sched: null");
     		}
-    		strbuf.append("send# ");
+    		strbuf.append("  send: ");
     		strbuf.append(service.isSendServiceData()).append("\n");
-    		strbuf.append("curl# ");
+    		strbuf.append("  url: ");
     		strbuf.append(service.getConnectionUrl()).append("\n");
-    		strbuf.append("driver# ");
+    		strbuf.append("  driver: ");
     		strbuf.append(service.getDriverClassName()).append("\n");
     		
     		for (String serviceItemName : service.getServicesItems().keySet()) {
     			ServiceItem serviceItem = service.getServiceItemByName(serviceItemName);
-    			strbuf.append("#Serviceitem#").append("\n");
-    			strbuf.append("name# ");
-    			strbuf.append(serviceItem.getServiceItemName()).append("\n");
-    			strbuf.append("alias# ");
+    			strbuf.append("ServiceItem> ").append(serviceItem.getServiceItemName()).append("\n");
+    			//strbuf.append("   name: ");
+    			//strbuf.append(serviceItem.getServiceItemName()).append("\n");
+    			strbuf.append("   alias: ");
         		strbuf.append(serviceItem.getAlias()).append("\n");
-        		strbuf.append("desc# ");
+        		strbuf.append("   desc: ");
     			strbuf.append(serviceItem.getDecscription()).append("\n");
-    			strbuf.append("exec# ");
+    			strbuf.append("   exec: ");
     			strbuf.append(serviceItem.getExecution()).append("\n");
+    			strbuf.append("   serviceitemclass: ");
+                strbuf.append(serviceItem.getClassName()).append("\n");
+                strbuf.append("   thresholdclass: ");
+                strbuf.append(serviceItem.getThresholdClassName()).append("\n");
     		}
+    		//strbuf.append("\n");
     	}
     	
     	return strbuf;
     }
+    
     
     /**
      * The method replace all NAME macros with the paramters 
