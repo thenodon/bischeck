@@ -206,6 +206,22 @@ LatexCommand tableofcontents
 Getting help
 \end_layout
 
+\begin_layout Standard
+More information about Bischeck and related projects can be found on 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+www.bischeck.org
+\end_layout
+
+\end_inset
+
+.
+ 
+\end_layout
+
 \begin_layout Chapter
 \begin_inset CommandInset label
 LatexCommand label
@@ -213,7 +229,11 @@ name "label:Installation"
 
 \end_inset
 
-Installation 
+Installation and upgrading
+\end_layout
+
+\begin_layout Section
+Installation
 \end_layout
 
 \begin_layout Standard
@@ -234,7 +254,12 @@ http://www.bischeck.org
 
 \begin_layout Standard
 Download the distribution file and follow the steps below to install.
- Make sure you have root privileges doing this.
+ Make sure you have 
+\series bold
+root
+\series default
+ privileges when running the installation if you like the init scripts to
+ be installed for automatic startup and shutdown.
  
 \end_layout
 
@@ -285,12 +310,129 @@ status open
 \end_layout
 
 \begin_layout Standard
-To get full list of available options to the install script use 
+To get a full list of available options to the install script use 
 \emph on
 -u
 \emph default
 .
- By default the 
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# ./install -u 
+\end_layout
+
+\begin_layout Plain Layout
+
+Welcome to bischeck 1.0.0_RC2 installer 
+\end_layout
+
+\begin_layout Plain Layout
+
+==================================== 
+\end_layout
+
+\begin_layout Plain Layout
+
+Copyright Anders Håål, Ingenjörsbyn AB 2011-2013 
+\end_layout
+
+\begin_layout Plain Layout
+
+Licensed under GPL version 2
+\end_layout
+
+\begin_layout Plain Layout
+
+Usage for the bischeck installer 
+\end_layout
+
+\begin_layout Plain Layout
+
+-u show usage.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-U the user name to install bischeck as and run the daemon as - default
+ nagios.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-J java home directory, no default value.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-I installation directory for bischeck - default /opt/socbox/addons/bischeck.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-R uninstall - permanently remove the installation.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-X upgrade from current version - if possible.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-d set the linux distribution name if the installer can not detected.
+ Supported are    
+\end_layout
+
+\begin_layout Plain Layout
+
+   rh, rhel, redhatenterpriseserver, centos, debian and ubuntu 
+\end_layout
+
+\begin_layout Plain Layout
+
+-p the port number for the JMX RMI server, for example 3333.
+ No default value.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-i the IP address where the RMI port should run, for example 127.0.0.1.
+ No default value.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-a if authentication should be used applied on JMX connection.
+ Default is false.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+By default the 
 \emph on
 install
 \emph default
@@ -300,9 +442,9 @@ install
 \emph default
 , referred to as 
 \emph on
-$BISHOME,
+$BISHOME 
 \emph default
- and with the ownership of the user id 
+in this documentation and with the ownership of the user id 
 \emph on
 nagios
 \emph default
@@ -312,7 +454,7 @@ nagios
 
 \begin_layout Standard
 The last commands start the Bischeck daemon with the effective user id of
- the user id set during install, default user 
+ the user id set during the installation, default user 
 \emph on
 nagios
 \emph default
@@ -322,15 +464,98 @@ nagios
 \end_layout
 
 \begin_layout Standard
-The process id of the java process running Bischeck in daemon mode is located
- in a file, default in 
+The process id of the java process running Bischeck in daemon mode will
+ be stored in a file, default in 
 \emph on
 /var/tmp/bischeck.pid
 \emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The location of the pid file can be changed by setting in the Bischeck propertie
+s.xml file.
+ More info in the 
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck configuration guide
+\end_layout
+
+\end_inset
+
 .
  This file is used by the bischeckd script to stop the java program running
  Bischeck and make sure that only one instance of Bischeck is started on
  the server.
+ 
+\end_layout
+
+\begin_layout Subsection
+Installation directory structure
+\end_layout
+
+\begin_layout Standard
+When the installation is complete the following directory structure exists:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$BISHOME - 
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- /bin        - Scripts and init scripts 
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- /customlib  - Custom jar files, like jdbc drivers 
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- /etc        - Bischeck XML based configuration files
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- /lib        - All jar files requiered for Bischeck
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- /resources  - Different resources files, like XML schema files,
+ logback.xml, etc.
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- svninfo.txt - Subversion commit number of the Bischeck build
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- version.txt - Bischeck version
+\end_layout
+
+\begin_layout Plain Layout
+
+ 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -345,8 +570,16 @@ Upgrading
 
 \begin_layout Standard
 From version 0.3.2 upgrading is possible.
- If you already have an installation download the new version as described
- in the previous chapter but to upgrade run: 
+ Download the new version as described in the previous chapter, but to upgrade
+ run the 
+\emph on
+install
+\emph default
+ script with the option 
+\emph on
+-X
+\emph default
+: 
 \end_layout
 
 \begin_layout Standard
@@ -357,7 +590,7 @@ status open
 
 \begin_layout Plain Layout
 
-# ./install -I /opt/socbox/addons/bischeck -X
+# ./install -X
 \end_layout
 
 \end_inset
@@ -366,12 +599,39 @@ status open
 \end_layout
 
 \begin_layout Standard
-The upgrade will save the current installation in a directory parallel to
- the new version named 
+The upgrade will automatically stop the currently running Bischeck and save
+ the current installation in a directory parallel to the new version named
+ 
 \emph on
 bischeck_x.y.z
 \emph default
 , where x.y.z is the version of the old installation.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# ./install -I /usr/local/bischeck -X
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+-I
+\emph default
+ switch must be used if the current installed Bischeck is not in the default
+ installation directory.
 \end_layout
 
 \begin_layout Standard
@@ -379,12 +639,12 @@ The file
 \emph on
 migrationpath.txt
 \emph default
- describe the supported upgrade paths and what migration scripts that will
- be run by the 
+ describe the supported upgrade paths and the migration scripts that will
+ run by the 
 \emph on
 install
 \emph default
- script when running in upgrade mode, -X.
+ script.
 \end_layout
 
 \begin_layout Standard
@@ -425,9 +685,10 @@ $BISHOME/etc
 \emph default
  directory there are working examples of all the configuration files.
  These works as an examples to get started with a simple Bischeck setup
- of monitoring the response time of a tcp ping on the ssh port, port 22.
+ of monitoring the response time of a tcp ping on the ssh port, port 22,
+ of localhost.
  You will find this familiar if you been using Nagios before and the example
- use the well known check command 
+ use the well known Nagios check command, 
 \emph on
 check_tcp
 \emph default
@@ -439,9 +700,9 @@ check_tcp
 \begin_layout Enumerate
 Go to the 
 \emph on
-etc
+$BISHOME/etc
 \emph default
- directory where you installed Bischeck, default is 
+ directory, default is 
 \emph on
 /opt/socbox/addons
 \emph default
@@ -466,7 +727,7 @@ check_tcp
 \emph on
 /usr/lib/nagios/plugins
 \emph default
- you do not need to edit the file 
+ you do not need to edit the file.
 \end_layout
 
 \begin_layout Enumerate
@@ -476,13 +737,21 @@ servers.xml
 \emph default
  file to add correct host name, line 12, and password , line 22, for your
  NSCA server.
- Even if you do not have a NSCA server defined Bischeck will still run but
- with a connection error when trying to send data to NSCA.
+ Even if you do not have a NSCA server defined Bischeck will still run,
+ but with a connection error when trying to send data to NSCA.
 \end_layout
 
 \begin_layout Enumerate
 Now you are done to start Bischeck and checkout what happens in the log
  file.
+ See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "label:Logging"
+
+\end_inset
+
+for more info about Bischeck logging.
 \end_layout
 
 \begin_layout Standard
@@ -537,11 +806,15 @@ Jar customization
 \begin_layout Standard
 To support custom jar files please place them in the directory 
 \emph on
-customlib
+$BISHOME/customlib
 \emph default
 .
  This would typical be jdbc drivers, custom threshold classes, etc.
- Any jar file in the customlib will automatically be class loaded by Bischeck.
+ Any jar file in the 
+\emph on
+$BISHOME/customlib
+\emph default
+ will automatically be class loaded by Bischeck.
 \end_layout
 
 \begin_layout Section
@@ -570,9 +843,9 @@ http://logback.qos.ch/
  The logback configuration is described in the logback.xml file located in
  the 
 \emph on
-resources
+$BISHOME/resources
 \emph default
- directory of the Bischeck installation.
+ directory.
  By default Bischeck writes log information at level INFO to file 
 \emph on
 /var/tmp/bischeck.log.
