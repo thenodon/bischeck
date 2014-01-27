@@ -83,12 +83,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
     
     private static MBeanManager mbsMgr = null;
     
-    private static String redisserver;
-    private static int redisport;
-    private static String redisauth = null;
-    private static int redisdb;
-    private static int redistimeout;
-
     private JedisPoolWrapper jedispool = null;
     
     private Lookup lu = null;
@@ -97,7 +91,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
     private AtomicLong rediscachehitcount = new AtomicLong();
     private boolean fastCacheEnable = true;
     
-    private LastStatusCache() {
+    private LastStatusCache(String redisserver, int redisport, int redistimeout, String redisauth, int redisdb) {
         fastCache = new ConcurrentHashMap<String,CacheQueue<LastStatus>>();
         
         jedispool = new JedisPoolWrapper(redisserver,redisport,redistimeout,redisauth,redisdb);    
@@ -109,16 +103,22 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
      * Return the cache reference
      * @return
      */
-    public static LastStatusCache getInstance() {
+    synchronized public static LastStatusCache getInstance() {
         if (lsc == null) {
-            LOGGER.error("Cache has not been initilized, must call init() first");
+        	LOGGER.error("Cache has not been initilized, must call init() first");
         }
         return lsc;
     }
     
-    public static synchronized void init() throws CacheException {
+    synchronized public static void init() throws CacheException {
         if (lsc == null) {
-            
+
+           String redisserver;
+           int redisport;
+           String redisauth = null;
+           int redisdb;
+           int redistimeout;
+
             redisserver = ConfigurationManager.getInstance().getProperties().
                     getProperty("cache.provider.redis.server","localhost");
 
@@ -160,7 +160,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
                 redistimeout=2000;
             }
             
-            lsc = new LastStatusCache();
+            lsc = new LastStatusCache(redisserver, redisport, redistimeout, redisauth, redisdb);
             lsc.testConnection();
     
             mbsMgr = new MBeanManager(lsc, BEANNAME);
