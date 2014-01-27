@@ -60,6 +60,7 @@ import com.ingby.socbox.bischeck.internal.InternalSurveillance;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
+import com.sun.org.apache.xml.internal.security.utils.IgnoreAllErrorHandler;
 
 /**
  * The Execute class is the main class to start Bischeck.
@@ -273,7 +274,7 @@ public final class Execute implements ExecuteMBean {
                     .getProperty("loopTimeout", "" + LOOPTIMEOUTDEF));
         } catch (NumberFormatException ne) {
             LOGGER.warn("Property loopTimeout was not a number. Set to {}",
-                    LOOPTIMEOUTDEF);
+                    LOOPTIMEOUTDEF, ne);
             looptimeout = LOOPTIMEOUTDEF;
         }
 
@@ -284,7 +285,7 @@ public final class Execute implements ExecuteMBean {
                     .getProperty("shutdownWait", "" + SHUTDOWNSLEEPDEF));
         } catch (NumberFormatException ne) {
             LOGGER.warn("Property shutdownWait no correctly set. Set to {}",
-                    SHUTDOWNSLEEPDEF);
+                    SHUTDOWNSLEEPDEF, ne);
             shutdownsleep = SHUTDOWNSLEEPDEF;
         }
 
@@ -302,6 +303,7 @@ public final class Execute implements ExecuteMBean {
                     syncObj.wait(looptimeout);
                 }
             } catch (InterruptedException ignore) {
+            	LOGGER.info("Interrupted while loop timeout", ignore);
             }
 
             // If no remaining triggers - shutdown
@@ -430,6 +432,7 @@ public final class Execute implements ExecuteMBean {
                 try {
                     dumpthread.join();
                 } catch (InterruptedException ignore) {
+                	LOGGER.info("Interrupted while waiting on dumpthread thread to complete", ignore);
                 }
             }
         });
@@ -450,8 +453,8 @@ public final class Execute implements ExecuteMBean {
 
         try {
             Thread.sleep(shutdownsleep);
-        } catch (InterruptedException e) {
-            LOGGER.error("Interrupted while waiting on main deamon thread to complete");
+        } catch (InterruptedException ignore) {
+            LOGGER.info("Interrupted while waiting on main deamon thread to complete", ignore);
         }
     }
 
@@ -595,7 +598,7 @@ public final class Execute implements ExecuteMBean {
             LOGGER.info("Bisheck version is {}", version);
         } catch (Exception ioe) {
             version = "N/A";
-            LOGGER.warn("Can not determine the bischeck version");
+            LOGGER.warn("Can not determine the bischeck version", ioe);
         } finally {
             try {
                 br.close();
