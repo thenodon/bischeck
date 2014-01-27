@@ -125,7 +125,7 @@
 
 
     <target name="testng" depends="compileng">
-        <jacoco:coverage destfile="${testoutput.dir}/jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
+        <jacoco:coverage destfile="${testoutput.dir}/jacoco-exec/jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
           <testng outputdir="${testoutput.dir}">
             <sysproperty key="bishome" value="${basedir}"/>
 
