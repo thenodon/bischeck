@@ -29,7 +29,7 @@ public class CacheFactory {
 	 * @return the cache object. If the cache has not been initialized return 
 	 * @throws  IllegalStateException If the cache factory has not been initialized
 	 */
-	public static CacheInf getInstance() {
+	synchronized public static CacheInf getInstance() {
 
 		if (cache == null) {
 			LOGGER.error("Cache factory has not been initialized"); 
