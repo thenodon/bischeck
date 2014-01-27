@@ -29,7 +29,7 @@
 	<property name="testoutput.dir" value="${basedir}/test-output" />
 	    
 
-    <property name="sonar.dynamicAnalysis" value="reuseReports" />
+    <!-- <property name="sonar.dynamicAnalysis" value="reuseReports" /> -->
 
     <!--  === Compilation Control Options ================================ -->
     <property name="compile.debug" value="true" />
