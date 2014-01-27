@@ -60,7 +60,6 @@ import com.ingby.socbox.bischeck.internal.InternalSurveillance;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
-import com.sun.org.apache.xml.internal.security.utils.IgnoreAllErrorHandler;
 
 /**
  * The Execute class is the main class to start Bischeck.
