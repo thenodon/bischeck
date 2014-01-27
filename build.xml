@@ -26,7 +26,8 @@
     <property name="javac_target" value="6" />
     <property name="javac_src" value="6" />
     <property name="version.file" value="${basedir}/version.txt" />
-    
+	<property name="testoutput.dir" value="${basedir}/test-output" />
+	    
 
     <property name="sonar.dynamicAnalysis" value="reuseReports" />
 
@@ -43,12 +44,21 @@
         </fileset>
     </path>
 
+    <path id="test.classpath">
+        <fileset dir="${basedir}/buildlib/">
+           <include name="*.jar" />
+        </fileset>
+    </path>
 
 
     <!-- ==== Task definitions =========================================== -->
 
     <taskdef name="testng" classname="org.testng.TestNGAntTask">
-        <classpath refid="compile.classpath"/>
+        <classpath refid="test.classpath"/>
+    </taskdef>
+
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+    	<classpath refid="test.classpath"/>
     </taskdef>
 
     <!-- === All Target ================================================= -->
@@ -93,7 +103,7 @@
 
 
     <target name="test" depends="dist, compileng">
-       <testng>
+       <testng outputdir="${testoutput.dir}">
             <sysproperty key="bishome" value="${basedir}"/>
 
             <classpath>
@@ -115,7 +125,8 @@
 
 
     <target name="testng" depends="compileng">
-        <testng>
+        <jacoco:coverage destfile="${testoutput.dir}/jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
+          <testng outputdir="${testoutput.dir}">
             <sysproperty key="bishome" value="${basedir}"/>
 
             <classpath>
@@ -135,6 +146,7 @@
 
             <classfileset dir="${build.home}/classes" includes="testng/**/*.class"/> 
         </testng>
+        </jacoco:coverage>   
     </target>
 
 
