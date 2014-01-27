@@ -21,8 +21,6 @@ package com.ingby.socbox.bischeck.host;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.service.Service;
 
@@ -32,7 +30,6 @@ import com.ingby.socbox.bischeck.service.Service;
  */
 public class Host {
 
-    private final static Logger  LOGGER = LoggerFactory.getLogger(Host.class);
     
     private String hostname;
     private HashMap<String,Service> services = new HashMap<String,Service>();
