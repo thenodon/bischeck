@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
+etc=$1
+shift
 program=$1
 shift
 arg=$@
@@ -24,13 +25,15 @@ ant compile
 jmxport=-Dcom.sun.management.jmxremote.port=3333 
 jmxssl=-Dcom.sun.management.jmxremote.ssl=false 
 jmxauth=-Dcom.sun.management.jmxremote.authenticate=false 
-jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
-jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+#jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
+#jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
 
 jmx="$jmxport $jmxssl $jmxauth $jmxpasswd $jmxaccess"
 #jmem="-XX:+TraceClassloading -Xmx30m"
 #debug="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
-java $debug $jmx $jmem -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=etc \
+# -classpath $bishome/src/main/resources:$bishome/target/classes:$bishome/lib/*:$bishome/customlib/* \
+# -classpath $bishome/src/main/resources:$bishome/bin:$bishome/lib/*:$bishome/customlib/* \
+java $debug $jmx $jmem -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=$etc \
  -classpath $bishome/src/main/resources:$bishome/target/classes:$bishome/lib/*:$bishome/customlib/* \
  com.ingby.socbox.bischeck.$program $arg 
 
