@@ -49,70 +49,72 @@ public class ConfigMacroUtil {
     private final static String SERVICEITEM_ALIAS_MACRO = "\\$\\$SERVICEITEMALIAS\\$\\$";
     
     
+    
     /**
      * Dump the configuration for a specific host
      * @param host
      * @return the full configuration
      */
     public static StringBuffer dump(Host host) {
-        
+    	final String separator = System.getProperty("line.separator");
+    	
         if (host == null) {
             return new StringBuffer().append("");
         }
         
     	StringBuffer strbuf = new StringBuffer();
     	
-    	strbuf.append("Host> ").append(host.getHostname()).append("\n");
+    	strbuf.append("Host> ").append(host.getHostname()).append(separator);
     	//strbuf.append("name: ");
-    	//strbuf.append(host.getHostname()).append("\n");
+    	//strbuf.append(host.getHostname()).append(separator);
     	strbuf.append("alias: ");
-		strbuf.append(host.getAlias()).append("\n");
+		strbuf.append(host.getAlias()).append(separator);
 		strbuf.append("desc: ");
-    	strbuf.append(host.getDecscription()).append("\n");
+    	strbuf.append(host.getDecscription()).append(separator);
     	
     	for (String serviceName: host.getServices().keySet()) {
     		Service service = host.getServiceByName(serviceName);
-    		strbuf.append("Service> ").append(service.getServiceName()).append("\n");
+    		strbuf.append("Service> ").append(service.getServiceName()).append(separator);
     		//strbuf.append("  name: ");
-    		//strbuf.append(service.getServiceName()).append("\n");
+    		//strbuf.append(service.getServiceName()).append(separator);
     		strbuf.append("  alias: ");
-    		strbuf.append(service.getAlias()).append("\n");
+    		strbuf.append(service.getAlias()).append(separator);
     		strbuf.append("  desc: ");
-    		strbuf.append(service.getDecscription()).append("\n");
+    		strbuf.append(service.getDecscription()).append(separator);
     		
     		if (service.getSchedules() != null) {
     			for (String str: service.getSchedules()) {
     				strbuf.append("  sched: ");
-    				strbuf.append(str).append("\n");
+    				strbuf.append(str).append(separator);
     			}
     		}
     		else {
     			strbuf.append("  sched: null");
     		}
     		strbuf.append("  send: ");
-    		strbuf.append(service.isSendServiceData()).append("\n");
+    		strbuf.append(service.isSendServiceData()).append(separator);
     		strbuf.append("  url: ");
-    		strbuf.append(service.getConnectionUrl()).append("\n");
+    		strbuf.append(service.getConnectionUrl()).append(separator);
     		strbuf.append("  driver: ");
-    		strbuf.append(service.getDriverClassName()).append("\n");
+    		strbuf.append(service.getDriverClassName()).append(separator);
     		
     		for (String serviceItemName : service.getServicesItems().keySet()) {
     			ServiceItem serviceItem = service.getServiceItemByName(serviceItemName);
-    			strbuf.append("ServiceItem> ").append(serviceItem.getServiceItemName()).append("\n");
+    			strbuf.append("ServiceItem> ").append(serviceItem.getServiceItemName()).append(separator);
     			//strbuf.append("   name: ");
-    			//strbuf.append(serviceItem.getServiceItemName()).append("\n");
+    			//strbuf.append(serviceItem.getServiceItemName()).append(separator);
     			strbuf.append("   alias: ");
-        		strbuf.append(serviceItem.getAlias()).append("\n");
+        		strbuf.append(serviceItem.getAlias()).append(separator);
         		strbuf.append("   desc: ");
-    			strbuf.append(serviceItem.getDecscription()).append("\n");
+    			strbuf.append(serviceItem.getDecscription()).append(separator);
     			strbuf.append("   exec: ");
-    			strbuf.append(serviceItem.getExecution()).append("\n");
+    			strbuf.append(serviceItem.getExecution()).append(separator);
     			strbuf.append("   serviceitemclass: ");
-                strbuf.append(serviceItem.getClassName()).append("\n");
+                strbuf.append(serviceItem.getClassName()).append(separator);
                 strbuf.append("   thresholdclass: ");
-                strbuf.append(serviceItem.getThresholdClassName()).append("\n");
+                strbuf.append(serviceItem.getThresholdClassName()).append(separator);
     		}
-    		//strbuf.append("\n");
+    		//strbuf.append(separator);
     	}
     	
     	return strbuf;
