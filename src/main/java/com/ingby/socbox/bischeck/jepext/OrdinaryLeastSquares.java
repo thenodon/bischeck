@@ -25,7 +25,7 @@ import org.nfunk.jep.*;
 import org.nfunk.jep.function.PostfixMathCommand;
 
 
-import com.beust.jcommander.ParameterException;
+//import com.beust.jcommander.ParameterException;
 import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLS;
 import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLSException;
 
