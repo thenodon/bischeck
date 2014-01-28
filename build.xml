@@ -27,7 +27,7 @@
     <property name="javac_src" value="6" />
     <property name="version.file" value="${basedir}/version.txt" />
 	<property name="testoutput.dir" value="${basedir}/test-output" />
-	    
+	<property name="coverageoutput.dir" value="${basedir}/coverage-output" />
 
     <!-- <property name="sonar.dynamicAnalysis" value="reuseReports" /> -->
 
@@ -125,7 +125,7 @@
 
 
     <target name="testng" depends="compileng">
-        <jacoco:coverage destfile="${testoutput.dir}/jacoco-exec/jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
+        <jacoco:coverage destfile="${coverageoutput.dir}/jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
           <testng outputdir="${testoutput.dir}">
             <sysproperty key="bishome" value="${basedir}"/>
 
