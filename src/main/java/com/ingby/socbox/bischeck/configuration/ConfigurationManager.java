@@ -694,13 +694,14 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
             	} else {
             		LOGGER.error("The cache template {} is not in the configuration", serviceitemconfig.getCache().getTemplate());
         			throw new ServiceItemFactoryException("The cache template " + serviceitemconfig.getCache().getTemplate() +" is not in the configuration");		
-            	}
-            	
-                    
+            	}   
             }
+            
             aggregation.setAggregate(url2service);
             setPurgeMap(aggregation.getRetentionMap());
             setPurge(xmlPurge,service,serviceitem);
+        } else {
+        	setPurge(null,service,serviceitem);
         }
         return serviceitem;
     }
@@ -785,7 +786,10 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
             aggregation.setAggregate(url2service);
             setPurgeMap(aggregation.getRetentionMap());
             setPurge(xmlPurge,service,serviceitem);
+        } else {
+        	setPurge(null,service,serviceitem);
         }
+        
         return serviceitem;
     }
     
@@ -801,25 +805,31 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
 
 
 	/**
-     * For serviceitem that has <purge> defined the purging will be set up.
-     * Currently supporting only <maxcount>
+     * For serviceitem that has <purge> defined the purging will be set up. If 
+     * a serviceitem do not have cache with purge then it will be set to property
+     * <code>lastStatusCacheSize</code> and default is 500.
      * @param xmlPurge
      * @param service
      * @param serviceitem
      */
 	private void setPurge(XMLPurge xmlPurge, Service service, ServiceItem serviceitem) {
-        if (xmlPurge == null)
-            return;
-        
-        String key = Util.fullName(service, serviceitem);
-        if(xmlPurge.getMaxcount() != null) {
-            purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
-        } else if (xmlPurge.getOffset() != null && xmlPurge.getPeriod() != null) {
-            purgeMap.put(key, "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
+		String key = Util.fullName(service, serviceitem);
+		if (xmlPurge == null) {
+			// Set default 
+			try {
+				purgeMap.put(key, String.valueOf(prop.getProperty("lastStatusCacheSize","500")));
+			} catch (NumberFormatException ne) {
+				purgeMap.put(key, String.valueOf("500"));
+			}
+        } else {
+        	if(xmlPurge.getMaxcount() != null) {
+        		purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
+        	} else if (xmlPurge.getOffset() != null && xmlPurge.getPeriod() != null) {
+        		purgeMap.put(key, "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
+        	}
         }
     }
     
-	
 	private void initServers() throws ConfigurationException {
         XMLServers serversconfig = (XMLServers) xmlFileMgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.SERVERS);
 
