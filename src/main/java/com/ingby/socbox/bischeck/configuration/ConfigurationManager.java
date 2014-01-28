@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -53,7 +54,6 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import ch.qos.logback.classic.Level;
 
-import com.ingby.socbox.bischeck.ExecuteMBean;
 import com.ingby.socbox.bischeck.MBeanManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.host.Host;
@@ -451,15 +451,20 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
             
                      
             // If a template is detected
-            if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) {
-                if (serviceconfig.getServiceoverride() != null && serviceconfig.getServiceoverride().isInactive() != null ){
-                    if (serviceconfig.getServiceoverride().isInactive()) {
-                        LOGGER.debug("Service {} for host {} is set to inactive - break", 
-                                serviceconfig.getName(), host.getHostname());
-                        continue;
-                    }
-                }
-            	service = createServiceByTemplate(host, serviceconfig);
+            if (serviceconfig.getTemplate() != null) {
+            	if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) {
+            		if (serviceconfig.getServiceoverride() != null && serviceconfig.getServiceoverride().isInactive() != null ){
+            			if (serviceconfig.getServiceoverride().isInactive()) {
+            				LOGGER.debug("Service {} for host {} is set to inactive - break", 
+            						serviceconfig.getName(), host.getHostname());
+            				continue;
+            			}
+            		}
+            		service = createServiceByTemplate(host, serviceconfig);
+            	} else {
+            		LOGGER.error("The serviceitem template {} is not in the configuration", serviceconfig.getTemplate());
+        			throw new ServiceItemFactoryException("The serviceitem template " + serviceconfig.getTemplate() +" is not in the configuration");
+            	}
             } else {
                 // If a normal service configuration is detected
                 if (serviceconfig.isInactive() != null ){
@@ -627,9 +632,15 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         	// If a normal service configuration is detected
         	XMLServiceitem serviceitemconfig = iterserviceitem.next();
         	
-        	if (serviceItemTemplateMap.containsKey(serviceitemconfig.getTemplate())){
-        		serviceitem = createServiceItemByTemplate(service,
-                        serviceitemconfig);
+        	if (serviceitemconfig.getTemplate() != null ) {
+        		
+        		if (serviceItemTemplateMap.containsKey(serviceitemconfig.getTemplate())){
+        			serviceitem = createServiceItemByTemplate(service,
+        					serviceitemconfig);
+        		} else {
+        			LOGGER.error("The serviceitem template {} is not in the configuration", serviceitemconfig.getTemplate());
+        			throw new ServiceItemFactoryException("The serviceitem template " + serviceitemconfig.getTemplate() +" is not in the configuration");
+        		}
             } else {
             	serviceitem = ceateServiceitemByClassic(service,
                         serviceitemconfig);
@@ -677,8 +688,15 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
                 aggregation = new Aggregation(serviceitemconfig.getCache(),service,serviceitem);
             } else {
                 // Template based
-                xmlPurge = cacheTemplateMap.get(serviceitemconfig.getCache().getTemplate()).getPurge();
-                aggregation = new Aggregation(cacheTemplateMap.get(serviceitemconfig.getCache().getTemplate()),service,serviceitem);    
+            	if (cacheTemplateMap.containsKey(serviceitemconfig.getCache().getTemplate())) {
+            		xmlPurge = cacheTemplateMap.get(serviceitemconfig.getCache().getTemplate()).getPurge();
+                    aggregation = new Aggregation(cacheTemplateMap.get(serviceitemconfig.getCache().getTemplate()),service,serviceitem);
+            	} else {
+            		LOGGER.error("The cache template {} is not in the configuration", serviceitemconfig.getCache().getTemplate());
+        			throw new ServiceItemFactoryException("The cache template " + serviceitemconfig.getCache().getTemplate() +" is not in the configuration");		
+            	}
+            	
+                    
             }
             aggregation.setAggregate(url2service);
             setPurgeMap(aggregation.getRetentionMap());
@@ -756,8 +774,13 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
                 aggregation = new Aggregation(xmlCache,service,serviceitem);
             } else {
                 // Template based
-                xmlPurge = cacheTemplateMap.get(template.getCache().getTemplate()).getPurge();
-                aggregation = new Aggregation(cacheTemplateMap.get(template.getCache().getTemplate()),service,serviceitem); 
+            	if (cacheTemplateMap.containsKey(template.getCache().getTemplate())) {
+            		xmlPurge = cacheTemplateMap.get(template.getCache().getTemplate()).getPurge();
+            		aggregation = new Aggregation(cacheTemplateMap.get(template.getCache().getTemplate()),service,serviceitem);
+            	} else {
+            		LOGGER.error("The cache template {} is not in the configuration", template.getCache().getTemplate());
+        			throw new ServiceItemFactoryException("The cache template " + template.getCache().getTemplate() +" is not in the configuration");		
+            	}
             }    
             aggregation.setAggregate(url2service);
             setPurgeMap(aggregation.getRetentionMap());
@@ -1228,11 +1251,15 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     
     @Override
     public String getPurgeConfiguration() {
-        
+    	final String separator = System.getProperty("line.separator");
+    	
         StringBuffer strbuf = new StringBuffer();
         Map<String,String> map = getPurgeMap();
-        for (String fullname: map.keySet()) {
-            strbuf.append(fullname).append(":").append(map.get(fullname)).append("\n");
+        TreeMap<String, String> treeMap = new TreeMap<String,String>();
+        treeMap.putAll(map);
+        treeMap.keySet();
+        for (String fullname: treeMap.keySet()) {
+            strbuf.append(fullname).append(":").append(treeMap.get(fullname)).append(separator);
         }
         return strbuf.toString();
     }
