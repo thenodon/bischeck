@@ -146,7 +146,27 @@
 
             <classfileset dir="${build.home}/classes" includes="testng/**/*.class"/> 
         </testng>
-        </jacoco:coverage>   
+        </jacoco:coverage>           
+    	
+    	<jacoco:report xmlns:jacoco="antlib:org.jacoco.ant">
+    	                        
+    	    <executiondata>
+    	        <file file="${coverageoutput.dir}/jacoco.exec"/>
+    	    </executiondata>
+    	                        
+    	    <structure name="Bischeck">
+    	        <classfiles>
+    	            <fileset dir="${build.home}/classes"/>
+    	        </classfiles>
+    	        <sourcefiles encoding="UTF-8">
+    	            <fileset dir="${javasrc.home}"/>
+    	        </sourcefiles>
+    	    </structure>
+    	                        
+    	    <html destdir="${coverageoutput.dir}"/>
+    	                        
+    	</jacoco:report>
+    	
     </target>
 
 
