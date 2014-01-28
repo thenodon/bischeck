@@ -114,7 +114,6 @@ public class ConfigMacroUtil {
                 strbuf.append("   thresholdclass: ");
                 strbuf.append(serviceItem.getThresholdClassName()).append(separator);
     		}
-    		//strbuf.append(separator);
     	}
     	
     	return strbuf;
