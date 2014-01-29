@@ -45,9 +45,13 @@
     </path>
 
     <path id="test.classpath">
-        <fileset dir="${basedir}/buildlib/">
+    	<fileset dir="${basedir}/lib/">
+    	   <include name="*.jar" />
+    	</fileset>
+    	<fileset dir="${basedir}/buildlib/">
            <include name="*.jar" />
         </fileset>
+    	
     </path>
 
 
@@ -80,6 +84,7 @@
             <src path="${javagensrc.home}" />
             <src path="${javasrc.home}" />
             <classpath refid="compile.classpath" />
+        	<classpath refid="test.classpath" />
         </javac>
 
     </target>
@@ -96,7 +101,7 @@
                    includeantruntime="false">
 
                 <src path="${javasrcng.home}" />
-                <classpath refid="compile.classpath" />
+                <classpath refid="test.classpath" />
             </javac>
 
     </target>
