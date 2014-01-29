@@ -165,9 +165,12 @@ public class NagiosUtil {
         perfmessage.append(";0; ");
         
         perfmessage.append("threshold=");
-        //BigDecimal threshold = new BigDecimal(currentThreshold);
+        
         if (threshold != null) {
             perfmessage.append(threshold.toString());
+        } else {
+        	//TODO this is compatibility, should be set to 
+        	perfmessage.append(0);
         }
         perfmessage.append(";0;0;0; ");
         
