@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -1260,17 +1261,48 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     
     
     @Override
-    public String getPurgeConfiguration() {
+    public String getPurgeConfigurations() {
     	final String separator = System.getProperty("line.separator");
     	
         StringBuffer strbuf = new StringBuffer();
-        Map<String,String> map = getPurgeMap();
         TreeMap<String, String> treeMap = new TreeMap<String,String>();
-        treeMap.putAll(map);
+        
+        treeMap.putAll(getPurgeMap());
         treeMap.keySet();
         for (String fullname: treeMap.keySet()) {
             strbuf.append(fullname).append(":").append(treeMap.get(fullname)).append(separator);
         }
+        return strbuf.toString();
+    }
+    
+    @Override
+    public String getServiceDefinitions() {
+    	final String separator = System.getProperty("line.separator");
+    	
+        StringBuffer strbuf = new StringBuffer();
+        TreeSet<String> set = new TreeSet<String>();
+        
+        Map<String,Host> hosts = getHostConfig();
+        for (String hostName: hosts.keySet()) {
+        	
+        	Map<String, Service> services = hosts.get(hostName).getServices();
+        	
+        	for(String serviceName: services.keySet() ) {
+        		if (serviceName.indexOf(Aggregation.AGGREGATION_SEPARATOR) == -1) {	
+        			Map<String, ServiceItem> serviceitems = services.get(serviceName).getServicesItems();
+
+        			for (String servicItemName: serviceitems.keySet() ) {
+
+        				set.add(Util.fullName(hostName, serviceName, servicItemName));
+        			}
+        		}
+        	}	
+        }
+        
+        for (String str:set) {
+        	strbuf.append(str).append(separator);
+        }
+        
         return strbuf.toString();
     }
 }

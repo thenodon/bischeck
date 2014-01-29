@@ -33,6 +33,7 @@ import com.ingby.socbox.bischeck.xsd.bischeck.XMLRetention;
 public class Aggregation {
 	private final static Logger LOGGER = LoggerFactory.getLogger(Aggregation.class);
 
+	public static final String AGGREGATION_SEPARATOR = "/";
 	private static final String WEEKEND = "/weekend";
 	private static final String URL_SERVICE = "bischeck://cache";
 	private static final String SERVICEITEM_CLASS = "CalculateOnCache";
