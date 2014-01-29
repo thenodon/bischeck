@@ -1,6 +1,8 @@
 package com.ingby.socbox.bischeck.cache.provider.redis;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -12,6 +14,8 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
  */
 public class JedisPoolWrapper {
 
+	private final static Logger LOGGER = LoggerFactory.getLogger(JedisPoolWrapper.class);
+
 	private JedisPool jedispool;
 
 	/**
@@ -22,9 +26,11 @@ public class JedisPoolWrapper {
 	 * @param redisauth the authentication token used when connecting to redis server
 	 * @param redisdb - the number of the redis database
 	 */
-	public JedisPoolWrapper(String redisserver, Integer redisport, Integer redistimeout, String redisauth, Integer redisdb) {
+	public JedisPoolWrapper(String redisserver, Integer redisport, Integer redistimeout, String redisauth, Integer redisdb, Integer maxPoolSize) {
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
-		poolConfig.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
+		poolConfig.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
+		poolConfig.setMaxActive(maxPoolSize);
+		LOGGER.info("Max active: {} Max Idel: {} When exhusted: {}",poolConfig.getMaxActive(), poolConfig.getMaxIdle(), poolConfig.getWhenExhaustedAction());
 		jedispool = new JedisPool(poolConfig,redisserver,redisport,redistimeout,redisauth,redisdb);	
 	}
 
@@ -44,7 +50,12 @@ public class JedisPoolWrapper {
 	 * @param jedis
 	 */
 	public void returnResource(Jedis jedis) {
-		jedispool.returnResource(jedis);
+		if (jedis != null) {
+			jedispool.returnResource(jedis);
+		} else {
+			LOGGER.warn("Tried to return a null object to the redis pool");
+		}
+		
 	}
 	
 	/**

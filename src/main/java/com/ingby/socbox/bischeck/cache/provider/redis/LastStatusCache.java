@@ -91,10 +91,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
     private AtomicLong rediscachehitcount = new AtomicLong();
     private boolean fastCacheEnable = true;
     
-    private LastStatusCache(String redisserver, int redisport, int redistimeout, String redisauth, int redisdb) {
+    private LastStatusCache(String redisserver, int redisport, int redistimeout, String redisauth, int redisdb, int jedisPoolSize) {
         fastCache = new ConcurrentHashMap<String,CacheQueue<LastStatus>>();
         
-        jedispool = new JedisPoolWrapper(redisserver,redisport,redistimeout,redisauth,redisdb);    
+        jedispool = new JedisPoolWrapper(redisserver,redisport,redistimeout,redisauth,redisdb,jedisPoolSize);    
         
         lu  = Lookup.init(jedispool);
      }
@@ -118,7 +118,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
            String redisauth = null;
            int redisdb;
            int redistimeout;
-
+           int jedisPoolSize;
+           
             redisserver = ConfigurationManager.getInstance().getProperties().
                     getProperty("cache.provider.redis.server","localhost");
 
@@ -160,7 +161,18 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
                 redistimeout=2000;
             }
             
-            lsc = new LastStatusCache(redisserver, redisport, redistimeout, redisauth, redisdb);
+            try {
+            	jedisPoolSize = Integer.parseInt(
+                        ConfigurationManager.getInstance().getProperties().
+                        getProperty("cache.provider.redis.poolsize","50"));
+            } catch (NumberFormatException ne) {
+                LOGGER.warn("Configuration of redis client pool size is not a valid number {}. Set to default 50",
+                        ConfigurationManager.getInstance().getProperties().getProperty("cache.provider.redis.poolsize","50"),ne);
+                jedisPoolSize = 50;
+            }
+            
+            
+            lsc = new LastStatusCache(redisserver, redisport, redistimeout, redisauth, redisdb, jedisPoolSize);
             lsc.testConnection();
     
             mbsMgr = new MBeanManager(lsc, BEANNAME);
