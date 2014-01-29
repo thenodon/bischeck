@@ -46,6 +46,10 @@
         <value></value>
     </property>
     
+    <property>
+        <key>cache.provider.redis.db</key>
+        <value>1</value>
+    </property>
   
       
     
