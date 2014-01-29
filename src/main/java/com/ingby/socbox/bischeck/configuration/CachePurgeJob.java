@@ -21,6 +21,7 @@ package com.ingby.socbox.bischeck.configuration;
 
 import java.text.ParseException;
 
+
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -91,7 +92,6 @@ public class CachePurgeJob implements Job {
             build();
                 
         
-        // Every minute TODO MAKE A PROPERTY
         CronTrigger trigger = newTrigger()
         .withIdentity("CachePurgeTrigger", "DailyMaintenance")
         .withSchedule(cronSchedule(prop.getProperty("cachePurgeJobCron","0 0 0/1 * * ? *")))
@@ -109,8 +109,8 @@ public class CachePurgeJob implements Job {
                 job.getDescription(), ft, trigger.getCronExpression());
     }
     
-    
-    @Override
+
+	@Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         final Timer timer = Metrics.newTimer(CachePurgeJob.class, 
 				"purge" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
@@ -118,8 +118,10 @@ public class CachePurgeJob implements Job {
 		
 		try {
 			Map<String, String> purgeMap = ConfigurationManager.getInstance().getPurgeMap();
+			LOGGER.info("CachePurge purging {}", purgeMap.size());
+			CacheInf cache = CacheFactory.getInstance();
+			
 			for (String key : purgeMap.keySet()) {
-				CacheInf cache = CacheFactory.getInstance();
 				if (cache instanceof CachePurgeInf) {
 					LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
 					
