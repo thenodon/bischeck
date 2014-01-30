@@ -34,7 +34,7 @@ public interface ServerInternal {
      * to manage protocol and formatting of message data.
      * @param service
      */
-    public void sendInternal(String host, String service, NAGIOSSTAT level, String message);
+    void sendInternal(String host, String service, NAGIOSSTAT level, String message);
 
     
 
