@@ -66,8 +66,6 @@ public class ThresholdFactory {
 				try {
 					// Check if this is a package threshold class with a name 
 					// without package name
-					
-					//current = (Threshold) ClassCache.getClassByName("com.ingby.socbox.bischeck.threshold." + serviceItem.getThresholdClassName()).newInstance();
 					current = invokeThresholdConstructor(
 							service.getHost().getHostname(), 
 							service.getServiceName(),

@@ -129,7 +129,6 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
         .create();
     	 payload.setMessage(level +"|"+ message);
     	 payload.setLevel(level.toString());
-    	 //LOGGER.info("Send Internal - sender.send(payload)");	    
     }
         
     
@@ -161,15 +160,16 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
             }
         } else {
             // If no connection is established still write a value 
-            //of null value=null;
+            // of null
             level=NAGIOSSTAT.CRITICAL;
             payload.setMessage(level + " " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
         }
         
         payload.setLevel(level.toString());
         
-        //if (LOGGER.isInfoEnabled())
+        if (LOGGER.isInfoEnabled()) {
         	LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
+        }
         
         final String timerName = instanceName+"_send";
 
@@ -178,12 +178,10 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
     	final TimerContext context = timer.time();
 
         try {
-        	//LOGGER.info("Send - sender.send(payload)");
+        	// Do nothing 
         } finally { 
         	long duration = context.stop()/1000000;
-			if (LOGGER.isDebugEnabled()) {
-            	LOGGER.debug("Nsca send execute: " + duration + " ms");
-			}	    
+        	LOGGER.debug("Nsca send execute: {} ms", duration);
         }
     }
     

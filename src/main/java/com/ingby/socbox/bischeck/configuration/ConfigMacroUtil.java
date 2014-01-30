@@ -65,8 +65,6 @@ public class ConfigMacroUtil {
     	StringBuffer strbuf = new StringBuffer();
     	
     	strbuf.append("Host> ").append(host.getHostname()).append(separator);
-    	//strbuf.append("name: ");
-    	//strbuf.append(host.getHostname()).append(separator);
     	strbuf.append("alias: ");
 		strbuf.append(host.getAlias()).append(separator);
 		strbuf.append("desc: ");
@@ -75,8 +73,6 @@ public class ConfigMacroUtil {
     	for (String serviceName: host.getServices().keySet()) {
     		Service service = host.getServiceByName(serviceName);
     		strbuf.append("Service> ").append(service.getServiceName()).append(separator);
-    		//strbuf.append("  name: ");
-    		//strbuf.append(service.getServiceName()).append(separator);
     		strbuf.append("  alias: ");
     		strbuf.append(service.getAlias()).append(separator);
     		strbuf.append("  desc: ");
@@ -101,8 +97,6 @@ public class ConfigMacroUtil {
     		for (String serviceItemName : service.getServicesItems().keySet()) {
     			ServiceItem serviceItem = service.getServiceItemByName(serviceItemName);
     			strbuf.append("ServiceItem> ").append(serviceItem.getServiceItemName()).append(separator);
-    			//strbuf.append("   name: ");
-    			//strbuf.append(serviceItem.getServiceItemName()).append(separator);
     			strbuf.append("   alias: ");
         		strbuf.append(serviceItem.getAlias()).append(separator);
         		strbuf.append("   desc: ");
@@ -163,7 +157,6 @@ public class ConfigMacroUtil {
     			for (String schedule: service.getSchedules()) {
     				String serviceSchedule = replaceMacroHost(schedule, host);
     				serviceSchedule = replaceMacroService(serviceSchedule, service);
-    				//scheduleList. remove(schedule);
     				scheduleList.add(serviceSchedule);
     			}
     			service.setSchedules(scheduleList);
@@ -195,7 +188,6 @@ public class ConfigMacroUtil {
     }
     
    
-
     private static String replaceMacroHost(String source, Host host) {
     	if (source == null) {
     		return null;
@@ -206,12 +198,10 @@ public class ConfigMacroUtil {
     	// Replace alias macro - if null empty string
     	if (host.getAlias() != null) {
     		str = str.replaceAll(HOST_ALIAS_MACRO, host.getAlias());
-    	}
-    	else {
+    	} else {
     		str = str.replaceAll(HOST_ALIAS_MACRO, "");        	
     	}
-		// Fix if the macro is quoted 
-    	//str = str.replaceAll("\\\\","");
+	
     	return str;
     }
     
@@ -225,14 +215,14 @@ public class ConfigMacroUtil {
     	// Replace alias macro - if null empty string
     	if (service.getAlias() != null) {
     		str = str.replaceAll(SERVICE_ALIAS_MACRO, service.getAlias());
-    	}
-    	else {
+    	} else {
     		str = str.replaceAll(SERVICE_ALIAS_MACRO, "");        	
     	}
-    	//str = str.replaceAll("\\\\","");
+    	
     	return str;
     }
 
+    
     private static String replaceMacroServiceItem(String source, ServiceItem serviceItem) {
     	if (source == null) {
     		return null;
@@ -242,13 +232,11 @@ public class ConfigMacroUtil {
     	// Replace alias macro - if null empty string
     	if (serviceItem.getAlias() != null) {
     		str = str.replaceAll(SERVICEITEM_ALIAS_MACRO, serviceItem.getAlias());
-    	}
-    	else {
+    	} else {
     		str = str.replaceAll(SERVICEITEM_ALIAS_MACRO, "");        	
     	}
-    	//str = str.replaceAll("\\\\","");
+    
     	return str;
     }
    
-    
 }

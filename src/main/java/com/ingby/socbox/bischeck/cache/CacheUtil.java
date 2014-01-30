@@ -86,7 +86,6 @@ public abstract class CacheUtil {
     
     
     public static boolean isByTime(String schedule) {
-    	//Pattern pattern = Pattern.compile(ObjectDefinitions.getFindintimepattern());
 
     	// Determine if there is an exact match
     	Matcher matcher = PATTERN_FIND_IN_TIME.matcher(schedule);

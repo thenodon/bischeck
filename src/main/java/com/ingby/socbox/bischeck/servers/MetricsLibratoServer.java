@@ -215,7 +215,6 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 			}	
 			
 			if (serviceItem.getLatestExecuted() != null){
-				//if (LOGGER.isInfoEnabled())
 				strbuf.append(metricName).
 					append("=").
 					append(serviceItem.getLatestExecuted());
@@ -225,7 +224,6 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 			}	
 			
 			if (sendThreshold && serviceItem.getThreshold().getThreshold() != null){
-				//if (LOGGER.isInfoEnabled())
 				strbuf.append(" ").
 					append(metricName).
 					append("_threshold=").

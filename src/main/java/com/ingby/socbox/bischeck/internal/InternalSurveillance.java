@@ -167,7 +167,6 @@ public class InternalSurveillance implements Job {
 					strbuf.append(trim(entry.getKey()));
 					strbuf.append("_");      
 					strbuf.append(subEntry.getKey().getName());
-					//strbuf.append("_tps=");    
 					strbuf.append("=");    
 
 					strbuf.append(Util.roundDecimals((float) timer.getMeanRate()));
@@ -187,10 +186,8 @@ public class InternalSurveillance implements Job {
 	
 		
 		double loadAvg = osMxBean.getSystemLoadAverage();
-		//int nProcessors = osMxBean.getAvailableProcessors();
 		long uptime = rtMxBean == null ? 1 : rtMxBean.getUptime();
-		// Get the CPU time of the process in nanoseconds...
-		//long processCpuTime = osMxBean == null ? 0 : osMxBean.ggetProcessCpuTime();
+		
 		StringBuffer strbuf = new StringBuffer();
 		strbuf.append("Uptime=");    
 		strbuf.append(uptime);
@@ -216,7 +213,6 @@ public class InternalSurveillance implements Job {
 		MetricsRegistry metricsMap = Metrics.defaultRegistry();
 		
 		return metricsMap;
-
 	}
 
 	@Override

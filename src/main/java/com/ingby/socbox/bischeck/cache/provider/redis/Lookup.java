@@ -14,10 +14,8 @@ public final class Lookup {
 	private final static Logger LOGGER = LoggerFactory.getLogger(Lookup.class);
 
 	private Map<String, String> name2id = new HashMap<String, String>();;
-	//private Map<String, String> id2name = new HashMap<String, String>();
 	private Map<String, Optimizer> optimizer = new HashMap<String, Optimizer>();
 	
-	// Lookup lookup = null;
 	private JedisPoolWrapper jedispool = null;
 
 	private final static String DICTIONARY = "dictionary";
@@ -26,17 +24,15 @@ public final class Lookup {
 		this.jedispool = jedispool;
 		Jedis jedis = null;
 		
-		
 		try {
 			jedis = this.jedispool.getResource();
 			for (String keyname : jedis.hgetAll(DICTIONARY).keySet()) {
 				name2id.put(keyname, jedis.hget(DICTIONARY, keyname));
-				//id2name.put(jedis.hget(DICTIONARY, keyname), keyname);
 				optimizer.put(keyname, new Optimizer(keyname));
 				
 			}
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			LOGGER.error("Redis connection failed, {}", je.getMessage(),je);
 			throw je;
 		} finally {
 			this.jedispool.returnResource(jedis);
@@ -57,7 +53,7 @@ public final class Lookup {
 		try {
 			return jedis.hgetAll(DICTIONARY);
 		} catch (JedisConnectionException je) {
-			LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+			LOGGER.error("Redis connection failed, {}", je.getMessage(),je);
 		} finally {
 			jedispool.returnResource(jedis);
 		}
@@ -65,11 +61,6 @@ public final class Lookup {
 		
 	}
 
-	/*
-	public Map<String, String> getAllIds() {
-		return id2name;
-	}
-*/
 	
 	public Map<String, String> getAllKeys() {
 		return name2id;
@@ -84,10 +75,9 @@ public final class Lookup {
 			Jedis jedis = jedispool.getResource();
 			try {
 				name2id.put(keyname, keyid);
-//				id2name.put(keyid, keyname);
 				jedis.hset(DICTIONARY, keyname, keyid);
 			} catch (JedisConnectionException je) {
-				LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+				LOGGER.error("Redis connection failed, {}", je.getMessage(),je);
 			} finally {
 				jedispool.returnResource(jedis);
 			}
@@ -101,8 +91,6 @@ public final class Lookup {
 	 * @return the name of the id or null if the id do not exists
 	 */
 	public String getNameById(String keyid) {
-		//String keyname = id2name.get(keyid);
-		//return keyname;
 		return keyid;
 	}
 	
@@ -115,9 +103,9 @@ public final class Lookup {
 		}	
 		
 		opti.setIndex(index);
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("High index for " + keyname +" is: " + opti.getHighIndex());
-		}
+		
+		LOGGER.debug("High index for {} is: {}", keyname, opti.getHighIndex());
+		
 	}
 
 }

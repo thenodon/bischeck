@@ -156,8 +156,6 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     	this.serviceName = serviceName;
     	this.serviceItemName = serviceItemName;
     	
-        //this.state = NAGIOSSTAT.OK;
-
         Integer stateAsInt = null;
         String stateAsString = null;
         
@@ -833,7 +831,6 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     private synchronized static XMLTwenty4Threshold configInit() throws Exception {
     	if (twenty4hourconfig == null) {
     		ConfigFileManager xmlfilemgr = new ConfigFileManager();
-    		//XMLTwenty4Threshold twenty4hourconfig  = (XMLTwenty4Threshold) configMgr.getXMLConfiguration(ConfigurationManager.XMLCONFIG.TWENTY4HOURTHRESHOLD);
     		twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD);
     	}
     	return twenty4hourconfig;
@@ -935,7 +932,6 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 			if (parsedstr == null) {
 				return null;
 			} else {
-				//Float value;
 				Float value = null;
 	    		ExecuteJEP jep = ExecuteJEPPool.getInstance().checkOut();
 	    		try {

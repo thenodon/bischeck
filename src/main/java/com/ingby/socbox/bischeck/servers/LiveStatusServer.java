@@ -142,7 +142,7 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 			}
 		} else {
 			// If no connection is established still write a value 
-			//of null value=null;
+			// of null 
 			level=NAGIOSSTAT.CRITICAL;
 			xml = format(level, 
 					service.getHost().getHostname(),

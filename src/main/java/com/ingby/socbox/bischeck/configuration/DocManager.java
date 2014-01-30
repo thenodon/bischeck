@@ -138,9 +138,8 @@ public class DocManager implements ConfigXMLInf {
      */
     public void genHtml() 
     throws TransformerFactoryConfigurationError, TransformerException, Exception {
-        //URL cssfile = Thread.currentThread().getContextClassLoader().getResource(CSSFILE);
-        //System.out.println(cssfile.toString());
-        URL cssfile = DocManager.class.getClassLoader().getResource(CSSFILE);
+        
+    	URL cssfile = DocManager.class.getClassLoader().getResource(CSSFILE);
         System.out.println(cssfile.toString());
         System.out.println(outputdir.getAbsolutePath()+File.separator+CSSFILE);
         copy(cssfile.getPath(), outputdir.getAbsolutePath()+File.separator+CSSFILE);
@@ -256,7 +255,6 @@ public class DocManager implements ConfigXMLInf {
     private void genFile(XMLCONFIG xmlconf, File outputdir, String type)
     throws TransformerFactoryConfigurationError, TransformerException, IOException, Exception {
 
-    	//URL xslUrl = Thread.currentThread().getContextClassLoader().getResource(xmlconf.nametag()+"2"+type+".xsl");
     	URL xslUrl = DocManager.class.getClassLoader().getResource(xmlconf.nametag()+"2"+type+".xsl");
     	if (xslUrl == null) {
     		throw new IOException("File " + xmlconf.nametag()+"2"+type+".xsl does not exists");
@@ -330,16 +328,20 @@ public class DocManager implements ConfigXMLInf {
         File fromFile = new File(fromFileName);
         File toFile = new File(toFileName);
 
-        if (!fromFile.exists())
+        if (!fromFile.exists()) {
             throw new IOException("FileCopy: " + "no such source file: "
                     + fromFileName);
-        if (!fromFile.isFile())
+        }
+        
+        if (!fromFile.isFile()) {
             throw new IOException("FileCopy: " + "can't copy directory: "
                     + fromFileName);
-        if (!fromFile.canRead())
+        }
+        
+        if (!fromFile.canRead()) {
             throw new IOException("FileCopy: " + "source file is unreadable: "
                     + fromFileName);
-
+        }
         
         FileInputStream from = null;
         FileOutputStream to = null;
@@ -349,21 +351,22 @@ public class DocManager implements ConfigXMLInf {
             byte[] buffer = new byte[4096];
             int bytesRead;
 
-            while ((bytesRead = from.read(buffer)) != -1)
-                to.write(buffer, 0, bytesRead); // write
+            while ((bytesRead = from.read(buffer)) != -1) {
+                to.write(buffer, 0, bytesRead); 
+            }
         } finally {
-            if (from != null)
-                try {
-                    from.close();
-                } catch (IOException e) {
-                    ;
-                }
-                if (to != null)
-                    try {
-                        to.close();
-                    } catch (IOException e) {
-                        ;
-                    }
+        	if (from != null) { 
+        		try {
+        			from.close();
+        		} catch (IOException ignore) {
+        		}
+        	}
+        	if (to != null) {
+        		try {
+        			to.close();
+        		} catch (IOException ignore) {
+        		}
+        	}
         }
     }
 }

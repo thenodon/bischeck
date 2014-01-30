@@ -72,7 +72,6 @@ public class NagiosUtil {
 
             Float currentThreshold = serviceItem.getThreshold().getThreshold();
             
-            //String currentMeasure = Util.fixExponetialFormat(serviceItem.getLatestExecuted());
             BischeckDecimal currentMeasure = new BischeckDecimal(serviceItem.getLatestExecuted());
             
             
@@ -87,8 +86,6 @@ public class NagiosUtil {
                 if (method.equalsIgnoreCase("=")) {
                     Float warnfloat = new Float ((1-serviceItem.getThreshold().getWarning())*currentThreshold);
                     Float critfloat = new Float ((1-serviceItem.getThreshold().getCritical())*currentThreshold);;
-                    //warnValue = new BigDecimal(Util.roundByOtherString(currentMeasure,warnfloat).toString());
-                    //critValue = new BigDecimal(Util.roundByOtherString(currentMeasure,critfloat).toString());
                     warnValue = new BischeckDecimal(warnfloat).scaleBy(threshold);
                     critValue = new BischeckDecimal(critfloat).scaleBy(threshold);
                     
@@ -106,8 +103,6 @@ public class NagiosUtil {
                 } else {
                     Float warnfloat = new Float (serviceItem.getThreshold().getWarning()*currentThreshold);
                     Float critfloat = new Float (serviceItem.getThreshold().getCritical()*currentThreshold);
-                    //warnValue = new BigDecimal(Util.roundByOtherString(currentMeasure,warnfloat).toString());
-                    //critValue = new BigDecimal(Util.roundByOtherString(currentMeasure,critfloat).toString());
                     warnValue = new BischeckDecimal(warnfloat).scaleBy(threshold);
                     critValue = new BischeckDecimal(critfloat).scaleBy(threshold);
                     
@@ -130,7 +125,6 @@ public class NagiosUtil {
                 append(currentMeasure).
                 append(" (NA) ");
                 
-                //currentThreshold=new Float(0); //This is so the perfdata will be correct.
             }
 
             // Building the performance string 
@@ -169,7 +163,7 @@ public class NagiosUtil {
         if (threshold != null) {
             perfmessage.append(threshold.toString());
         } else {
-        	//TODO this is compatibility, should be set to 
+        	//TODO this is compatibility, should be set to U  
         	perfmessage.append(0);
         }
         perfmessage.append(";0;0;0; ");

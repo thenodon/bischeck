@@ -819,7 +819,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
      */    
     @Override
     public void dump2file() {
-        //BackendStorage.dump2file(cache,lastStatusCacheDumpFile);
+        //Do nothing - redis this
     }
 
     /*

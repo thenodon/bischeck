@@ -123,7 +123,7 @@ public class NRDPWorker implements WorkerInf, Runnable {
                     nagutil.createNagiosMessage(service));
         } else {
             // If no connection is established still write a value 
-            //of null value=null;
+            // of null 
             level=NAGIOSSTAT.CRITICAL;
             xml = xmlNRDPFormat(level, 
                     service.getHost().getHostname(),
@@ -136,8 +136,8 @@ public class NRDPWorker implements WorkerInf, Runnable {
         }
         
         connectAndSend(xml);
-
     }
+    
     
     private void connectAndSend(String xml) throws ServerException {
         
@@ -241,9 +241,9 @@ public class NRDPWorker implements WorkerInf, Runnable {
         
         conn.setRequestProperty("User-Agent", "bischeck");
         conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
-        conn.setRequestProperty("Accept","text/html,application/xhtml+xml,application/xml");//;q=0.9,*/*;q=0.8");
+        conn.setRequestProperty("Accept","text/html,application/xhtml+xml,application/xml");
         conn.setRequestProperty("Accept-Language","en-US,en;q=0.8");
-        conn.setRequestProperty("Accept-Charset","ISO-8859-1,utf-8");//;q=0.7,*;q=0.3");
+        conn.setRequestProperty("Accept-Charset","ISO-8859-1,utf-8");
         return conn;
     }
     

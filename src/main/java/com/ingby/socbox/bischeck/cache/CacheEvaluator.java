@@ -36,8 +36,6 @@ public class CacheEvaluator {
 	private static final Pattern PATTERN_HOST_SERVICE_SERVICEITEM = Pattern
 			.compile(ObjectDefinitions.getHostServiceItemRegexp());
 
-	// private static boolean notFullListParse = false;
-
 	static boolean notNullSupport = ConfigurationManager.getInstance()
 			.getProperties().getProperty("notFullListParse", "false")
 			.equalsIgnoreCase("false");
@@ -114,8 +112,7 @@ public class CacheEvaluator {
 		// Indicator to see if any parameters are null since then no calc will
 		// be done
 		boolean notANumber = false;
-		// ArrayList<String> paramOut = new ArrayList<String>();
-
+	
 		Iterator<String> iter = cacheEntriesValue.iterator();
 
 		while (iter.hasNext()) {

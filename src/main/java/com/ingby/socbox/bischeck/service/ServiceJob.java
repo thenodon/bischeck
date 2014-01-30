@@ -212,7 +212,7 @@ public class ServiceJob implements Job {
 	 * @throws ServiceItemException 
 	 * @throws ServiceException 
 	 */
-	private void executeJob(Service service) {// throws ServiceItemException, ServiceException, ThresholdException {
+	private void executeJob(Service service) {
 
 		for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
 			ServiceItem serviceitem = serviceitementry.getValue();

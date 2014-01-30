@@ -69,7 +69,6 @@ public final class ServerMessageExecutor {
 	
 	private static final String GETINSTANCE = "getInstance";
 	private static final String UNREGISTER = "unregister";
-	//private Fiber fiber = null;
 	private Channel<Service> channel = null;
 	private ExecutorService execService = null;
     private PoolFiberFactory poolFactory = null;
@@ -83,8 +82,6 @@ public final class ServerMessageExecutor {
 		serverSet = ConfigurationManager.getInstance().getServerClassMap();
 		
 		// TODO - check how the pool size of this is managed compared to fixed
-		//execService = Executors.newCachedThreadPool();
-		// Create a pool with the size of the number of server instances
 		execService = Executors.newFixedThreadPool(serverSet.size()*10);
         poolFactory = new PoolFiberFactory(execService);
         channel = new MemoryChannel<Service>();
