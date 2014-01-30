@@ -307,7 +307,7 @@ if [ "x$JAVA_HOME" = "x" ] ; then
     initerror=true
   else 
     jver=$(java -version 2>&1 | awk '/version/ {print $3}' | awk -F . '{print $2}')
-    if [ $jver -eq 6 ] ; then 
+    if [ $jver -ge 6 ] ; then 
       progress "Java runtime exists with jdk version $jver"
     else
       errormsg "Java version is must be 6 or higher."
