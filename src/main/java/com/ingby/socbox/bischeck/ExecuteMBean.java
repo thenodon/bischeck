@@ -26,47 +26,47 @@ package com.ingby.socbox.bischeck;
  */
 public interface ExecuteMBean {
     
-    public static final String BEANNAME = "com.ingby.socbox.bischeck:name=Execute";
+    static final String BEANNAME = "com.ingby.socbox.bischeck:name=Execute";
     
     
     /**
      * List the triggers to schedule
      * @return all triggers to execute
      */
-    public String[] getTriggers();
+    String[] getTriggers();
     
     
     /**
      * Shutdown the execution
      */
-    public void shutdown();
+    void shutdown();
 
     
     /**
      * Reload/restart bischeck with the configuration in the etc directory 
      */
-    public boolean reload();
+    boolean reload();
 
     
     /**
      * The time in milliseconds when the last reload occurred
      * @return the time when last reload occurred in milliseconds
      */
-    public long getReloadTime();
+    long getReloadTime();
     
     
     /**
      * The number of times reload has been done since bischeck was started
      * @return number of reloads done
      */
-    public int getReloadCount();
+    int getReloadCount();
     
     
     /**
      * Get the bischeck install directory
      * @return install directory 
      */
-    public String getBischeckHome();
+    String getBischeckHome();
     
     
     /**
@@ -74,21 +74,21 @@ public interface ExecuteMBean {
      * configuration files resides.
      * @return configuration file directory
      */
-    public String getXmlConfigDir();
+    String getXmlConfigDir();
     
     
     /**
      * Return the version of bischeck
      * @return current version
      */
-    public String getBischeckVersion();
+    String getBischeckVersion();
     
     
     /**
      * The number of bischeck classes found in the class cache 
      * @return
      */
-    public int getCacheClassHit();
+    int getCacheClassHit();
     
     
     /**
@@ -96,6 +96,6 @@ public interface ExecuteMBean {
      * not in the class cache 
      * @return
      */
-    public int getCacheClassMiss();
+    int getCacheClassMiss();
     
 }

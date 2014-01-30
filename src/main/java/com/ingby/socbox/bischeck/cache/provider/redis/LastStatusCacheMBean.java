@@ -25,42 +25,42 @@ package com.ingby.socbox.bischeck.cache.provider.redis;
  */
 public interface LastStatusCacheMBean {
 
-    public final static String BEANNAME = "com.ingby.socbox.bischeck.cache:name=Redis";
+    final static String BEANNAME = "com.ingby.socbox.bischeck.cache:name=Redis";
 	/**
 	 * Get the number of unique keys managed by the cache
 	 * @return
 	 */
-	public int getCacheKeyCount();
+	int getCacheKeyCount();
 	
 	/**
 	 * Get all the keys in the cache
 	 * @return
 	 */
-    public String[] getCacheKeys();
+    String[] getCacheKeys();
     
     /**
      * Dump the cache to a simple xml
      */
-    public void dump2file();
+    void dump2file();
     
     /**
      * Clear cache content
      */
-    public void clearCache();
+    void clearCache();
     
     /**
      * Cache count fast
      */
-    public long getFastCacheCount();
+    long getFastCacheCount();
     
     /**
      * Cache count redis
      */
-    public long getRedisCacheCount();
+    long getRedisCacheCount();
     
     /**
      * Cache ratio between fast and redis.
      * ratio = fast/redis
      */
-    public int getCacheRatio();
+    int getCacheRatio();
 }

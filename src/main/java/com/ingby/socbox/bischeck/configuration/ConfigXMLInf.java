@@ -24,7 +24,7 @@ package com.ingby.socbox.bischeck.configuration;
  */
 
 public interface ConfigXMLInf {
-    public enum XMLCONFIG  { 
+    enum XMLCONFIG  { 
         BISCHECK { 
             public String toString() {
                 return "BISCHECK";

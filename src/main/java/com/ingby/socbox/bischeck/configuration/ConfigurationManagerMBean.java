@@ -2,7 +2,7 @@ package com.ingby.socbox.bischeck.configuration;
 
 public interface ConfigurationManagerMBean {
 
-    public static final String BEANNAME = "com.ingby.socbox.bischeck.configuration:type=ConfigurationManager,name=configuration";
+    static final String BEANNAME = "com.ingby.socbox.bischeck.configuration:type=ConfigurationManager,name=configuration";
 
     /**
      * Get the full bischeck.xml configuration for a host name.
@@ -11,7 +11,7 @@ public interface ConfigurationManagerMBean {
      * @param hostname
      * @return
      */
-    public String getHostConfiguration(String hostname);
+    String getHostConfiguration(String hostname);
     
     
     /**
@@ -20,14 +20,14 @@ public interface ConfigurationManagerMBean {
      * definition.
      * @return
      */
-    public String getPurgeConfigurations();
+    String getPurgeConfigurations();
     
     
     /**
      * Get a list of all configured service definitions in bischeck
      * @return
      */
-    public String getServiceDefinitions();
+    String getServiceDefinitions();
         
     
 }

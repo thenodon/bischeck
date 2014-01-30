@@ -28,6 +28,7 @@ package com.ingby.socbox.bischeck.cache;
  *
  */
 public interface CachePurgeInf {
+	
 	/**
 	 * The method will trim the list of object in the cache
 	 * @param key - the key of the type host-service-serviceitem

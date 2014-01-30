@@ -49,14 +49,14 @@ public interface Service {
      * Get the service name for the Service.
      * @return service name
      */
-    public String getServiceName();
+    String getServiceName();
     
     
     /**
      * Get the connection url.
      * @return the connection url
      */
-    public String getConnectionUrl();
+    String getConnectionUrl();
     
     
     /**
@@ -68,41 +68,41 @@ public interface Service {
      * definition of Service classes and corresponding url schema.
      * @param connectionUrl e.g. jdbc://...
      */
-    public void setConnectionUrl(String connectionUrl);
+    void setConnectionUrl(String connectionUrl);
     
     
     /**
      * Get the description text of the Service.
      * @return description text
      */
-    public String getDecscription();
+    String getDecscription();
     
     
     /**
      * Set the List of execution schedules, according to quartz crontrigger format
      * @param schedulelist 
      */
-    public void setSchedules(List<String> schedulelist);
+    void setSchedules(List<String> schedulelist);
 
     /**
      * Get the list of execution schedules, 
      * @return list of schedules
      */
-    public List<String> getSchedules();
+    List<String> getSchedules();
     
     
     /**
      * Set the description text of the Service.
      * @param decscription Description text
      */
-    public void setDecscription(String decscription);
+    void setDecscription(String decscription);
 
     
     /**
      * Get the driver class. 
      * @return the driver class name
      */
-    public String getDriverClassName();
+    String getDriverClassName();
     
     
     /**
@@ -112,7 +112,7 @@ public interface Service {
      * directory of the bischeck installation directory.  
      * @param driverClassName Class name for the driver class
      */
-    public void setDriverClassName(String driverClassName);
+    void setDriverClassName(String driverClassName);
     
     
     /**
@@ -121,7 +121,7 @@ public interface Service {
      * method is called.   
      * @throws ServiceException if the opening of connection fail
      */
-    public void openConnection() throws ServiceException;
+    void openConnection() throws ServiceException;
     
     
     /**
@@ -129,7 +129,7 @@ public interface Service {
      * connection when the method is called. 
      * @throws  ServiceException if the closing of connection failes
      */
-    public void closeConnection() throws ServiceException ;
+    void closeConnection() throws ServiceException ;
 
     
     /**
@@ -150,14 +150,14 @@ public interface Service {
      * to the specific instance of the Service. 
      * @param serviceItem The ServiceItem object to add
      */
-    public void addServiceItem(ServiceItem serviceItem);
+    void addServiceItem(ServiceItem serviceItem);
     
     
     /**
      * Return all the service items instances configured for the Service. 
      * @return a Map of service items with service item name as the key.
      */
-    public Map<String,ServiceItem> getServicesItems();
+    Map<String,ServiceItem> getServicesItems();
     
     
     /**
@@ -165,7 +165,7 @@ public interface Service {
      * @param name Service item name
      * @return Service item object for the named service item
      */
-    public ServiceItem getServiceItemByName(String name);
+    ServiceItem getServiceItemByName(String name);
     
     
     
@@ -173,62 +173,55 @@ public interface Service {
      * Called by the framework to map the Service to a specific Host object. 
      * @param host Host object
      */
-    public void setHost(Host host);
+    void setHost(Host host);
     
     
     /**
      * Get the Host object for the Service.
      * @return Host that the Service is related to
      */
-    public Host getHost();
+    Host getHost();
     
     
     /**
      * Return the current nagios level of the service
      * @return current nagios level of the service
      */
-    public NAGIOSSTAT getLevel();
+    NAGIOSSTAT getLevel();
     
     
     /**
      * Set the current status level of the service
      * @param level
      */
-    public void setLevel(NAGIOSSTAT level);
+    void setLevel(NAGIOSSTAT level);
     
     
     /**
      * Check if the service has a valid connection
      * @return true if connection is established
      */
-    public boolean isConnectionEstablished();
+    boolean isConnectionEstablished();
     
-    
-    /**
-     * Set the connection status
-     * @param connected
-     */
-    //public void setConnectionEstablished(boolean connected);
-
-    
+        
     /**
      * Determine if the data retrieved by the service should be sent to the 
      * different configured monitoring servers. 
      * @return true if the data should be sent - true should be the default
      */
-    public Boolean isSendServiceData();
+    Boolean isSendServiceData();
     
     
     /**
      * Set to true if the data should be sent to monitoring servers
      * @param sendServiceData true to send and false not to send.
      */
-    public void setSendServiceData(Boolean sendServiceData);
+    void setSendServiceData(Boolean sendServiceData);
 
     
     
-    public String getAlias();
+    String getAlias();
 
 
-	public void setAlias(String alias);
+	void setAlias(String alias);
 }

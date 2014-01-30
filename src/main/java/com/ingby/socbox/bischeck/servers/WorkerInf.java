@@ -31,6 +31,6 @@ public interface WorkerInf {
      * @throws ServerException if any communication exception occur. 
      * If {@ ServerCircuitBreak} is used it will be triggered by the exception.
      */
-    public void send(Service service) throws ServerException;
+    void send(Service service) throws ServerException;
 
 }

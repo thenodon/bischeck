@@ -35,7 +35,7 @@ package com.ingby.socbox.bischeck.threshold;
 
 public interface Threshold {
 
-    public enum NAGIOSSTAT  { 
+    enum NAGIOSSTAT  { 
         OK { 
             public String toString() {
                 return "OK";
@@ -75,21 +75,21 @@ public interface Threshold {
      * do not exists in the Threshold cache for the combination of 
      * host->service->serviceitem.
      */
-    public void init() throws ThresholdException;
+    void init() throws ThresholdException;
     
     
     /**
      * Get the current warning value calculated for the Threshold.
      * @return calculated warning value
      */
-    public Float getWarning();
+    Float getWarning();
     
     
     /**
      * Get the current critical value calculated for the Threshold.
      * @return calculated critical value
      */
-    public Float getCritical();
+    Float getCritical();
     
     
     /**
@@ -97,41 +97,41 @@ public interface Threshold {
      * @param value Measured value to compare the threshold against
      * @return the state
      */
-    public NAGIOSSTAT getState(String value);
+    NAGIOSSTAT getState(String value);
     
     
     /**
      * Get the host name for the Threshold.
      * @return host name
      */
-    public String getHostName();
+    String getHostName();
     
     
     /**
      * Get the service name for the Threshold.
      * @return service name
      */
-    public String getServiceName();
+    String getServiceName();
     
     
     /**
      * Get the service item name for the Threshold.
      * @return service item name
      */
-    public String getServiceItemName();
+    String getServiceItemName();
 
     
     /**
      * Get the current threshold value.
      * @return the value of the threshold
      */
-    public Float getThreshold();
+    Float getThreshold();
     
     
     /**
      * Return the method used for the threshold calculation. Like <, > or =.
      * @return method for the calculated threshold
      */
-    public String getCalcMethod();
+    String getCalcMethod();
 
 }

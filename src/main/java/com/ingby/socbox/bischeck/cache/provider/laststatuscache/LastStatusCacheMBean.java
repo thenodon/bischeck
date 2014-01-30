@@ -23,16 +23,16 @@ public interface LastStatusCacheMBean {
     
     public final static String BEANNAME = "com.ingby.socbox.bischeck:name=Cache";
     
-    public int getLastStatusCacheCount();
-    public String[] getCacheKeys();
+    int getLastStatusCacheCount();
+    String[] getCacheKeys();
     
     /**
      * Dump the cache to a simple xml
      */
-    public void dump2file();
+    void dump2file();
     
     /**
      * Clear cache content
      */
-    public void clearCache();
+    void clearCache();
 }

@@ -47,35 +47,35 @@ public interface ServiceItem {
      * Get the service item name for the ServiceItem
      * @return service item name
      */
-    public String getServiceItemName();
+    String getServiceItemName();
 
     
     /**
      * Get the description text of the ServiceItem
      * @return description test
      */
-    public String getDecscription();
+    String getDecscription();
     
     
     /**
      * Set the description text of the ServiceItem.
      * @param decscription Description text
      */
-    public void setDecscription(String decscription);
+    void setDecscription(String decscription);
     
     
     /**
      * Get the execution statement string.
      * @return the execute statement string
      */
-    public String getExecution();
+    String getExecution();
 
     
     /**
      * Set the execution statement string.
      * @param execution The execution statement for the ServiceItem
      */
-    public void setExecution(String execution);
+    void setExecution(String execution);
 
     
     /**
@@ -83,103 +83,103 @@ public interface ServiceItem {
      * for configuration presentations
      * @return the execute statement string
      */
-    public String getExecutionStat();
+    String getExecutionStat();
 
     
     /**
      * Get the class name for the threshold class used for the ServiceItem.
      * @return the threshold class name
      */
-    public String getThresholdClassName();
+    String getThresholdClassName();
     
     
     /**
      * Set the class name for the threshold class used for the ServiceItem. 
      * @param thresholdclassname Name of the Threshold class 
      */
-    public void setThresholdClassName(String thresholdclassname);
+    void setThresholdClassName(String thresholdclassname);
     
     
     /**
      * Set the time for executing the ServiceItem's execution statement. 
      * @param exectime The time to execute the ServiceItem statement
      */
-    public void setExecutionTime(Long exectime);
+    void setExecutionTime(Long exectime);
     
     
     /**
      * Return the time it took to execute the execution statement. 
      * @return the execution time
      */
-    public Long getExecutionTime();
+    Long getExecutionTime();
     
     
     /**
      * Set a reference to the currently used threshold object.
      * @param threshold Threshold object to use for threshold calculation
      */
-    public void setThreshold(Threshold threshold);
+    void setThreshold(Threshold threshold);
     
     
     /**
      * Get the threshold object used for the ServiceItem object.
      * @return Threshold for the ServiceItem
      */
-    public Threshold getThreshold();
+    Threshold getThreshold();
     
     
     /**
      * Set the execution statement for the ServiceItem.
      * @throws Exception
      */
-    public void execute() throws ServiceException, ServiceItemException;
+    void execute() throws ServiceException, ServiceItemException;
     
     
     /**
      * Return the last return value from the execution.
      * @return last execution value
      */
-    public String getLatestExecuted();
+    String getLatestExecuted();
     
     
     /**
      * Set the last executed value form the execution.
      * @param value
      */
-    public void setLatestExecuted(String value);
+    void setLatestExecuted(String value);
     
     
     /**
      * Set the Service object the the ServiceItem is configured for. 
      * @param service Service object that the ServiceItem belongs to
      */
-    public void setService(Service service);
+    void setService(Service service);
     
     
     /**
      * Set the class name to be used to exceute the serviceitem
      * @param classname
      */
-    public void setClassName(String classname);
+    void setClassName(String classname);
 
     
     /**
      * Get the class name used for the service item
      * @return
      */
-    public String getClassName();
+    String getClassName();
 
     /**
      * Set the serviceitem alias
      * @return
      */
-    public String getAlias();
+    String getAlias();
 
 
     /**
      * Get the serviceitem alias
      * @param alias
      */
-	public void setAlias(String alias);
+	void setAlias(String alias);
 
 }

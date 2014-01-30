@@ -29,76 +29,76 @@ public interface ServerCircuitBreakMBean {
 	 * exception and circuit break being in OPEN state.
 	 * @return the total count of failed calls to the server
 	 */
-	public long getTotalFailed();
+	long getTotalFailed();
 	
 	
 	/**
 	 * The current state of the circuit break
 	 * @return the circuit break current state
 	 */
-	public String getCurrentState();
+	String getCurrentState();
 	
 	
 	/**
 	 * Get the date and time for last state change
 	 * @return last state change
 	 */
-	public String getLastStateChange();
+	String getLastStateChange();
 	
 	
 	/**
 	 * The total number of times the circuit break been open
 	 * @return the total number of times the circuit break been opened
 	 */
-	public long getTotalOpenCount();
+	long getTotalOpenCount();
 
 	
 	/**
 	 * Check if circuit break is enabled
 	 * @return true if enabled and false if disabled
 	 */
-	public boolean isEnabled();
+	boolean isEnabled();
 
 	
 	/**
 	 * Enable circuit break
 	 */
-	public void enable();
+	void enable();
 	
 	
 	/**
 	 * Disable circuit break
 	 */
-	public void disable();
+	void disable();
 	
 	
 	/**
 	 * Get the OPEN timeout time in milliseconds 
 	 */
-	public long getOpenTimeout();
+	long getOpenTimeout();
    
 	
 	/**
 	 * Set the OPEN timeout time in milliseconds
 	 * @param timeout
 	 */
-	public void setOpenTimeout(long timeout);
+	void setOpenTimeout(long timeout);
     
 	
     /**
      * Get the CLOSE to OPEN count 
      */
-    public int getExceptionThreshold();
+    int getExceptionThreshold();
     
     
     /**
      * Set the exception count before going to OPEN state
      * @param exceptionThreshold
      */
-    public void setExceptionThreshold(int exceptionThreshold);
+    void setExceptionThreshold(int exceptionThreshold);
     
     /**
      * Get the time remaining until reset
      */
-    public String getAttemptResetAfter();
+    String getAttemptResetAfter();
 }

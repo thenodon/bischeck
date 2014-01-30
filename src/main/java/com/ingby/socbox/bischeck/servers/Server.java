@@ -34,7 +34,7 @@ public interface Server {
      * @throws ServerException if any communication exception occur. 
      * If {@ ServerCircuitBreak} is used it will be triggered by the exception.
      */
-    public void send(Service service) throws ServerException;
+	void send(Service service) throws ServerException;
     
     
     /**
@@ -45,12 +45,12 @@ public interface Server {
      * 
      * @return the name of the server instance
      */
-    public String getInstanceName();
+    String getInstanceName();
     
     
     /**
      * Unregister all resources related to the server instance
      */
-    public void unregister();
+    void unregister();
 
 }
