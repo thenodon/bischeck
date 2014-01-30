@@ -14,8 +14,9 @@ public class Optimizer {
 	}
 	
 	public void setIndex(long index) {
-		if (index > highindex)
+		if (index > highindex) {
 			highindex = index;
+		}
 	}
 	
 	public long getHighIndex() {

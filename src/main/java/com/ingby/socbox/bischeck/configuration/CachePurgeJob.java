@@ -82,8 +82,9 @@ public class CachePurgeJob implements Job {
     	
     	
     	sched = StdSchedulerFactory.getDefaultScheduler();
-        if (!sched.isStarted())
+        if (!sched.isStarted()) {
         	sched.start();
+        }
         
         
         JobDetail job = newJob(CachePurgeJob.class).
@@ -99,8 +100,10 @@ public class CachePurgeJob implements Job {
         .build();
         
         // If job exists delete and add
-        if (sched.getJobDetail(job.getKey()) != null)
-        		sched.deleteJob(job.getKey());
+        if (sched.getJobDetail(job.getKey()) != null) {
+        	sched.deleteJob(job.getKey());
+        }
+        
         Date ft = sched.scheduleJob(job, trigger);
         
         sched.addJob(job, true);

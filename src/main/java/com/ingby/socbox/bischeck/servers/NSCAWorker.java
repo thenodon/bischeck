@@ -106,9 +106,10 @@ public class NSCAWorker implements WorkerInf, Runnable {
 
         payload.setLevel(level.toString());
 
-        if (LOGGER.isInfoEnabled())
+        if (LOGGER.isInfoEnabled()) {
             LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
-
+        }
+        
         final String timerName = instanceName+"_send";
 
         final Timer timer = Metrics.newTimer(NSCAServer.class, 
@@ -127,9 +128,8 @@ public class NSCAWorker implements WorkerInf, Runnable {
             throw new ServerException(e);
         } finally {
             long duration = context.stop()/1000000;
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("Nsca send execute: {} ms", duration);
-        }       
+            LOGGER.debug("Nsca send execute: {} ms", duration);
+         }
     }
 }
 

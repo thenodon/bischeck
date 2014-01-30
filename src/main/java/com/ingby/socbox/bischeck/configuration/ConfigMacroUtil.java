@@ -197,9 +197,10 @@ public class ConfigMacroUtil {
    
 
     private static String replaceMacroHost(String source, Host host) {
-    	if (source == null)
+    	if (source == null) {
     		return null;
-    				
+    	}
+    	
     	// Replace with all macros applicable for host
     	String str = source.replaceAll(HOST_NAME_MACRO, host.getHostname());
     	// Replace alias macro - if null empty string
@@ -216,8 +217,9 @@ public class ConfigMacroUtil {
     
     
     private static String replaceMacroService(String source, Service service) {
-    	if (source == null)
+    	if (source == null) {
     		return null;
+    	}
     	
     	String str = source.replaceAll(SERVICE_NAME_MACRO, service.getServiceName());
     	// Replace alias macro - if null empty string
@@ -232,8 +234,9 @@ public class ConfigMacroUtil {
     }
 
     private static String replaceMacroServiceItem(String source, ServiceItem serviceItem) {
-    	if (source == null)
+    	if (source == null) {
     		return null;
+    	}
     	
     	String str = source.replaceAll(SERVICEITEM_NAME_MACRO, serviceItem.getServiceItemName());
     	// Replace alias macro - if null empty string

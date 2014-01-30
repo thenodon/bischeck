@@ -72,15 +72,16 @@ public class InternalSurveillance implements Job {
 		bischeckHostName = ConfigurationManager.getInstance().getProperties().getProperty("bischeckHostName","bischeck");
 		boolean sendInternal= Boolean.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("sendInternal","false"));
 		String sendInternalInterval= ConfigurationManager.getInstance().getProperties().getProperty("sendInternalInterval","0 */5 * * * ? *");
-		if (!CronExpression.isValidExpression(sendInternalInterval)){
+		if (!CronExpression.isValidExpression(sendInternalInterval)) {
 			sendInternalInterval= "0 */5 * * * ? *";
 		}
 		
 		if (sendInternal) {
 			Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
-			if (!sched.isStarted())
+			if (!sched.isStarted()) {
 				sched.start();
-
+			}
+			
 			JobDetail job = newJob(InternalSurveillance.class).
 					withIdentity("Internal", "Internal").
 					withDescription("Internal").    
@@ -95,8 +96,10 @@ public class InternalSurveillance implements Job {
 					.build();
 
 			// If job exists delete and add
-			if (sched.getJobDetail(job.getKey()) != null)
+			if (sched.getJobDetail(job.getKey()) != null) {
 				sched.deleteJob(job.getKey());
+			}
+			
 			Date ft = sched.scheduleJob(job, trigger);
 
 			sched.addJob(job, true);

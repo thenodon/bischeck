@@ -57,11 +57,12 @@ public class Query {
 		for (int i = 0; i < listtosearch.size(); i++) {
 			long d1 = Math.abs(time - listtosearch.get(i).getTimestamp());
 			long d2;
-			if (i+1 < listtosearch.size())
+			if (i+1 < listtosearch.size()) {
 				d2 = Math.abs(time - listtosearch.get(i+1).getTimestamp());
-			else 
+			} else { 
 				d2 = Long.MAX_VALUE;
-
+			}
+			
 			if ( d1 < bestDistanceFoundYet ) {
 
 				// For the moment, this value is the nearest to the desired number...
@@ -99,11 +100,12 @@ public class Query {
 		for (int i = 0; i < listtosearch.size(); i++) {
 			long d1 = Math.abs(time - listtosearch.get(i).getTimestamp());
 			long d2;
-			if (i+1 < listtosearch.size())
+			if (i+1 < listtosearch.size()) {
 				d2 = Math.abs(time - listtosearch.get(i+1).getTimestamp());
-			else 
+			} else { 
 				d2 = Long.MAX_VALUE;
-
+			}
+			
 			if ( d1 < bestDistanceFoundYet ) {
 
 				// For the moment, this value is the nearest to the desired number...
@@ -138,7 +140,10 @@ public class Query {
 		Integer fromindex = null;
 		
 		
-		if (totime < fromtime) return null;
+		if (totime < fromtime) {
+			return null;
+		}
+		
 		// if outside take all 
 		
 		if (totime > listtosearch.getFirst().getTimestamp() &&
@@ -151,10 +156,12 @@ public class Query {
 			fromindex=listtosearch.size()-1;
 		}
 		
-		if (toindex == null)
+		if (toindex == null) {
 			toindex = Query.nearestByIndex(totime, listtosearch);
-		if (fromindex == null)
+		}
+		if (fromindex == null) {
 			fromindex = Query.nearestByIndex(fromtime, listtosearch);
+		}
 		
 		LOGGER.debug("fromindex: {} toindex: {}", fromindex, toindex);
 		for (int i = fromindex; i>toindex-1; i--){

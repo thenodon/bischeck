@@ -170,9 +170,10 @@ public final class ServerExecutor {
 					Method method = serverSet.get(name).getMethod(GETINSTANCE,String.class);
 
 					Object serverobj = method.invoke(null,name);
-					if (serverobj instanceof ServerInternal)
+					if (serverobj instanceof ServerInternal) {
 						((ServerInternal) serverobj).sendInternal(host, service, level, message);
-
+					}
+					
 				} catch (IllegalArgumentException e) {
 					LOGGER.error(e.toString(), e);
 				} catch (IllegalAccessException e) {

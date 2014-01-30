@@ -131,9 +131,10 @@ public class NRDPWorker implements WorkerInf, Runnable {
                     Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
         }
 
-        if (LOGGER.isInfoEnabled())
+        if (LOGGER.isInfoEnabled()) {
             LOGGER.info(ServerUtil.logFormat(instanceName, service, xml));
-
+        }
+        
         connectAndSend(xml);
 
     }
@@ -213,8 +214,9 @@ public class NRDPWorker implements WorkerInf, Runnable {
             throw new ServerException(e);
         } finally { 
             try {
-                if (wr != null)
+                if (wr != null) {
                     wr.close();
+                }
             } catch (IOException ignore) {}
             
             long duration = context.stop()/1000000;

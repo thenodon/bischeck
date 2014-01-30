@@ -21,9 +21,7 @@ package com.ingby.socbox.bischeck.migration;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -42,7 +40,6 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
-import com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLKey;
@@ -148,12 +145,14 @@ public class MoveCache2Redis {
 				
 				totalCountEntries += countEntries;
 				
-				if (verbose)
+				if (verbose) {
 					System.out.println("Loading : " + key.getId());
-			
+				}
+				
 				for (LastStatus ls: list) {
-					if (verbose)
+					if (verbose) {
 						System.out.println(ls.getJson());
+					}
 					if (!check) {
 						lsc.add(ls, key.getId());	
 					}

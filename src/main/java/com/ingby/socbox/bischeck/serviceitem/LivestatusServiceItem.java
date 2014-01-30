@@ -116,10 +116,15 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
 
 
     private boolean validateExecStatement(JSONObject jsonStatement) {
-        if (!jsonStatement.containsKey("host"))  return false;
+        if (!jsonStatement.containsKey("host"))  {
+        	return false;
+        }
         
-        if (!jsonStatement.containsKey("query")) return false; 
-        else if(!validateQuery(jsonStatement.getString("query"))) return false;    
+        if (!jsonStatement.containsKey("query")) {
+        	return false; 
+        } else if (!validateQuery(jsonStatement.getString("query"))) {
+        	return false;    
+        }
         
         return true;
     }
@@ -127,7 +132,9 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
 
     private boolean validateQuery(String ops) {
         if (ops.equalsIgnoreCase("state") || 
-                (ops.equalsIgnoreCase("perfdata")) ) return true;
+                (ops.equalsIgnoreCase("perfdata")) ) { 
+        	return true;
+        }
         return false;
     }
 }

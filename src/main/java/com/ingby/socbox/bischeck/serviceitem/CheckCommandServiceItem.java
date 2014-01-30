@@ -77,9 +77,13 @@ public class CheckCommandServiceItem extends ServiceItemAbstract implements Serv
 
 	private boolean validateExecStatement(final JSONObject jsonStatement) {
 
-		if (!jsonStatement.containsKey("check"))  return false;
+		if (!jsonStatement.containsKey("check")) {
+			return false;
+		}
 
-		if (!jsonStatement.containsKey("label")) return false; 
+		if (!jsonStatement.containsKey("label")) {
+			return false; 
+		}
 
 		return true;
 	}

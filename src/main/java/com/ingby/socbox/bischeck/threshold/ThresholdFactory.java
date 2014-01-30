@@ -105,12 +105,13 @@ public class ThresholdFactory {
 			    }
 			}
 		} else {
-			if (LOGGER.isDebugEnabled())
+			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Threshold for " + 
 						service.getHost().getHostname() + ":" +
 						service.getServiceName() + ":" +
 						serviceItem.getServiceItemName() + ":" +
 						" in cache");
+			}
 		}
 
 		return current;

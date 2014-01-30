@@ -181,9 +181,10 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
         	//LOGGER.info("Send - sender.send(payload)");
         } finally { 
         	long duration = context.stop()/1000000;
-			if (LOGGER.isDebugEnabled())
+			if (LOGGER.isDebugEnabled()) {
             	LOGGER.debug("Nsca send execute: " + duration + " ms");
-        }	    
+			}	    
+        }
     }
     
     

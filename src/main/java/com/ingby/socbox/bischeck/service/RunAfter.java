@@ -47,10 +47,11 @@ public class RunAfter {
 	public boolean equals(Object obj) {
 		if (obj != null) {
 			if (this.hostname.equals( ((RunAfter) obj).getHostname()) &&  
-					this.servicename.equals( ((RunAfter) obj).getServicename()) )
+					this.servicename.equals( ((RunAfter) obj).getServicename()) ) {
 				return true;
-			else
+			} else {
 				return false;
+			}	
 		}
 		return false;
 	}

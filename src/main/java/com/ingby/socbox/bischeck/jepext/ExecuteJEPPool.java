@@ -39,8 +39,9 @@ public final class ExecuteJEPPool {
 	
 	
 	static synchronized public ExecuteJEPPool getInstance() {
-		if (pool == null)
+		if (pool == null) {
 			pool = new ExecuteJEPPool();
+		}
 		return pool;
 	}
 	
@@ -95,8 +96,9 @@ public final class ExecuteJEPPool {
 		long count = locked.get(jep);
 		count++;
 		locked.remove(jep);
-		if (count < DIECOUNT)
+		if (count < DIECOUNT) {
 			unlocked.put(jep,count);
+		}
 		
 		LOGGER.debug("Return JEP obj used {} (unlocked/locked): {} / {}", 
 				count, unlocked.size(),  +locked.size());

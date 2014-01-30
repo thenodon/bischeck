@@ -112,9 +112,10 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
             message = null;
         }
 
-        if (LOGGER.isInfoEnabled())
+        if (LOGGER.isInfoEnabled()) {
         	LOGGER.info(ServerUtil.logFormat(instanceName, service, message));
-
+        }
+        
         connectAndSend(message);
 
     }
@@ -149,11 +150,13 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
             LOGGER.error("Network error - check OpenTSDB server and that service is started", e);
         }
         finally {
-            if (out != null)
+            if (out != null) {
                 out.close();
+            }
             try {
-            	if (opentsdbSocket != null)
+            	if (opentsdbSocket != null) {
             		opentsdbSocket.close();
+            	}
             } catch (IOException ignore) {}    
             
             long duration = context.stop()/1000000;
@@ -209,18 +212,20 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     
     
     private String checkNull(String str) {
-        if (str == null)
+        if (str == null) {
             return "NaN";
-        else
+        } else {
             return str;
+        }
     }
 
     
     private String checkNull(Float number) {
-        if (number == null)
+        if (number == null) {
             return "NaN";
-        else
+        } else {
             return String.valueOf(number);
+        }
     }
     
     

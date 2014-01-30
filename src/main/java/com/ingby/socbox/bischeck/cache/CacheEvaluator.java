@@ -104,9 +104,10 @@ public class CacheEvaluator {
 		cacheEntriesName = parseParameters(statement);
 
 		// If no cache definition present return the orignal string
-		if (cacheEntriesName.size() == 0)
+		if (cacheEntriesName.size() == 0) {
 			parsedstatement = statement;
-
+		}
+		
 		// If cache entries in the string parse and replace
 		cacheEntriesValue = getValues(cacheEntriesName);
 
@@ -194,10 +195,11 @@ public class CacheEvaluator {
 			for (int i = 0; i < valueList.size(); i++) {
 				String trimNull = valueList.get(i).replaceAll("null,", "")
 						.replaceAll(",null", "");
-				if (trimNull.length() == 0)
+				if (trimNull.length() == 0) {
 					valueList.set(i, "null");
-				else
+				} else {
 					valueList.set(i, trimNull);
+				}	
 			}
 		}
 

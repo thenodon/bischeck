@@ -77,13 +77,15 @@ public final class CalculateOLS {
     		String resolutionMethod,
     		String resolution,
     		Integer forecast,
-    		String timeOffSet) throws CalculateOLSException 
-    {
-    	if (forecast < 1) 
-    		throw new CalculateOLSException("Forcast must be => 1");
+    		String timeOffSet) throws CalculateOLSException {
     	
-    	if (!(resolution.equalsIgnoreCase("H") || resolution.equalsIgnoreCase("D") || resolution.equalsIgnoreCase("W"))) 
+    	if (forecast < 1) {
+    		throw new CalculateOLSException("Forcast must be => 1");
+    	}
+    	
+    	if (!(resolution.equalsIgnoreCase("H") || resolution.equalsIgnoreCase("D") || resolution.equalsIgnoreCase("W"))) { 
     		throw new CalculateOLSException("Support resolution interval are H,D or W");
+    	}
     	
     	this.hostName = hostName;
     	this.serviceName = serviceName;
@@ -114,11 +116,11 @@ public final class CalculateOLS {
     		String serviceItemName, 
     		String resolutionMethod,
     		String resolution,
-    		String timeOffSet) throws CalculateOLSException 
-    {
+    		String timeOffSet) throws CalculateOLSException  {
     	
-    	if (!(resolution.equalsIgnoreCase("H") || resolution.equalsIgnoreCase("D") || resolution.equalsIgnoreCase("W"))) 
+    	if (!(resolution.equalsIgnoreCase("H") || resolution.equalsIgnoreCase("D") || resolution.equalsIgnoreCase("W"))) { 
     		throw new CalculateOLSException("Support resolution interval are H,D or W");
+    	}
     	
     	this.hostName = hostName;
     	this.serviceName = serviceName;
@@ -138,8 +140,9 @@ public final class CalculateOLS {
     public Double getPredictiveValue() {
 		
 		PredictArray pa = createPredictionArray();
-		if (pa == null)
+		if (pa == null) {
 			return null;
+		}
 		
 		SimpleRegression regression = createRegression(pa);
 		
@@ -155,8 +158,9 @@ public final class CalculateOLS {
 	public Double getPredictiveSlope() {
 		
 		PredictArray pa = createPredictionArray();
-		if (pa == null)
+		if (pa == null) {
 			return null;
+		}
 		
 		SimpleRegression regression = createRegression(pa);
 		
@@ -172,8 +176,9 @@ public final class CalculateOLS {
 	public Double getPredictiveSignificance() {
 		
 		PredictArray pa = createPredictionArray();
-		if (pa == null)
+		if (pa == null) {
 			return null;
+		}
 		
 		SimpleRegression regression = createRegression(pa);
 		
@@ -185,13 +190,14 @@ public final class CalculateOLS {
 	
     private RESMETHOD getResolutioMethod(String resolutionmethod) {
 		RESMETHOD resmeth = RESMETHOD.AVG;
-		if (resolutionmethod.equalsIgnoreCase(RESMETHOD.AVG.toString()))
+		if (resolutionmethod.equalsIgnoreCase(RESMETHOD.AVG.toString())) {
 			resmeth = RESMETHOD.AVG;
-		else if (resolutionmethod.equalsIgnoreCase(RESMETHOD.MAX.toString()))
+		} else if (resolutionmethod.equalsIgnoreCase(RESMETHOD.MAX.toString())) {
 			resmeth = RESMETHOD.MAX;
-		else if (resolutionmethod.equalsIgnoreCase(RESMETHOD.MIN.toString()))
+		} else if (resolutionmethod.equalsIgnoreCase(RESMETHOD.MIN.toString())) {
 			resmeth = RESMETHOD.MIN;
-		 
+		}
+		
 		return resmeth;
 	}
 
@@ -249,22 +255,25 @@ public final class CalculateOLS {
 			
 			switch (resolutionMethod) {
 			case AVG: 
-				if (pa.getAverage(i) != null) 
+				if (pa.getAverage(i) != null) { 
 					regression.addData(i, pa.getAverage(i));
+				}
 				break;
 			case MAX:
-				if (pa.getMax(i) != null)
+				if (pa.getMax(i) != null) {
 					regression.addData(i, pa.getMax(i));
+				}
 				break;
 			case MIN:
-				if (pa.getMin(i) != null)
+				if (pa.getMin(i) != null) {
 					regression.addData(i, pa.getMin(i));
+				}
 				break;	
 			default:
-				if (pa.getAverage(i) != null)
+				if (pa.getAverage(i) != null) {
 					regression.addData(i, pa.getAverage(i));
+				}
 				break;
-
 			}
 		}
 		return regression;

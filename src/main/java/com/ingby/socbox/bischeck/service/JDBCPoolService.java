@@ -94,7 +94,7 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
     		statement.setQueryTimeout(querytimeout);
     		res = statement.executeQuery(exec);
 
-    		if (res.next()) {//Changed from first - not working with as400 jdbc driver
+    		if (res.next()) { //Changed from first - not working with as400 jdbc driver
     			return (res.getString(1));
     		}
     	} catch (SQLException sqle) {
@@ -104,12 +104,14 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
     		throw se;
     	} finally {
     		try {	
-    			if (res != null)
+    			if (res != null) {
     				res.close();
+    			}
     		} catch(SQLException ignore) {}    
     		try {
-    			if (statement != null)
+    			if (statement != null) {
     				statement.close();
+    			}
     		} catch(SQLException ignore) {}    
     	}
 

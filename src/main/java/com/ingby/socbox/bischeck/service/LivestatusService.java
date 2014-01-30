@@ -133,14 +133,16 @@ public class LivestatusService extends ServiceAbstract implements Service {
     		throw se;
         } finally {    
             try {
-            	if (dataOut != null)
+            	if (dataOut != null) {
             		dataOut.close();
+            	}
             } catch (IOException ignore) {}  
             dataOut = null;  
 
             try {
-            	if (bufIn != null)
+            	if (bufIn != null) {
             		bufIn.close();
+            	}
             } catch (IOException ignore) {}  
             bufIn = null; 
         }

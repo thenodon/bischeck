@@ -74,8 +74,9 @@ public class Properties2ServerProperties {
         if (line.hasOption("source")) {
         	String sourcedir = line.getOptionValue("source");
             String destdir=".";
-            if (line.hasOption("destination"))
+            if (line.hasOption("destination")) {
                 destdir=line.getOptionValue("destination");
+            }
             
             converter.createXMLServerProperties(sourcedir,destdir);
             

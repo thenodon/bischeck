@@ -89,8 +89,9 @@ public class MatchServiceToSend {
 			append(service.getServiceName()).append("-").
 			append(serviceItem.getServiceItemName());
 			if (isMatch(st.toString())) {
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("Matching regex - will not send " + st.toString());	
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Matching regex - will not send " + st.toString());
+				}
 				return true;
 			}
 		}

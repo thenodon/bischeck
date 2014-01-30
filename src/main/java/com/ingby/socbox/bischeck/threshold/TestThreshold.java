@@ -48,13 +48,15 @@ public class TestThreshold implements Threshold {
 
     @Override
     public Float getWarning() {
-        if (this.warning == null)
+        if (this.warning == null) {
             return null;
+        }
+        
         if (calcMethod.equalsIgnoreCase("<")) {
             return (1-this.warning)+1;
-        }
-        else
+        } else {
             return this.warning;
+        }
     }
 
 
@@ -65,13 +67,14 @@ public class TestThreshold implements Threshold {
     
     @Override
     public Float getCritical() {
-        if (this.critical == null)
+        if (this.critical == null) {
             return null;
+        }
         if (calcMethod.equalsIgnoreCase("<")) {
             return (1-this.critical)+1;
-        }
-        else
+        } else {
             return this.critical;
+        }
     }
     
     

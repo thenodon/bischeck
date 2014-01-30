@@ -115,8 +115,9 @@ public final class Lookup {
 		}	
 		
 		opti.setIndex(index);
-		if (LOGGER.isDebugEnabled())
+		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("High index for " + keyname +" is: " + opti.getHighIndex());
+		}
 	}
 
 }

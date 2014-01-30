@@ -58,7 +58,9 @@ public class Min extends PostfixMathCommand {
 			curNumberOfParameters = curNumberOfParameters - Util.deleteNullFromStack(stack);
 		}
 	
-		if (curNumberOfParameters < 1) throw new ParseException("No arguments for Sum");
+		if (curNumberOfParameters < 1) {
+			throw new ParseException("No arguments for Sum");
+		}
 
 		// initialize the result to the first argument
 		Object min = stack.pop();

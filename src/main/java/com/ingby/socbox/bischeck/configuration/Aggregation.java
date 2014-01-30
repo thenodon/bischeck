@@ -205,9 +205,10 @@ public class Aggregation {
 	 * 
 	 */
 	void setAggregate(Properties urlPropeties) throws ServiceFactoryException, ServiceItemFactoryException  {
-		if (xmlconfig == null)
+		if (xmlconfig == null) {
 			return;
-
+		}
+		
 		ArrayList<AGGREGATION> periods = new ArrayList<AGGREGATION>();
 		periods.add(AGGREGATION.HOUR);
 		periods.add(AGGREGATION.DAY);

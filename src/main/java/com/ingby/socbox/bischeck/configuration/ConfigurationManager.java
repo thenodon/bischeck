@@ -591,23 +591,29 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         // Override with template properties
         if (serviceconfig.getServiceoverride() != null) {
             
-            if (serviceconfig.getServiceoverride().getAlias() != null) 
+            if (serviceconfig.getServiceoverride().getAlias() != null) {
                 service.setAlias(serviceconfig.getServiceoverride().getAlias());
+            }
             
-            if (serviceconfig.getServiceoverride().getDesc() != null) 
+            if (serviceconfig.getServiceoverride().getDesc() != null) { 
                 service.setDecscription(serviceconfig.getServiceoverride().getDesc());
+            }
             
-            if (!serviceconfig.getServiceoverride().getSchedule().isEmpty()) 
+            if (!serviceconfig.getServiceoverride().getSchedule().isEmpty()) { 
                 service.setSchedules(serviceconfig.getServiceoverride().getSchedule());
+            }
             
-            if (serviceconfig.getServiceoverride().getUrl() != null) 
+            if (serviceconfig.getServiceoverride().getUrl() != null) { 
                 service.setConnectionUrl(serviceconfig.getServiceoverride().getUrl());
+            }
             
-            if (serviceconfig.getServiceoverride().getDriver() != null) 
+            if (serviceconfig.getServiceoverride().getDriver() != null) { 
                 service.setDriverClassName(serviceconfig.getServiceoverride().getDriver());
-        
-            if (serviceconfig.getServiceoverride().isSendserver() != null)
+            }
+            
+            if (serviceconfig.getServiceoverride().isSendserver() != null) {
                 service.setSendServiceData(serviceconfig.getServiceoverride().isSendserver());
+            }
         }
         return service;
     }
@@ -749,17 +755,21 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         }
         
         if (serviceitemconfig.getServiceitemoverride() != null) {
-            if (serviceitemconfig.getServiceitemoverride().getAlias() != null) 
+            if (serviceitemconfig.getServiceitemoverride().getAlias() != null) { 
                 serviceitem.setAlias(serviceitemconfig.getServiceitemoverride().getAlias());
+            }
             
-            if (serviceitemconfig.getServiceitemoverride().getDesc() != null) 
+            if (serviceitemconfig.getServiceitemoverride().getDesc() != null) { 
                 serviceitem.setDecscription(serviceitemconfig.getServiceitemoverride().getDesc());
-
-            if (serviceitemconfig.getServiceitemoverride().getExecstatement() != null) 
+            }
+            
+            if (serviceitemconfig.getServiceitemoverride().getExecstatement() != null) { 
                 serviceitem.setExecution(serviceitemconfig.getServiceitemoverride().getExecstatement());
-
-            if (serviceitemconfig.getServiceitemoverride().getThresholdclass() != null) 
+            }
+            
+            if (serviceitemconfig.getServiceitemoverride().getThresholdclass() != null) { 
                 serviceitem.setThresholdClassName(serviceitemconfig.getServiceitemoverride().getThresholdclass());
+            }
         }
         
         /*
@@ -1194,10 +1204,11 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         		return false;
         }
         else {
-        	if(new File(pidfile.getParent()).canWrite())
+        	if (new File(pidfile.getParent()).canWrite()) {
         		return true;
-        	else
+        	} else {
         		return false;
+        	}
         }
     }
     

@@ -40,8 +40,9 @@ public class JedisPoolWrapper {
 	 */
 	public Jedis getResource() {
 		Jedis jedis = jedispool.getResource();
-		if (jedis == null) 
+		if (jedis == null) { 
 			throw new JedisConnectionException("No pool resources available");
+		}
 		return jedis;
 	}
 	

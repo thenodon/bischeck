@@ -137,8 +137,9 @@ public final class GraphiteServer implements Server, MessageServerInf {
         }
 
         
-        if (LOGGER.isInfoEnabled())
+        if (LOGGER.isInfoEnabled()) {
         	LOGGER.info(ServerUtil.logFormat(instanceName, service, message));
+        }
         
         connectAndSend(message);
     }
@@ -171,11 +172,13 @@ public final class GraphiteServer implements Server, MessageServerInf {
         } catch (IOException e) {
             LOGGER.error("Network error - check Graphite server and that service is started", e);
         } finally {
-        	if (out != null)
+        	if (out != null) {
         		out.close();
+        	}
         	try {
-        		if (graphiteSocket != null)
+        		if (graphiteSocket != null) {
         			graphiteSocket.close();
+        		}
             } catch (IOException ignore) {}    
         
         	long duration = context.stop()/1000000;
@@ -232,18 +235,20 @@ public final class GraphiteServer implements Server, MessageServerInf {
     
     
     private String checkNull(String str) {
-        if (str == null)
+        if (str == null) {
             return "NaN";
-        else
+        } else {
             return str;
+        }
     }
 
     
     private String checkNull(Float number) {
-        if (number == null)
+        if (number == null) {
             return "NaN";
-        else
+        } else {
             return String.valueOf(number);
+        }
     }
     
     

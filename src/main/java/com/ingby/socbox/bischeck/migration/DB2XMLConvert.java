@@ -92,13 +92,14 @@ public class DB2XMLConvert {
         DB2XMLConvert converter = new DB2XMLConvert();
         if (line.hasOption("source")) {
             String destdir=".";
-            if (line.hasOption("destination"))
+            if (line.hasOption("destination")) {
                 destdir=line.getOptionValue("destination");
+            }
             
             StringWriter xmlstr = converter.createXMLProperties(line.getOptionValue("source") + File.separator + "bischeck.conf");
-            if (!line.hasOption("verbose")) 
+            if (!line.hasOption("verbose")) { 
                 converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.PROPERTIES.xml(),xmlstr);
-            else { 
+            } else { 
                 System.out.println("############## " + 
                 		ConfigXMLInf.XMLCONFIG.PROPERTIES.xml() + 
                         " ##############");
@@ -106,9 +107,9 @@ public class DB2XMLConvert {
             }
             
             xmlstr = converter.createXMLURL2Services(line.getOptionValue("source") + File.separator + "bischeck.conf");
-            if (!line.hasOption("verbose")) 
+            if (!line.hasOption("verbose")) { 
                 converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.URL2SERVICES.xml(),xmlstr);
-            else {
+            } else {
                 System.out.println("############## " + 
                 		ConfigXMLInf.XMLCONFIG.URL2SERVICES.xml() + 
                         " ##############");
@@ -116,18 +117,18 @@ public class DB2XMLConvert {
             }
             
             xmlstr = converter.createXMLBischeck(line.getOptionValue("source") + File.separator + "bischeck.conf");
-            if (!line.hasOption("verbose")) 
+            if (!line.hasOption("verbose")) { 
                 converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.BISCHECK.xml(),xmlstr);
-            else {
+            } else {
                 System.out.println("############## " + ConfigXMLInf.XMLCONFIG.BISCHECK.xml() +
                         " ##############");
                 System.out.println(xmlstr);
             }
 
             xmlstr = converter.createXMLTwenty4HourThreshold(line.getOptionValue("source") + File.separator + "24threshold.conf");
-            if (!line.hasOption("verbose")) 
+            if (!line.hasOption("verbose")) { 
                 converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml(),xmlstr);
-            else { 
+            } else { 
                 System.out.println("############## " +
                 		ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml() +
                         " ##############");
@@ -385,17 +386,28 @@ public class DB2XMLConvert {
                     if (rsperiod.getString("type") != null) {
                         if (rsperiod.getString("type").equalsIgnoreCase("M")) {
                             XMLMonths months = new XMLMonths();
-                            if (rsperiod.getString("interval") != null)
+                            if (rsperiod.getString("interval") != null) {
                                 months.setMonth(new Integer(rsperiod.getString("interval")));
-                            if (rsperiod.getString("day") != null)
+                            }
+                            
+                            if (rsperiod.getString("day") != null) {
                                 months.setDayofmonth(new Integer(rsperiod.getString("day")));
+                            }
+                          
                             period.getMonths().add(months);
+                        
                         } else if (rsperiod.getString("type").equalsIgnoreCase("W")) {
-                            XMLWeeks weeks = new XMLWeeks();
-                            if (rsperiod.getString("interval") != null)
+                            
+                        	XMLWeeks weeks = new XMLWeeks();
+                            
+                            if (rsperiod.getString("interval") != null) {
                                 weeks.setWeek(new Integer(rsperiod.getString("interval")));
-                            if (rsperiod.getString("day") != null)
+                            }
+                            
+                            if (rsperiod.getString("day") != null) {
                                 weeks.setDayofweek(new Integer(rsperiod.getString("day")));
+                            }
+                            
                             period.getWeeks().add(weeks);
                         }
                         
@@ -422,16 +434,18 @@ public class DB2XMLConvert {
                     
                     if (i < 10){
                         rshour.getString("H0"+i);
-                        if (rshour.wasNull())
+                        if (rshour.wasNull()) {
                             hour.add("null");
-                        else
+                        } else {
                             hour.add(rshour.getString("H0"+i));
+                        }
                     } else {
                         rshour.getString("H"+i);
-                        if (rshour.wasNull())
+                        if (rshour.wasNull()) {
                             hour.add("null");
-                        else
+                        } else {
                             hour.add(rshour.getString("H"+i));    
+                        }
                     }
                 }
                 hoursList.add(hours);
@@ -474,11 +488,13 @@ public class DB2XMLConvert {
             //Start writing to the output stream
             bufferedWriter.write(xmlstr.toString());
         } finally {
-        	if (bufferedWriter != null)
+        	if (bufferedWriter != null) {
         		bufferedWriter.flush();
+        	}
             try {
-            	if (bufferedWriter != null)
-                bufferedWriter.close();
+            	if (bufferedWriter != null) {
+            		bufferedWriter.close();
+            	}
             } catch (IOException ignore) {}
         }
     }

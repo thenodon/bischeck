@@ -171,11 +171,12 @@ public class ServiceJob implements Job {
 		Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
 
 		for (Service service:services) {
-			if (LOGGER.isDebugEnabled())
+			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Service to run immiediate {}-{}",
 						service.getHost().getHostname(), 
 						service.getServiceName());
-
+			}
+			
 			Map<String,Object> map = new HashMap<String, Object>();
 			map.put("service", service);
 			JobDataMap jobmap = new JobDataMap(map);

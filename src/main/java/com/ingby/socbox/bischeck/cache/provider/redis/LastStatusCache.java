@@ -501,8 +501,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
             
             for (long index = fromIndex; index <= toIndex; index++) {
                 LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
-                if (ls == null)
+                if (ls == null) {
                     break;
+                }
                 lslist.add(ls.copy());
             }
             
@@ -692,8 +693,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         try {
             jedis = jedispool.getResource();
             
-            if (jedis.llen(key) == 0)
+            if (jedis.llen(key) == 0) {
                 return null;
+            }
         
             index = nearestByIndex(stime, key);
             
@@ -753,8 +755,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         String key = Util.fullName( hostName, serviceName, serviceItemName);
         
         // Clear fast cache data
-        if (fastCache == null)
+        if (fastCache == null) {
             fastCache.get(key).clear();
+        }
         
         // Clear redis cache data
         Jedis jedis = null;
@@ -896,8 +899,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
     }
 
     private String checkNull(String str) {
-        if (str == null)
+        if (str == null) {
             return "";
+        }
         return str;
     }
 
@@ -998,11 +1002,12 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         for (int i = 0; i < listtosearch.size(); i++) {
             long d1 = Math.abs(time - listtosearch.get(i).getTimestamp());
             long d2;
-            if (i+1 < listtosearch.size())
+            if (i+1 < listtosearch.size()) {
                 d2 = Math.abs(time - listtosearch.get(i+1).getTimestamp());
-            else 
+            } else { 
                 d2 = Long.MAX_VALUE;
-
+            }
+            
             if ( d1 < bestDistanceFoundYet ) {
 
                 // For the moment, this value is the nearest to the desired number...
@@ -1038,11 +1043,12 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
             for (int i = 0; i < size; i++) {
                 long d1 = Math.abs(time - new LastStatus(jedis.lindex(key, i)).getTimestamp());
                 long d2;
-                if (i+1 < size)
+                if (i+1 < size) {
                     d2 = Math.abs(time - new LastStatus(jedis.lindex(key, i+1)).getTimestamp());
-                else 
+                } else { 
                     d2 = Long.MAX_VALUE;
-
+                }
+                
                 if ( d1 < bestDistanceFoundYet ) {
 
                     // For the moment, this value is the nearest to the desired number...
@@ -1071,12 +1077,15 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
      * @return cache index
      */
     private Long nearestByIndexFast(long time, String key) {
-        if (!fastCacheEnable)
+        if (!fastCacheEnable) {
             return null;
+        }
         
         LinkedList<LastStatus> listtosearch =  fastCache.get(key);
-        if (listtosearch == null)
+        if (listtosearch == null) {
             return null;
+        }
+        
         if (time > listtosearch.getFirst().getTimestamp() || 
             time < listtosearch.getLast().getTimestamp() ) {
             return null;

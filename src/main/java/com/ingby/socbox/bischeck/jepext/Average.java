@@ -63,7 +63,9 @@ public class Average extends PostfixMathCommand {
 			curNumberOfParameters -= Util.deleteNullFromStack(stack);
 		}
 		
-		if (curNumberOfParameters < 1) throw new ParseException("No arguments for Sum");
+		if (curNumberOfParameters < 1) {
+			throw new ParseException("No arguments for Sum");
+		}
 
 		// initialize the result to the first argument
 		Object sum = stack.pop();

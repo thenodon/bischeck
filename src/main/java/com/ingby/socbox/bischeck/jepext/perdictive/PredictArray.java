@@ -57,11 +57,12 @@ public class PredictArray {
 		LOGGER.debug("predictsize "+ predictSize);
 		
 		// Check if the bucket size are hour
-		if (bucketSize == 1*60*60*1000)
+		if (bucketSize == 1*60*60*1000) {
 			cal = getCalendarStartOfDayAndHour(endTimeStamp);
-		else
+		} else {
 			cal = getCalendarStartOfDay(endTimeStamp);
-
+		}
+		
 		startTime = cal.getTimeInMillis();
 		LOGGER.debug(("First found date " + new Date(startTime).toString()));
 		bucketArray = new Double[predictSize+1];
@@ -137,11 +138,13 @@ public class PredictArray {
 		
 		bucketArray[index] += value;
 		
-		if (value > bucketMaxArray[index])
+		if (value > bucketMaxArray[index]) {
 			bucketMaxArray[index] = value;
-
-		if (value < bucketMinArray[index])
+		}
+		
+		if (value < bucketMinArray[index]) {
 			bucketMinArray[index] = value;
+		}
 	}
 
 
@@ -153,8 +156,9 @@ public class PredictArray {
 	private void add(long timestamp, String value) {
 		int index = getIndex(timestamp);
 		
-		if (value == null || value.equals("null"))
+		if (value == null || value.equals("null")) {
 			return;
+		}
 		double dvalue = Double.valueOf(value);
 		addind(index, dvalue);	
 	}
@@ -167,22 +171,25 @@ public class PredictArray {
 	 * data in the bucket null is returned.
 	 */
 	public Double getAverage(int index) {
-		if (bucketCountArray[index] == 0)
+		if (bucketCountArray[index] == 0) {
 			return null;
+		}
 		
 		return bucketArray[index]/bucketCountArray[index];	
 	}
 
 	public Double getMax(int index) {
-		if (bucketCountArray[index] == 0)
+		if (bucketCountArray[index] == 0) {
 			return null;
+		}
 		
 		return bucketMaxArray[index];	
 	}
 
 	public Double getMin(int index) {
-		if (bucketCountArray[index] == 0)
+		if (bucketCountArray[index] == 0){
 			return null;
+		}
 		
 		return bucketMinArray[index];	
 	}
@@ -196,8 +203,6 @@ public class PredictArray {
 		
 		long offset = timestamp-startTime;
 		int mindex = (int) (offset/(bucketSize));
-		
-		//LOGGER.debug((new Date(timestamp)).toString() + ":" + mindex);
 		
 		return mindex;
 	}

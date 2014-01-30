@@ -150,9 +150,10 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 					Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
 		}
 
-		 if (LOGGER.isInfoEnabled())
+		 if (LOGGER.isInfoEnabled()) {
 	        	LOGGER.info(ServerUtil.logFormat(instanceName, service, xml));
-		
+		 }
+		 
 		connectAndSend(xml);
 	}
 
@@ -181,11 +182,13 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 		} catch (IOException e) {
 			LOGGER.error("Network error - check livestatus server and that service is started", e);
 		} finally { 
-			if (out != null)
+			if (out != null) {
 				out.close();
+			}
 			try {
-				if (clientSocket != null)
+				if (clientSocket != null) {
 					clientSocket.close();
+				}
 			} catch (IOException ignore) {}
 
 			long duration = context.stop()/1000000;

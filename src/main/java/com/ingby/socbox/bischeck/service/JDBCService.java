@@ -106,12 +106,14 @@ public class JDBCService extends ServiceAbstract implements Service {
     		throw se;
         } finally {
             try {
-            	if (res != null)
+            	if (res != null) {
             		res.close();
+            	}
             } catch(SQLException ignore) {}    
             try {
-            	if (statement != null)
+            	if (statement != null) {
             		statement.close();
+            	}
             } catch(SQLException ignore) {}    
         }
 
