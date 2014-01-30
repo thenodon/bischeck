@@ -15,8 +15,9 @@ public class CacheQueue<E> extends LinkedList<E> {
 	
 	@Override
 	public void addFirst(E ls) {
-		if (maxsize == 0) 
+		if (maxsize == 0) {
 			return;
+		}
 		
 		if (size() >= maxsize) {
 			removeLast();
