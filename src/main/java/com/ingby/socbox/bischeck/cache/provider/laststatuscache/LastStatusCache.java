@@ -80,8 +80,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	private HashMap<String, CacheQueue<LastStatus>> cache = null;
 
 	private static int fifosize = 500;
-	//private static boolean notFullListParse = false;
-	private static LastStatusCache lsc; // = new LastStatusCache();
+	private static LastStatusCache lsc; 
 	private static MBeanManager mbsMgr = null;
 
 	
@@ -99,8 +98,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * @return
 	 */
 	public static LastStatusCache getInstance() {
-		if (lsc == null)
+		if (lsc == null) {
 			LOGGER.error("Cache impl has not been initilized");
+		}
 		return lsc;
 	}
 	
@@ -196,11 +196,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			} else {
 				fifo = cache.get(key);
 			}
-/*
-			if (fifo.size() >= fifosize) {
-				fifo.removeLast();
-			}
-*/
+
 			cache.get(key).addFirst(ls);
 		}
 	}
@@ -219,24 +215,27 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			String serviceItemName, 
 			long timestamp) {
 		String key = Util.fullName( hostName, serviceName, serviceItemName);
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Find cache data for " + key + " at time " + new java.util.Date(timestamp));
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Find cache data for {} at time {}", key, new java.util.Date(timestamp));
+		}
 		
 		LastStatus ls = null;
 
 		synchronized (cache) {
 			LinkedList<LastStatus> list = cache.get(key); 
 			// list has no size
-			if (list == null || list.size() == 0) 
+			if (list == null || list.size() == 0) { 
 				return null;
+			}
 
 			ls = nearest(timestamp, list);
 
 		}
-		if (ls == null) 
+		if (ls == null) { 
 			return null;
-		else
+		} else {
 			return ls;    
+		}
 	}
 
 	@Override
@@ -252,13 +251,11 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			try {
 				ls = cache.get(key).get((int)index);
 			} catch (NullPointerException ne) {
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("No objects in the cache for " + key);
+				LOGGER.debug("No objects in the cache for {}", key);
 				return null;
 			}    
 			catch (IndexOutOfBoundsException ie) {
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("No object on index in the cache for " + key + "["+index+"]");
+				LOGGER.debug("No object on index in the cache for {} at index {}", key, index);
 				return null;
 			}
 		}
@@ -283,12 +280,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		List<LastStatus> lslist = null;
 		
 		lslist = getLastStatusListByIndex(hostName, serviceName, serviceItemName, indfrom, indto);
-		/*
-		for (long index = indfrom; index <= indto; index++) {
-			LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
-			lslist.add(ls);
-		}
-		*/
+		
 		return lslist;
 	}
 	
@@ -304,8 +296,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		
 		for (long index = fromIndex; index <= toIndex; index++) {
 			LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
-			if (ls == null)
+			if (ls == null) {
 				break;
+			}
 			lslist.add(ls.copy());
 		}
 		
@@ -343,10 +336,12 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			long index) {
 
 		LastStatus ls = getLastStatusByIndex(hostName, serviceName, serviceItemName, index);
-		if (ls == null) 
+	
+		if (ls == null) { 
 			return null;
-		else
+		} else {
 			return ls.getValue();
+		}
 	}
 
 	@Override
@@ -367,8 +362,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		
 		List<LastStatus> lslist = getLastStatusListByIndex(hostName, serviceName, serviceItemName, fromIndex, toIndex);
 			
-		if (lslist.isEmpty())
+		if (lslist.isEmpty()) {
 			return null;
+		}
 		
 		StringBuffer strbuf = new StringBuffer();
 		for (LastStatus ls : lslist) {
@@ -388,8 +384,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 		List<LastStatus> lslist = getLastStatusListByTime(hostName, serviceName, serviceItemName, from, to);
 		
-		if (lslist.isEmpty())
+		if (lslist.isEmpty()) {
 			return null;
+		}
 		
 		StringBuffer strbuf = new StringBuffer();
 		for (LastStatus ls : lslist) {
@@ -409,8 +406,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 		List<LastStatus> lslist = getLastStatusListAll(hostName, serviceName, serviceItemName);
 		
-		if (lslist.isEmpty())
+		if (lslist.isEmpty()) {
 			return null;
+		}
 		
 		StringBuffer strbuf = new StringBuffer();
 		for (LastStatus ls : lslist) {
@@ -440,24 +438,26 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			String serviceItemName, long stime) {
 		
 		String key = Util.fullName( hostname, serviceName, serviceItemName);
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Find cache index for " + key +" at time " + new java.util.Date(stime));
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Find cache index for {} at time {}", key, new java.util.Date(stime));
+		}
 		
 		Integer index = null;
 
 		synchronized (cache) {
 			LinkedList<LastStatus> list = cache.get(key); 
 			// list has no size
-			if (list == null || list.size() == 0) 
+			if (list == null || list.size() == 0) { 
 				return null;
-
+			}
 			index = nearestByIndex(stime, list);
-
 		}
-		if (index == null) 
+	
+		if (index == null) { 
 			return null;
-		else
+		} else {
 			return (long) index;    
+		}
 	}
 	
 	@Override
@@ -500,8 +500,9 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		String key = Util.fullName( hostName, serviceName, serviceItemName);
 		
 		synchronized (cache) {
-			if (cache.containsKey(key))
-			cache.get(key).clear();
+			if (cache.containsKey(key)) {
+				cache.get(key).clear();
+			}
 		}
 	}
 
@@ -592,11 +593,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			} else {
 				fifo = cache.get(key);
 			}
-/*
-			if (fifo.size() >= fifosize) {
-				fifo.removeLast();
-			}
-*/
+
 			cache.get(key).addLast(ls);
 		}
 	}
@@ -620,22 +617,21 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		File dumpfile = new File(lastStatusCacheDumpDir,LASTSTATUSCACHE_DUMP_FILE);
 		
 		if (!dumpdir.isDirectory()) {
-			LOGGER.error("Dump cache directory property " + dumpdir.getAbsolutePath() + " is not a directory");
+			LOGGER.error("Dump cache directory property {} is not a directory", dumpdir.getAbsolutePath());
 			throw new Exception("Dump cache directory property " + dumpdir.getAbsolutePath() + " is not a directory");
 		}
 		
 		if (!dumpdir.canWrite()) {
-			LOGGER.error("No permission to write to cache dir " + dumpdir.getAbsolutePath());
+			LOGGER.error("No permission to write to cache dir {}", dumpdir.getAbsolutePath());
 			throw new Exception("No permission to write to cache dir " + dumpdir.getAbsolutePath());
 		}
 
 		if (dumpfile.exists() && !dumpfile.canWrite()) {
-			LOGGER.error("No permission to write to cache file " + dumpfile.getAbsolutePath());
+			LOGGER.error("No permission to write to cache file {}", dumpfile.getAbsolutePath());
 			throw new Exception("No permission to write to cache file " + dumpfile.getAbsolutePath());
 		}
 
 		if (dumpfile.exists()) {
-
 
 			long countEntries = 0;
 			long countKeys = 0;
@@ -648,8 +644,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 
 			XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
 			for (XMLKey key:cache.getKey()) {
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("Loading cache - " + key.getId());
+				LOGGER.debug("Loading cache - {}", key.getId());
 				countKeys++;
 				for (XMLEntry entry:key.getEntry()) {
 
@@ -660,8 +655,7 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			}
 
 			long end = System.currentTimeMillis();
-			LOGGER.info("Cache loaded " + countKeys + " keys and " +
-					countEntries + " entries in " + (end-start) + " ms");
+			LOGGER.info("Cache loaded {} keys and {} entries in {} ms", countKeys, countEntries, (end-start));
 		} else {
 			LOGGER.info("Cache file do not exists - will be created on next shutdown");
 		}
@@ -677,32 +671,34 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * @return the LastStatus object closes to the time
 	 */
 	private LastStatus nearest(long time,  LinkedList<LastStatus> listtosearch) {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Find value in cache at " + new java.util.Date(time));
-        
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Find value in cache at {}", new java.util.Date(time));
+		}
+	
 		if (time > listtosearch.getFirst().getTimestamp() || 
 			time < listtosearch.getLast().getTimestamp() ) {
 			return null;
 		}
+		
 		LastStatus nearest = null;
 		long bestDistanceFoundYet = Long.MAX_VALUE;
 		// We iterate on the array...
 		for (int i = 0; i < listtosearch.size(); i++) {
 			long d1 = Math.abs(time - listtosearch.get(i).getTimestamp());
 			long d2;
-			if (i+1 < listtosearch.size())
+			if (i+1 < listtosearch.size()) {
 				d2 = Math.abs(time - listtosearch.get(i+1).getTimestamp());
-			else 
+			} else {
 				d2 = Long.MAX_VALUE;
-
+			}
+			
 			if ( d1 < bestDistanceFoundYet ) {
 
 				// For the moment, this value is the nearest to the desired number...
 				bestDistanceFoundYet = d1;
 				nearest = listtosearch.get(i);
 				if (d1 <= d2) { 
-					if (LOGGER.isDebugEnabled())
-						LOGGER.debug("Break at index " + i);
+					LOGGER.debug("Break at index {}", i);
 					break;
 				}
 			}
@@ -720,9 +716,10 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	 * @return cache index
 	 */
 	private Integer nearestByIndex(long time, LinkedList<LastStatus> listtosearch) {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Find value in cache at " + new java.util.Date(time));
-        
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Find value in cache at {}", new java.util.Date(time));
+		}
+		
 		if (time > listtosearch.getFirst().getTimestamp() || 
 			time < listtosearch.getLast().getTimestamp() ) {
 			return null;
@@ -734,19 +731,19 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		for (int i = 0; i < listtosearch.size(); i++) {
 			long d1 = Math.abs(time - listtosearch.get(i).getTimestamp());
 			long d2;
-			if (i+1 < listtosearch.size())
+			
+			if (i+1 < listtosearch.size()) {
 				d2 = Math.abs(time - listtosearch.get(i+1).getTimestamp());
-			else 
+			} else {
 				d2 = Long.MAX_VALUE;
-
+			}
+			
 			if ( d1 < bestDistanceFoundYet ) {
-
 				// For the moment, this value is the nearest to the desired number...
 				bestDistanceFoundYet = d1;
 				index=i;
 				if (d1 <= d2) {
-					if (LOGGER.isDebugEnabled())
-						LOGGER.debug("Break at index " + i);
+					LOGGER.debug("Break at index {}", i);
 					break;
 				}
 			}
