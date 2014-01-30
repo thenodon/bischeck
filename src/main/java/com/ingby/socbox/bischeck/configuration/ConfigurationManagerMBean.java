@@ -2,7 +2,7 @@ package com.ingby.socbox.bischeck.configuration;
 
 public interface ConfigurationManagerMBean {
 
-    static final String BEANNAME = "com.ingby.socbox.bischeck.configuration:type=ConfigurationManager,name=configuration";
+    String BEANNAME = "com.ingby.socbox.bischeck.configuration:type=ConfigurationManager,name=configuration";
 
     /**
      * Get the full bischeck.xml configuration for a host name.
