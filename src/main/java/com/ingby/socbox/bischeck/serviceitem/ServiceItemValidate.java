@@ -27,5 +27,5 @@ package com.ingby.socbox.bischeck.serviceitem;
  */
 public interface ServiceItemValidate {
         
-    public Boolean validate();
+    Boolean validate();
 }

@@ -26,7 +26,7 @@ package com.ingby.socbox.bischeck;
  */
 public interface ExecuteMBean {
     
-    static final String BEANNAME = "com.ingby.socbox.bischeck:name=Execute";
+    String BEANNAME = "com.ingby.socbox.bischeck:name=Execute";
     
     
     /**

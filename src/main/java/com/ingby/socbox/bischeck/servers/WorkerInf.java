@@ -22,7 +22,7 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public interface WorkerInf {
     
-    final int MAX_RUNS_BEFORE_END = 100;
+    int MAX_RUNS_BEFORE_END = 100;
     
     /**
      * Send the Service information to the server. Implementation is responsible

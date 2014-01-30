@@ -35,8 +35,8 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  */
 public interface CacheInf {
 
-	static final String ENDMARK = "END";
-	static final String JEPLISTSEP = ",";
+	String ENDMARK = "END";
+	String JEPLISTSEP = ",";
 
 	/*
 	 ***********************************************
