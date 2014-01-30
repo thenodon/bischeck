@@ -267,7 +267,7 @@ public class ConfigurationManagerTest {
 
 	@Test (groups = { "ConfigurationManager" })
 	public void getPurgeConfigCompare(){
-		String purgeConf = confMgmr.getPurgeConfiguration();
+		String purgeConf = confMgmr.getPurgeConfigurations();
 		String purgeConfExp = "host0-sshport-response:5000\n" +
 				"host0-sshport/D/avg/weekend-response:7\n" +
 				"host0-sshport/H/avg/weekend-response:25\n" +
