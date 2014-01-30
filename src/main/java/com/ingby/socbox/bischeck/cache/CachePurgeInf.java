@@ -33,5 +33,5 @@ public interface CachePurgeInf {
 	 * @param key - the key of the type host-service-serviceitem
 	 * @param maxSize - the max size of the list for the key
 	 */
-	public void trim(String key, Long maxSize);
+	void trim(String key, Long maxSize);
 }
