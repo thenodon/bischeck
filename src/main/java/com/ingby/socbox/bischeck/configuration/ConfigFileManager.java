@@ -234,8 +234,8 @@ public class ConfigFileManager {
 				jc = JAXBContext.newInstance(xmlconf.instance());
 				jccache.putIfAbsent(xmlconf.instance(),jc);
 			} catch (JAXBException e) {
-				LOGGER.error("Could not get JAXB context from class");
-				throw new Exception(e.getMessage());
+				LOGGER.error("Could not get JAXB context from class", e);
+				throw new Exception(e);
 			}
 		}
 		
@@ -246,8 +246,7 @@ public class ConfigFileManager {
 
 		URL xsdUrl = ConfigFileManager.class.getClassLoader().getResource(xmlconf.xsd());
 		if (xsdUrl == null) {
-			LOGGER.error("Could not find xsd file " +
-					xmlconf.xsd() + " in classpath");
+			LOGGER.error("Could not find xsd file {} in classpath", xmlconf.xsd());
 			throw new Exception("Could not find xsd file " +
 					xmlconf.xsd() + " in classpath");
 		}
@@ -255,9 +254,8 @@ public class ConfigFileManager {
 		try {
 			schema = sf.newSchema(new File(xsdUrl.getFile()));
 		} catch (Exception e) {
-			LOGGER.error("Could not vaildate xml file " + xmlconf.xml() + " with xsd file " +
-					xmlconf.xsd() + ": " + e.getMessage());
-			throw new Exception(e.getMessage());
+			LOGGER.error("Could not vaildate xml file {} with xsd file {}", xmlconf.xml(), xmlconf.xsd(), e);
+			throw new Exception(e);
 		} 
 
 		Marshaller m = null;
@@ -265,7 +263,7 @@ public class ConfigFileManager {
 			m = jc.createMarshaller();
 			m.setProperty("jaxb.formatted.output",Boolean.TRUE);
 		} catch (JAXBException e) {
-			LOGGER.error("Could not create an marshaller for for context " + xmlconf.xml());
+			LOGGER.error("Could not create an marshaller for for context {}", xmlconf.xml(), e);
 			throw new Exception(e);
 		}
 		m.setSchema(schema);
@@ -276,13 +274,13 @@ public class ConfigFileManager {
 			m.marshal(xmlobj, writer);
 
 		} catch (JAXBException e) {
-			LOGGER.error("Could not marshall the file " + xmlconf.xml() +":" + e);
-			throw new Exception(xmlconf.xml() + ":" + e.toString());
+			LOGGER.error("Could not marshall the file {}", xmlconf.xml(), e);
+			throw new Exception(e);
 		} finally {
 			writer.flush();
 			writer.close();
 
 		}
-		LOGGER.debug("Create new file in directory "+ directory + "for xml object " + xmlconf.nametag());
+		LOGGER.debug("Create new file in directory {} for xml object {}", directory, xmlconf.nametag());
 	}
 }

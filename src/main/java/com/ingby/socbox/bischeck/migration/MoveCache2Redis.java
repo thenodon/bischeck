@@ -165,7 +165,7 @@ public class MoveCache2Redis {
 					totalCountEntries + " entries in " + (end-start) + " ms");
 		} else {
 			System.out.println("Cache file do not exists - will be created on next shutdown");
-			throw new Exception();
+			throw new Exception("Cache file do not exists - will be created on next shutdown");
 		}
 	}
 
@@ -175,7 +175,7 @@ public class MoveCache2Redis {
 		try {
 			jc = JAXBContext.newInstance("com.ingby.socbox.bischeck.xsd.laststatuscache");
 		} catch (JAXBException e) {
-			throw new Exception(e.getMessage());
+			throw new Exception(e);
 		}
 		SchemaFactory sf = SchemaFactory.newInstance(
 				javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -190,7 +190,7 @@ public class MoveCache2Redis {
 		try {
 			schema = sf.newSchema(new File(xsdUrl.getFile()));
 		} catch (Exception e) {
-			throw new Exception(e.getMessage());
+			throw new Exception(e);
 		} 
 
 		Unmarshaller u = null;

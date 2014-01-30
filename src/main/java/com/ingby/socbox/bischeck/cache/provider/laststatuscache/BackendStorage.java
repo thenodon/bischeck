@@ -63,7 +63,7 @@ public class BackendStorage {
 		try {
 			jc = JAXBContext.newInstance("com.ingby.socbox.bischeck.xsd.laststatuscache");
 		} catch (JAXBException e) {
-			LOGGER.error("Could not get JAXB context from class");
+			LOGGER.error("Could not get JAXB context from class", e);
 			throw new Exception(e.getMessage());
 		}
 		SchemaFactory sf = SchemaFactory.newInstance(
@@ -72,20 +72,15 @@ public class BackendStorage {
 
 		URL xsdUrl = ConfigurationManager.class.getClassLoader().getResource("laststatuscache.xsd");
 		if (xsdUrl == null) {
-			LOGGER.error("Could not find xsd file " +
-					"laststatuscache.xsd"+ " in classpath");
-			throw new Exception("Could not find xsd file " +
-					"laststatuscache.xsd" + " in classpath");
+			LOGGER.error("Could not find xsd file laststatuscache.xsd in classpath");
+			throw new Exception("Could not find xsd file laststatuscache.xsd in classpath");
 		}
 
 		try {
 			schema = sf.newSchema(new File(xsdUrl.getFile()));
 		} catch (Exception e) {
-			LOGGER.error("Could not vaildate xml file " + 
-					dumpFile.getAbsolutePath() + 
-					" with xsd file " +
-					"laststatuscache.xsd" + ": " + 
-					e.getMessage());
+			LOGGER.error("Could not vaildate xml file {} with xsd file laststatuscache.xsd", 
+					dumpFile.getAbsolutePath(), e);
 			throw new Exception(e.getMessage());
 		} 
 
@@ -101,10 +96,10 @@ public class BackendStorage {
 		try {
 			xmlobj =  u.unmarshal(dumpFile);
 		} catch (JAXBException e) {
-			LOGGER.error("Could not unmarshall the file " +  dumpFile.getAbsolutePath() +":" + e);
+			LOGGER.error("Could not unmarshall the file {}", dumpFile.getAbsolutePath(), e);
 			throw new Exception(e);
 		}
-		LOGGER.debug("Create new object for xml file " +  dumpFile.getAbsolutePath());
+		LOGGER.debug("Create new object for xml file {}", dumpFile.getAbsolutePath());
 		return xmlobj;
 	}
 
@@ -172,11 +167,7 @@ public class BackendStorage {
 						dumpwriter.newLine();
 						countEntries++;
 					} catch (NullPointerException ne) {
-						StringWriter sw = new StringWriter();
-						PrintWriter pw = new PrintWriter(sw);
-						ne.printStackTrace(pw);
-						sw.toString();
-						LOGGER.warn("Dump entry failed: "+ sw.toString());
+						LOGGER.error("Dump entry failed", ne);
 					}
 				}
 
@@ -191,7 +182,7 @@ public class BackendStorage {
 			dumpwriter.flush();
 			filewriter.flush();
 		} catch (IOException e) {
-			LOGGER.warn("Failed to write to cache dump with exception: " + e.getMessage());
+			LOGGER.warn("Failed to write to cache dump",e);
 		}finally {
 			try {
 				if (dumpwriter != null)
@@ -205,8 +196,7 @@ public class BackendStorage {
 
 		long end = System.currentTimeMillis();
 
-		LOGGER.info("Cache dumped " + countKeys + " keys and " +
-				countEntries + " entries in " + (end-start) + " ms");
+		LOGGER.info("Cache dumped {} keys and {} entries in {} ms", countKeys, countEntries, (end-start));
 	}
 
 
@@ -216,10 +206,7 @@ public class BackendStorage {
 			try {
 				destFile.createNewFile();
 			} catch (IOException e) {
-				LOGGER.error("Can not create destination file " + 
-						destFile.getAbsolutePath() + 
-						" with exception: " + 
-						e.getMessage());
+				LOGGER.error("Can not create destination file {}", destFile.getAbsolutePath(), e);
 			}
 		}
 
@@ -231,7 +218,7 @@ public class BackendStorage {
 			destination.transferFrom(source, 0, source.size());
 		}
 		catch (IOException ioe) {
-			LOGGER.error("Can not copy file: " + ioe.getMessage());
+			LOGGER.error("Can not copy file", ioe);
 		}
 		finally {
 			if(source != null) {
