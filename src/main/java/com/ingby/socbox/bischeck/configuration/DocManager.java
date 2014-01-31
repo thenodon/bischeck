@@ -50,7 +50,10 @@ import com.ingby.socbox.bischeck.configuration.ConfigXMLInf.XMLCONFIG;
  *
  */
 public class DocManager implements ConfigXMLInf {
-
+	
+	private static final int OKAY = 0;
+    private static final int FAILED = 1;
+    
     private static final String CSSFILE = "bischeck.css";
     private static final String DEFAULTDIR = "bischeckdoc";
 
@@ -74,13 +77,13 @@ public class DocManager implements ConfigXMLInf {
 
         } catch (org.apache.commons.cli.ParseException e) {
             System.out.println( "Command parse error:" + e.getMessage() );
-            System.exit(1);
+            System.exit(FAILED); // NOPMD - System.exit okay from main()
         }
-
+        
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "DocManager", options );
-            System.exit(0);
+            System.exit(OKAY); // NOPMD - System.exit okay from main()
         }
 
         DocManager dmgmt = null;
@@ -91,14 +94,14 @@ public class DocManager implements ConfigXMLInf {
                 dmgmt = new DocManager(dirname);
             } catch (IOException ioe) {
                 System.out.println(ioe.getMessage());
-                System.exit(1);
+                System.exit(FAILED); // NOPMD - System.exit okay from main()
             }
         } else {
             try {
                 dmgmt= new DocManager();
             } catch (IOException ioe) {
                 System.out.println(ioe.getMessage());
-                System.exit(1);
+                System.exit(FAILED); // NOPMD - System.exit okay from main()
             }
         }
         
@@ -115,7 +118,7 @@ public class DocManager implements ConfigXMLInf {
         	}
         } catch (Exception e) {
         	System.out.println(e.getMessage());
-            System.exit(1);
+            System.exit(FAILED); // NOPMD - System.exit okay from main()
         }
     }
 

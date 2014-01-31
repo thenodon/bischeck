@@ -69,13 +69,13 @@ public class MoveCache2Redis {
 
 		} catch (org.apache.commons.cli.ParseException e) {
 			System.out.println( "Command parse error:" + e.getMessage() );
-			System.exit(1);
+			System.exit(1); // NOPMD - System.exit okay from main()
 		}
 
 		if (line.hasOption("usage")) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp( "MoveCache2Redis", options );
-			System.exit(0);
+			System.exit(0); // NOPMD - System.exit okay from main()
 		}
 		
 		if (line.hasOption("verbose")) {
@@ -88,7 +88,7 @@ public class MoveCache2Redis {
 
 		if (!line.hasOption("cachefile")) {
 			System.out.println("Please supply cache file name");
-			System.exit(1);
+			System.exit(1); // NOPMD - System.exit okay from main()
 		}
 
 		ConfigurationManager.init();

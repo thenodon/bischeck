@@ -98,6 +98,9 @@ import com.yammer.metrics.core.TimerContext;
  */
 
 public final class ConfigurationManager  implements ConfigurationManagerMBean {
+	
+	private static final int OKAY = 0;
+    private static final int FAILED = 1;
     
     private static final String DEFAULT_TRESHOLD = "DummyThreshold";
 
@@ -147,13 +150,13 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
 
         } catch (org.apache.commons.cli.ParseException e) {
             System.out.println( "Command parse error:" + e.getMessage() );
-            System.exit(1);
+            System.exit(FAILED); // NOPMD - System.exit okay from main()
         }
 
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "ConfigurationManager", options );
-            System.exit(0);
+            System.exit(OKAY); // NOPMD - System.exit okay from main()
         }
 
         ConfigurationManager.initonce();
@@ -162,7 +165,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         ((ch.qos.logback.classic.Logger) LOGGER).setLevel(Level.WARN);
         
         if (line.hasOption("verify")) {
-            System.exit(ValidateConfiguration.verify());
+            System.exit(ValidateConfiguration.verify()); // NOPMD - System.exit okay from main()
         }
 
         if (line.hasOption("pidfile")) {

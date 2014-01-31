@@ -110,6 +110,6 @@ public class JDBCtest {
 		System.out.println("Open time: " + (openEnd-openStart) + " ms");
 		System.out.println("Meta time: " + (metaEnd-metaStart) + " ms");
 		System.out.println("Exec time: " + (execEnd-execStart) + " ms");
-		System.exit(0);
+		
 	}
 }

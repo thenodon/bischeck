@@ -110,14 +110,16 @@ public final class Execute implements ExecuteMBean {
             line = parser.parse(options, args);
 
         } catch (org.apache.commons.cli.ParseException e) {
-            System.out.println("Command parse error:" + e.getMessage());
-            System.exit(1);
+        	System.out.println("Command parse error:" + e.getMessage());
+        	HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("Bischeck", options);
+            System.exit(FAILED); // NOPMD - System.exit okay from main()
         }
 
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("Bischeck", options);
-            System.exit(OKAY);
+            System.exit(OKAY); // NOPMD - System.exit okay from main()
         }
 
         dumpthread = new Thread() {
@@ -134,7 +136,6 @@ public final class Execute implements ExecuteMBean {
 
         int retStat = OKAY;
         do {
-
             try {
                 if (line.hasOption("deamon")) {
                     ConfigurationManager.init();
@@ -145,7 +146,7 @@ public final class Execute implements ExecuteMBean {
                 LOGGER.error(
                         "Creating bischeck Configuration Manager failed with: {}",
                         e.getMessage(), e);
-                System.exit(FAILED);
+                System.exit(FAILED); // NOPMD - System.exit okay from main()
             }
 
             retStat = Execute.getInstance().deamon();
@@ -156,7 +157,7 @@ public final class Execute implements ExecuteMBean {
         
         LOGGER.info("******************* Shutdown ********************");
         
-        System.exit(retStat);
+        System.exit(retStat); // NOPMD - System.exit okay from main()
     }
 
     private Execute() {
@@ -220,12 +221,7 @@ public final class Execute implements ExecuteMBean {
         }
 
         ServerMessageExecutor.getInstance().unregisterAll();
-        /*
-         * try { Thread.sleep(10000); } catch (InterruptedException e) { // TODO
-         * Auto-generated catch block e.printStackTrace(); }
-         */
-        // LOGGER.info("******************* Shutdown ********************");
-
+        
         if (reloadRequested) {
             return RESTART;
         } else {
