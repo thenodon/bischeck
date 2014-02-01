@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.ClassCache;
 import com.ingby.socbox.bischeck.Util;
-import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 /**
  * Service factory to instantiate {@link Service} objects 
@@ -90,11 +89,13 @@ public class ServiceFactory {
             }
         }
          
-        Class[] param = (Class[]) Array.newInstance(Class.class, 2);
+        @SuppressWarnings("rawtypes")
+		Class[] param = (Class[]) Array.newInstance(Class.class, 2);
         param[0] = String.class;
         param[1] = Properties.class;
         
-        Constructor cons = null;
+        @SuppressWarnings("rawtypes")
+		Constructor cons = null;
         try {
             cons = clazz.getConstructor(param);
         } catch (Exception e) {
