@@ -20,6 +20,8 @@
 package com.ingby.socbox.bischeck.service;
 
 
+import java.util.Properties;
+
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 
 /**
@@ -30,7 +32,7 @@ public class LastCacheService extends ServiceAbstract implements Service {
 
     
     
-    public LastCacheService (String serviceName) {
+    public LastCacheService (String serviceName, Properties notUsed) {
         this.serviceName = serviceName;
     }
 

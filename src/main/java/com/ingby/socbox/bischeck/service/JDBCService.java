@@ -25,6 +25,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,20 +43,22 @@ public class JDBCService extends ServiceAbstract implements Service {
     private Connection connection;
     
     static {
-        try {
-            querytimeout = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
-                    getProperty("JDBCService.querytimeout","10"));
-        } catch (NumberFormatException ne) {
-            LOGGER.error("Property JDBCSerivce.querytimeout is not " + 
-                    "set correct to an integer: {}",
-                    ConfigurationManager.getInstance().getProperties().getProperty(
-                    "JDBCSerivce.querytimeout"));
-        }
+        
     }
 
     
-    public JDBCService (String serviceName) {
+    public JDBCService (String serviceName, Properties bischeckProperties) {
         this.serviceName = serviceName;
+        
+        if (bischeckProperties != null) {
+        	try {
+        		querytimeout = Integer.parseInt(bischeckProperties.getProperty("JDBCService.querytimeout","10"));
+        	} catch (NumberFormatException ne) {
+        		LOGGER.error("Property JDBCSerivce.querytimeout is not set correct to an integer: {}", 
+        				bischeckProperties.getProperty("JDBCSerivce.querytimeout"));
+        	}
+        }
+        
     }
 
     

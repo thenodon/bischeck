@@ -59,7 +59,7 @@ public class ConfigUtilTest {
     	serviceItem.setDecscription("Host $$HOSTNAME$$ for service $$SERVICENAME$$, alias $$SERVICEALIAS$$ and $$SERVICEITEMNAME$$");
     	serviceItem.setExecution("{\"check\":\"/usr/lib/nagios/plugins/check_tcp -H $$HOSTNAME$$ -p 22\",\"$$SERVICEITEMNAME$$\":\"time\"}");
     		
-    	Service service = ServiceFactory.createService("serviceNAME", "bischeck://cache/$$HOSTNAME$$",ConfigurationManager.getInstance().getURL2Service());
+    	Service service = ServiceFactory.createService("serviceNAME", "bischeck://cache/$$HOSTNAME$$",ConfigurationManager.getInstance().getURL2Service(), null);
     	service.setAlias("serviceALIAS");
     	service.setDecscription("Host $$HOSTNAME$$ for service $$SERVICENAME$$");
     	service.addServiceItem(serviceItem);

@@ -225,7 +225,7 @@ public class Aggregation {
 													period.prefix() + "/" + 
 													aggregated.getMethod() + WEEKEND;
 					try {
-						service = ServiceFactory.createService(aggregationServiceName, URL_SERVICE,urlPropeties);
+						service = ServiceFactory.createService(aggregationServiceName, URL_SERVICE,urlPropeties, null);
 					} catch (ServiceFactoryException e) {
 						LOGGER.error("Could not create service for {}", aggregationServiceName, e);
 						throw e;
@@ -235,7 +235,7 @@ public class Aggregation {
 													period.prefix()  + "/" + 
 													aggregated.getMethod();
 					try {
-						service = ServiceFactory.createService(aggregationServiceName, URL_SERVICE, urlPropeties);
+						service = ServiceFactory.createService(aggregationServiceName, URL_SERVICE, urlPropeties, null);
 					} catch (ServiceFactoryException e) {
 						LOGGER.error("Could not create service for {}", aggregationServiceName, e);
 						throw e;

@@ -23,6 +23,7 @@ package com.ingby.socbox.bischeck.service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class ShellService extends ServiceAbstract implements Service {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ShellService.class);
 	
-    public ShellService (String serviceName) {
+    public ShellService (String serviceName, Properties notUsed) {
         this.serviceName = serviceName;
     }
 

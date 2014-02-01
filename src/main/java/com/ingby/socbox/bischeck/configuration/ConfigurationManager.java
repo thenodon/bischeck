@@ -113,7 +113,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      */
     private static ConfigurationManager configMgr = null;
     
-    private Properties prop = null;    
+    private Properties bischeckProperties = null;    
     private Properties url2service = null;
     private Map<String,Host> hostsMap = null;
     private List<ServiceJobConfig> scheduleJobs = null;
@@ -188,7 +188,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      */
     private void allocateDataStructs() {
     	xmlFileMgr  = new ConfigFileManager();
-    	prop = new Properties();    
+    	bischeckProperties = new Properties();    
     	url2service = new Properties();
     	hostsMap = new HashMap<String,Host>();
     	scheduleJobs = new ArrayList<ServiceJobConfig>();
@@ -308,7 +308,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
 
         while (iter.hasNext()) {
             XMLProperty propertyconfig = iter.next(); 
-            prop.put(propertyconfig.getKey(),propertyconfig.getValue());      
+            bischeckProperties.put(propertyconfig.getKey(),propertyconfig.getValue());      
         }
     }
 
@@ -328,8 +328,8 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     
     private void initScheduler() throws ConfigurationException {
         try {
-        	CachePurgeJob.init(prop);
-            ThresholdCacheClearJob.init(prop);
+        	CachePurgeJob.init(bischeckProperties);
+            ThresholdCacheClearJob.init(bischeckProperties);
             adminJobsCount = 2;
         } catch (SchedulerException e) {
             LOGGER.error("Quartz scheduler failed with exception {}", e.getMessage(), e);
@@ -529,7 +529,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         service = ServiceFactory.createService(
         		serviceconfig.getName(),
         		serviceconfig.getUrl().trim(),
-        		url2service);
+        		url2service, bischeckProperties);
 
         //Check for null - not supported logger.error
         service.setHost(host);
@@ -565,19 +565,19 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
                 service = ServiceFactory.createService(
                         serviceconfig.getServiceoverride().getName(),
                         template.getUrl().trim(),
-                        url2service);
+                        url2service, bischeckProperties);
             } else {
                 service = ServiceFactory.createService(
                         serviceconfig.getServiceoverride().getName(),
                         serviceconfig.getServiceoverride().getUrl().trim(),
-                        url2service);
+                        url2service, bischeckProperties);
                     
             }
         } else {    
             service = ServiceFactory.createService(
                     template.getName(),
                     template.getUrl().trim(),
-                    url2service);
+                    url2service, bischeckProperties);
         }
         
         service.setHost(host);
@@ -831,7 +831,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
 		if (xmlPurge == null) {
 			// Set default 
 			try {
-				purgeMap.put(key, String.valueOf(prop.getProperty("lastStatusCacheSize","500")));
+				purgeMap.put(key, String.valueOf(bischeckProperties.getProperty("lastStatusCacheSize","500")));
 			} catch (NumberFormatException ne) {
 				purgeMap.put(key, String.valueOf("500"));
 			}
@@ -1105,7 +1105,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         if (initDone.get()) {
             return url2service;
         } else {
-            LOGGER.error("Configuration manager not initilized (getURL2Service)");
+            LOGGER.error("Configuration manager not initilized, call to getURL2Service() failed)");
             throw new IllegalStateException("Configuration manager not initilized");
         }
     }
@@ -1119,9 +1119,9 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      */
     public Properties getProperties() {
         if (initDone.get()) {
-            return prop;
+            return bischeckProperties;
         } else {
-            LOGGER.error("Configuration manager not initilized (getProperties)");
+            LOGGER.error("Configuration manager not initilized, call to getProperties() failed)");
             throw new IllegalStateException("Configuration manager not initilized");
         }
     }
@@ -1138,7 +1138,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         if (initDone.get()) {
         return hostsMap;
         } else {
-            LOGGER.error("Configuration manager not initilized (getHostConfig)");
+            LOGGER.error("Configuration manager not initilized, call to getHostConfig() failed)");
             throw new IllegalStateException("Configuration manager not initilized");
         }
     }
@@ -1154,7 +1154,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         if (initDone.get()) {
                 return scheduleJobs;
         } else { 
-            LOGGER.error("Configuration manager not initilized (getScheduleJobsConfigs)");
+            LOGGER.error("Configuration manager not initilized, call to getScheduleJobsConfigs() failed)");
             throw new IllegalStateException("Configuration manager not initilized");
         }
     }
@@ -1170,7 +1170,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         if (initDone.get()) {
             return purgeMap;
         } else { 
-            LOGGER.error("Configuration manager not initilized (getPurgeMap)");
+            LOGGER.error("Configuration manager not initilized, call to getPurgeMap() failed");
             throw new IllegalStateException("Configuration manager not initilized");
         }
     }
@@ -1190,7 +1190,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      * @return 
      */
     public  File getPidFile() {
-        return new File(prop.getProperty("pidfile","/var/tmp/bischeck.pid"));
+        return new File(bischeckProperties.getProperty("pidfile","/var/tmp/bischeck.pid"));
     }
 
     

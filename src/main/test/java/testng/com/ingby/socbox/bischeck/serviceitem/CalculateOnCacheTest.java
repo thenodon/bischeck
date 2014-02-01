@@ -102,7 +102,7 @@ public class CalculateOnCacheTest {
     public void verifyService() throws Exception {
     	cache.clear();
     	
-    	Service bis = new LastCacheService("servicename");
+    	Service bis = new LastCacheService("servicename", null);
 		ServiceItem coc = new CalculateOnCache("serviceitemname");
 		coc.setService(bis);
 		
@@ -152,7 +152,7 @@ public class CalculateOnCacheTest {
 		
     @Test (groups = { "ServiceItem" }, expectedExceptions = ServiceItemException.class )
     public void verifyServiceException() throws ServiceException, ServiceItemException{
-    	Service bis = new LastCacheService("servicename");
+    	Service bis = new LastCacheService("servicename",null);
 		ServiceItem coc = new CalculateOnCache("serviceitemname");
 		coc.setService(bis);
 		
@@ -164,7 +164,7 @@ public class CalculateOnCacheTest {
     @Test (groups = { "ServiceItem" })
     public void verifyServiceNull() throws Exception {
 
-    	Service bis = new LastCacheService("serviceName");
+    	Service bis = new LastCacheService("serviceName",null);
 		ServiceItem coc = new CalculateOnCache("serviceItemName");
 		coc.setService(bis);
 		
@@ -275,7 +275,7 @@ public class CalculateOnCacheTest {
     public void verifyAggregationNaming() throws Exception {
         cache.clear();
         
-        Service bis = new LastCacheService("servicename");
+        Service bis = new LastCacheService("servicename",null);
         ServiceItem coc = new CalculateOnCache("serviceitemname");
         coc.setService(bis);
         

@@ -67,7 +67,7 @@ public class UtilTest {
     
     @Test (groups = { "Util" })
     public void fullNameServiceServiceItem() {
-    	Service service = new JDBCService("service");
+    	Service service = new JDBCService("service", null);
     	service.setHost(new Host("host"));
     	ServiceItem serviceitem = new SQLServiceItem("serviceitem");
     	Assert.assertEquals(Util.fullName(service, serviceitem),"host-service-serviceitem");

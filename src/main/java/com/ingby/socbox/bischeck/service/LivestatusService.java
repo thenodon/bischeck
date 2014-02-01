@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,24 +45,19 @@ public class LivestatusService extends ServiceAbstract implements Service {
     
     static private int querytimeout = 10000; //millisec
     private Socket clientSocket = null;
-    
-    
-    
-    static {
-        try {
-            querytimeout = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
-                    getProperty("LiveStatusService.querytimeout","10")) * 1000;
-        } catch (NumberFormatException ne) {
-            LOGGER.error("Property LiveStatusService.querytimeout is not " + 
-                    "set correct to an integer: {}",
-                    ConfigurationManager.getInstance().getProperties().getProperty(
-                    "LiveStatusService.querytimeout"));
-        }
-    }
 
     
-    public LivestatusService (String serviceName) {
+    public LivestatusService (String serviceName, Properties bischeckProperties) {
         this.serviceName = serviceName;
+        
+        if (bischeckProperties != null) {
+        	try {
+        		querytimeout = Integer.parseInt(bischeckProperties.getProperty("LiveStatusService.querytimeout","10000"));
+        	} catch (NumberFormatException ne) {
+        		LOGGER.error("Property LiveStatusService.querytimeout is not set correct to an integer: {}",
+        				bischeckProperties.getProperty("LiveStatusService.querytimeout"));
+        	}
+        }
     }
 
     
@@ -74,10 +70,14 @@ public class LivestatusService extends ServiceAbstract implements Service {
     		clientSocket.setSoTimeout(querytimeout);
     	} catch (IOException ioe) {
     		setConnectionEstablished(false);
-    		LOGGER.warn("Open connection failed", ioe);
+    		LOGGER.warn("Open connection failed ", ioe);
+    		
     		try {
-    			clientSocket.close();
+    			if (clientSocket != null) {
+    				clientSocket.close();
+    			}
     		} catch (IOException ignore) {}
+    		
     		ServiceException se = new ServiceException(ioe);
     		se.setServiceName(this.serviceName);
     		throw se;
@@ -94,7 +94,9 @@ public class LivestatusService extends ServiceAbstract implements Service {
     @Override
     public void closeConnection() throws ServiceException{
         try {
-            clientSocket.close();
+        	if (clientSocket != null) {
+        		clientSocket.close();
+        	}
         } catch (IOException ignore) {}
     }
 

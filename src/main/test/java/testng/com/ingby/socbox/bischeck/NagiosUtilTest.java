@@ -58,7 +58,7 @@ public class NagiosUtilTest {
 	    
 	    NagiosUtil nagutil = new NagiosUtil();
 	    ServiceItem serviceItem = new CheckCommandServiceItem("SERVICEITEM");
-	    Service service = new ShellService("SERVICE");
+	    Service service = new ShellService("SERVICE",null);
 	    service.addServiceItem(serviceItem);
 	    Host host = new Host("HOST");
 	    host.addService(service);

@@ -51,7 +51,7 @@ public class ServiceFactory {
      * take a the service name as a parameter do not exists
      */
     @SuppressWarnings("unchecked")
-    public static Service createService(String serviceName, String url, Properties urlProperties) throws ServiceFactoryException 
+    public static Service createService(String serviceName, String url, Properties urlProperties, Properties bischeckProperties) throws ServiceFactoryException 
     {
         
         URI uri = null;
@@ -90,24 +90,28 @@ public class ServiceFactory {
             }
         }
          
-        Class param[] = (Class[]) Array.newInstance(Class.class, 1);
+        Class[] param = (Class[]) Array.newInstance(Class.class, 2);
         param[0] = String.class;
-        
+        param[1] = Properties.class;
         
         Constructor cons = null;
         try {
             cons = clazz.getConstructor(param);
-        } catch (Exception e) {
-            LOGGER.error("Error getting class constructor for class {} and service {}", clazz.getName(), serviceName);
+        } catch (Throwable e) {
+            LOGGER.error("Error getting class constriuctor for class {} and service {}", clazz.getName(), serviceName);
             ServiceFactoryException sfe = new ServiceFactoryException(e);
             sfe.setServiceName(serviceName);
             throw sfe;
         }
         
         Service service = null;
+        Object[] obj = (Object[]) Array.newInstance(Object.class, 2);
+        obj[0] = serviceName;
+        obj[1] = bischeckProperties;
+        
         try {
-            service = (Service) cons.newInstance(serviceName);
-        } catch (Exception e) {
+            service = (Service) cons.newInstance(obj);
+        } catch (Throwable e) {
             LOGGER.error("Error creating an instance of {} with class {}", serviceName, clazz.getName(), e);
             ServiceFactoryException sfe = new ServiceFactoryException(e);
             sfe.setServiceName(serviceName);

@@ -58,7 +58,7 @@ public class CheckCommandServiceitemTest {
             confMgmr = ConfigurationManager.getInstance();  
         }    
     
-		shell = new ShellService("serviceName");
+		shell = new ShellService("serviceName",null);
 
 		CacheFactory.init();
 		

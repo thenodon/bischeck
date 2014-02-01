@@ -65,7 +65,7 @@ public class SQLServiceitemTest {
         }    
     
 
-		jdbc = new JDBCService("test");
+		jdbc = new JDBCService("test",null);
 		jdbc.setConnectionUrl("jdbc:derby:memory:myDB;create=true");
 		jdbc.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
 		sql = new SQLServiceItem("serviceItemName");
