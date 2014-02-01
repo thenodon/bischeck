@@ -137,8 +137,8 @@ public class ExecuteJEP {
 			value = (float) parser.getValue();
 		
 			if (parser.hasError()) {
-				LOGGER.warn("Math jep expression error, {}", parser.getErrorInfo());
-				// This may change but currently it break compatibility
+				LOGGER.warn("Math jep parse error, {}", parser.getErrorInfo());
+				// Todo - This may change but currently it break compatibility
 				//throw new ParseException(parser.getErrorInfo());
 			}
 			
