@@ -97,7 +97,7 @@ public class ServiceFactory {
         Constructor cons = null;
         try {
             cons = clazz.getConstructor(param);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             LOGGER.error("Error getting class constriuctor for class {} and service {}", clazz.getName(), serviceName);
             ServiceFactoryException sfe = new ServiceFactoryException(e);
             sfe.setServiceName(serviceName);
@@ -111,7 +111,7 @@ public class ServiceFactory {
         
         try {
             service = (Service) cons.newInstance(obj);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             LOGGER.error("Error creating an instance of {} with class {}", serviceName, clazz.getName(), e);
             ServiceFactoryException sfe = new ServiceFactoryException(e);
             sfe.setServiceName(serviceName);
