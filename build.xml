@@ -175,14 +175,12 @@
     </target>
 
 
-    <target name="dist" depends="clean, genjaxb, compile, javadoc, svninfo " description="Create binary distribution">
+    <target name="dist" depends="clean, genjaxb, compile, javadoc, svninfo, manuals " description="Create binary distribution">
 
         <jar index="true" destfile="${build.home}/lib/${app.name}-${app.version}.jar" basedir="${build.home}/classes" >
             <manifest>
                 <attribute name="Built-By" value="Anders Håål"/>
-                <attribute name="Jar" value="${app.name}"/>
-                <attribute name="Version" value="${app.version}"/>
-                <attribute name="Copyright" value="(C) 2010-2011 Anders Håål, Ingenjörsbyn"/>  
+                <attribute name="Copyright" value="(C) 2010-2014 Anders Håål, Ingenjörsbyn"/>  
             </manifest>
         </jar>
 
@@ -219,11 +217,15 @@
         </copy>
         -->
 
-        <!--
-        <copy todir="${build.home}" file="${docs.home}/README" />
-        -->
-        <copy todir="${build.home}" file="${docs.home}/README.pdf" />
-        <copy todir="${build.home}" file="${docs.home}/LICENSE" />
+        
+    	<copy todir="${build.home}/docs">
+    	    <fileset dir="${docs.home}">
+    		    <include name="*.pdf"/>
+    		</fileset>
+    	</copy>
+    	
+    	<copy todir="${build.home}" file="${docs.home}/README" />        
+    	<copy todir="${build.home}" file="${docs.home}/LICENSE" />
         <copy todir="${build.home}" file="${basedir}/install" />
         <chmod file="${build.home}/install" perm="ug+x"/>
         <copy todir="${build.home}" file="${basedir}/svninfo.txt" />
@@ -283,6 +285,11 @@
        </exec>
     </target>
 
+	<target name="manuals">      
+	       <exec executable="/bin/bash" dir="${docs.home}">         
+	       <arg value="lyx2pdf"/>
+	       </exec>
+	    </target>
 
     <target name="genjaxb" description="Generate jaxb">
        <exec executable="/bin/bash" dir="${basedir}">      
