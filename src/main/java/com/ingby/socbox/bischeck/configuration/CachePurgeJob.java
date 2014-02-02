@@ -63,7 +63,7 @@ import com.yammer.metrics.core.TimerContext;
  * &lt;retention&gt;.
  * <br>
  * The class take one property cachePurgeJobCron that is a cron expression when
- * the purge job should be run. The default is every hour, "0 0 0/1 * * ? *" 
+ * the purge job should be run. The default is every hour, "0 2/5 * * * ? *" 
  */
 public class CachePurgeJob implements Job {
 
@@ -95,7 +95,7 @@ public class CachePurgeJob implements Job {
         
         CronTrigger trigger = newTrigger()
         .withIdentity("CachePurgeTrigger", "DailyMaintenance")
-        .withSchedule(cronSchedule(prop.getProperty("cachePurgeJobCron","0 0 0/1 * * ? *")))
+        .withSchedule(cronSchedule(prop.getProperty("cachePurgeJobCron","0 2/5 * * * ? *")))
         .forJob("CachePurge", "DailyMaintenance")
         .build();
         
