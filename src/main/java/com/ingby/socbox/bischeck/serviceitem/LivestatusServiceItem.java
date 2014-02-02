@@ -26,7 +26,10 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
+
 import com.ingby.socbox.bischeck.QueryNagiosPerfData;
+import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceException;
 
 /**
@@ -106,6 +109,13 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
         append("\n");
         
         JSONArray jsonReplyArray =  (JSONArray) JSONSerializer.toJSON(service.executeStmt(strbuf.toString()));
+        if (jsonReplyArray.size() != 1) {
+        	LOGGER.warn("Request to livestatus returned no data - check the configuration for {}", Util.fullQoutedName( service, this));
+        	ServiceItemException si = new ServiceItemException("Request to livestatus returned no data - check the configuration for " + Util.fullQoutedName( service, this));
+    		si.setServiceItemName(this.serviceItemName);
+    		throw si;  	
+        }
+        
         String firstValue = ((JSONArray) JSONSerializer.toJSON(jsonReplyArray.getString(0))).getString(0);
         if (jsonStatement.containsKey("label")) {
             firstValue = QueryNagiosPerfData.parse(jsonStatement.getString("label"),firstValue) ;
