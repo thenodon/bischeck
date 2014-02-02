@@ -103,7 +103,11 @@ Installation and administration guide
 \end_layout
 
 \begin_layout Date
-2014-01-XX
+DRAFT - IN WORK - Version 1.0.0
+\begin_inset Newline linebreak
+\end_inset
+
+2014-02-XX
 \end_layout
 
 \begin_layout Standard
@@ -271,7 +275,7 @@ status open
 
 \begin_layout Plain Layout
 
-# tar xzvf bischeck-x.y.z.tgz 
+# tar xzvf bischeck-x.y.z.tar.gz
 \end_layout
 
 \begin_layout Plain Layout
@@ -1543,7 +1547,7 @@ This will create a compressed tar file in the
 \shape italic
 target
 \shape default
- directory, named bischeck-x.y.z.tgz where x.y.z is the version number.
+ directory, named bischeck-x.y.z.tar.gz where x.y.z is the version number.
  Different versions of Bischeck can be checked out from the tags directory
  located in 
 \begin_inset Flex URL
@@ -1557,6 +1561,23 @@ http://gforge.ingby.com/svn/bischeck/bischeck/tags
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The dist directive will also convert all documentation in lyx format to
+ pdf.
+ This require the lyx
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+On Redhat/Centos lyx are part of the EPEL repos and should be version 2
+ or higher.
+\end_layout
+
+\end_inset
+
+ and imagemagick installed.
 \end_layout
 
 \begin_layout Section

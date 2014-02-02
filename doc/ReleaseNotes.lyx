@@ -95,7 +95,18 @@ Release Notes
 \end_layout
 
 \begin_layout Date
-2014-01-XX
+DRAFT - IN WORK - Version 1.0.0
+\begin_inset Newline linebreak
+\end_inset
+
+2014-02-XX
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -185,11 +196,134 @@ LatexCommand tableofcontents
 \end_layout
 
 \begin_layout Section
-Release 1.0.0 - 2014-
+Release 1.0.0 - 2014-02-
 \end_layout
 
 \begin_layout Subsection
 New features
+\end_layout
+
+\begin_layout Itemize
+The installation script 
+\end_layout
+
+\begin_layout Itemize
+Redis cache
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Cache purging
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Configuration templates and macros - 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Template override
+\end_layout
+
+\begin_layout Itemize
+Macros
+\end_layout
+
+\begin_layout Itemize
+Queue END statement
+\end_layout
+
+\begin_layout Itemize
+Aggregations configuration
+\end_layout
+
+\begin_layout Itemize
+Cache directives 
+\end_layout
+
+\begin_layout Itemize
+Inactivation of hosts and services 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Aggregations
+\end_layout
+
+\begin_layout Itemize
+Prediction
+\end_layout
+
+\begin_layout Itemize
+Re architectures the execution with jetlang
+\end_layout
+
+\begin_layout Itemize
+Servers integrations
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+NSCA and NRDP workers
+\end_layout
+
+\begin_layout Itemize
+Circuit breaks 
+\end_layout
+
+\begin_layout Itemize
+Nagios extended performance data 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Logback
+\end_layout
+
+\begin_layout Itemize
+JEP custom development 
+\end_layout
+
+\begin_layout Itemize
+New manual set
+\end_layout
+
+\begin_layout Itemize
+New java interface for Service and ServiceItem
+\end_layout
+
+\begin_layout Itemize
+All configuration management classes is moved to a separate java package
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-249]
+\end_layout
+
+\begin_layout Itemize
+[TR-251]
+\end_layout
+
+\begin_layout Itemize
+Bisconf 0.3.1
+\series bold
+ do not
+\series default
+ support Bischeck 1.0.0.
+ A later version of Bisconf is target for Bischeck 1.0.0.
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 1.0.0 support upgrade from release 0.4.3
 \end_layout
 
 \begin_layout Section

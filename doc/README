@@ -1,7 +1,11 @@
 Bischeck README
 ===============
-- Please see the version.txt file for the current version
-- All documentation is located in the docs/ directory
+- The current version is part of the tar file name, bischeck-x.y.z.tar.gz
+- After installation the version number is set in the file version.txt
+- All documentation is located in the docs/ directory, including javadoc:
+  * ReleaseNotes.pdf
+  * Bischeck installation and administration guide.pdf
+  * Bischeck configuration guide.pdf
 - More information and help can be found at http://www.bischeck.org
 - Bugs and feature request should be reported at http://gforge.ingby.com
 - Other feedback can be mailed to bischeck@ingby.com
