@@ -44,7 +44,8 @@ public class ServiceFactoryTest {
 			
 		}
 		Assert.assertEquals(service.getClass().getName(), "com.ingby.socbox.bischeck.service.JDBCService");
-	
+		Assert.assertEquals(service.getServiceName(), "myJDBC");
+		
 		try {
 			service = ServiceFactory.createService("myLastCache","bischeck://localhost",
 					url2service, new Properties());
@@ -52,7 +53,8 @@ public class ServiceFactoryTest {
 			
 		}
 		Assert.assertEquals(service.getClass().getName(), "com.ingby.socbox.bischeck.service.LastCacheService");
-	
+		Assert.assertEquals(service.getServiceName(), "myLastCache");
+		
 		try {
 			service = ServiceFactory.createService("myLivestatus","livestatus://somehost:6373",
 					url2service, new Properties());
@@ -60,7 +62,7 @@ public class ServiceFactoryTest {
 			
 		}
 		Assert.assertEquals(service.getClass().getName(), "com.ingby.socbox.bischeck.service.LivestatusService");
-	
+		Assert.assertEquals(service.getServiceName(), "myLivestatus");
 		try {
 			service = ServiceFactory.createService("myShell","shell://localhost",
 					url2service, new Properties());
@@ -68,7 +70,7 @@ public class ServiceFactoryTest {
 			
 		}
 		Assert.assertEquals(service.getClass().getName(), "com.ingby.socbox.bischeck.service.ShellService");
-	
+		Assert.assertEquals(service.getServiceName(), "myShell");
 	}
 
 }
