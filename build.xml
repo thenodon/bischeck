@@ -312,10 +312,11 @@
     <target name="svninfo" description="svn info">
        <exec executable="svn" output="svninfo.txt" outputproperty="svnrev">      
             <arg value="log"/>
+       	    <arg value="--no-auth-cache"/>
             <arg value="--username"/>
             <arg value="anonymous"/>
             <arg value="--password"/>
-            <arg value="''"/>
+            <arg value="nopasswd"/>
             <arg value="-rHEAD"/>
             <arg value="-q"/>
        </exec>
