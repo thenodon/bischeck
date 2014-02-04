@@ -315,7 +315,7 @@
             <arg value="--username"/>
             <arg value="anonymous"/>
             <arg value="--password"/>
-            <arg value=""/>
+            <arg value="''"/>
             <arg value="-rHEAD"/>
             <arg value="-q"/>
        </exec>
