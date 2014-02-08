@@ -31,7 +31,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 public class NagiosUtil {
     
     private boolean formatWarnCrit = false;
-
+	
         
     public NagiosUtil() {
         
@@ -48,6 +48,15 @@ public class NagiosUtil {
     public NagiosUtil(boolean extended) {
     	this.formatWarnCrit = new Boolean(extended);
     }
+    
+    public void setExtended() {
+    	this.formatWarnCrit = true;
+    }
+    
+    public boolean isExtended() {
+    	return this.formatWarnCrit;
+    }
+    
     
     /**
      * Formatting to Nagios style return message
@@ -171,7 +180,7 @@ public class NagiosUtil {
         }
         perfmessage.append(";0;0;0; ");
         
-        if (formatWarnCrit) {
+        if (isExtended()) {
         	if (threshold != null) {
         		perfmessage.append("warning=");
         		perfmessage.append(warnValue.toString());
