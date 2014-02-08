@@ -19,7 +19,6 @@
 
 package com.ingby.socbox.bischeck;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
@@ -44,6 +43,10 @@ public class NagiosUtil {
         }
         
         this.formatWarnCrit = new Boolean(extendFormat);
+    }
+    
+    public NagiosUtil(boolean extended) {
+    	this.formatWarnCrit = new Boolean(extended);
     }
     
     /**
@@ -168,13 +171,22 @@ public class NagiosUtil {
         }
         perfmessage.append(";0;0;0; ");
         
-        if (formatWarnCrit && threshold != null) {
-            perfmessage.append("warning=");
-            perfmessage.append(warnValue.toString());
-            perfmessage.append(";0;0;0; ");
-            perfmessage.append("critical=");
-            perfmessage.append(critValue.toString());
-            perfmessage.append(";0;0;0; ");
+        if (formatWarnCrit) {
+        	if (threshold != null) {
+        		perfmessage.append("warning=");
+        		perfmessage.append(warnValue.toString());
+        		perfmessage.append(";0;0;0; ");
+        		perfmessage.append("critical=");
+        		perfmessage.append(critValue.toString());
+        		perfmessage.append(";0;0;0; ");
+        	} else {
+        		perfmessage.append("warning=");
+        		perfmessage.append("0");
+        		perfmessage.append(";0;0;0; ");
+        		perfmessage.append("critical=");
+        		perfmessage.append("0");
+        		perfmessage.append(";0;0;0; ");
+        	}
         }
         return perfmessage;
     }
