@@ -83,7 +83,10 @@
 
     <server name="MetricsLibrato">
         <class>MetricsLibratoServer</class>
-        
+        <property>
+            <key>apiUrl</key>
+            <value>https://localhost/v1/metrics</value>
+        </property>
     </server>
 
 

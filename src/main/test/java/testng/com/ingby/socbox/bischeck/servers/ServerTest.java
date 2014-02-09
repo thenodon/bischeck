@@ -11,11 +11,16 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
 import com.ingby.socbox.bischeck.service.ServiceFactoryException;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactoryException;
+import com.ingby.socbox.bischeck.threshold.Threshold;
+import com.ingby.socbox.bischeck.threshold.ThresholdException;
+import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 
 public class ServerTest {
 
@@ -47,28 +52,26 @@ public class ServerTest {
 	}
 	
 	@Test (groups = { "Server" } )
-	public void execute()  {
+	public void execute() throws ServiceFactoryException, ServiceItemFactoryException, ThresholdException, ServiceException, ServiceItemException {
 		Service service = null;
 		
 		Assert.assertNotEquals(serverexecutor, null);
 		
-		try {
-			service = ServiceFactory.createService("myShell","shell://localhost",
-					url2service, new Properties());
-		} catch (ServiceFactoryException e) {
-			e.printStackTrace();
-		}
+		
+		service = ServiceFactory.createService("myShell","shell://localhost",
+				url2service, new Properties());
+		
 		service.setConnectionUrl("shell://localhost");
 		Assert.assertEquals(service.getClass().getName(), "com.ingby.socbox.bischeck.service.ShellService");
 		
 		Assert.assertEquals(service.getServiceName(), "myShell");
 		
 		ServiceItem serviceItem = null; 
-		try {
-			serviceItem = ServiceItemFactory.createServiceItem("myShellItem", "CheckCommandServiceItem");
-		} catch (ServiceItemFactoryException e) {
-			e.printStackTrace();
-		}
+		serviceItem = ServiceItemFactory.createServiceItem("myShellItem", "CheckCommandServiceItem");
+
+		serviceItem.setService(service);
+		serviceItem.setExecution("{\"check\":\"/bin/echo Ok\\|time=10;;;;\",\"label\":\"time\"}");
+		
 		
 		Assert.assertEquals(service.getConnectionUrl(), "shell://localhost");
 		service.addServiceItem(serviceItem);
@@ -77,10 +80,18 @@ public class ServerTest {
 		
 		host.addService(service);
 		service.setHost(host);
-		
-		
+
+
+		serviceItem.setThreshold(ThresholdFactory.getCurrent(service, serviceItem));
+
+
+		service.openConnection();
+		serviceItem.execute();
+		serviceItem.setExecutionTime(100L);
+		service.closeConnection();
+
 		serverexecutor.execute(service);
-		
+
 		
 	}
 	
