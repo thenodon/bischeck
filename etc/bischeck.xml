@@ -1,7 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <bischeck>
+
+  <!--       -->
+  <!-- HOSTS -->
+  <!--       -->
+
+  <!-- Host with a single service using template -->
   <host>
     <name>host0</name>
+    <inactive>false</inactive>
     <alias>127.0.0.1</alias>
     <desc>Host host0</desc>
     
@@ -11,27 +18,142 @@
 
   </host>
   
+  <!-- Host has two services using template-->  
   <host>
     <name>host1</name>
     <alias>127.0.0.1</alias>
     <desc>Host host1</desc>
-    
+    <!-- Using service template with override -->    
     <service>
         <template>sshporttemplate</template>
+        <serviceoverride>
+            <name>PROPssh</name>
+            <inactive>false</inactive>
+            <alias>10.10.10.10</alias>
+            <schedule>40S</schedule>
+        </serviceoverride>
+    </service>
+
+    <service>
+        <template>webporttemplate</template>
+        <serviceoverride>
+            <name>WEB</name>
+        </serviceoverride>
     </service>
 
   </host>
-  
+ 
+  <!-- Host with one service that has two serviceitems -->
+  <!-- 
+    OBS remember that its not possible to mix serviceitems that do not
+    share the same connection url 
+    -->
+  <host>
+    <name>host2</name>
+    <alias>127.0.0.1</alias>
+    <desc>Host host2</desc>
+    
+    <service>
+      <name>sshAndHttpPort</name>
+      <desc>Monitor the ssh port response time $$SERVICENAME$$ </desc>
+      <schedule>5S</schedule> 
+      <url>shell://localhost</url>
+    
+      <!-- Ovvriding the serviceitem name set in the template -->
+      <serviceitem>
+        <template>sshresponsetimetemplate</template>
+        <serviceitemoverride>
+          <name>SSHport</name>
+        </serviceitemoverride>
+      </serviceitem>
+      
+      <serviceitem>
+        <template>webresponsetimetemplate</template>
+        <serviceitemoverride>
+          <name>WEBport</name>
+        </serviceitemoverride>
+      </serviceitem>
+    
+    </service>
+
+  </host>
+ 
+  <host>
+    <name>host3</name>
+    <inactive>false</inactive>
+    <alias>127.0.0.1</alias>
+    <desc>Host host3</desc>
+    
+    <service>
+      <name>sshport</name>
+      <desc>Monitor the ssh port response time $$SERVICENAME$$ </desc>
+      <schedule>45S</schedule> 
+      <url>shell://localhost</url>
+
+      <serviceitem>
+        <template>sshresponsetimetemplate</template>
+      </serviceitem>
+
+    </service>
+
+  </host>
+
+  <!-- Classic pre version 1.0.0 configuration, but with a cache template -->
+  <host>
+    <name>host4</name>
+    <inactive>false</inactive>
+    <alias>127.0.0.1</alias>
+    <desc>Host use classic configuration, but with a cache template smallCache</desc>
+    
+    <service>
+      <name>sshport</name>
+      <desc>Monitor the ssh port response time $$SERVICENAME$$ </desc>
+      <schedule>60S</schedule> 
+      <url>shell://localhost</url>
+
+      <serviceitem>
+        <name>response</name>
+        <desc>Response time for tcp check</desc>
+        <execstatement>{"check":"/usr/lib/nagios/plugins/check_tcp -H $$HOSTALIAS$$ -p 22","label":"time"}</execstatement>
+        <thresholdclass>Twenty4HourThreshold</thresholdclass>
+        <serviceitemclass>CheckCommandServiceItem</serviceitemclass>
+        <cache>
+          <template>smallCache</template>
+       </cache>
+      </serviceitem>
+    </service>
+
+  </host>
+
+  <!--                   -->
+  <!-- SERVICE TEMPLATES -->
+  <!--                   -->
   <servicetemplate templatename="sshporttemplate">  
     <name>sshport</name>
-    <desc>Monitor the ssh port response time</desc>
+    <desc>Monitor the ssh port response time $$SERVICENAME$$ </desc>
     <schedule>5S</schedule> 
+    <schedule>10S</schedule>
     <url>shell://localhost</url>
     <serviceitem>
       <template>sshresponsetimetemplate</template>
     </serviceitem>
   </servicetemplate>
   
+
+  <servicetemplate templatename="webporttemplate">  
+    <name>webport</name>
+    <desc>Monitor the web port response time $$SERVICENAME$$ </desc>
+    <schedule>30S</schedule> 
+    <url>shell://localhost</url>
+    <serviceitem>
+      <template>webresponsetimetemplate</template>
+    </serviceitem>
+  </servicetemplate>
+
+
+  <!--                       -->
+  <!-- SERVICEITEM TEMPLATES -->
+  <!--                       -->
   
   <serviceitemtemplate templatename="sshresponsetimetemplate">  
     <name>response</name>
@@ -39,8 +161,69 @@
     <execstatement>{"check":"/usr/lib/nagios/plugins/check_tcp -H $$HOSTALIAS$$ -p 22","label":"time"}</execstatement>
     <thresholdclass>Twenty4HourThreshold</thresholdclass>
     <serviceitemclass>CheckCommandServiceItem</serviceitemclass>
-   
     <cache>
+        <template>smallCache</template>
+    </cache>
+  
+  </serviceitemtemplate>
+
+  <serviceitemtemplate templatename="webresponsetimetemplate">  
+    <name>response</name>
+    <desc>Response time for tcp check against port 80</desc>
+    <execstatement>{"check":"/usr/lib/nagios/plugins/check_tcp -H $$HOSTALIAS$$ -p 80","label":"time"}</execstatement>
+    <thresholdclass>Twenty4HourThreshold</thresholdclass>
+    <serviceitemclass>CheckCommandServiceItem</serviceitemclass>
+    <cache>
+        <template>cacheDef</template>
+    </cache>
+  
+  </serviceitemtemplate>
+
+  <!--                 -->
+  <!-- CACHE TEMPLATES -->
+  <!--                 -->
+
+  <!--  Example cache -->
+  <cachetemplate templatename="cacheDef">
+      <aggregate>
+        <!-- Aggregate with using average -->
+        <method>max</method>
+        <!-- Include weekend data in the aggregation -->
+        <useweekend>true</useweekend>
+        <!-- 
+          Define retention for the aggregated periods. 
+          If no retention is define for a period no retention will be done.
+          Periods that can be define are (H)our,(D)ay, (W)eek and (M)onth    
+        -->
+        <retention>
+          <!-- Purge hours after 168 hours (7 days, 24*7) -->
+          <period>H</period>
+          <offset>168</offset>
+        </retention>
+        <retention>
+          <!-- Purge days after 60 days -->
+          <period>D</period>
+          <offset>60</offset>
+        </retention>
+        <retention>
+          <!-- Purge days after 53 weeks -->
+          <period>W</period>
+          <offset>53</offset>
+        </retention>
+      </aggregate>
+      <!-- 
+        Define purge rules for the data that is collected with this serviceitem
+      -->
+      <purge>
+        <maxcount>1000</maxcount> 
+      </purge>
+  </cachetemplate>
+  
+
+  <!-- This cache directive is set with retention that is two small so they -->
+  <!-- will be override by the Aggregation logic to secure that correct -->
+  <!-- aggrgation can be created for dya, week and month-->
+  <cachetemplate templatename="smallCache">
       <aggregate>
         <!-- Aggregate with using average -->
         <method>avg</method>
@@ -52,27 +235,38 @@
           Periods that can be define are (H)our,(D)ay, (W)eek and (M)onth    
         -->
         <retention>
-          <!-- Purge hours after after 7 days (24*7) -->
+          <!-- Purge hours after 1 hour, but will be set to 25 -->
           <period>H</period>
-          <offset>168</offset>
+          <offset>1</offset>
         </retention>
         <retention>
-          <!-- Purge days after 60 days -->
+          <!-- Purge days after 2 days, but will be set to 8 -->
           <period>D</period>
-          <offset>60</offset>
+          <offset>2</offset>
         </retention>
+        <retention>
+          <!-- Purge days after 1 week, but will be set to 5 -->
+          <period>W</period>
+          <offset>1</offset>
+        </retention>
+        
+        <!-- Retention for month not set, will never be purged -->
+
       </aggregate>
       <!-- 
         Define purge rules for the data that is collected with this serviceitem
       -->
+      <!-- 
+        Since it does not have a purge directive the default will be used set to
+        to the property of lastStatusCacheSize or the default of 500
+      -->  
+      <!-- 
       <purge>
-        <!--  The max number of items -->
-        <maxcount>1000</maxcount> 
+        <maxcount>5000</maxcount> 
       </purge>
-    </cache>
-  
-  </serviceitemtemplate>
-
+      -->
+    </cachetemplate>
+    
 </bischeck>
 
 

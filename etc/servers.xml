@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <servers>
     <server name="NSCA-1">
-        <class>        NSCAServer     </class>
+        <class>NSCAServer</class>
         <property>
             <key>hostAddress</key>
             <value>localhost</value>

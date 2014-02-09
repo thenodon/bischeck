@@ -10,15 +10,47 @@
         
         <member>
            <hostname>host1</hostname>
+            <servicename>PROPssh</servicename>
+            <serviceitemname>response</serviceitemname>
+        </member>
+
+        <member>
+           <hostname>host2</hostname>
             <servicename>sshport</servicename>
             <serviceitemname>response</serviceitemname>
         </member>
-        
-        <template>sshResponse</template>    
+
+        <template>response1</template>    
+     
     </servicedefgroup>
      
+    <servicedefgroup>  
+        <member>
+           <hostname>host2</hostname>
+            <servicename>sshAndHttpPort</servicename>
+            <serviceitemname>SSHport</serviceitemname>
+        </member>
+    
+        <member>
+           <hostname>host2</hostname>
+            <servicename>sshAndHttpPort</servicename>
+            <serviceitemname>WEBport</serviceitemname>
+        </member>
       
-    <servicedeftemplate templatename="sshResponse">
+        <template>response1</template>    
+    </servicedefgroup>
+    
+    <servicedefgroup>    
+        <member>
+           <hostname>host3</hostname>
+            <servicename>RESPONSE</servicename>
+            <serviceitemname>responseNoTemplate</serviceitemname>
+        </member>
+        
+        <template>response2</template>    
+    </servicedefgroup>
+            
+    <servicedeftemplate templatename="response1">
         
         <period>
             <calcmethod>&lt;</calcmethod>
@@ -28,12 +60,30 @@
         </period>
     </servicedeftemplate>
         
+      
+    <servicedeftemplate templatename="response2">
+        
+        <period>
+            <calcmethod>&gt;</calcmethod>
+            <warning>5</warning>
+            <critical>10</critical>
+            <hoursIDREF>1</hoursIDREF>
+        </period>
+    </servicedeftemplate>
     
     <hours hoursID="0">
         <hourinterval>
             <from>00:00</from>
             <to>23:00</to>
-            <threshold>avg($$HOSTNAME$$-sshport-response[10:19])</threshold>
+            <threshold>avg($$HOSTNAME$$-$$SERVICENAME$$-$$SERVICEITEMNAME$$[0:9])</threshold>
+        </hourinterval>
+    </hours>
+    
+     <hours hoursID="1">
+        <hourinterval>
+            <from>00:00</from>
+            <to>23:00</to>
+            <threshold>avg($$HOSTNAME$$-$$SERVICENAME$$-$$SERVICEITEMNAME$$[10:19])</threshold>
         </hourinterval>
     </hours>
 
