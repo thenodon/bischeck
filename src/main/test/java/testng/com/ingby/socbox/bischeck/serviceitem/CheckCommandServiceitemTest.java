@@ -32,9 +32,11 @@ import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.service.ShellService;
 import com.ingby.socbox.bischeck.serviceitem.CheckCommandServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 
 public class CheckCommandServiceitemTest {
 
@@ -76,27 +78,23 @@ public class CheckCommandServiceitemTest {
 	}
 
 	@Test (groups = { "ServiceItem" })
-	public void verifyService() throws Exception {
+	public void verifyService() throws ServiceException, ServiceItemException  {
 		ServiceItem checkcommand = new CheckCommandServiceItem("serviceItemName");
 		checkcommand.setService(shell);
 		
 		
 		
 		checkcommand.setExecution("{\"check\":"+
-				"\"/usr/lib/nagios/plugins/check_ping -H localhost -w 100.0,80% -c 200.0,90%\","+
+				"\"echo Ok\\|rta=0.1;;;;\","+
 				"\"label\":"+ 
 		"\"rta\"}");
 
-		try {
-			checkcommand.execute();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		checkcommand.execute();
+		
 		System.out.println("Return value:" + checkcommand.getLatestExecuted());
 		Assert.assertNotNull(checkcommand.getLatestExecuted());
 		checkcommand.setExecution("{\"check\":"+
-				"\"/usr/lib/nagios/plugins/check_tcp -H localhost -p 22\","+
+				"\"echo Ok\\|time=0.1;;;;\","+
 				"\"label\":"+ 
 		"\"time\"}");
 
