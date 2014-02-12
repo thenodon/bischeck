@@ -1,6 +1,5 @@
 package testng.com.ingby.socbox.bischeck.threshold;
 
-import java.util.Properties;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -16,6 +15,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactoryException;
 import com.ingby.socbox.bischeck.threshold.ThresholdException;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
+import com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold;
 
 public class Twenty4HourThresholdTest {
 	private ConfigurationManager confMgmr;
@@ -59,7 +59,10 @@ public class Twenty4HourThresholdTest {
 		service.closeConnection();
 		
 		Assert.assertEquals(serviceItem.getLatestExecuted(), "10");
-		serviceItem.setThreshold(ThresholdFactory.getCurrent(service,serviceItem));
+		Twenty4HourThreshold threshold = new Twenty4HourThreshold(service.getHost().getHostname(), service.getServiceName(), serviceItem.getServiceItemName());
+		threshold.init();
+		serviceItem.setThreshold(threshold);
+		
 		NAGIOSSTAT curstate = serviceItem.getThreshold().getState(serviceItem.getLatestExecuted());
 
 		Assert.assertEquals(curstate.toString(),"OK");
