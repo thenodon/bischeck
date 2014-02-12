@@ -66,9 +66,7 @@ public class CalculateOnCacheTest {
 	@BeforeClass
     public void beforeTest() throws Exception {
 	
-		System.out.println("======== BeforeClass " + CalculateOnCacheTest.class.getName());
-		
-		
+				
 		try {
             confMgmr = ConfigurationManager.getInstance();
         } catch (java.lang.IllegalStateException e) {
@@ -90,14 +88,13 @@ public class CalculateOnCacheTest {
 		cache.clear();
 	}
 	
+	
 	@AfterClass
 	public void afterTest() throws CacheException {
-		System.out.println("======== AfterClass " + CalculateOnCacheTest.class.getName());
-		
-		//cache.close();
 		CacheFactory.destroy();
 	}
 
+	
     @Test (groups = { "ServiceItem" })
     public void verifyService() throws Exception {
     	cache.clear();
