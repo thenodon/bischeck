@@ -70,7 +70,7 @@ public class ServerTest {
 		serviceItem = ServiceItemFactory.createServiceItem("myShellItem", "CheckCommandServiceItem");
 
 		serviceItem.setService(service);
-		serviceItem.setExecution("{\"check\":\"/bin/echo Ok\\|time=10;;;;\",\"label\":\"time\"}");
+		serviceItem.setExecution("{\"check\":\"echo Ok\\|time=10;;;;\",\"label\":\"time\"}");
 		
 		
 		Assert.assertEquals(service.getConnectionUrl(), "shell://localhost");
