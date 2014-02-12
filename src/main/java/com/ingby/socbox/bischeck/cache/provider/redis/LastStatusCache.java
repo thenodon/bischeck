@@ -199,10 +199,14 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
     }
 
     public static synchronized void destroy() {
-        lsc.jedispool.destroy();
-      
+        if (lsc != null) {
+        	lsc.jedispool.destroy();
+        }
+        
         try {
-            mbsMgr.unRegisterMBeanserver();
+        	if (mbsMgr != null) {
+        		mbsMgr.unRegisterMBeanserver();
+        	}
         } finally {
           mbsMgr = null;  
         }

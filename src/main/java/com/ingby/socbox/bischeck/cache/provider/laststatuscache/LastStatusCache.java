@@ -138,10 +138,14 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	public static synchronized void destroy() {
-		lsc.close();
+		if (lsc != null) {
+			lsc.close();
+		}
 		
 		try {
-            mbsMgr.unRegisterMBeanserver();
+			if (mbsMgr != null) {
+				mbsMgr.unRegisterMBeanserver();
+			}
         } finally {
           mbsMgr = null;  
         }
