@@ -9,9 +9,18 @@
         </member>
         <template>randthreshold</template>    
     </servicedefgroup>
+
+    <servicedefgroup>
+        <member>
+           <hostname>myhost</hostname>
+            <servicename>myShell</servicename>
+            <serviceitemname>myShellItem</serviceitemname>
+        </member>
+        <template>mythreshold</template>    
+    </servicedefgroup>
+      
       
     <servicedeftemplate templatename="randthreshold">
-        
         <period>
             <calcmethod>&gt;</calcmethod>
             <warning>5</warning>
@@ -20,7 +29,16 @@
         </period>
     </servicedeftemplate>
         
-    
+
+    <servicedeftemplate templatename="mythreshold">        
+        <period>
+            <calcmethod>&gt;</calcmethod>
+            <warning>5</warning>
+            <critical>10</critical>
+            <hoursIDREF>1</hoursIDREF>
+        </period>
+    </servicedeftemplate>
+
     <hours hoursID="0">
         <hourinterval>
             <from>00:00</from>
@@ -28,7 +46,28 @@
             <threshold>avg($$HOSTNAME$$-rand-number[10:19])</threshold>
         </hourinterval>
     </hours>
+    
+    <hours hoursID="1">
+        <hourinterval>
+            <from>00:00</from>
+            <to>23:00</to>
+            <threshold>1</threshold>
+        </hourinterval>
+    </hours>
 
-    <holiday year="2013">
+    <holiday year="2014">
+      <dayofyear>0101</dayofyear>
+      <dayofyear>0106</dayofyear>
+      <dayofyear>0422</dayofyear>
+      <dayofyear>0424</dayofyear>
+      <dayofyear>0425</dayofyear>
+      <dayofyear>0501</dayofyear>
+      <dayofyear>0602</dayofyear>
+      <dayofyear>0606</dayofyear>
+      <dayofyear>0612</dayofyear>
+      <dayofyear>0625</dayofyear>
+      <dayofyear>1105</dayofyear>
+      <dayofyear>1225</dayofyear>
+      <dayofyear>1226</dayofyear>
     </holiday>
 </twenty4threshold>

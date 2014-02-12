@@ -1,0 +1,69 @@
+package testng.com.ingby.socbox.bischeck.threshold;
+
+import java.util.Properties;
+
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.host.Host;
+import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceException;
+import com.ingby.socbox.bischeck.service.ServiceFactoryException;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactoryException;
+import com.ingby.socbox.bischeck.threshold.ThresholdException;
+import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
+import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
+
+public class Twenty4HourThresholdTest {
+	private ConfigurationManager confMgmr;
+
+	@BeforeClass
+    public void beforeTest() throws Exception {
+	
+				
+		try {
+            confMgmr = ConfigurationManager.getInstance();
+        } catch (java.lang.IllegalStateException e) {
+            System.setProperty("bishome", ".");
+            System.setProperty("xmlconfigdir","testetc");
+            
+            ConfigurationManager.init();
+            confMgmr = ConfigurationManager.getInstance();  
+        }    
+		
+		
+	}
+
+	@Test (groups = { "Threshold" } )
+	public void execute() throws ServiceFactoryException, ServiceItemFactoryException, ThresholdException, ServiceException, ServiceItemException {
+		
+		
+		Host host = confMgmr.getHostConfig().get("myhost");
+		Service service = host.getServiceByName("myShell");
+		
+		Assert.assertEquals(service.getClass().getName(), "com.ingby.socbox.bischeck.service.ShellService");
+		
+		Assert.assertEquals(service.getServiceName(), "myShell");
+		
+		ServiceItem serviceItem = service.getServiceItemByName("myShellItem"); 
+				
+		Assert.assertEquals(service.getConnectionUrl(), "shell://localhost");
+		
+
+		service.openConnection();
+		serviceItem.execute();
+		serviceItem.setExecutionTime(100L);
+		service.closeConnection();
+		
+		Assert.assertEquals(serviceItem.getLatestExecuted(), "10");
+		serviceItem.setThreshold(ThresholdFactory.getCurrent(service,serviceItem));
+		NAGIOSSTAT curstate = serviceItem.getThreshold().getState(serviceItem.getLatestExecuted());
+
+		Assert.assertEquals(curstate.toString(),"OK");
+		
+	}
+	
+}

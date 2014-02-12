@@ -120,6 +120,28 @@
 
   </host>
 
+  <!-- Threshold test service definition -->
+  <host>
+    <name>myhost</name>
+    <inactive>false</inactive>
+    <alias>127.0.0.1</alias>
+    
+    <service>
+      <name>myShell</name>
+      <schedule>10S</schedule>
+      <url>shell://localhost</url>
+
+      <serviceitem>
+        <name>myShellItem</name>
+        <execstatement>{"check":"echo Ok|time=10;;;;","label":"time"}</execstatement>
+        <thresholdclass>Twenty4HourThreshold</thresholdclass>
+        <serviceitemclass>CheckCommandServiceItem</serviceitemclass>
+        
+      </serviceitem>
+    </service>
+
+  </host>
+  
   <!--                   -->
   <!-- SERVICE TEMPLATES -->
   <!--                   -->
