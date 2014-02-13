@@ -278,7 +278,16 @@ Nagios extended performance data
 
 \end_deeper
 \begin_layout Itemize
-Logback
+Logback has replaced log4j as the logging framework.
+ Configuration of 
+\emph on
+logback
+\emph default
+ is done in the 
+\emph on
+logback.xml
+\emph default
+ file located in the resources directory.
 \end_layout
 
 \begin_layout Itemize
@@ -286,7 +295,44 @@ JEP custom development
 \end_layout
 
 \begin_layout Itemize
-New manual set
+New manual set.
+ The manuals are now divided into 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck installation and administration guide
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+, 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck configuration guide
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+ and 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck release notes
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+.
 \end_layout
 
 \begin_layout Itemize
@@ -316,6 +362,10 @@ Bisconf 0.3.1
 \series default
  support Bischeck 1.0.0.
  A later version of Bisconf is target for Bischeck 1.0.0.
+\end_layout
+
+\begin_layout Itemize
+The DocManager utility has been removed.
 \end_layout
 
 \begin_layout Subsection

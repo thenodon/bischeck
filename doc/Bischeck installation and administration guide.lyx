@@ -137,8 +137,7 @@ http://creativecommons.org/licenses/by-sa/3.0/
 
 .
  If you distribute this document, or a modified version of it, you must
- provide attribution to Ingenjörsbyn AB.
- and provide a link to the original.
+ provide attribution to Ingenjörsbyn AB and provide a link to the original.
  
 \begin_inset Newline newline
 \end_inset
@@ -194,6 +193,7 @@ Bischeck - configuration guide
 \begin_inset Quotes erd
 \end_inset
 
+.
  
 \end_layout
 
@@ -264,7 +264,14 @@ root
 \series default
  privileges when running the installation if you like the init scripts to
  be installed for automatic startup and shutdown.
- 
+ Before installing please see the 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:System-requirements"
+
+\end_inset
+
+ chapter.
 \end_layout
 
 \begin_layout Standard
@@ -453,7 +460,7 @@ in this documentation and with the ownership of the user id
 nagios
 \emph default
 .
- Make sure that the user exist before running install.
+ Make sure that the user exists before running install.
 \end_layout
 
 \begin_layout Standard
@@ -490,10 +497,26 @@ Bischeck configuration guide
 \end_inset
 
 .
- This file is used by the bischeckd script to stop the java program running
+ This file is used by the bischeckd script to stop the java process running
  Bischeck and make sure that only one instance of Bischeck is started on
  the server.
  
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+If the installation is done as none root user, effective user id is not
+ root, Bischeck will be installed as the user running the install script.
+ This means that the init script, bischeckd, will not be installed in /etc/init.d.
+ To start Bischeck the command line utility must be used, see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:Command-line-utilities"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -532,7 +555,8 @@ $BISHOME -
 
 \begin_layout Plain Layout
 
-         |- /lib        - All jar files requiered for Bischeck
+         |- /lib        - All jar files requiered for Bischeck including
+ the Bischeck jar
 \end_layout
 
 \begin_layout Plain Layout
@@ -1061,7 +1085,7 @@ status open
 
 \begin_layout Plain Layout
 
-$ bischeck ConfigurationManager -p
+$ bischeck configuration.ConfigurationManager -p
 \end_layout
 
 \end_inset
@@ -1072,71 +1096,6 @@ $ bischeck ConfigurationManager -p
 \begin_layout Standard
 This command is used in the init script bischeckd to retrieve the current
  pid.
-\end_layout
-
-\begin_layout Section
-List Bischeck configuration
-\end_layout
-
-\begin_layout Standard
-Formatted listing of all configuration files is managed by the DocManager
- class.
- 
-\end_layout
-
-\begin_layout Standard
-To generate the configuration files in html format:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ bischeck DocManager -d <directory name> -t html
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The files are generated to the directory set with -d.
- Point your browser to the index.html file in the directory to get links
- to each configuration file.
-\end_layout
-
-\begin_layout Standard
-To get the same but in plain text:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ bischeck DocManager -d <directory name> -t text
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-If -d is omitted the files file be created in the default directory 
-\emph on
-bisheckdoc
-\emph default
-.
- The default value for -t is html.
 \end_layout
 
 \begin_layout Section
@@ -1157,7 +1116,7 @@ status open
 
 \begin_layout Plain Layout
 
-$ bischeck ConfigurationManager -v; echo $?
+$ bischeck configuration.ConfigurationManager -v; echo $?
 \end_layout
 
 \end_inset
@@ -1183,7 +1142,7 @@ status open
 \begin_layout Plain Layout
 
 $ bischeck threshold.Twenty4HourThreshold -h erphost -s orders -i ediorders
- -d 20111207
+ -d 20141207
 \end_layout
 
 \end_inset
@@ -1194,7 +1153,7 @@ $ bischeck threshold.Twenty4HourThreshold -h erphost -s orders -i ediorders
 \begin_layout Standard
 The above command will show which threshold definition that will be used
  for host erphost, service orders and serviceitem ediorders on seventh of
- December 2012.
+ December 2014.
  If -d is omitted the current date will be used.
 \end_layout
 
@@ -1209,6 +1168,15 @@ Bischeck internal surveillance
 \end_layout
 
 \begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+FIX
+\end_layout
+
+\end_inset
+
 Bischeck use the Java JMX standard for internal monitoring.
  Bischeck expose a number of JMX MBeans that enables controlling and instrumenta
 tion of the running Bischeck daemon.
@@ -1591,15 +1559,17 @@ Developing with Bischeck
 \end_layout
 
 \begin_layout Standard
-Its simple to develop your own service, service item, threshold and server
+It's simple to develop your own service, service item, threshold and server
  classes.
  To develop your own you must follow the interface that exist for each type.
  For service and service items an abstract class exist with default implementati
 on of most of the methods described in the interfaces.
-\end_layout
-
-\begin_layout Standard
-TODO
+ For more information check out the Bischeck javadoc that is generated using
+ ant and also part of the distribution in the 
+\emph on
+docs/javadoc
+\emph default
+ directory.
 \end_layout
 
 \begin_layout Chapter
@@ -1609,7 +1579,7 @@ name "label:System-requirements"
 
 \end_inset
 
-System requirements
+System requirements 
 \end_layout
 
 \begin_layout Section
@@ -1629,7 +1599,7 @@ Redis
 \end_layout
 
 \begin_layout Standard
-From version 1.0.0 of Bischeck redis,
+Since version 1.0.0 of Bischeck redis,
 \begin_inset Flex URL
 status collapsed
 
@@ -1640,8 +1610,15 @@ http://www.redis.io
 
 \end_inset
 
-, is the default cache for Bischeck collected data.
- Bischeck has been tested with redis version 2.6.7.
+, is the default memory cache.
+ Redis provides a different range of persistence options like point-in-time
+ snapshots and persistence logs.
+ Redis also support replication and high-availability options.
+ 
+\end_layout
+
+\begin_layout Standard
+Bischeck has been tested with redis version 2.6.7.
  Installation of redis is not part of the Bischeck installation and should
  be installed prior to starting Bischeck.
  Redis is not required to run on the same server as Bischeck.
@@ -1682,6 +1659,44 @@ cache.provider.redis.auth - the authorization token for redis, default is empty
 
 \begin_layout Itemize
 cache.provider.redis.timeout - the connection timeout, default is 2000 ms.
+ 
+\end_layout
+
+\begin_layout Standard
+There is also an additional property that can be used with the new redis
+ based cache and that is 
+\emph on
+cache.provider.redis.fastCacheSize
+\emph default
+.
+ This parameter defines the number of cache items that for each service
+ definition (host-service-serviceitem) should be held in parallel with the
+ redis cache in the bischeck heap space.
+ If Bischeck finds the data in the fast cache on a read, access to redis
+ is not needed.
+ Data is always written to redis.
+ The default value for the option is 0, meaning that the fast cache is 0
+ size.
+ Depending on how the cached data is used in your configuration increasing
+ the fast cache can improve performance.
+ 
+\end_layout
+
+\begin_layout Standard
+Using redis it's possible to access the data in the cache in runtime.
+ Redis provide many client libraries for different languages.
+ The quickest way is just to use the 
+\emph on
+redis-cli
+\emph default
+ command line utility.
+ 
+\end_layout
+
+\begin_layout Standard
+The pre version 1.0.0 cache should be regarded as deprecated.
+ Many of the the new features available from 1.0.0 is not supported in the
+ old implementation, like aggregations.
  
 \end_layout
 
@@ -1759,12 +1774,39 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 \end_deeper
 \begin_layout Itemize
 commons-dbcp-1.4.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/proper/commons-dbcp/
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 commons-lang-2.5.jar - 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -1779,7 +1821,7 @@ http://commons.apache.org/lang/
 \begin_deeper
 \begin_layout Itemize
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -1824,13 +1866,67 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 
 \end_deeper
 \begin_layout Itemize
-commons-logging-1.1.1.jar
+commons-logging-1.1.1.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/proper/commons-logging/
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
 \begin_layout Itemize
-commons-math3-3.1.1
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-math3-3.1.1 - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/proper/commons-math/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 ezmorph-1.0.6.jar - 
 \begin_inset Flex URL
@@ -1863,9 +1959,36 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 
 \end_deeper
 \begin_layout Itemize
-jedis-2.1.0-jar
+jedis-2.1.0-jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/xetorthio/jedis
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/xetorthio/jedis/blob/master/LICENSE.txt
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 jep-2.4.1.jar - 
 \begin_inset Flex URL
@@ -1898,13 +2021,40 @@ http://www.gnu.org/licenses/gpl-2.0.html
 
 \end_deeper
 \begin_layout Itemize
-jetlang-0.2.10.jar
+jetlang-0.2.10.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://code.google.com/p/jetlang/
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://opensource.org/licenses/BSD-3-Clause
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 jsendnsca-2.0.1.jar - 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -1964,13 +2114,36 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 
 \end_deeper
 \begin_layout Itemize
-logback-classic-1.0.3.jar
+logback-classic-1.0.3.jar and logback-core-1.0.3.jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://logback.qos.ch/
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
 \begin_layout Itemize
-logback-core-1.0.3.jar
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.eclipse.org/legal/epl-v10.html
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 metrics-core.jar - 
 \begin_inset Flex URL
@@ -2036,7 +2209,7 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 \begin_layout Itemize
 slf4j-api-1.6.0.jar - 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -2051,7 +2224,7 @@ http://www.slf4j.org/
 \begin_deeper
 \begin_layout Itemize
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -2067,7 +2240,7 @@ http://www.opensource.org/licenses/mit-license.php
 \begin_layout Itemize
 slf4j-log4j12-1.6.0.jar - 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -2082,7 +2255,7 @@ http://www.slf4j.org/
 \begin_deeper
 \begin_layout Itemize
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -2096,11 +2269,42 @@ http://www.opensource.org/licenses/mit-license.php
 
 \end_deeper
 \begin_layout Itemize
-testng-6.3.jar
+testng-6.3.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://testng.org/
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Standard
-All jar files distributed as part of Bischeck are located in the lib directory.
+All jar files are distributed as part of Bischeck and located in the 
+\emph on
+lib
+\emph default
+ directory.
  
 \end_layout
 
@@ -2127,7 +2331,7 @@ http://www.gnu.org/licenses/gpl-2.0.htm
 
 \end_inset
 
-l
+
 \end_layout
 
 \begin_layout Chapter
@@ -2194,7 +2398,7 @@ http://www.contemplateltd.com/threadsafe
 YourKit is kindly supporting Bischeck open source projects with its full-feature
 d Java Profiler, 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -2203,7 +2407,22 @@ http://www.yourkit.com/java/profiler
 
 \end_inset
 
- 
+
+\end_layout
+
+\begin_layout Itemize
+Cloudbees provide continues integration service through Jenkins, 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.cloudbees.com/
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_body
