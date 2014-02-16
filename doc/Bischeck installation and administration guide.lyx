@@ -508,7 +508,15 @@ Bischeck configuration guide
 \series bold
 If the installation is done as none root user, effective user id is not
  root, Bischeck will be installed as the user running the install script.
- This means that the init script, bischeckd, will not be installed in /etc/init.d.
+ This means that the init script, 
+\emph on
+bischeckd
+\emph default
+, will not be installed in 
+\emph on
+/etc/init.d
+\emph default
+.
  To start Bischeck the command line utility must be used, see 
 \begin_inset CommandInset ref
 LatexCommand nameref
@@ -952,7 +960,11 @@ script located in the
 $BISHOME/bin
 \emph default
  directory.
- To use the bischeck script add it to your PATH variable.
+ To use the 
+\emph on
+bischeck
+\emph default
+ script add it to your PATH variable.
 \end_layout
 
 \begin_layout Standard
@@ -1449,7 +1461,7 @@ The execution time to parse and retrieve data from the cache used in serviceitem
 status open
 
 \begin_layout Plain Layout
-TODO go through and find a naming standard and hiarki 
+TODO go through and find a naming standard and hierarchy 
 \end_layout
 
 \end_inset
@@ -1567,9 +1579,51 @@ on of most of the methods described in the interfaces.
  For more information check out the Bischeck javadoc that is generated using
  ant and also part of the distribution in the 
 \emph on
-docs/javadoc
+$BISHOME/docs/javadoc
 \emph default
  directory.
+\end_layout
+
+\begin_layout Section
+Developing custom JEP functions
+\end_layout
+
+\begin_layout Standard
+To develop custom mathematical JEP functions that operates on cached data
+ please see the JEP documentation, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.cse.msu.edu/SENS/Software/jep-2.23/doc/website/doc/doc_usage.htm
+\end_layout
+
+\end_inset
+
+.
+ To make the function recognized by Bischeck it should be put in a jar and
+ copied to the 
+\emph on
+$BISHOME/customlib
+\emph default
+ directory.
+ Then the class must then be mapped to a name that will be used in the Bischeck.
+ This is done in the file 
+\emph on
+jepextfunctions.xml
+\emph default
+ located in the 
+\emph on
+$BISHOME/resources
+\emph default
+ directory.
+ The 
+\emph on
+jepextfunctions.xml
+\emph default
+ file is a standard Java XML property file where the key is the name and
+ the value is the class name that implements it.
 \end_layout
 
 \begin_layout Chapter
@@ -1628,13 +1682,9 @@ Bischeck has been tested with redis version 2.6.7.
 \begin_layout Standard
 The connection to redis is configured in the 
 \emph on
-property.xml
+$BISHOME/etc/property.xml
 \emph default
- file located in the 
-\emph on
-etc
-\emph default
- directory.
+ file.
  The following properties control the connection:
 \end_layout
 
@@ -1660,6 +1710,11 @@ cache.provider.redis.auth - the authorization token for redis, default is empty
 \begin_layout Itemize
 cache.provider.redis.timeout - the connection timeout, default is 2000 ms.
  
+\end_layout
+
+\begin_layout Itemize
+cache.provider.redis.poolsize - the size of the redis connection pool, default
+ is 50.
 \end_layout
 
 \begin_layout Standard
@@ -2375,7 +2430,7 @@ Thanks to all people who has developed all the great software that Bischeck
 
 \begin_layout Standard
 Also like to thank the following companies that sponsor the Bischeck project
- with valuable commercial tools: 
+ with valuable commercial tools and development environments: 
 \end_layout
 
 \begin_layout Itemize
