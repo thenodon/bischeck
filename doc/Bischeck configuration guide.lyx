@@ -6064,7 +6064,7 @@ Cache template
 
 \change_inserted -2048955058 1392593591
 \begin_inset Note Note
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -6605,13 +6605,9 @@ value – the Service class name.
 customlib
 \emph default
  directory.
-\change_inserted -2048955058 1392560404
-
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392560452
 For valid url's see 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -6620,205 +6616,6 @@ reference "label:Services-and-service"
 \end_inset
 
 
-\change_unchanged
-
-\end_layout
-
-\begin_layout Section
-\begin_inset CommandInset label
-LatexCommand label
-name "label:server.xml"
-
-\end_inset
-
-server.xml 
-\end_layout
-
-\begin_layout Standard
-The configuration file define the mapping between service url schema and
- Server class.
- The 
-\change_inserted -2048955058 1392560502
-server
-\change_deleted -2048955058 1392560500
-urlservice
-\change_unchanged
-.xml has a structure of: 
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-<servers>
-\end_layout
-
-\begin_layout Plain Layout
-
-	<server name="Nagios1">     
-\end_layout
-
-\begin_layout Plain Layout
-
-		<class>NSCAServer</class>
-\end_layout
-
-\begin_layout Plain Layout
-
-		<property>
-\end_layout
-
-\begin_layout Plain Layout
-
-			<key>hostAddress</key>
-\end_layout
-
-\begin_layout Plain Layout
-
-			<value>localhost</value>
-\end_layout
-
-\begin_layout Plain Layout
-
-		</property>
-\end_layout
-
-\begin_layout Plain Layout
-
-		<property>       
-\end_layout
-
-\begin_layout Plain Layout
-
-			<key>encryptionMode</key>
-\end_layout
-
-\begin_layout Plain Layout
-
-			<value>XOR</value>     
-\end_layout
-
-\begin_layout Plain Layout
-
-		</property>
-\end_layout
-
-\begin_layout Plain Layout
-
-		<property>
-\end_layout
-
-\begin_layout Plain Layout
-
-			<key>password</key>       
-\end_layout
-
-\begin_layout Plain Layout
-
-			<value>change this</value>     
-\end_layout
-
-\begin_layout Plain Layout
-
-		</property>
-\end_layout
-
-\begin_layout Plain Layout
-
-		<property>       
-\end_layout
-
-\begin_layout Plain Layout
-
-			<key>port</key>       
-\end_layout
-
-\begin_layout Plain Layout
-
-			<value>5667</value>     
-\end_layout
-
-\begin_layout Plain Layout
-
-		</property>
-\end_layout
-
-\begin_layout Plain Layout
-
-		<property>       
-\end_layout
-
-\begin_layout Plain Layout
-
-			<key>connectionTimeout</key>       
-\end_layout
-
-\begin_layout Plain Layout
-
-			<value>5000</value>     
-\end_layout
-
-\begin_layout Plain Layout
-
-		</property> 
-\end_layout
-
-\begin_layout Plain Layout
-
-	</server>
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-	<server name="Nagios2">     
-\end_layout
-
-\begin_layout Plain Layout
-
-		......
-\end_layout
-
-\begin_layout Plain Layout
-
-	</server>
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-</servers>
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Each server that is integrated with Bischeck must be defined with the server
- tag and with a unique attribute name.
- This solution enable Bischeck to send data to multiple servers of the same
- type, like multiple Nagios servers.
- The class tag define what Server class implementation to use for the integratio
-n.
- Each Server implementation can have different numbers of properties that
- is specific for the Server class.
- Custom developed server classes should be placed in the 
-\emph on
-customlib
-\emph default
- directory 
 \end_layout
 
 \begin_layout Section
@@ -7881,7 +7678,7 @@ status open
 
 \begin_layout Standard
 
-\change_inserted -2048955058 1392595164
+\change_inserted -2048955058 1392637670
 In the above example both erpserver1- shipments-outboundshipment and erpserver1-
  shipments-outboundshipment share the same threshold template named 
 \emph on
@@ -7898,6 +7695,340 @@ outboundShipments
 .
  The servicedefgroup and servicedeftemplate must be located before any individua
 l servicedef definitions.
+\end_layout
+
+\begin_layout Section
+
+\change_inserted -2048955058 1392637673
+\begin_inset CommandInset label
+LatexCommand label
+name "label:server.xml-1"
+
+\end_inset
+
+server.xml 
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1392637763
+The configuration file define the servers that Bischeck should be integrated
+ with.
+ The server.xml has a structure of: 
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1392637673
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+<servers>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+	<server name="Nagios1">     
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		<class>NSCAServer</class>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		<property>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+			<key>hostAddress</key>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+			<value>localhost</value>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		<property>       
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+			<key>encryptionMode</key>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+			<value>XOR</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		<property>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+			<key>password</key>       
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+			<value>change this</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		<property>       
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+			<key>port</key>       
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+			<value>5667</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		<property>       
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+			<key>connectionTimeout</key>       
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+			<value>5000</value>     
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		</property> 
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+	</server>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+	<server name="Nagios2">     
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+		......
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+	</server>
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1392637673
+
+</servers>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1392637940
+Each server that is integrated with Bischeck must be defined with the server
+ tag and with a unique attribute name.
+ This solution enable Bischeck to send data to multiple servers of the same
+ type, like multiple NSCA servers.
+ The class tag define what Server class implementation to use for the integratio
+n.
+ Each Server implementation can have different numbers of properties that
+ is specific for the Server class.
+ Custom developed server classes should be placed in the 
+\emph on
+customlib
+\emph default
+ directory.
+\end_layout
+
+\begin_layout Subsection
+
+\change_inserted -2048955058 1392637957
+Circuit breaks
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1392638193
+Circuit breaks are a technique to detect if the remote server is down or
+ can not accept connections.
+ If the remote server is not responding correctly after a number of configured
+ attempts the circuit break will 
+\begin_inset Quotes eld
+\end_inset
+
+OPEN
+\begin_inset Quotes erd
+\end_inset
+
+ and Bischeck will stop sending data during a timeout period before retrying.
+ The implementation is inspired by Michael Nygard's circuit break pattern
+ in the excellent book "Release It!".
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1392638244
+Server integrtions that support the circuit break have 3 additional properties:
+\end_layout
+
+\begin_layout Itemize
+
+\change_inserted -2048955058 1392638255
+cbEnable - enable circuit break, default is false.
+\end_layout
+
+\begin_layout Itemize
+
+\change_inserted -2048955058 1392638353
+cbAttempts - the number of connection attempts before the circuit break
+ is set in a OPEN state, default 5.
+\end_layout
+
+\begin_layout Itemize
+
+\change_inserted -2048955058 1392638298
+cbTimeout - the time in ms the circuit break will stay in the OPEN state
+ before going to HALF-OPEN and retry connection, default is 60000.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1392638330
+Currently the following server integrations support circuit breaks:
+\end_layout
+
+\begin_layout Itemize
+
+\change_inserted -2048955058 1392638337
+NSCA
+\end_layout
+
+\begin_layout Itemize
+
+\change_inserted -2048955058 1392638578
+NRDP
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1392638617
+The state of a circuit break can be instrumented through JMX.
 \end_layout
 
 \begin_layout Chapter
