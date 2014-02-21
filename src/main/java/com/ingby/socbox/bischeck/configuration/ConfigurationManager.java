@@ -247,7 +247,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
             configMgr = new ConfigurationManager();
 
     	final Timer timer = Metrics.newTimer(ConfigurationManager.class, 
-				"init" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				"initializationTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 
         configMgr.allocateDataStructs();

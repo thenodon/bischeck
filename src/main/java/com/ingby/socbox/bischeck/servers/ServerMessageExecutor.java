@@ -185,17 +185,7 @@ public final class ServerMessageExecutor {
 	 */
 	public void execute(Service service) {
 
-		
-		final Timer timer = Metrics.newTimer(ServerMessageExecutor.class, 
-				"publish" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-		final TimerContext context = timer.time();
-
-		try { 
-			channel.publish(service);
-		}finally { 			
-			Long duration = context.stop()/1000000;
-			LOGGER.debug("All servers execution time: {} ms", duration);
-		}
+		channel.publish(service);
 	}
 
 

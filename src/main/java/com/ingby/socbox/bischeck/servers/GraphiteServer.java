@@ -150,7 +150,7 @@ public final class GraphiteServer implements Server, MessageServerInf {
         Socket graphiteSocket = null;
         PrintWriter out = null;
         
-        final String timerName = instanceName+"_send";
+        final String timerName = instanceName+"_sendTimer";
         final Timer timer = Metrics.newTimer(GraphiteServer.class, 
         		timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
         final TimerContext context = timer.time();

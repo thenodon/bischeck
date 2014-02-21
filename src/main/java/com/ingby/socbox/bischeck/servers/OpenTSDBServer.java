@@ -125,7 +125,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
 		Socket opentsdbSocket = null;
         PrintWriter out = null;
         
-        final String timerName = instanceName+"_send";
+        final String timerName = instanceName+"_sendTimer";
 
     	final Timer timer = Metrics.newTimer(OpenTSDBServer.class, 
     			timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);

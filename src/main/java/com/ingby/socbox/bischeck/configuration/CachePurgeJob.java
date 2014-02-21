@@ -116,7 +116,7 @@ public class CachePurgeJob implements Job {
 	@Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         final Timer timer = Metrics.newTimer(CachePurgeJob.class, 
-				"purge" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				"purgeTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 		
 		try {

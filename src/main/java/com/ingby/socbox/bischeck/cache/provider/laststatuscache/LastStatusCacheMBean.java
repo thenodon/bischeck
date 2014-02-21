@@ -21,7 +21,7 @@ package com.ingby.socbox.bischeck.cache.provider.laststatuscache;
 
 public interface LastStatusCacheMBean {
     
-    String BEANNAME = "com.ingby.socbox.bischeck:name=Cache";
+    String BEANNAME = "com.ingby.socbox.bischeck.cache.provider.laststatuscache:name=stats,type=LastStatusCache";
     
     int getLastStatusCacheCount();
     String[] getCacheKeys();

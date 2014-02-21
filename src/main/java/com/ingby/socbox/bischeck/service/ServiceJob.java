@@ -89,7 +89,7 @@ public class ServiceJob implements Job {
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		final Timer timer = Metrics.newTimer(ServiceJob.class, 
-				"execute", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				"executeTotalTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext timercontext = timer.time();
 
 		Service service = null;
@@ -114,7 +114,15 @@ public class ServiceJob implements Job {
 			checkRunImmediate(runafter);
 
 			if (service.isSendServiceData()) {
-				ServerMessageExecutor.getInstance().execute(service); 
+				final Timer timerPub = Metrics.newTimer(ServiceJob.class, 
+						"publishTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				final TimerContext contextPub = timerPub.time();
+				try {
+					ServerMessageExecutor.getInstance().execute(service); 
+				}finally { 			
+					Long duration = contextPub.stop()/1000000;
+					LOGGER.debug("All servers execution time: {} ms", duration);
+				}
 			}
 		} finally {
 			long executetime = timercontext.stop()/1000000;         	
@@ -231,7 +239,7 @@ public class ServiceJob implements Job {
 
 	private void executeService(Service service, ServiceItem serviceitem) {
 		final Timer timer = Metrics.newTimer(ServiceJob.class, 
-				"executeService", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				"executeServiceTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 
 		try {
@@ -284,8 +292,8 @@ public class ServiceJob implements Job {
 
 		NAGIOSSTAT servicestate= NAGIOSSTAT.OK;
 
-		final Timer timer = Metrics.newTimer(Threshold.class, 
-				"execute", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final Timer timer = Metrics.newTimer(ServiceJob.class, 
+				"executeThresholdTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext ctxthreshold = timer.time();
 
 		// Get the threshold class

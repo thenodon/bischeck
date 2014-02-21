@@ -180,7 +180,7 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 
 	private void connectAndSend(String source) {
 		Long duration = null;
-		final String timerName = instanceName+"_send";
+		final String timerName = instanceName+"_sendTimer";
 		final Timer timer = Metrics.newTimer(MetricsLibratoServer.class, 
 				timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();

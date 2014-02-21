@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -48,6 +49,9 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 
 /**
@@ -332,6 +336,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         CacheQueue<LastStatus> fifo;
         
         Jedis jedis = null;
+        final Timer timer = Metrics.newTimer(LastStatusCache.class, 
+				"writeTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext context = timer.time();
         
         try {
             jedis = jedispool.getResource();
@@ -356,6 +363,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         } catch (JedisConnectionException je) {
             connectionFailed(je);
         } finally {
+        	context.stop();
             jedispool.returnResource(jedis);
         }
     }

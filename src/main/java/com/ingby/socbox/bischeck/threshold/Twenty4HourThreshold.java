@@ -346,8 +346,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         
         LOGGER.debug("Cache miss getThreshold");
         
-        final Timer timer = Metrics.newTimer(Threshold.class, 
-				"recalculate", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(Twenty4HourThreshold.class, 
+				"recalculateTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext ctxthreshold = timer.time();
         
 		if (thresholdByPeriod[hourThreshold] == null || 

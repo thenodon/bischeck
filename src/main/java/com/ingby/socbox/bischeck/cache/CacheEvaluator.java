@@ -46,7 +46,7 @@ public class CacheEvaluator {
 	 * @return
 	 */
 	public static String parse(String statement) {
-		final Timer timer = Metrics.newTimer(CacheEvaluator.class, "parse",
+		final Timer timer = Metrics.newTimer(CacheEvaluator.class, "parseTimer",
 				TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
 		final TimerContext context = timer.time();
