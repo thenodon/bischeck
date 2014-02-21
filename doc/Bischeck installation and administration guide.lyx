@@ -10,7 +10,7 @@
 \fancyfoot{}
 \fancyfoot[C]{\thepage}
 %\fancyhead[LE,RO]{\slshape bischeck Readme}
-\fancyhead[LE,RO]{bischeck - A business activity check command server for Nagios}
+\fancyhead[LE,RO]{bischeck - dynamic and adaptive monitoring}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 %\lhead{bischeck}
@@ -124,7 +124,7 @@ Legal Notice Copyright
 
 \begin_layout Standard
 This document is licensed by Ingenjörsbyn AB under the Creative Commons
- Attribution-ShareAlike 3.0 Unported License,
+ Attribution-ShareAlike 3.0 Unported License, 
 \begin_inset Flex URL
 status collapsed
 
@@ -185,7 +185,7 @@ Abstract
 \begin_layout Standard
 This guide provides information of the installation and administration of
  Bischeck.
- For more in-depth configuration see the 
+ For more in-depth configuration options please see the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -265,12 +265,18 @@ root
  privileges when running the installation if you like the init scripts to
  be installed for automatic startup and shutdown.
  Before installing please see the 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
 LatexCommand nameref
-reference "label:System-requirements"
+reference "label:System-requirements-1"
 
 \end_inset
 
+
+\emph default
+\bar default
  chapter.
 \end_layout
 
@@ -470,8 +476,11 @@ The last commands start the Bischeck daemon with the effective user id of
 nagios
 \emph default
 .
- The installation will configure bischeckd to start automatically in run
- level 3, 4 and 5.
+ The installation will configure 
+\emph on
+bischeckd
+\emph default
+ to start automatically in run level 3, 4 and 5.
 \end_layout
 
 \begin_layout Standard
@@ -497,9 +506,12 @@ Bischeck configuration guide
 \end_inset
 
 .
- This file is used by the bischeckd script to stop the java process running
- Bischeck and make sure that only one instance of Bischeck is started on
- the server.
+ This file is used by the 
+\emph on
+bischeckd
+\emph default
+ script to stop the java process running Bischeck and make sure that only
+ one instance of Bischeck is started on the server.
  
 \end_layout
 
@@ -518,12 +530,20 @@ bischeckd
 \emph default
 .
  To start Bischeck the command line utility must be used, see 
+\series default
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
 LatexCommand nameref
 reference "label:Command-line-utilities"
 
 \end_inset
 
+
+\series bold
+\emph default
+\bar default
 .
 \end_layout
 
@@ -563,20 +583,27 @@ $BISHOME -
 
 \begin_layout Plain Layout
 
-         |- /lib        - All jar files requiered for Bischeck including
- the Bischeck jar
+         |- /lib        - All jar files requiered for Bischeck 
 \end_layout
 
 \begin_layout Plain Layout
 
-         |- /resources  - Different resources files, like XML schema files,
- logback.xml, etc.
+         |                including the Bischeck jar
 \end_layout
 
 \begin_layout Plain Layout
 
-         |- svninfo.txt - Subversion commit number of the Bischeck build
-  
+         |- /resources  - Different resources files, like XML schema 
+\end_layout
+
+\begin_layout Plain Layout
+
+         |                files, logback.xml, etc.
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- svninfo.txt - Subversion commit number for the version  
 \end_layout
 
 \begin_layout Plain Layout
@@ -611,11 +638,7 @@ From version 0.3.2 upgrading is possible.
 \emph on
 install
 \emph default
- script with the option 
-\emph on
--X
-\emph default
-: 
+ script with the option -X: 
 \end_layout
 
 \begin_layout Standard
@@ -662,11 +685,11 @@ status open
 \end_layout
 
 \begin_layout Standard
-The 
+The
 \emph on
--I
+ 
 \emph default
- switch must be used if the current installed Bischeck is not in the default
+-I switch must be used if the current installed Bischeck is not in the default
  installation directory.
 \end_layout
 
@@ -684,7 +707,7 @@ install
 \end_layout
 
 \begin_layout Standard
-If the upgrade is successful Bischeck can be started.
+If the upgrade is successful Bischeck can be started manually by executing.
  
 \end_layout
 
@@ -722,7 +745,7 @@ $BISHOME/etc
  directory there are working examples of all the configuration files.
  These works as an examples to get started with a simple Bischeck setup
  of monitoring the response time of a tcp ping on the ssh port, port 22,
- of localhost.
+ on localhost.
  You will find this familiar if you been using Nagios before and the example
  use the well known Nagios check command, 
 \emph on
@@ -781,13 +804,19 @@ servers.xml
 Now you are done to start Bischeck and checkout what happens in the log
  file.
  See 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "label:Logging"
 
 \end_inset
 
-for more info about Bischeck logging.
+
+\emph default
+\bar default
+ for more info about Bischeck logging.
 \end_layout
 
 \begin_layout Standard
@@ -926,7 +955,8 @@ nagios$ ln -s check_dummy check_bischeck
 \end_layout
 
 \begin_layout Standard
-When describing the service always use the check_bischeck as the check command.
+When describing the service always use the check_bischeck as the check command
+ in the Nagios configuration.
  The 
 \emph on
 check_bischeck.php
@@ -1016,7 +1046,7 @@ Running in this way have limitations since the execution will not automatically
  be placed as a background process and the effective user id will be the
  user starting the process which may not have all permissions according
  to the installation.
- Neither will pid files be updated correctly.
+ Neither will the pid files be updated correctly.
  For production system always use the init.d script.
  
 \end_layout
@@ -1106,8 +1136,11 @@ $ bischeck configuration.ConfigurationManager -p
 \end_layout
 
 \begin_layout Standard
-This command is used in the init script bischeckd to retrieve the current
- pid.
+This command is used in the init script 
+\emph on
+bischeckd
+\emph default
+ to retrieve the current pid.
 \end_layout
 
 \begin_layout Section
@@ -1309,6 +1342,73 @@ jconsole
 The key MBeans are:
 \end_layout
 
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck:type=Execute
+\emph default
+ 
+\begin_inset Newline linebreak
+\end_inset
+
+Include information about Bischeck version, configuration directory, reload
+ count and reload time, information about class cache
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+This is related to the class loader to secure that classes are not reloaded
+ every time Bischeck is restarted.
+\end_layout
+
+\end_inset
+
+.
+ Operations provided is shutdown and reload, where reload is a restart of
+ Bischeck without a new process is created but only configuration is re-read.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.configuration:name=configuration,type=ConfigurationManager
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+Display different configuration details.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.cache.provider.redis:name=stats,type=LastStatusCache
+\emph default
+
+\begin_inset Newline linebreak
+\end_inset
+
+Display different statistics about cache usage.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.servers:name=XYZ,type=CircuitBreak
+\emph default
+
+\begin_inset Newline linebreak
+\end_inset
+
+For server classes that implements a circuit break, this bean will display
+ information about the current state, number of times the circuit break
+ has been opened, etc.
+ The circuit break can also be enabled/disabled and the timeout and fail
+ count can be changed.
+\end_layout
+
 \begin_layout Section
 Timers 
 \end_layout
@@ -1323,7 +1423,7 @@ target "http://metrics.codahale.com/"
 
 \end_inset
 
-and shows the following parameter for each defined timer:
+ and shows the following parameter for each defined timer:
 \end_layout
 
 \begin_layout Itemize
@@ -1393,44 +1493,123 @@ The timers used in Bischeck are:
 \begin_layout Itemize
 
 \emph on
-com.ingby.socbox.bischeck.service:name=execute,type=ServiceJob
-\emph default
- 
+com.ingby.socbox.bischeck.service:name=executeTotalTimer,type=ServiceJob 
 \begin_inset Newline linebreak
 \end_inset
 
-This is the most important metric since it shows the total execution time
- to process a definition of a host, service and serviceitem(s) every time
- it's scheduled.
- The execution time included connecting and retrieving data, execution over
- serviceitem logic, threshold calculation and the time to send data to the
- defined servers.
+
+\emph default
+This is the most important metric since it shows the total count and execution
+ time to process a service definition (a host, service(s) and serviceitem(s))
+ every time it's scheduled.
+ The execution time included connecting and retrieving data, execution of
+ the serviceitem logic, cache writes and threshold calculation.
+ It do not include the time to send data to the defined servers.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.service:name=executeServiceTimer,type=ServiceJob
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+This timer show the count and execution time to process a service definition.
+ The execution time included connecting and retrieving data, execution of
+ the serviceitem logic and cache writes.
+ This timer is part of the timer 
+\emph on
+executeTotal.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.service:name=executeThresholdTimer,type=ServiceJob
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+This timer show the count and execution time to publish the result of executing
+ the service definition to the queue so it can be processed by servers.
+ This timer is part of the timer 
+\emph on
+executeTotal.
+
+\emph default
  
 \end_layout
 
 \begin_layout Itemize
 
 \emph on
-com.ingby.socbox.bischeck.servers:name=execute,type=ServerExecutor
+com.ingby.socbox.bischeck.service:name=publishTimer,type=ServiceJob 
 \begin_inset Newline linebreak
 \end_inset
 
 
 \emph default
-This is the total time to send the data to all the servers defined.
- This time in is included in the 
+The time to publish the measured and threshold data to the configured servers.
+ This do not include the time it actually take to send to the remote servers,
+ that is included in respective 
 \emph on
-ServiceJob
+XYZ_sendTimer
 \emph default
- time.
- Each server also have it's own timer to track the time down on individual
- servers.
+.
+ The timer is part of the 
+\emph on
+executeTotal.
+
+\emph default
+ 
 \end_layout
 
 \begin_layout Itemize
 
 \emph on
-com.ingby.socbox.bischeck.jepext:name=calulate,type=ExecuteJEP
+com.ingby.socbox.bischeck.threshold:name=recalculateTimer,type=Twenty4HourThreshold
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+The time it takes to recalculate the threshold value.
+ Can be part of the executeThresholdTimer if recalculation is needed.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.configuration:name=purgeTimer,type=CachePurgeJob
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+The time it took for the cache purger to run.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.cache.provider.redis:name=writeTimer,type=LastStatusCache
+ 
+\emph default
+
+\begin_inset Newline linebreak
+\end_inset
+
+The time it took to write a single data entry to the redis cache.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.jepext:name=calulateTimer,type=ExecuteJEP
 \emph default
 
 \begin_inset Newline linebreak
@@ -1438,35 +1617,52 @@ com.ingby.socbox.bischeck.jepext:name=calulate,type=ExecuteJEP
 
 The execution time to calculate any mathematical expressions like sum, average,
  etc used in serviceitem and threshold logic.
+ 
 \end_layout
 
 \begin_layout Itemize
 
 \emph on
-com.ingby.socbox.bischeck.cache.provider:name=parse,type=LastStatusCache
+com.ingby.socbox.bischeck.configuration:name=initializationTimer,type=ConfigurationM
+anager
 \emph default
  
 \begin_inset Newline linebreak
 \end_inset
 
-The execution time to parse and retrieve data from the cache used in serviceitem
- and threshold logic.
- This include all different way to retrieved data like based on index, index
- range, time and time range.
- 
+The time to read and setup the configuration of Bischeck.
+ This occure on start up and on every reload.
 \end_layout
 
-\begin_layout Standard
-\begin_inset Note Note
-status open
+\begin_layout Itemize
 
-\begin_layout Plain Layout
-TODO go through and find a naming standard and hierarchy 
-\end_layout
-
+\emph on
+com.ingby.socbox.bischeck.cache:name=parseTimer,type=CacheEvaluator
+\begin_inset Newline linebreak
 \end_inset
 
 
+\emph default
+The execution time to parse and retrieve data from the fast cache and/or
+ the redis cache.
+ This include all different way to retrieved data based on index, index
+ range, time and time range.
+ Standard deviation could be high on this timer depending on difference
+ in logic and query pattern.
+ 
+\end_layout
+
+\begin_layout Itemize
+com.ingby.socbox.bischeck.servers:name=XYZ_sendTimer,type=<Server class> 
+\begin_inset Newline linebreak
+\end_inset
+
+The time it took to send data to server XYZ.
+ One timer exist for each server configured in the 
+\emph on
+server.xml
+\emph default
+.
 \end_layout
 
 \begin_layout Chapter
@@ -1480,8 +1676,8 @@ Building Bischeck from source
 \end_layout
 
 \begin_layout Standard
-To build Bischeck from source is simple.
- Check out the Bischeck trunk from gforge.ingby.com: 
+To build Bischeck from source check out the Bischeck trunk from gforge.ingby.com:
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1557,7 +1753,55 @@ On Redhat/Centos lyx are part of the EPEL repos and should be version 2
 
 \end_inset
 
- and imagemagick installed.
+ and imagemagick packages to be installed.
+\end_layout
+
+\begin_layout Standard
+To run all unit tests:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ant testng
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To set the Bischeck version number the 
+\emph on
+build.xml
+\emph default
+ file must be edited or the ant variable 
+\emph on
+app.version
+\emph default
+ can overridden:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ant -Dapp.version=X.Y.Z dist
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1571,11 +1815,11 @@ Developing with Bischeck
 \end_layout
 
 \begin_layout Standard
-It's simple to develop your own service, service item, threshold and server
+It's simple to develop your own service, serviceitem, threshold and server
  classes.
  To develop your own you must follow the interface that exist for each type.
- For service and service items an abstract class exist with default implementati
-on of most of the methods described in the interfaces.
+ For service and serviceitems an abstract class exist with default implementatio
+n of most of the methods described in the interfaces.
  For more information check out the Bischeck javadoc that is generated using
  ant and also part of the distribution in the 
 \emph on
@@ -1629,6 +1873,13 @@ jepextfunctions.xml
 \begin_layout Chapter
 \begin_inset CommandInset label
 LatexCommand label
+name "label:System-requirements-1"
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
 name "label:System-requirements"
 
 \end_inset
@@ -1653,9 +1904,9 @@ Redis
 \end_layout
 
 \begin_layout Standard
-Since version 1.0.0 of Bischeck redis,
+Since version 1.0.0 of Bischeck redis, 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -1674,7 +1925,7 @@ http://www.redis.io
 \begin_layout Standard
 Bischeck has been tested with redis version 2.6.7.
  Installation of redis is not part of the Bischeck installation and should
- be installed prior to starting Bischeck.
+ be installed prior to installing Bischeck.
  Redis is not required to run on the same server as Bischeck.
  
 \end_layout
@@ -1729,17 +1980,29 @@ cache.provider.redis.fastCacheSize
  redis cache in the bischeck heap space.
  If Bischeck finds the data in the fast cache on a read, access to redis
  is not needed.
- Data is always written to redis.
+ Data writes are always written to redis storage.
  The default value for the option is 0, meaning that the fast cache is 0
  size.
  Depending on how the cached data is used in your configuration increasing
- the fast cache can improve performance.
- 
+ the fast cache can improve performance, but will also increase the heap
+ space.
 \end_layout
 
 \begin_layout Standard
-Using redis it's possible to access the data in the cache in runtime.
- Redis provide many client libraries for different languages.
+With redis it is possible to access the data in the cache at runtime.
+ Redis provide many client libraries for different programming languages,
+ 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://redis.io/clients
+\end_layout
+
+\end_inset
+
+.
  The quickest way is just to use the 
 \emph on
 redis-cli
@@ -1749,7 +2012,7 @@ redis-cli
 \end_layout
 
 \begin_layout Standard
-The pre version 1.0.0 cache should be regarded as deprecated.
+The pre-version 1.0.0 cache should be regarded as deprecated.
  Many of the the new features available from 1.0.0 is not supported in the
  old implementation, like aggregations.
  
