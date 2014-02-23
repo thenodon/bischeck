@@ -10,7 +10,7 @@
 \fancyfoot{}
 \fancyfoot[C]{\thepage}
 %\fancyhead[LE,RO]{\slshape bischeck Readme}
-\fancyhead[LE,RO]{bischeck - dynamic and adaptive monitoring}
+\fancyhead[LE,RO]{Bischeck - dynamic and adaptive monitoring}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 %\lhead{bischeck}

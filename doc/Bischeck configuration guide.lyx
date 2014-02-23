@@ -9,8 +9,7 @@
 \fancyhead{}
 \fancyfoot{}
 \fancyfoot[C]{\thepage}
-%\fancyhead[LE,RO]{\slshape bischeck Readme}
-\fancyhead[LE,RO]{bischeck - A business activity check command server for Nagios}
+\fancyhead[LE,RO]{Bischeck - dynamic and adaptive monitoring}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 %\lhead{bischeck}
@@ -86,17 +85,12 @@
 \html_math_output 0
 \html_css_as_file 0
 \html_be_strict false
-\author -2048955058 "andersh,,," 
 \end_header
 
 \begin_body
 
 \begin_layout Title
-
-\change_inserted -2048955058 1367249204
-B
-\change_unchanged
-ischeck 
+Bischeck 
 \begin_inset Newline newline
 \end_inset
 
@@ -104,52 +98,22 @@ ischeck
 \begin_inset Newline newline
 \end_inset
 
-
-\change_deleted -2048955058 1367249219
-A Business Activity Monitoring Server
-\change_inserted -2048955058 1389457733
 Configuration guide
-\change_deleted -2048955058 1367249219
- 
-\change_unchanged
-
 \end_layout
 
 \begin_layout Date
-
-\change_inserted -2048955058 1391339669
-DRAFT - IN WORK - 
-\change_unchanged
-Version 
-\change_inserted -2048955058 1389457739
-1
-\change_deleted -2048955058 1389457738
-0
-\change_unchanged
-.
-\change_deleted -2048955058 1389457742
-4.3
-\change_inserted -2048955058 1389457743
-0.0
-\change_unchanged
- 
+DRAFT - IN WORK - Version 1.0.0 
 \begin_inset Newline newline
 \end_inset
 
 2013-03-27
-\change_inserted -2048955058 1389457778
-
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1389457779
 Legal Notice Copyright 
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1389457915
 © 2013-2014 Ingenjörsbyn AB.
 \begin_inset Newline newline
 \end_inset
@@ -158,16 +122,12 @@ Legal Notice Copyright
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1389457779
 This document is licensed by Ingenjörsbyn AB under the Creative Commons
  Attribution-ShareAlike 3.0 Unported License,
 \begin_inset Flex URL
 status collapsed
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1389457779
 
 http://creativecommons.org/licenses/by-sa/3.0/
 \end_layout
@@ -186,8 +146,6 @@ http://creativecommons.org/licenses/by-sa/3.0/
 
 \begin_layout Standard
 \noindent
-
-\change_inserted -2048955058 1389457779
 Linux® is the registered trademark of Linus Torvalds in the United States
  and other countries.
  
@@ -195,30 +153,22 @@ Linux® is the registered trademark of Linus Torvalds in the United States
 
 \begin_layout Standard
 \noindent
-
-\change_inserted -2048955058 1389457779
 Java® is a registered trademark of Oracle and/or its affiliates.
  
 \end_layout
 
 \begin_layout Standard
 \noindent
-
-\change_inserted -2048955058 1389457779
 Nagios® is an official trademark of Nagios Enterprise Inc.
  
 \end_layout
 
 \begin_layout Standard
 \noindent
-
-\change_inserted -2048955058 1389457779
 All other trademarks are the property of their respective owners.
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1389457779
 \begin_inset Newpage pagebreak
 \end_inset
 
@@ -227,17 +177,13 @@ All other trademarks are the property of their respective owners.
 
 \begin_layout Standard
 
-\change_inserted -2048955058 1389457779
-
 \series bold
 Abstract 
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392235533
-This guide provides information howto configure Bischeck.
- For task related to installation and administration see the 
+This guide provides information how to configure Bischeck.
+ For tasks related to installation and administration see the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -247,8 +193,6 @@ Bischeck - installation and administration guide
 
 .
  
-\change_unchanged
-
 \end_layout
 
 \begin_layout Standard
@@ -267,83 +211,98 @@ name "label:Introduction"
 
 \end_inset
 
-Introduction 
+Introduction
 \end_layout
 
 \begin_layout Standard
 Monitoring and surveillance is today common in any IT operation.
  The market is mature and a number of excellent solutions exist, especially
- in the open source market, like Nagios.
- 
-\change_inserted -2048955058 1392233430
-The major limitation is that the current solution predominately only work
- with static thresholds.
- This becomes especially limiting when working with dynamic processes.
- 
-\change_deleted -2048955058 1392233448
-But w
-\change_inserted -2048955058 1392233448
-W
-\change_unchanged
-hen it comes to monitoring of business applications, the maturity is not
- at the same level
-\change_inserted -2048955058 1392233482
- as the traditional infrastructure monitoring
-\change_unchanged
-.
- Business operations teams seldom have any monitoring solutions to understand
- what goes on in their business processes and applications.
- Business intelligence solutions can often tell what happened last month,
- but from a more tactical operations view there is a gap.
- So why do not business 
-\change_inserted -2048955058 1392233513
-and applications 
-\change_unchanged
-operations team implement the same surveillance structure or use the existing
- IT operations infrastructure to understand 
+ in the open source market.
+ The major limitation is that the current solution predominately only work
+ with single entities of data, 
 \emph on
 
 \begin_inset Quotes eld
 \end_inset
 
-why the number of orders have dropped under the current threshold
+check response time of web service xyz
 \begin_inset Quotes erd
 \end_inset
 
 
 \emph default
-?
+, and static thresholds, 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+response time lower then 100 ms for xyz is okay
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+.
+ 
 \end_layout
 
 \begin_layout Standard
-What is the difference between business activity monitoring
-\change_deleted -2048955058 1392233551
-,
-\change_unchanged
- 
-\change_inserted -2048955058 1392233553
-(
-\change_unchanged
-BAM
-\change_inserted -2048955058 1392233548
-)
-\change_deleted -2048955058 1392233547
-,
-\change_inserted -2048955058 1392233563
- application monitoring
-\change_unchanged
- and traditional IT infrastructure monitoring? Basically it is the same.
- Some entity to measure and for that entity 
-\change_deleted -2048955058 1392233573
-to 
-\change_unchanged
-define threshold levels that will generate 
-\change_deleted -2048955058 1392233586
-warnings or critical 
-\change_unchanged
-alarms.
- The demands we have seen in addition to the basic functionality are the
- following features provided by Bischeck:
+This limitation becomes very obvious when trying to monitor something that
+ is a little bit more complicated like monitoring business processes and
+ applications, but also applicable for normal IT infrastructure monitoring.
+ This type of monitoring require that we can set the data we collect into
+ a context, both with historical data and with data from different sources.
+ Lets say we like to monitor the ratio between cpu utilization of the server
+ and the number order transaction processed by our webshop.
+ So expect for the obvious we need a monitoring system that in addition
+ to just absolute values manage:
+\end_layout
+
+\begin_layout Itemize
+Percentage change 
+\end_layout
+
+\begin_layout Itemize
+Rate of change 
+\end_layout
+
+\begin_layout Itemize
+Ratios
+\end_layout
+
+\begin_layout Itemize
+Deviations from a calculated baseline 
+\end_layout
+
+\begin_layout Itemize
+Trends over time 
+\end_layout
+
+\begin_layout Itemize
+Forecasting
+\end_layout
+
+\begin_layout Standard
+The second aspect of monitoring is to determine if the monitored data is
+ in the boundaries of what is expected.
+ The capability to set and define thresholds is key to get the 
+\begin_inset Quotes eld
+\end_inset
+
+right
+\begin_inset Quotes erd
+\end_inset
+
+ alarms.
+ The static way to define threshold is not enough.
+ Trying to find one value that is the correct in all situations and at all
+ times is impossible.
+ The risk is that we will just get to many or to few alarm notifications.
+\end_layout
+
+\begin_layout Standard
+To enable advanced monitoring Bischeck supports the following features:
 \end_layout
 
 \begin_layout Itemize
@@ -357,85 +316,25 @@ Support dynamic configuration of thresholds depending of time of the day
 
 \begin_layout Itemize
 Support thresholds based on fixed values as well as thresholds based on
- measured 
-\change_deleted -2048955058 1367249795
-values
-\change_inserted -2048955058 1367249795
-data
-\change_unchanged
- from other services.
- This is typical for process driven businesses
-\change_inserted -2048955058 1392233621
- flows
-\change_unchanged
-.
+ measured data from other services.
+ This is typical for process driven businesses flows.
  
 \end_layout
 
 \begin_layout Itemize
-Support for 
-\change_deleted -2048955058 1392233636
-a large number of 
-\change_unchanged
-mathematical functions 
-\change_deleted -2048955058 1392233642
-used 
-\change_unchanged
-to calculate thresholds
-\change_inserted -2048955058 1392233653
- based on historical data
-\change_unchanged
-.
-\change_inserted -2048955058 1367249807
-
+Support for mathematical functions to calculate thresholds based on historical
+ data.
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392233681
 Predictive based mathematical operation like Linear Least Square to calculate
  trend based thresholds.
-\change_unchanged
-
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1367249476
-Historical d
-\change_deleted -2048955058 1367249476
-D
-\change_unchanged
-ata cache for all measured service
-\change_inserted -2048955058 1367249481
-s
-\change_unchanged
- 
-\change_deleted -2048955058 1367249484
-items 
-\change_unchanged
-that can be retrieved based on index 
-\change_inserted -2048955058 1392233699
-and
-\change_deleted -2048955058 1392233698
-or
-\change_unchanged
- time.
- 
-\change_deleted -2048955058 1392233708
-Cache
-\change_inserted -2048955058 1392233712
-Historical
-\change_unchanged
- data is the main source to 
-\change_inserted -2048955058 1367249501
-calculate
-\change_deleted -2048955058 1367249497
-create
-\change_unchanged
- dynamic and adaptive thresholds.
-
-\change_inserted -2048955058 1392377957
+Historical data cache for all measured services that can be retrieved based
+ on index and time.
+ Historical data is the main source to calculate dynamic and adaptive thresholds.
  The cache is persistent between starts and stop of Bischeck.
  Since version 1.0.0 the cache is implemented using Redis, 
 \begin_inset Flex URL
@@ -443,89 +342,39 @@ status collapsed
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392377954
-
 http://www.redis.io
-\change_unchanged
-
 \end_layout
 
 \end_inset
 
 .
  
-\change_unchanged
-
 \end_layout
 
 \begin_layout Itemize
-Support for multiple scheduling schema
-\change_inserted -2048955058 1367249530
-'s
-\change_deleted -2048955058 1367249525
-s
-\change_unchanged
- per service
-\change_inserted -2048955058 1367249536
-s
-\change_unchanged
-.
- This enables a fine grain
-\change_deleted -2048955058 1392233727
-ed
-\change_unchanged
- control of when a service should be run.
+Support for multiple scheduling schema's per services.
+ This enables a fine grain control of when a service should be run.
  Bischeck supports interval scheduling, cron scheduling and service relation
  based scheduling.
 \end_layout
 
 \begin_layout Itemize
+Support for 
+\begin_inset Quotes eld
+\end_inset
 
-\change_deleted -2048955058 1392233768
-Configuration of
-\change_inserted -2048955058 1392233771
-Support for
-\change_unchanged
- 
-\change_inserted -2048955058 1367249612
-virtual 
-\change_unchanged
-services 
-\change_inserted -2048955058 1367249616
-that is 
-\change_unchanged
-based on
-\change_inserted -2048955058 1367249589
- calculation of data from multiple
-\change_deleted -2048955058 1367249573
- multiple
-\change_unchanged
- measured 
-\change_deleted -2048955058 1392233787
-values of other
-\change_unchanged
- services
-\change_inserted -2048955058 1367249632
-.
-\change_deleted -2048955058 1367249634
-, which could be described as "virtual" entities.
+virtual
+\begin_inset Quotes erd
+\end_inset
 
-\change_unchanged
+ services that is based on calculation from data from multiple sources.
+ This enables monitoring for ratios, trends, forecasting, etc.
  
 \end_layout
 
 \begin_layout Itemize
-Support for date macros in the execution statements of a service, typically
- used in a 
-\emph on
-where
-\emph default
- clause when selecting from databases.
-\end_layout
-
-\begin_layout Itemize
-Support for a multitude of ways to connect to source systems by allowing
- custom developed service connection methods.
+Support a multitude of ways to connect to source systems by allowing custom
+ developed service connection methods.
 \end_layout
 
 \begin_layout Itemize
@@ -536,98 +385,23 @@ Support for custom threshold classes to enable any way to define threshold
 
 \begin_layout Itemize
 Integration with multiple monitoring and surveillance tools, like any Nagios
- 
-\change_inserted -2048955058 1392233835
-based
-\change_deleted -2048955058 1392233834
-like
-\change_unchanged
- systems that supports the Nagios Service Check Acceptor (NSCA)
-\change_inserted -2048955058 1392233874
-,
-\change_deleted -2048955058 1392233873
- and/or
-\change_unchanged
- the Nagios Remote Data Processor (NRDP)
-\begin_inset Note Greyedout
-status open
-
-\begin_layout Plain Layout
-[New in 0.4.2]
-\end_layout
-
-\end_inset
-
- protocol
-\change_inserted -2048955058 1392233939
- and Livestatus,
-\change_unchanged
-
+ based systems that supports the Nagios Service Check Acceptor (NSCA), the
+ Nagios Remote Data Processor (NRDP) protocol and Livestatus,
 \begin_inset Foot
 status open
 
 \begin_layout Plain Layout
 Nagios Core, Nagios XI, Icinga, OP5 Monitor, Shinken, Opsview, Centreon,
- NetEye, 
-\change_inserted -2048955058 1389457961
-Naemon,
-\change_unchanged
-etc.
+ NetEye, Naemon,etc.
 \end_layout
 
 \end_inset
 
-
-\change_inserted -2048955058 1392233958
-, but also systems like
-\change_deleted -2048955058 1392233945
-,
-\change_unchanged
- OpenTSDB
-\change_inserted -2048955058 1392233962
- and 
-\change_deleted -2048955058 1392233961
-,
-\change_unchanged
- Graphite 
-\change_deleted -2048955058 1392235880
-
-\begin_inset Note Greyedout
-status open
-
-\begin_layout Plain Layout
-[New in 0.4.2]
-\end_layout
-
-\end_inset
-
- 
-\change_unchanged
-and more.
-\change_deleted -2048955058 1392235867
-
-\begin_inset Note Greyedout
-status open
-
-\begin_layout Plain Layout
-[New in 0.4.0]
-\end_layout
-
-\end_inset
-
-
-\change_unchanged
-
+, but also systems like OpenTSDB and Graphite..
 \end_layout
 
 \begin_layout Standard
-Let us look at 
-\change_inserted -2048955058 1392234043
-4
-\change_deleted -2048955058 1392234042
-3
-\change_unchanged
- examples that can be solved by using Bischeck: 
+Let us look at 3 examples that can be solved by using Bischeck: 
 \begin_inset Newline newline
 \end_inset
 
@@ -666,8 +440,8 @@ Example 2 – Monitor the number of created invoices in relation to the number
 \end_layout
 
 \begin_layout Standard
-The invoice system should invoice at least 80% of the daily incoming orders
- in the same day with a maximum of one hour delay.
+The invoicing system should invoice at least 80% of the daily incoming orders
+ in the same day, with a maximum of one hour delay.
  This means that the measured value of orders with one hour delay must be
  used as a threshold for the number of created invoices.
 \begin_inset Newline newline
@@ -678,108 +452,37 @@ The invoice system should invoice at least 80% of the daily incoming orders
 \end_inset
 
 
+\begin_inset Newline newline
+\end_inset
+
+
 \series bold
-Example 3 – Monitor the current number of orders and if the incoming flow
- is zero we need an alarm
+Example 3 – Monitor if we will run out of disk space in the next 40 days
 \series default
  
 \end_layout
 
 \begin_layout Standard
-The order system have a table with all received orders, but the requirement
- is that we need to monitor how many that has been received during the last
- 10 minutes.
- If this 
-\change_inserted -2048955058 1367250030
-delta 
-\change_unchanged
-value is zero an alarm must be generated since that is an indication that
- the sales system is not generating orders.
- To achieve this monitoring we use the last and the previous sample of the
- total number of orders from example 1 and create the difference between
- the two to get a new virtual entity to measure, with a threshold level
- of 0.
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\change_inserted -2048955058 1367250263
-
-\series bold
-Example 4 – Monitor if we will run out of disk space in the next 40 days
-\series default
- 
-\end_layout
-
-\begin_layout Standard
-
-\change_inserted -2048955058 1367250552
-To enable early information to purchase additional disk storage we need
- to get an alarm of the predictive trend of growth will pass our 90 % utilizatio
-n level in the next 40 days.
- 
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Hopefully these examples have convinced you that 
-\change_deleted -2048955058 1392234061
-with
-\change_unchanged
- Bischeck 
-\change_deleted -2048955058 1392234066
-you 
-\change_unchanged
-can do complex application monitoring by advanced threshold management and
- processes dependencies.
- And this can be done by just integrate it with your existing IT surveillance
- infrastructure.
- 
-\end_layout
-
-\begin_layout Standard
-But complex threshold management is not limited to the area of 
-\change_inserted -2048955058 1392234105
-business and application monitroing
-\change_deleted -2048955058 1392234096
-BAM
-\change_unchanged
-.
- 
-\change_deleted -2048955058 1392234126
-Even i
-\change_inserted -2048955058 1392234127
-I
-\change_unchanged
-n the normal infrastructure and network monitoring the
-\change_inserted -2048955058 1392234131
-se
-\change_unchanged
- capabilities are important.
- A typical threshold for disk utilization is defined like 90% of total space.
+A typical threshold for disk utilization is defined like 90% of total space.
  This is of course important but it could be equally important to understand
  the growth speed of the disk utilization, like if the size has grown with
- 5% from yesterday.
- This is simple 
-\change_inserted -2048955058 1392234160
-with
-\change_deleted -2048955058 1392234157
-in
-\change_unchanged
- Bischeck without developing a specialized check command
-\change_inserted -2048955058 1392234178
-, it's just configuration.
-\change_deleted -2048955058 1392234169
-.
-\change_unchanged
+ 5% from yesterday To enable early information to purchase additional disk
+ storage we need to get an alarm of the predictive trend of growth will
+ pass our 90 % utilization level in the next 40 days.
+ 
+\begin_inset Newline newline
+\end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+Hopefully these examples have convinced you that Bischeck can do complex
+ monitoring by advanced threshold management and processes dependencies
+ independent if you monitor business, application or system metrics.
+ And this can be done by integrate it with your existing IT surveillance
+ infrastructure.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -832,19 +535,8 @@ Threshold - Manage the threshold configuration and processing
 \end_layout
 
 \begin_layout Itemize
-Cache - Storage of
-\change_inserted -2048955058 1367250693
- 
-\change_deleted -2048955058 1367250692
- all 
-\change_inserted -2048955058 1367250696
-historical 
-\change_deleted -2048955058 1367250700
-values
-\change_inserted -2048955058 1367250700
-data
-\change_unchanged
- that has been collected from the source systems
+Cache - Storage of historical data that has been collected from the source
+ systems
 \end_layout
 
 \begin_layout Itemize
@@ -857,27 +549,12 @@ Bisconf is an optional web tool that provide editing management of the Bischeck
  configuration files.
  In addition it also provide life cycle management to deploy new configuration
  and start and stop the Bischeck process.
-  
+ 
 \end_layout
 
 \begin_layout Standard
-Bischeck 
-\change_inserted -2048955058 1367250732
-and Bisconf 
-\change_unchanged
-is open source and licensed under GPL version 2.
- Bischeck 
-\change_inserted -2048955058 1367250741
-and Bisconf 
-\change_unchanged
-is written in Java and runs as
-\change_deleted -2048955058 1367250749
- a
-\change_unchanged
- stand-alone daemon
-\change_inserted -2048955058 1367250755
-s
-\change_unchanged
+Bischeck and Bisconf is open source and licensed under GPL version 2.
+ Bischeck and Bisconf is written in Java and runs as stand-alone daemons
  and integrates with different monitoring and surveillance tools over open
  protocols.
  If you have ideas to new features, find bugs, etc please visit 
@@ -892,13 +569,7 @@ http://www.bischeck.org
 \end_inset
 
  where you can fill in bug reports and feature requests.
- You can also email 
-\change_inserted -2048955058 1392235030
-bischeck
-\change_deleted -2048955058 1392235028
-anders.haal
-\change_unchanged
-@ingby.com.
+ You can also email bischeck@ingby.com.
  We look forward to your feedback.
 \end_layout
 
@@ -913,22 +584,48 @@ Configuration concept
 \end_layout
 
 \begin_layout Standard
-The design of Bischeck is based on the concept of configuring hosts, services
- and serviceitems.
- As an example we have host 
+The design of Bischack is based on 3 main configuration entities:
+\end_layout
+
+\begin_layout Itemize
+Service definitions - the configuration of what is to be monitored.
+ The service definition is defined as host, service and service items
+\end_layout
+
+\begin_layout Itemize
+Thresholds - the threshold configuration for a specific service definition
+\end_layout
+
+\begin_layout Itemize
+Servers - the configuration of the servers where the monitored data should
+ be sent
+\end_layout
+
+\begin_layout Standard
+As an example we have host 
 \emph on
 erpserver
 \emph default
- and we define a service called 
+.
+ The 
+\emph on
+erpserver
+\emph default
+ server has two services that needs to be monitored, 
 \emph on
 orders
 \emph default
-.
+ and 
+\emph on
+invoices
+\emph default
+..
  For the 
 \emph on
 order
 \emph default
- service we can have multiple serviceitems, defined like 
+ service we have 2 different kind of order types that needs to be monitored,
+ 
 \emph on
 ediOrders
 \emph default
@@ -937,128 +634,78 @@ ediOrders
 mailOrders
 \emph default
 .
- The service define the connection url to connect to the system to measure
- and the serviceitems define the statement to be executed to retrieve the
- monitoring data.
- The service url is used by Bischeck to instantiate the right service class
- to manage the the connection.
+ If there are any problem with either 
+\emph on
+ediOrders
+\emph default
+ or 
+\emph on
+mailOrders
+\emph default
+ we need an alarm of the service 
+\emph on
+orders
+\emph default
+.
+ The service define the connection url to instantiate the right service
+ class to manage the the connection.
  For example if the url has a schema part that is jdbc, the JDBCService
  class is used.
- 
+ The serviceitems define the statement to be executed to retrieve the monitoring
+ data.
+ If the the connection for the service is jdbc the serviceitems can execute
+ SQL statements to collect data.
+ The serviceitem also define the threshold class to be used to calculate
+ the severity of the collected data.
+ The severity levels in Bischeck is OKAY, WARNING, CRITICAL and UNKNOWN
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The severity is the same as in the Nagios specification
 \end_layout
 
-\begin_layout Standard
-The mapping between the service url and the class to use is configurable.
- Each service class must implement the Service interface.
+\end_inset
+
+.
  The execution statement configured for the serviceitem must only return
  a single numeric value.
- A serviceitem class must implement the interface Serviceitem.
- The host can av multiple services, and each service can have multiple serviceit
-ems.
-\end_layout
-
-\begin_layout Standard
-A unique combination of a host, service and a serviceitem are called a service
- definition.
- Each service definition must be unique in a Bischeck configuration.
- The data collected per service definition is stored in Bischeck's cache
- and can be queried by its name when used in thresholds and for virtual
- services.
- The threshold 
-\change_inserted -2048955058 1392589514
-that is used 
-\change_deleted -2048955058 1392589509
-to use
-\change_unchanged
- for a specific service definition is define
-\change_inserted -2048955058 1392589520
-d
-\change_unchanged
- for each serviceitem, see 
-\change_inserted -2048955058 1392589437
-
-\begin_inset CommandInset ref
-LatexCommand nameref
-reference "label:bischeck-configuration-files"
-
-\end_inset
-
-
-\change_deleted -2048955058 1392589427
-
-\begin_inset CommandInset ref
-LatexCommand nameref
-reference "label:bischeck.xml"
-
-\end_inset
-
-
-\change_unchanged
-.
  
-\change_inserted -2048955058 1392589524
-
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392589679
-After threshold evaluation is done for each collected value the calculated
- state and performance data is sent to all the configured monitoring systems.
- The configuration of the server systems are define in its own configuration
- separated from the service definitions and thresholds, see 
-\begin_inset CommandInset ref
-LatexCommand nameref
-reference "label:Server-integration"
-
-\end_inset
-
-.
-\change_unchanged
-
+To summarize a host can av multiple services, and each service can have
+ multiple serviceitems and the state of the service is always the state
+ of the serviceitem that resolved to the highest severity level.
+ 
 \end_layout
 
 \begin_layout Standard
-All 
-\change_inserted -2048955058 1392589688
-configuration 
-\change_unchanged
-are described 
-\change_inserted -2048955058 1392589705
-different 
-\change_deleted -2048955058 1392589701
-in 
-\change_unchanged
-xml 
-\change_deleted -2048955058 1392589713
-configuration 
-\change_unchanged
-files located in the 
+Each service definition must be unique in a Bischeck configuration.
+ The data collected per service definition is stored in Bischeck's cache
+ and can be queried by its name when used in thresholds calculations and
+ for virtual services.
+ .
+ 
+\end_layout
+
+\begin_layout Standard
+After threshold evaluation is done for the service definition the monitoring
+ data, including state, performance data and threshold, is sent to all the
+ configured servers.
+\end_layout
+
+\begin_layout Standard
+All configuration are described different xml files located in the 
 \emph on
 etc
 \emph default
  directory of the installation,
 \emph on
- 
-\change_deleted -2048955058 1392589722
-refered
-\change_inserted -2048955058 1392589722
-refereed
-\change_unchanged
- to as $BISHOME
+ refereed to as $BISHOME
 \emph default
  in this document.
- For more information about services and serviceitems please see section
-\begin_inset CommandInset ref
-LatexCommand nameref
-reference "label:Services-and-service"
-
-\end_inset
-
-.
  
-\change_inserted -2048955058 1392560550
-
 \end_layout
 
 \begin_layout Chapter
@@ -1068,75 +715,26 @@ name "label:Services-and-service"
 
 \end_inset
 
-Services and service
-\change_deleted -2048955058 1392378040
- 
-\change_unchanged
-items
-\change_deleted -2048955058 1392235778
- classes
-\change_unchanged
-
+Service definition - hosts, services and serviceitems
 \end_layout
 
 \begin_layout Standard
-The key configuration objects in Bischeck are the service and 
-\change_deleted -2048955058 1392378086
-service item
-\change_inserted -2048955058 1392378086
-serviceitem
-\change_unchanged
-.
- 
-\change_inserted -2048955058 1392235224
-The key attributes of the 
-\change_deleted -2048955058 1392235225
-The 
-\change_unchanged
-service 
-\change_deleted -2048955058 1392235231
-key attributes 
-\change_unchanged
-are the service name, the schedules when to execute the service and the
- url that define the connection used by the 
-\change_deleted -2048955058 1392378087
-service item
-\change_inserted -2048955058 1392378087
-serviceitem
-\change_unchanged
-.
- 
+As described in the previous chapter the service definition is defined as
+ a host, service(s) and serviceitems.
+ The host configuration act only as a name space container and do not provide
+ anything then name and alias.
+ A host can have one or multiple services and a service can have one or
+ multiple serviceitems..
+ The key attributes of the service are the service name, the schedules when
+ to execute the service and the url connection that define the protocol
+ to connect to the data to monitor.
 \end_layout
 
 \begin_layout Standard
-The 
-\change_deleted -2048955058 1392378088
-service item
-\change_inserted -2048955058 1392378088
-serviceitem
-\change_unchanged
- key attributes are the execute statement that define what should be executed
- to retrieve the 
-\change_inserted -2048955058 1367251005
-data that is subject to the monitoring 
-\change_deleted -2048955058 1367251008
-measured entity 
-\change_unchanged
-and the threshold class used to process 
-\change_deleted -2048955058 1367251047
-the measured entity to 
-\change_inserted -2048955058 1367251050
-and 
-\change_unchanged
-validate the state of the measured 
-\change_inserted -2048955058 1367251030
-data
-\change_deleted -2048955058 1367251028
-entity
-\change_unchanged
-.
-\change_inserted -2048955058 1392235266
-
+The serviceitem key attributes are the execute statement that define what
+ should be executed to retrieve the data that is subject to the monitoring
+ and the threshold class used to calculate and validate the state of the
+ measured data.
 \end_layout
 
 \begin_layout Section
@@ -1146,31 +744,12 @@ name "label:Service-classes"
 
 \end_inset
 
-Service
-\change_inserted -2048955058 1392235800
-s
-\change_deleted -2048955058 1392235797
- classes
-\change_unchanged
- 
+Services 
 \end_layout
 
 \begin_layout Standard
-The following 
-\change_deleted -2048955058 1392235811
-S
-\change_inserted -2048955058 1392235811
-s
-\change_unchanged
-ervice 
-\change_deleted -2048955058 1392235808
-classes 
-\change_inserted -2048955058 1392235290
-are
-\change_deleted -2048955058 1392235289
-is
-\change_unchanged
- provided in the standard Bischeck distribution.
+The following services classes are provided in the standard Bischeck distributio
+n.
 \end_layout
 
 \begin_layout Subsection
@@ -1178,35 +757,19 @@ JDBC
 \end_layout
 
 \begin_layout Standard
-JDBCService manage services connecting to databases over JDBC.
- JDBC driver jars should be put in the directory 
+JDBCService manage connections to databases over JDBC.
+ JDBC driver jars must be stored in the directory 
 \emph on
-customlib
+$BISHOME/customlib
 \emph default
- in the Bischeck install directory to automatically be found at start-up.
-
-\change_inserted -2048955058 1392235324
+ to automatically be loaded at start-up.
  No JDBC drivers are provided with the Bischeck distribution.
-
-\change_unchanged
  
 \end_layout
 
 \begin_layout Standard
 A JDBC connection is described with a normal jdbc url and with an additional
- driver class 
-\change_inserted -2048955058 1367251128
-name 
-\change_deleted -2048955058 1367251133
-in the driver tag of the
-\change_inserted -2048955058 1367251133
-in
-\change_unchanged
- 
-\change_inserted -2048955058 1367251140
-the 
-\change_unchanged
-Bischeck configuration.
+ driver class name in the Bischeck configuration file.
 \end_layout
 
 \begin_layout Subsection
@@ -1234,23 +797,8 @@ target "http://mathias-kettner.de/checkmk_livestatus.html"
 \end_inset
 
 .
- 
-\change_deleted -2048955058 1367251400
-With this service both the service state and performance data can be retrieved
- from a Nagios server
-\change_unchanged
-.
- 
-\begin_inset Note Greyedout
-status open
-
-\begin_layout Plain Layout
-[New in 0.4.0]
-\end_layout
-
-\end_inset
-
-.
+ .
+ .
  A livestatus connection is specified with a url with the following format:
 \end_layout
 
@@ -1273,13 +821,7 @@ livestatus://hostname:port
 \begin_layout Standard
 The requirement for this type of connection is that livestatus is configured
  as a xinetd service on the server running livestatus and Nagios.
- To configure livestatus 
-\change_inserted -2048955058 1367251181
-with xinetd
-\change_deleted -2048955058 1367251173
-this
-\change_unchanged
- way please see 
+ To configure livestatus with xinetd please see 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1303,55 +845,12 @@ Bischeck cache
 \end_layout
 
 \begin_layout Standard
-LastCacheService enables connection to Bischeck's 
-\change_inserted -2048955058 1367251203
-historical data 
-\change_deleted -2048955058 1367251198
-internal
-\change_unchanged
- cache where the measured data is stored.
- With the service any existing 
-\change_inserted -2048955058 1367251223
-service definition (
-\change_unchanged
-host-
-\change_deleted -2048955058 1367251225
->
-\change_unchanged
-service-
-\change_deleted -2048955058 1367251229
->
-\change_unchanged
-serviceitem
-\change_inserted -2048955058 1367251232
-)
-\change_unchanged
+LastCacheService enables connection to Bischeck's historical data cache
+ where the measured data is stored.
+ With the service any existing service definition (host-service-serviceitem)
  can be retrieved from the cache.
- This 
-\change_deleted -2048955058 1367251251
-can
-\change_inserted -2048955058 1367251251
-is
-\change_unchanged
- typical
-\change_deleted -2048955058 1392238255
- be
-\change_unchanged
- used to create 
-\change_deleted -2048955058 1392238261
-new 
-\change_unchanged
-virtual services based on mathematical expression 
-\change_inserted -2048955058 1392238276
-to combine 
-\change_deleted -2048955058 1367251287
-for combination of
-\change_unchanged
- cache 
-\change_inserted -2048955058 1367251296
-data 
-\change_unchanged
-entities.
+ This is typical used to create virtual services based on mathematical expressio
+n to combine cache data entities.
  The connection url for the Bischeck cache is:
 \end_layout
 
@@ -1376,19 +875,6 @@ Shell
 \end_layout
 
 \begin_layout Standard
-
-\change_deleted -2048955058 1392235855
-\begin_inset Note Greyedout
-status open
-
-\begin_layout Plain Layout
-[New in 0.4.1]
-\end_layout
-
-\end_inset
-
- 
-\change_unchanged
 ShellService enables execution of programs and scripts on the localhost.
  The connection url for the shell service is:
 \end_layout
@@ -1416,37 +902,12 @@ name "label:Service-item-classes"
 
 \end_inset
 
-
-\change_deleted -2048955058 1392378091
-Service item
-\change_inserted -2048955058 1392378102
 Serviceitems
-\change_deleted -2048955058 1392238318
- classes
-\change_unchanged
-
 \end_layout
 
 \begin_layout Standard
-The following 
-\change_deleted -2048955058 1392238333
-S
-\change_inserted -2048955058 1392238334
-s
-\change_unchanged
-ervice
-\change_inserted -2048955058 1392238330
- i
-\change_deleted -2048955058 1392238327
-I
-\change_unchanged
-tem
-\change_inserted -2048955058 1392238336
-s
-\change_deleted -2048955058 1392238325
- classes
-\change_unchanged
- is provided in the standard Bischeck distribution.
+The following service items classes are provided in the standard Bischeck
+ distribution.
 \end_layout
 
 \begin_layout Subsection
@@ -1457,19 +918,10 @@ SQL
 The 
 \emph on
 SQLServiceItem
-\change_deleted -2048955058 1392238376
-
 \emph default
- class
-\change_unchanged
  enables execution of a SQL statements.
- Its important that the SQL statement only return one single num
-\change_deleted -2048955058 1392238356
-ber
-\change_inserted -2048955058 1392238356
-eric
-\change_unchanged
- value, like a "
+ Its important that the SQL statement only return one single numeric value,
+ like a "
 \emph on
 select count(*) ....
 \emph default
@@ -1489,26 +941,11 @@ select sum(orderValue) from ....
 \end_layout
 
 \begin_layout Standard
-The SQLServiceItem
-\change_deleted -2048955058 1392238371
- class
-\change_unchanged
- can be used 
-\change_inserted -2048955058 1367394237
-with the service url matching 
+The SQLServiceItem can be used with the service url matching 
 \emph on
 jdbc://
 \emph default
 .
-\change_deleted -2048955058 1367251368
-when the service url is a 
-\emph on
-jdbc://...
-
-\emph default
- url.
-\change_unchanged
-
 \end_layout
 
 \begin_layout Subsection
@@ -1519,11 +956,7 @@ Livestatus
 With the 
 \emph on
 LivestatusServiceItem
-\change_deleted -2048955058 1392238385
-
 \emph default
- class
-\change_unchanged
  both state and performance data can be queried for a Nagios service.
  The query is formatted as a json structure.
  To query a specific Nagios service state the following statement example
@@ -1588,26 +1021,12 @@ status open
 The 
 \emph on
 LivestatusServiceItem
-\change_deleted -2048955058 1392238438
-
 \emph default
- class
-\change_unchanged
- can be used 
-\change_inserted -2048955058 1367394294
-with the service url
+ can be used with the service url
 \emph on
  livestatus://hostname:port
 \emph default
 .
-\change_deleted -2048955058 1367255649
-for service url 
-\emph on
-livestatus://hostname:port
-\emph default
-.
-\change_unchanged
-
 \end_layout
 
 \begin_layout Subsection
@@ -1619,47 +1038,23 @@ Cache calculations
 \emph on
 CalculateOnCache
 \emph default
- 
-\change_deleted -2048955058 1392378107
-service item
-\change_inserted -2048955058 1392378107
-serviceitem
-\change_unchanged
- 
-\change_deleted -2048955058 1392238452
-class 
-\change_unchanged
-enable statement execution using 
-\change_inserted -2048955058 1367255708
-data from the historical cache and 
-\change_deleted -2048955058 1367255719
-measured values residing in the Bischeck internal cache.
- M
-\change_inserted -2048955058 1367255725
-m
-\change_unchanged
-athematical 
-\change_deleted -2048955058 1367255756
-statements
-\change_inserted -2048955058 1367393609
-functions, 
+ serviceitem class enable statement execution using data from the historical
+ cache and mathematical functions, 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "label:Mathematical-expressions-on"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
  With this capability powerful expression can be created on the cached data
- 
-\change_deleted -2048955058 1367393384
- according to jep expressions capability is possible 
-\change_unchanged
-like:
-\begin_inset Newline newline
-\end_inset
-
- 
+ like: 
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true,tabsize=4"
 inline false
@@ -1667,22 +1062,7 @@ status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1367393845
-
-avg
-\change_deleted -2048955058 1367393844
-if((
-\change_unchanged
-erpserver-orders-ediOrders[0
-\change_inserted -2048955058 1367393853
-:9
-\change_unchanged
-]
-\change_deleted -2048955058 1367393856
- - erpserver-orders-ediOrders[1]) < 0,0, erpserver-orders-ediOrders[0] -
- erpserver-orders-ediOrders[1])
-\change_unchanged
-
+avg(erpserver-orders-ediOrders[0:9])
 \end_layout
 
 \end_inset
@@ -1691,36 +1071,27 @@ erpserver-orders-ediOrders[0
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1367393938
 The above example will calculate the average of the last 10 collected data
- entries in the cache for the service definition 
-\change_deleted -2048955058 1367393962
-The above example check if the result of
-\change_unchanged
- "erpserver-orders-ediOrders
-\change_deleted -2048955058 1367393969
-[0]
-\emph on
- - 
-\emph default
-erpserver-orders-ediOrders[1]
-\change_unchanged
-"
-\change_inserted -2048955058 1367393971
-.
+ entries in the cache for the service definition "erpserver-orders-ediOrders".
+\end_layout
 
-\change_deleted -2048955058 1367393973
- is less then 0.
- If true, return 0 and if false return the result of "erpserver-orders-ediOrders
-[0]
-\emph on
- - 
-\emph default
-erpserver-orders-ediOrders[1]".
- The value to use from the cache is defined by an index [X], where 0 is
- the latest value retrieved for the specific host-service-item.
-\change_unchanged
+\begin_layout Standard
+Ratios can be created using data from different service definitions like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+avg(erpserver-orders-ediOrders[0:9])/avg(erpserver-orders-webOrders[0:9])
+\end_layout
+
+\end_inset
+
 
 \end_layout
 
@@ -1728,16 +1099,8 @@ erpserver-orders-ediOrders[1]".
 The 
 \emph on
 CalculateOnCache
-\change_deleted -2048955058 1392238507
-
 \emph default
- class
-\change_unchanged
- can be used with 
-\change_inserted -2048955058 1367394162
-the 
-\change_unchanged
-service url 
+ can be used with the service url 
 \emph on
 bischeck://cache.
 \end_layout
@@ -1747,20 +1110,33 @@ Check commands
 \end_layout
 
 \begin_layout Standard
-\begin_inset Note Greyedout
+With the 
+\emph on
+CheckCommandServiceItem
+\emph default
+ class performance data can be retrieved by executing a Nagios check command
+\begin_inset Foot
 status open
 
 \begin_layout Plain Layout
-[New in 0.4.1]
+Nagios check commands are also called Nagios plugins.
+ A check command must follow the Nagios Plugin development guideline, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://nagios-plugins.org/doc/guidelines.html
 \end_layout
 
 \end_inset
 
- With the 
-\emph on
-CheckCommandServiceItem
-\emph default
- class performance data can be retrieved by executing a Nagios check command.
+
+\end_layout
+
+\end_inset
+
+.
  The check command that is executed must output performance data according
  the Nagios specifications for the 
 \emph on
@@ -1780,17 +1156,7 @@ status open
 
 \begin_layout Plain Layout
 
-{"check":"
-\change_inserted -2048955058 1367394701
-/
-\change_unchanged
-usr/lib/nagios/plugins/check_tcp -H 
-\change_inserted -2048955058 1386244672
-moon
-\change_deleted -2048955058 1386244670
-localhost
-\change_unchanged
- -p 22","label":"time"}
+{"check":"/usr/lib/nagios/plugins/check_tcp -H moon -p 22","label":"time"}
 \end_layout
 
 \end_inset
@@ -1814,24 +1180,12 @@ time
 \begin_layout Standard
 The benefit of using a check command from Bischeck would be if there is
  a need to manage the performance data with dynamic thresholds that is not
- possible in Nagios Core.
+ possible in Nagios.
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1367394692
-It's 
-\change_deleted -2048955058 1367394693
-I
-\change_inserted -2048955058 1367394694
-i
-\change_unchanged
-mportant 
-\change_inserted -2048955058 1367394388
-to understand 
-\change_unchanged
-is that there is no management of environment variables through Bischeck
- when executing a check command.
+It's important to understand that there is no management of environment
+ variables through Bischeck when executing a check command.
  
 \end_layout
 
@@ -1840,13 +1194,7 @@ The
 \emph on
 CheckCommandServiceItem
 \emph default
- class can be used 
-\change_inserted -2048955058 1367394186
-with the
-\change_deleted -2048955058 1367394184
-for
-\change_unchanged
- service url 
+ class can be used with the service url 
 \emph on
 shell://localhost
 \emph default
@@ -1860,107 +1208,70 @@ name "label:Service-item-cache"
 
 \end_inset
 
-Service 
-\change_deleted -2048955058 1392240879
-item
-\change_inserted -2048955058 1392240881
-definition
-\change_unchanged
- cache
-\change_deleted -2048955058 1392238776
- - LastStatusCache
-\change_unchanged
-
+Service definition cache
 \end_layout
 
 \begin_layout Standard
-Bischeck keeps a cache of the measured data points for every 
-\change_inserted -2048955058 1367394855
-service definition
-\change_deleted -2048955058 1367394858
-service items
-\change_unchanged
-.
- The cache content can be used in the specification of execute statements
- of 
-\change_deleted -2048955058 1392378109
-serviceitem
-\change_inserted -2048955058 1392378109
-serviceitem
-\change_unchanged
-s 
-\change_inserted -2048955058 1367394911
-to create virtual services 
-\change_unchanged
-and in threshold classes to create dynamic and adaptive thresholds, see
- section 
+Bischeck keeps a cache of the measured data points for every service definition.
+ The cached data can be used in the execute statements of serviceitems,
+ like 
+\emph on
+CalculateOnCache,
+\emph default
+ to create virtual services and in threshold classes to create dynamic and
+ adaptive thresholds, see section 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand vref
+LatexCommand nameref
 reference "label:Twenty4HourThreshold-class"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
  
-\change_inserted -2048955058 1367394958
-
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392240915
 The number of items per service definitions that will be kept in the cache
- can be configured, see 
+ can be configured per service definition, see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
 LatexCommand nameref
 reference "label:bischeck.xml"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
- If it's not specified the default size will be used that is specified by
- the property 
+ If it's not specified the default size will be used that is set by the
+ property 
 \emph on
 lastStatusCacheSize
 \emph default
 , see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
 LatexCommand nameref
 reference "label:properties.xml"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
  
-\end_layout
-
-\begin_layout Standard
-
-\change_deleted -2048955058 1392239465
-The cached data is saved to disk every time Bischeck is stopped and reloaded
- every time Bischeck is started.
- The stored data is written to a file called 
-\emph on
-lastStatusCacheDump
-\emph default
- and located in the directory specified by the property 
-\emph on
-lastStatusCacheDumpDir
-\emph default
-, see 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "label:properties.xml"
-
-\end_inset
-
-.
- Before a save is made a backup file is created in the same directory called
- 
-\emph on
-lastStatusCacheDump.bak.
-\change_unchanged
-
 \end_layout
 
 \begin_layout Section
@@ -1979,82 +1290,27 @@ Retrieve single cache data element by index
 \end_layout
 
 \begin_layout Standard
-
-\change_deleted -2048955058 1367395149
-For each service item the last 500 measured values are kept in the cache
- in a LRU list.
-
-\change_unchanged
- To retrieve 
-\change_inserted -2048955058 1367395174
-a single 
-\change_unchanged
-data from the cache the following format is 
-\change_deleted -2048955058 1367395180
-used
-\change_inserted -2048955058 1367395187
-supported:
-\change_deleted -2048955058 1367395186
-,
-\change_unchanged
- 
-\change_inserted -2048955058 1367395189
-
+To retrieve a single data element from the cache the following format is
+ supported: 
 \end_layout
 
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
 
 \emph on
-host-service-item[
-\change_inserted -2048955058 1367395259
-X
-\change_deleted -2048955058 1367395258
-index
-\change_unchanged
-]
+host-service-item[X]
 \emph default
  
-\change_inserted -2048955058 1367395216
-
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1367395218
-W
-\change_deleted -2048955058 1367395218
-w
-\change_unchanged
-here 
-\change_inserted -2048955058 1367395268
-
+Where 
 \emph on
 X
 \emph default
- is the 
-\change_unchanged
-index 
-\change_deleted -2048955058 1367395273
-is the lru entry
-\change_inserted -2048955058 1367395301
- in the cache for the service definition.
-\change_deleted -2048955058 1367395300
-,
-\change_unchanged
- 
-\change_inserted -2048955058 1367395306
-Index
-\change_deleted -2048955058 1367395307
-with
-\change_unchanged
- 0 
-\change_inserted -2048955058 1367395545
-will always return the last stored data for the service definition
-\change_deleted -2048955058 1367395551
-specifying that last retrieved measured value 
-\change_unchanged
-, e.g.
+ is the index in the cache for the service definition.
+ Index 0 will always return the last stored data for the service definition,
+ e.g.
  
 \emph on
 erpserver-orders-ediOrders[0]
@@ -2068,13 +1324,7 @@ Retrieve single cache data element by time
 \end_layout
 
 \begin_layout Standard
-Data can
-\change_deleted -2048955058 1367395685
- also
-\change_unchanged
- be retrieved from the cache by using a time offset
-\change_inserted -2048955058 1367395783
-.
+Data can also be retrieved from the cache by using a time offset.
  This will retrieve the data for the service definition closes to the specified
  time offset.
  The support format is:
@@ -2083,16 +1333,12 @@ Data can
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
 
-\change_inserted -2048955058 1367395827
-
 \emph on
 host-service-item[-XS]
 \end_layout
 
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-
-\change_inserted -2048955058 1367395831
 
 \emph on
 host-service-item[-XM]
@@ -2101,44 +1347,19 @@ host-service-item[-XM]
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
 
-\change_inserted -2048955058 1372019538
-
 \emph on
 host-service-item[-XH]
 \end_layout
 
 \begin_layout Standard
-
-\change_deleted -2048955058 1367395900
-, 
-\change_inserted -2048955058 1372019549
 X is the time and S (seconds),M (minutes) or H (hour) define the resolution
  of X.
- 
-\change_deleted -2048955058 1367396053
-like the cache data of 
-\emph on
-erpserver-orders-ediOrders
-\emph default
- 30 minutes ago.
- This is specified by setting the index part to 
-\emph on
--30M, 
-\change_inserted -2048955058 1367396073
-
-\emph default
-For example the expression 
-\change_unchanged
-
+ For example the expression 
 \emph on
 erpserver-orders-ediOrders[-30M]
-\change_inserted -2048955058 1367396158
-
 \emph default
  will retrieve the data for the service definition closest to 30 minutes
  ago
-\change_unchanged
-
 \emph on
 .
  
@@ -2146,10 +1367,6 @@ erpserver-orders-ediOrders[-30M]
 This is useful since the relation between static index and service schedule
  do not need to be known.
  
-\change_deleted -2048955058 1367396176
-The time operator supported is S for seconds, M for minutes and H for hours.
-\change_unchanged
-
 \end_layout
 
 \begin_layout Subsection
@@ -2158,42 +1375,12 @@ Retrieve a list of cache data elements by index
 
 \begin_layout Standard
 For mathematical functions that operates of a list of elements, like a sum,
- avg
-\change_inserted -2048955058 1367396216
- and 
-\change_deleted -2048955058 1367396214
-, 
-\change_unchanged
-max, Bischeck support two methods to 
-\change_deleted -2048955058 1367396194
-reterive
-\change_inserted -2048955058 1367396194
-retrieve
-\change_unchanged
- the range by index.
- The first method 
-\change_deleted -2048955058 1367396240
-is to 
-\change_unchanged
-define a 
-\change_inserted -2048955058 1367396262
-
+ avg and max, Bischeck support two methods to retrieve the range by index.
+ The first method define a 
 \begin_inset Quotes eld
 \end_inset
 
-
-\change_unchanged
-from
-\change_inserted -2048955058 1367396267
--
-\change_deleted -2048955058 1367396264
- 
-\begin_inset Quotes eld
-\end_inset
-
-
-\change_unchanged
-to index
+from-to index
 \begin_inset Quotes erd
 \end_inset
 
@@ -2202,21 +1389,13 @@ to index
 erpserver-orders-ediOrders[0:9] 
 \emph default
 that will retrieve all cache elements from index 0 to 9 as a list separated
- by 
-\begin_inset Quotes eld
-\end_inset
-
-,
-\begin_inset Quotes erd
-\end_inset
-
-
+ by comma (,)
 \begin_inset Foot
 status open
 
 \begin_layout Plain Layout
-The choice of , as separator character is due to this is the separator character
- used by JEP functions that take a list of values.
+The choice of comma (,) as separator character is due to this is the separator
+ character used by JEP functions that take a list of values.
 \end_layout
 
 \end_inset
@@ -2296,35 +1475,22 @@ erpserver-orders-ediOrders[-30M:-120M].
 \emph default
 This will retrieve a list of all elements that exist in the cache between
  30 minutes to 120 minutes ago.
- The time operator supported is 
-\change_inserted -2048955058 1367396400
-the same as for a single data
-\change_deleted -2048955058 1367396406
-S for seconds, M for minutes and H for hours
-\change_unchanged
-.
+ The time operator supported is the same as for a single data.
 \end_layout
 
 \begin_layout Section
-
-\change_inserted -2048955058 1367393275
 \begin_inset CommandInset label
 LatexCommand label
 name "label:Mathematical-expressions-on"
 
 \end_inset
 
-
-\change_unchanged
 Mathematical expressions on cache data
 \end_layout
 
 \begin_layout Standard
-In places where cache data can be used, like thresholds and 
-\change_inserted -2048955058 1392591784
-for some 
-\change_unchanged
-serviceitems, it's possible to use mathematical expressions on the data.
+In places where cache data can be used, like thresholds and for some serviceitem
+s, it's possible to use mathematical expressions on the data.
  In Bischeck we use the mathematical package JEP to evaluate mathematical
  expressions and formulas.
  Lets look at some examples.
@@ -2381,27 +1547,19 @@ In the above the highest value will be returned of the cached data for
 erphost-orders-ediorders
 \emph default
  cached 5, 10 and 15 minutes ago.
-\change_inserted -2048955058 1367393655
-
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1367393735
 Conditional expression is supported through the if statement
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1367393689
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true,tabsize=4"
 inline false
 status open
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1367393689
 
 if((erpserver-orders-ediOrders[0] - erpserver-orders-ediOrders[1]) < 0,0,
  erpserver-orders-ediOrders[0] - erpserver-orders-ediOrders[1])
@@ -2413,8 +1571,6 @@ if((erpserver-orders-ediOrders[0] - erpserver-orders-ediOrders[1]) < 0,0,
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1367393689
 The above example check if the result of "erpserver-orders-ediOrders[0]
 \emph on
  - 
@@ -2428,8 +1584,6 @@ erpserver-orders-ediOrders[1]" is less then 0.
 erpserver-orders-ediOrders[1]".
  The value to use from the cache is defined by an index [X], where 0 is
  the latest value retrieved for the specific host-service-item.
-\change_unchanged
-
 \end_layout
 
 \begin_layout Standard
@@ -2439,28 +1593,19 @@ status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392592307
-
 http://www.cse.msu.edu/SENS/Software/jep-2.23/doc/website/doc/doc_usage.htm
-\change_deleted -2048955058 1392592306
-www.sourceforge.net
-\change_unchanged
-
 \end_layout
 
 \end_inset
 
- and download the JEP distribution to get access to the JEP version 2 documentat
-ion.
-\change_inserted -2048955058 1392591797
-
+.
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392592436
 Custom mathematical functions can be developed by following the JEP standard.
  Please see the 
+\emph on
+
 \begin_inset Quotes eld
 \end_inset
 
@@ -2468,9 +1613,9 @@ Bischeck installation and administration guide
 \begin_inset Quotes erd
 \end_inset
 
- howto deploy custom JEP functions with Bischeck.
-\change_unchanged
 
+\emph default
+ howto deploy custom JEP functions with Bischeck.
 \end_layout
 
 \begin_layout Subsection
@@ -2570,19 +1715,13 @@ multNull((x1,x2,x3,...) - Multiply the numbers in the list, but if any of the
 \begin_layout Itemize
 divNull(x1,x2) - Divide the numbers, but if any of the numbers are null
  the function will return null.
-\change_inserted -2048955058 1392590577
-
 \end_layout
 
 \begin_layout Subsection
-
-\change_inserted -2048955058 1392590599
 Prediction functions
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392592477
 Prediction functions take historical data and calculate a prediction using
  the ordinary least square method, see 
 \begin_inset Flex URL
@@ -2590,11 +1729,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392590723
-
 http://en.wikipedia.org/wiki/Ordinary_least_squares
-\change_unchanged
-
 \end_layout
 
 \end_inset
@@ -2613,16 +1748,12 @@ olss
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392592480
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true"
 inline false
 status open
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392592503
 
 ols(host, service, serviceitem, resolutionMethod, resolution, forecast,
  timeOffSet)
@@ -2634,16 +1765,12 @@ ols(host, service, serviceitem, resolutionMethod, resolution, forecast,
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392592481
 \begin_inset listings
 lstparams "basicstyle={\ttfamily}"
 inline false
 status open
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392592517
 
 olss(host, service, serviceitem, resolutionMethod, resolution, timeOffSet)
 \end_layout
@@ -2654,39 +1781,27 @@ olss(host, service, serviceitem, resolutionMethod, resolution, timeOffSet)
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392591139
 The parameters have the following meaning:
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392591225
 host - the host name to get from the cache 
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392591239
 service - the service name to get from the cache
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392591250
 serviceItem - the serviceitem name to get from the cache
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392591497
 resolution - the time resolution that the calculation is based on .
  Support values are H (hour), D (day) and W (week)
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392591349
 forecast - depending on the resolution this is the number of unites of the
  resolution to calculate the prediction for.
  If resolution is D and forecast is 10 the calculated value will be the
@@ -2695,8 +1810,6 @@ forecast - depending on the resolution this is the number of unites of the
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392591508
 timeOffSet - define the number of historical data that will be used in the
  prediction calculation.
  The unit is define by the resolution parameter.
@@ -2705,11 +1818,22 @@ timeOffSet - define the number of historical data that will be used in the
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392591593
 resolutionMethod - the calculation method to use if there are multiple cached
  data in the in the resolution period.
  Supported methods are AVG, MAX and MIN.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Add Example
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -2758,10 +1882,6 @@ If null is stored in the cache at the index that the time specification
 \end_layout
 
 \begin_layout Itemize
-If the index is not yet been populated with data.
-\end_layout
-
-\begin_layout Itemize
 If the index is out of bound of the specified cache size.
 \end_layout
 
@@ -2799,11 +1919,21 @@ In the above example the
 \emph on
 sum
 \emph default
- function will evaluate to null if erphost-orders-ediorders[0] 
+ function will evaluate to null if 
+\emph on
+erphost-orders-ediorders[0]
+\emph default
+ 
+\series bold
+and/or
+\series default
 \bar under
-and/or 
+ 
+\emph on
 \bar default
-erphost-orders-phoneorders[0] return null.
+erphost-orders-phoneorders[0]
+\emph default
+ return null.
  If the the property 
 \emph on
 notFullListParse
@@ -2812,16 +1942,28 @@ notFullListParse
 \emph on
 sum
 \emph default
- function will only return null if both erphost-orders-ediorders[0] 
+ function will only return null if both 
+\emph on
+erphost-orders-ediorders[0]
+\emph default
+ 
 \series bold
 and
 \series default
- erphost-orders-phoneorders[0] return null.
+ 
+\emph on
+erphost-orders-phoneorders[0]
+\emph default
+ return null.
  The whole statement will return null independent of the 
 \emph on
 notFullListParse
 \emph default
- property if erphost-orders-state[0] returns null.
+ property if 
+\emph on
+erphost-orders-state[0]
+\emph default
+ returns null.
  
 \end_layout
 
@@ -2868,37 +2010,21 @@ If the
 \emph on
 notFullListParse
 \emph default
- is set to true all the cache data in erphost-orders-ediorders[0:100] 
-\bar under
+ is set to true all the cache data in 
+\emph on
+erphost-orders-ediorders[0:100]
+\emph default
+ 
+\series bold
 and
-\bar default
- erphost-orders-phoneorders[-5M:-15M] will be filtered out.
- For functions like avg the average will only be based on the none null
- values.
-\end_layout
-
-\begin_layout Standard
-
-\change_inserted -2048955058 1392241145
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\change_inserted -2048955058 1392241159
-TODO - this has changed in 1.0.0
-\change_unchanged
-
-\end_layout
-
-\end_inset
-
-
-\change_unchanged
-The only exception to this rule is when using time range like erphost-orders-pho
-neorders[-5M:-15M].
- A time range will resolve to null if the lower or higher boundaries are
- not in the range of the data that exists in the cache.
+\series default
+ 
+\emph on
+erphost-orders-phoneorders[-5M:-15M]
+\emph default
+ will be filtered out.
+ For functions like avg the caclulated average will only be based on the
+ none null values.
 \end_layout
 
 \begin_layout Standard
@@ -2906,12 +2032,8 @@ The
 \emph on
 nullFullListParse
 \emph default
- property also have another implication 
-\change_deleted -2048955058 1392241180
-and that 
-\change_unchanged
-if using mathematical expressions inside a function that take a list of
- values.
+ property also have another implication if using mathematical expressions
+ inside a function that take a list of values.
  
 \end_layout
 
@@ -2936,12 +2058,20 @@ The above example will result in null for the whole
 \emph on
 avg
 \emph default
- function if any of erphost-orders-ediorders[0] 
-\bar under
+ function if any of 
+\emph on
+erphost-orders-ediorders[0]
+\emph default
+ 
+\series bold
 or
-\bar default
- erphost-orders-phoneorders[0] is null since the multiply with a constant
- will fail if any of the cache data are null.
+\series default
+ 
+\emph on
+erphost-orders-phoneorders[0]
+\emph default
+ is null since the multiply with a constant will fail if any of the cache
+ data are null.
  To manage this the 
 \emph on
 multNull
@@ -2990,85 +2120,90 @@ Using multNull will result in that the
 \emph on
 avg
 \emph default
- function will return null only if both erphost-orders-ediorders[0] 
-\bar under
+ function will return null only if both 
+\emph on
+erphost-orders-ediorders[0]
+\emph default
+ 
+\series bold
 and
+\bar under
+ 
+\series default
+\emph on
 \bar default
- erphost-orders-phoneorders[0] are null.
-\change_inserted -2048955058 1392238866
-
+erphost-orders-phoneorders[0]
+\emph default
+ are null.
 \end_layout
 
 \begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Aggregations"
 
-\change_inserted -2048955058 1392238885
+\end_inset
+
 Aggregations
 \end_layout
 
 \begin_layout Standard
+Aggregations of cached data can be automated by Bischeck, see 
+\emph on
+\bar under
 
-\change_inserted -2048955058 1392378375
-Aggregations of historical data can be automated by Bischeck, see 
 \begin_inset CommandInset ref
 LatexCommand nameref
 reference "label:Cache-template"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
  The aggregation is done on hour, day, week and month.
  Aggregations methods that are available are
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392378530
 avg - calculate the average value in the period
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392378441
 min - calculate the min value in the period
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392378454
 max - calculate the max value in the period
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392378535
 It also possible to configure the aggregation to include or exclude weekends,
  Saturdays and Sundays.
  
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392378962
 The aggregated data is also stored in the cache as any other collected data
- and can be retrived from the same cache in the same way as the collected
+ and can be retrieved from the same cache in the same way as the collected
  data.
- The difference is the name convetion used for aggregated data.
- For the service definition erphost-orders-ediorders the aggregated data
- will have the format for the aggregation on hour using average calculation
- and including weekend days:
+ The difference is the name convention used for aggregated data.
+ For the service definition 
+\emph on
+erphost-orders-ediorders
+\emph default
+ the aggregated data will have the format for hourly based aggregation where
+ average calculation is used and weekend days are included:
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392378967
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true"
 inline false
 status open
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392378874
 
 erphost-orders/H/avg/weekend-ediorders
 \end_layout
@@ -3079,22 +2214,16 @@ erphost-orders/H/avg/weekend-ediorders
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392379113
 If weekends are not included the format will be:
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392379129
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true"
 inline false
 status open
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392379114
 
 erphost-orders/H/avg-ediorders
 \end_layout
@@ -3105,25 +2234,23 @@ erphost-orders/H/avg-ediorders
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392379200
 The period is define as H (hour), D (day), W (week) and M (month).
- 
-\end_layout
-
-\begin_layout Standard
-
-\change_inserted -2048955058 1392394285
-The data are stored in the same order as for collected data, the last calculated
- aggregation are at index 0.
+ The data are stored in the same order as for collected data, the last calculate
+d aggregation is at index 0.
  How many aggregated data items that will be kept in the cache is define
  per service definition, see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
 LatexCommand nameref
 reference "label:Cache-template"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
  
 \end_layout
@@ -3139,55 +2266,16 @@ Threshold configuration
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1367398889
-A threshold define if the measured value for the service definition is in
- the boundary what is expected.
- What threshold to usThresholds are in Bischeck defined as a threshold class
- 
-\change_unchanged
-To define the state of the retrieved 
-\change_deleted -2048955058 1392378110
-service item
-\change_inserted -2048955058 1392378110
-serviceitem
-\change_unchanged
-s value a threshold class is specified for each 
-\change_deleted -2048955058 1392378112
-service item
-\change_inserted -2048955058 1392378112
-serviceitem
-\change_unchanged
-.
+A threshold define if the measured value for a service definition is in
+ the boundary of what is expected.
+ To define the state of the measured service definition value, a threshold
+ class is specified for each serviceitem.
  The threshold class evaluate the measured value with some logic and return
- the state as okay, warning
-\change_inserted -2048955058 1367398932
-,
-\change_deleted -2048955058 1367398931
- or
-\change_unchanged
- critical 
-\change_inserted -2048955058 1367398923
-or unknown
-\change_deleted -2048955058 1367398928
-level
-\change_unchanged
-.
- The threshold instance for the specific 
-\change_deleted -2048955058 1392378113
-service item
-\change_inserted -2048955058 1392378113
-serviceitem
-\change_unchanged
- is stored in a threshold cache and valid for a period of a day.
+ the state as OKAY, WARNING, CRITICAL or UNKNOWN.
+ The threshold instance for the specific serviceitem is stored in a threshold
+ cache and valid for a period of a day.
  Every new day the threshold cache is invalidated and Bischeck looks for
- new valid threshold classes to instantiate for the 
-\change_deleted -2048955058 1392378114
-service item
-\change_inserted -2048955058 1392378114
-serviceitem
-\change_unchanged
- to be used for the period of a day.
+ new valid threshold classes to instantiate for each serviceitem.
  The reason that the period is set to a day is that there may be a need
  to configure the threshold instance differently depending on the day of
  the week or month.
@@ -3198,25 +2286,20 @@ serviceitem
 A valid threshold class must implement the interface Threshold.
  This structure enables a flexible implementation of very different ways
  to calculate or specify a threshold.
- In the simplest form a threshold class could just return a okay independent
+ In the simplest form a threshold class could just return a OKAY independent
  of measured value and in the more complex solution be based on algorithms,
- database content, measured values from other 
-\change_deleted -2048955058 1392378115
-service item
-\change_inserted -2048955058 1392378115
-serviceitem
-\change_unchanged
-s, day of month or some complex combination.
+ database content, content in the Bischeck cache, day of month or some complex
+ combination.
  
 \end_layout
 
 \begin_layout Standard
 Warning and critical level specification are also part of the threshold
  class.
- The threshold class are also responsible to define what operations are
- support for the measured value, like measured value should be higher, lower
- or in an interval of the threshold.
- Warning and critical level are always defined as the percentage of the
+ The threshold class are responsible to define what operations are supported
+ for the measured value, like measured value should be higher, lower or
+ in an interval of the threshold.
+ Warning and critical levels should be defined as the percentage of the
  threshold.
 \end_layout
 
@@ -3227,24 +2310,24 @@ name "label:Twenty4HourThreshold-class"
 
 \end_inset
 
-Twenty4HourThreshold class
+Twenty four hour threshold 
 \end_layout
 
 \begin_layout Standard
 The Twenty4Hour threshold class divides the day into 24 hours.
  For each hour of the day a threshold is defined.
- The two threshold values that are next to each other used to calculate
- a slope of a linear equation between the two closest hours.
- For example, if the threshold value is 1000 at 14:00 and 1600 at 15:00,
- the calculation for a threshold value between 14:00 and 15:00 is y=x*(1600-1000
-)/60 + 1000.
+ The two threshold values that are next to each other are used to calculate
+ a slope of a linear equation between the two .
+ For example, if the threshold value is set to 1000 at 14:00 and to 1600
+ at 15:00, the calculation for a threshold value between 14:00 and 15:00
+ is y=x*(1600-1000)/60 + 1000.
  At 14:20 the threshold is 20*(1600-1000)/60+1000 = 1200.
  
 \end_layout
 
 \begin_layout Standard
 The threshold model gives a linear equation with one hour granularity, but
- over 24 hours it can resemble a curve.
+ over a 24 hour period it can resemble a curve.
  This behavior is typical in business systems where the key business values
  are distributed in a none linear and none constant way over the period
  of a day, e.g.
@@ -3263,20 +2346,14 @@ Period definition
 \end_layout
 
 \begin_layout Standard
-Since the threshold for a 
-\change_deleted -2048955058 1392378118
-service item
-\change_inserted -2048955058 1392378118
-serviceitem
-\change_unchanged
- can be different depending on the month, day of month, week, day of week
- the configuration supports thresholds to be described on a granularity
- called period.
+Since the threshold for a serviceitem can be different depending on the
+ month, day of month, week, day of week the configuration supports thresholds
+ to be described on a granularity called period.
  A period include multiple months and weeks definitions as long as they
  share the same threshold definition.
  For a month it is possible to specify a specific month and/or a day of
  a month and for a week a specific week and/or a day of a week.
- To find the right threshold period the the class look for threshold period
+ To find the right threshold period the the class looks for threshold period
  specification in the following order: 
 \end_layout
 
@@ -3310,14 +2387,14 @@ Default
 
 \begin_layout Standard
 Month is specified between 1-12, week 1-53, day of month 1-31 and day of
- week 1-7 (1=Sunday).
+ week 1-7 where 1 is Sunday and 7 is Saturday.
  The default threshold period is used if no other matching occurs.
 \end_layout
 
 \begin_layout Standard
-Since holidays are often days where the business are not operational there
+Since holidays are often days where the business are not operational, there
  is a way to describe days that should no have any threshold checks.
- These exclude days are checked before any other rule above are evaluated.
+ These excluded days are checked before any other rule above are evaluated.
 \end_layout
 
 \begin_layout Subsection
@@ -3331,12 +2408,12 @@ Calculation definition
 \end_layout
 
 \begin_layout Standard
-The class support tree ways how the threshold is compered to the measured
+The class support tree ways how the threshold is compared to the measured
  value: 
 \end_layout
 
 \begin_layout Description
-">" Measured value should be higher then threshold.
+">" Measured value should be higher then the threshold.
  If the measured value is lower then threshold*warning(%) warning state
  is set and if measured value is lower then threshold*critical(%) critical
  state is set.
@@ -3344,7 +2421,7 @@ The class support tree ways how the threshold is compered to the measured
 \end_layout
 
 \begin_layout Description
-"<" Measured value should be lower then threshold.
+"<" Measured value should be lower then the threshold.
  If the measured value is higher then threshold*(1-warning(%)) warning state
  is set and if if measured value is higher then threshold*(1-critical(%))
  critical state is set.
@@ -3360,12 +2437,16 @@ The class support tree ways how the threshold is compered to the measured
 
 \begin_layout Standard
 For complete configuration description see section 
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand vref
+LatexCommand nameref
 reference "label:24thresholds.xml"
 
 \end_inset
 
+
+\bar default
 .
 \end_layout
 
@@ -3380,7 +2461,7 @@ Hours and threshold definition
 \end_layout
 
 \begin_layout Standard
-The measured value is compered against the threshold value that is calculated
+The measured value is compared against the threshold value that is calculated
  from linear equation of the two closest threshold values.
  As described in the introduction of this chapter we can set the threshold
  values to fixed number, but in a business system this is not enough.
@@ -3403,47 +2484,39 @@ The measured value is compered against the threshold value that is calculated
 \emph default
 The syntax of expression based thresholds is simple and powerful.
  Expressions are based on the JEP package, see chapter 
+\emph on
+
 \begin_inset CommandInset ref
-LatexCommand ref
-reference "label:System-requirements"
+LatexCommand nameref
+reference "label:Mathematical-expressions-on"
 
 \end_inset
 
-, where the parameters are any measured values that exist in the 
-\change_deleted -2048955058 1392378119
-service item
-\change_inserted -2048955058 1392378119
-serviceitem
-\change_unchanged
+
+\emph default
+, where the parameters can be any measured values that exist in the Bischeck
  cache, see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "label:Service-item-cache"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
  For example the expression 
 \emph on
 "erpserver-orders-ediorders[0]*0.8"
 \emph default
- is the threshold is set to 80% of the last measured value of the 
-\change_deleted -2048955058 1392378121
-service item
-\change_inserted -2048955058 1392378121
-serviceitem
-\change_unchanged
+ setthe threshold to 80% of the last measured value of the service definition
  
 \emph on
-ediorders
-\emph default
- for the service 
-\emph on
-order
-\emph default
- and host 
-\emph on
-erpserver
+erpserver-orders-ediorders
 \emph default
 .
  We could also combine multiple cached values from different sources in
@@ -3458,16 +2531,11 @@ erpserver
 to get some sort of ratio threshold
 \emph on
 .
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
-
-\emph default
+\begin_layout Standard
 If we just need to check parts of a day for thresholds, just set the hour
  to NULL and no calculation will be done for that time interval.
- For example if no threshold checks should be done on weekends just define
- period rule number 4 for day 1 and 6 with all hour thresholds set to NULL.
- 
 \end_layout
 
 \begin_layout Chapter
@@ -3481,10 +2549,10 @@ Server integration
 \end_layout
 
 \begin_layout Standard
-Since Bischeck support integration with multiple monitoring infrastructures
- its not possible to define a single message format or protocol.
- For that reason each Server class implementation is responsible for message
- formatting and communication with the integrated server.
+Bischeck support integration with multiple monitoring infrastructures.
+ Each integration is implemented as a server class.
+ The server class The Server class are responsible for message formatting
+ and communication with the integrated server.
  If the server system is not responding the message will be dropped on the
  Bischeck side.
  
@@ -3501,74 +2569,53 @@ Nagios integration with NSCA, NRDP and Livestatus
 \end_layout
 
 \begin_layout Standard
-The data format between Bischeck and Nagios follow the standard Nagios format.
- This means that the Nagios host and service names must be the same as you
- configure in Bischeck.
- Since NSCA and NRDP
-\begin_inset Note Greyedout
-status open
-
-\begin_layout Plain Layout
-[New in 0.4.1]
-\end_layout
-
-\end_inset
-
- works with passive checks the 
+The data format between Bischeck and Nagios follow the standard Nagios format
+ for passive checks.
+ This means that the Nagios host and service name must be the same as the
+ configuration in Bischeck.
+ Even for passive checks Nagios require that a check command is specified
+ for the Nagios service like
 \emph on
-check_dummy
+ check_dummy
 \emph default
- or equivalent check command should be used on the Nagios side in the service
- configuration.
- For a service in Bischeck the data is split in the status and the performance
- output.
- The Bischeck status output has the following format: 
-\end_layout
-
-\begin_layout Standard
-<level> <
-\change_deleted -2048955058 1392378122
-service item
-\change_inserted -2048955058 1392378122
-serviceitem
-\change_unchanged
- name> = <measured value> (<threshold> <warning value> <warning_calc method>
- <critical value>) <critical calc method> , <
-\change_deleted -2048955058 1392378129
-service item
-\change_inserted -2048955058 1392378129
-serviceitem
-\change_unchanged
- name> = ...
+ or equivalent check command.
+ Bischeck follow the Nagios specification for check command output that
+ require that data is split in a status and a performance part seperated
+ with pipe sign (|).
  
 \end_layout
 
 \begin_layout Standard
-Since a service can have multiple 
-\change_deleted -2048955058 1392378130
-service item
-\change_inserted -2048955058 1392378130
-serviceitem
-\change_unchanged
-s, the output is presented as a concatenated string of the 
-\change_deleted -2048955058 1392378132
-service item
-\change_inserted -2048955058 1392378132
-serviceitem
-\change_unchanged
-s.
+The Bischeck status output has the following format: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<level> <serviceitem name> = <measured value> (<threshold> <warning value>
+ <warning_calc method> <critical value>) <critical calc method> , <serviceitem
+ name> = ...
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since a service can have multiple serviceitems, the output is presented
+ as a concatenated string of the serviceitems.
  The <measured value> is the value that was retrieved from the execution
- of the specific 
-\change_deleted -2048955058 1392378133
-service item
-\change_inserted -2048955058 1392378133
-serviceitem
-\change_unchanged
- execute statement.
+ of the specific service definition's serviceitem execute statement.
  The <threshold> is the current threshold value that the measured value
- has been compared against.
- The calculated warning and critical levels are also calculated based on
- the percentage value of the threshold.
+ has been evaluated against.
+ The calculated warning and critical levels are based on the percentage
+ value of the threshold.
 \end_layout
 
 \begin_layout Standard
@@ -3577,13 +2624,13 @@ Depending of the calculation method the string representation will differ.
 \end_layout
 
 \begin_layout Itemize
-Measure value must be higher the threshold: <warning level> = > W > <critical
- level> = > C >
+Measure value must be higher then the threshold: <warning level> = > W >
+ <critical level> = > C >
 \end_layout
 
 \begin_layout Itemize
-Measure value must be lower the threshold: <warning level> = < W < <critical
- level> = < C <
+Measure value must be lower then the threshold: <warning level> = < W <
+ <critical level> = < C <
 \end_layout
 
 \begin_layout Itemize
@@ -3614,59 +2661,67 @@ OK ediOrders = 12000 (11000 > W > 9900 > C > 7700)
 \begin_layout Standard
 In this case the threshold value is 11000 and warning and critical levels
  has been set to 10% and 30 % of the current threshold.
- Since the warning and critical level are as a fixed percentage the calculated
- level will changed with the current threshold.
+ Since the warning and critical level are a fixed percentage the calculated
+ level will changed with the change of the threshold.
 \end_layout
 
 \begin_layout Standard
 If there are no threshold values defined for the current period in which
- the measured value is done, the threshold is reported as null and no calculatio
-n is done that can be used for notification.
+ the measured value is collected, the threshold is reported as null and
+ no calculation is done that can be used for notification.
  Null can also be reported as the measured value.
- This can occur if a none or a null value is retrieved for the 
-\change_deleted -2048955058 1392378134
-service item
-\change_inserted -2048955058 1392378134
-serviceitem
-\change_unchanged
-, for example from a faulty SQL statement.
+ This can occur if a none or a null value is retrieved for the serviceitem,
+ for example from a faulty SQL statement.
+ Service connection problems will by default be reported as critical.
+ This can be changed by setting the property 
+\emph on
+saveNullOnConnectionError
+\emph default
+, see 
+\emph on
+\bar under
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:properties.xml"
+
+\end_inset
+
+
+\emph default
+\bar default
+.
+ The service state will be based on the serviceitem that has the highest
+ level of severity if there are more then one serviceitem defined for the
+ service.
+ If one serviceitem reports critical and the other reports OK the service
+ will report critical.
  
 \end_layout
 
 \begin_layout Standard
-Service connection problems will be reported as critical.
- Warning and critical notification will be based on the 
-\change_deleted -2048955058 1392378135
-service item
-\change_inserted -2048955058 1392378135
-serviceitem
-\change_unchanged
- that has the highest level of severity if there are more then one 
-\change_deleted -2048955058 1392378136
-service item
-\change_inserted -2048955058 1392378136
-serviceitem
-\change_unchanged
- defined for a service.
- If one 
-\change_deleted -2048955058 1392378137
-service item
-\change_inserted -2048955058 1392378137
-serviceitem
-\change_unchanged
- reports critical and the other reports OK the service will report critical.
- 
+If no threshold is define the status will be reported as:
 \end_layout
 
 \begin_layout Standard
-For the performance data, which Nagios graphs, like pnp4nagios, are based
- upon, each 
-\change_deleted -2048955058 1392378138
-service item
-\change_inserted -2048955058 1392378138
-serviceitem
-\change_unchanged
- is included with the addition of the current threshold.
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+OK ediOrders = 12000 (NA)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the performance data each serviceitem is included with the addition
+ of the current threshold.
 \end_layout
 
 \begin_layout Standard
@@ -3686,8 +2741,8 @@ ediOrders=12000;9900;7000;0; threshold=11000;0;0;0; avg-exec-time=223ms
 \end_layout
 
 \begin_layout Standard
-The execution time of the service execute statement is always part of the
- performance data and reported in milliseconds.
+The execution time of the serviceitem execute statement is always part of
+ the performance data and reported as avg-exec-time in milliseconds.
  With the pnp4nagios template that is provided by the Bischeck installation
  the average execution time is not graphed.
  
@@ -3697,12 +2752,30 @@ The execution time of the service execute statement is always part of the
 
 \end_layout
 
+\begin_layout Standard
+All server integrations are configured in the $BISHOME/etc/servers.xml file,
+ see 
+\emph on
+\bar under
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:server.xml-1"
+
+\end_inset
+
+
+\emph default
+\bar default
+ for more information.
+\end_layout
+
 \begin_layout Subsection
 NSCA configuration
 \end_layout
 
 \begin_layout Standard
-The configuration parameters that need to be define in the server.xml for
+The configuration parameters that needs to be define in the server.xml for
  NSCA are:
 \end_layout
 
@@ -3731,7 +2804,7 @@ encryptionMode - the encryption mode used in the communication with the
 \end_layout
 
 \begin_layout Itemize
-password - the NSCA server password, no by default.
+password - the NSCA server password, no default value.
 \end_layout
 
 \begin_layout Subsection
@@ -3739,7 +2812,7 @@ NRDP configuration
 \end_layout
 
 \begin_layout Standard
-The configuration parameters that need to be define in the server.xml for
+The configuration parameters that needs to be define in the server.xml for
  NRDP are:
 \end_layout
 
@@ -3769,12 +2842,32 @@ path - the URL path for NRDP, default is nrdp.
 password - the NRDP server token, no by default.
 \end_layout
 
+\begin_layout Standard
+The resulting URL will have the following format:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+http://<hostAddress>:<port>/<path>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Livestatus configuration
 \end_layout
 
 \begin_layout Standard
-The configuration parameters that need to be define in the server.xml for
+The configuration parameters that needs to be define in the server.xml for
  Livestatus are:
 \end_layout
 
@@ -3801,14 +2894,9 @@ Nagios state on null
 \end_layout
 
 \begin_layout Standard
-If the service connection fail or the 
-\change_deleted -2048955058 1392378139
-service item
-\change_inserted -2048955058 1392378139
-serviceitem
-\change_unchanged
- execstatement returns a null value its not possible to calculate thresholds
- or to determine the state that should be propagated to Nagios.
+If the service connection fail or the serviceitem execstatement returns
+ a null value its not possible to calculate the threshold or to determine
+ the state that should be propagated to Nagios.
  The state that should be communicate to Nagios in this type of situation
  is defined by property 
 \emph on
@@ -3830,19 +2918,12 @@ OpenTSDB
 \end_layout
 
 \begin_layout Standard
-OpenTSDB is an monitoring system that provide storage and indexing of high
+OpenTSDB is an monitoring system that provide storage and indexing for high
  volume of time series data.
- Access to the data in through a graphical web console provide easy way
- to view many different data sources for advanced analysis.
- The OpenTSDB integration is provided over OpenTSDB text based protocol.
- From Bischeck the format will be the following for the host erpserver,
- service orders and 
-\change_deleted -2048955058 1392378143
-service item
-\change_inserted -2048955058 1392378143
-serviceitem
-\change_unchanged
- ediOrders:
+ The OpenTSDB integration is implemented over OpenTSDB text based protocol.
+ From Bischeck 4 lines are sent to OpenTSDB for each service definition.
+ The lines include measured, threshold, warning and critical values.
+ No state information is sent.
 \end_layout
 
 \begin_layout Standard
@@ -3881,14 +2962,18 @@ diOrders
 \end_layout
 
 \begin_layout Standard
-So for each host, service and 
-\change_deleted -2048955058 1392378145
-service item
-\change_inserted -2048955058 1392378145
-serviceitem
-\change_unchanged
- configuration 4 lines of data will be sent to the OpenTSDB server for the
- measured, threshold, warning and critical value.
+For more information about OpenTSDB text protocol please visit 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://opentsdb.net
+\end_layout
+
+\end_inset
+
+ 
 \begin_inset Newline newline
 \end_inset
 
@@ -3929,9 +3014,10 @@ Graphite
 \end_layout
 
 \begin_layout Standard
-Graphite is an monitoring system that provide excellent graphing.
- Access to the data in through a graphical web console provide easy way
- to view many different data sources for advanced analysis.
+Graphite is an monitoring system that provide excellent graphing and visualizati
+on.
+ Access to the data in Graphite is through a graphical web console that
+ provides an easy way to view many different data sources.
  The Graphite integration is provided over Graphites text based protocol.
  The format has the following simple format:
 \end_layout
@@ -3956,19 +3042,15 @@ n
 
 \begin_layout Standard
 The metric_path is the dot separated string like foo.bar.baz.
- Value is a number and timestamp is the UNIX epoch time in milliseconds.
+ Value is a number and timestamp is the time when the data was collected
+ in the UNIX epoch time in milliseconds.
  
 \end_layout
 
 \begin_layout Standard
-From Bischeck the format will be the following for the host erpserver, service
- orders and 
-\change_deleted -2048955058 1392378146
-service item
-\change_inserted -2048955058 1392378146
-serviceitem
-\change_unchanged
- ediOrders:
+From Bischeck 4 lines are sent to Graphite for each service definition.
+ The lines include measured, threshold, warning and critical values.
+ No state information is sent.
 \end_layout
 
 \begin_layout Standard
@@ -4011,17 +3093,6 @@ n
 \end_layout
 
 \begin_layout Standard
-So for each host, service and 
-\change_deleted -2048955058 1392378147
-service item
-\change_inserted -2048955058 1392378147
-serviceitem
-\change_unchanged
- configuration 4 lines of data will be sent to the Graphite server for the
- measured, threshold, warning and critical value.
-\end_layout
-
-\begin_layout Standard
 The Graphite server integration support a method to filter what data that
  will be sent to Graphite.
  The filter is defined by regular expression with the property 
@@ -4029,8 +3100,11 @@ The Graphite server integration support a method to filter what data that
 doNotSendRegex
 \emph default
 .
- If a host-service-serviceitem in anyway match the regular expression it
- will not be sent to Graphite.
+ If a 
+\emph on
+host-service-serviceitem
+\emph default
+ in anyway match the regular expression it will not be sent to Graphite.
  Multiple regular expressions can be defined by a list of regular expressions
  in the property 
 \emph on
@@ -4057,7 +3131,7 @@ doNotSendRegexDelim
 
 \begin_layout Standard
 The configuration parameters that need to be define in the server.xml for
- OpenTSDB are:
+ raphite are:
 \end_layout
 
 \begin_layout Itemize
@@ -4094,35 +3168,6 @@ doNotSendRegexDelim - The delimiter to separate regular expressions in the
 \end_inset
 
 .
-\change_inserted -2048955058 1392593276
-
-\end_layout
-
-\begin_layout Section
-
-\change_inserted -2048955058 1392593290
-Circuit breaks
-\end_layout
-
-\begin_layout Standard
-
-\change_inserted -2048955058 1392593293
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\change_inserted -2048955058 1392593295
-Todo
-\change_unchanged
-
-\end_layout
-
-\end_inset
-
-
-\change_unchanged
-
 \end_layout
 
 \begin_layout Chapter
@@ -4136,32 +3181,13 @@ Bischeck configuration files
 \end_layout
 
 \begin_layout Standard
-The basic configuration file
-\change_inserted -2048955058 1392593305
-s
-\change_unchanged
- are xml based and located in the 
+The basic configuration files are xml based and located in the 
 \emph on
 $BISHOME/etc
 \emph default
  directory.
- The distribution package
-\change_deleted -2048955058 1392246081
- also
-\change_unchanged
- include all xml schema
-\change_inserted -2048955058 1392593319
- files
-\change_unchanged
-, xsd, 
-\change_deleted -2048955058 1392593326
-files 
-\change_unchanged
-used for validation
-\change_inserted -2048955058 1392246097
- of the configuration files
-\change_unchanged
-.
+ The distribution package include all xml schema files, xsd, used for validation
+ of the configuration files.
  For detail information please review the xsd files located in the directory
 \emph on
  $BISHOME/resources
@@ -4170,13 +3196,9 @@ used for validation
  
 \series bold
 Remember that all xml configuration files should use HTML encoded characters.
-\change_inserted -2048955058 1392246183
-
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392246417
 There are two important aspects of the Bischeck configuration to enable
  flexibility and a compact configuration structure - macros and templates.
  Macros comes in two shapes, configuration macros and runtime macros.
@@ -4186,14 +3208,10 @@ There are two important aspects of the Bischeck configuration to enable
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392248054
 Templates are used in configuration files to support re-usability of configurati
 on blocks that are common.
  With macros this works very well to minimize the amount of configuration
  code.
-\change_unchanged
-
 \end_layout
 
 \begin_layout Section
@@ -4208,57 +3226,24 @@ Naming standard
 
 \begin_layout Standard
 The rules for naming hosts, services and serviceitems must adhere to the
- following rules:
-\change_deleted -2048955058 1392248271
-
-\end_layout
-
-\begin_layout Itemize
-host
-\change_inserted -2048955058 1392248091
- 
-\change_unchanged
-name 
-\change_deleted -2048955058 1392248088
-- 
-\change_unchanged
-can include any character from a-z, A-Z and 0-9.
- The host
-\change_inserted -2048955058 1392248102
- 
-\change_unchanged
-name can also include the 
-\change_deleted -2048955058 1392248140
-following special 
-\change_unchanged
-character, dash (-), dot (.) and underscore (_).
- Its not allowed to start the name with any of the special characters.
+ following rules:host name can include any character from a-z, A-Z and 0-9.
+ The host name can also include the the characters, dash (-), dot (.) and
+ underscore (_).
+ Its not allowed to start the name with any of the these characters.
  Examples of valid names are erphost.xyz.com and erp1_host.my-domain.com.
 \end_layout
 
 \begin_layout Itemize
-service and serviceitem 
-\change_deleted -2048955058 1392248120
-- 
-\change_unchanged
-can include any character from a-z, A-Z and 0-9.
- The name can also include the 
-\change_deleted -2048955058 1392248130
-following special
-\change_unchanged
- characters, dash (-), dot (.), underscore (_), at sign (@) and space ( ).
+service and serviceitem can include any character from a-z, A-Z and 0-9.
+ The name can also include the the characters, dash (-), dot (.), underscore
+ (_), at sign (@) and space ( ).
  Its not allowed to start or end the name with dash (-) and space ( ).
  
-\change_inserted -2048955058 1392248281
-
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392248329
-Dash (-) is the separator character between the host, s
-\change_unchanged
-ervice and serviceitem when using it in expression.
+Dash (-) is the separator character between host, service and serviceitem
+ name when used in expression.
  
 \series bold
 When using a host-servie-serviceitem[X] expression in the execstatement
@@ -4280,26 +3265,20 @@ status open
 
 erp1_host.my
 \backslash
--domain.com-@service1-item.1.1[1]
+-domain.com-@service1-item[1]
 \end_layout
 
 \end_inset
 
 
-\change_inserted -2048955058 1392239237
-
 \end_layout
 
 \end_deeper
 \begin_layout Section
-
-\change_inserted -2048955058 1392248387
 Configuration macros
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392248883
 Configuration macros have the format of 
 \emph on
 $$macroname$$
@@ -4309,74 +3288,54 @@ $$macroname$$
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392248638
 $$HOSTNAME$$ - will be replaced with the value of tag <name> in the current
  scope from the host section
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392248651
 $$HOSTALIAS$$ - will be replaced with the value of tag <alias> in the current
  scope from the host section 
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392248662
 $$SERVICENAME$$ - will be replaced with the value of tag <name> in the current
  scope from the service section
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392248681
 $$SERVICEALIAS$$ - will be replaced with the value of tag <alias> in the
  current scope from the service section
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392248696
 $$SERVICEITEMNAME$$ - will be replaced with the value of tag <name> in the
  current scope from the serviceitem section
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392248768
 $$SERVICEITEMALIAS$$ - will be replaced with the value of tag <alias> in
  the current scope from the serviceitem section
 \end_layout
 
 \begin_layout Standard
 
-\change_inserted -2048955058 1392248853
-
 \series bold
 All the *NAME macros are support both in the bischeck.xml and 24thresholds.xml
  file.
- The *ALIAS macros is only supported in the bischeck.xml since there is no
- equivalent alias tag in 24threshols.xml.
+ The *ALIAS macros are only supported in the bischeck.xml since there is
+ no equivalent alias tag in 24threshols.xml.
 \end_layout
 
 \begin_layout Section
-
-\change_inserted -2048955058 1392248888
 Runtime macros
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392248946
 Runtime macros is evaluate in runtime and have the format %%macro%%.
  Currently only data macro is supported.
 \end_layout
 
 \begin_layout Subsection
-
-\change_inserted -2048955058 1392248951
 \begin_inset CommandInset label
 LatexCommand label
 name "label:Date-formatting-1"
@@ -4387,13 +3346,11 @@ Date formatting macro
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392378152
 Many serviceitems will typically execute something depending on a date.
  For this reason Bischeck supports date macros in the execute statement
  of a serviceitems.
- For example, if this is a SQL select statement that using a date condition,
- the formatting could be done like this:
+ For example in the following SQL select statement that is using a date
+ condition, the formatting could be done like this:
 \begin_inset Newline newline
 \end_inset
 
@@ -4401,8 +3358,6 @@ Many serviceitems will typically execute something depending on a date.
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392239300
 \begin_inset listings
 lstparams "basicstyle={\ttfamily}"
 inline false
@@ -4410,21 +3365,15 @@ status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392239300
-
 select count(orders) from order where 
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392239300
-
 fromdate='%%yyyy-MM-dd%%' and 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392239300
 
 todate='%%yy.MM.dd%[D2]%%'
 \end_layout
@@ -4435,8 +3384,6 @@ todate='%%yy.MM.dd%[D2]%%'
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392239300
 Bischeck will replace anything between %% and %% with the current date according
  to the format string.
  The formatting follows the structure of the Java SimpleDateFormatter class.
@@ -4446,8 +3393,6 @@ Bischeck will replace anything between %% and %% with the current date according
  two months to the current date.
  A construction like D-1Y-1 is not supported.
  
-\change_unchanged
-
 \end_layout
 
 \begin_layout Section
@@ -4462,26 +3407,10 @@ bischeck.xml
 
 \begin_layout Standard
 The Bischeck configuration can be described as a hierarchy of hosts, services
- and 
-\change_deleted -2048955058 1392378157
-service item
-\change_inserted -2048955058 1392378157
-serviceitem
-\change_unchanged
-s to monitor.
+ and serviceitems to monitor.
  Each host can have one or more services, and for each service one or more
- 
-\change_deleted -2048955058 1392378158
-service item
-\change_inserted -2048955058 1392378158
-serviceitem
-\change_unchanged
-s can be configured.
- 
-\change_inserted -2048955058 1392250596
-Below is an example of a simple configuration but without any templates.
-\change_unchanged
-
+ serviceitems can be configured.
+ Below is an example of a simple configuration but without any templates.
 \end_layout
 
 \begin_layout Standard
@@ -4503,17 +3432,11 @@ status open
 \begin_layout Plain Layout
 
 		<name>erpserver</name>
-\change_inserted -2048955058 1392248978
-
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392249005
-
         <alias>172.25.1.113<alias>
-\change_unchanged
-
 \end_layout
 
 \begin_layout Plain Layout
@@ -4548,13 +3471,7 @@ status open
 
 \begin_layout Plain Layout
 
-				jdbc:mysql://
-\change_deleted -2048955058 1392249572
-erphost
-\change_inserted -2048955058 1392249581
-$$HOSTALIAS$$
-\change_unchanged
-/erpdb?user=bischeck&amp;password=bischeck
+				jdbc:mysql://$$HOSTALIAS$$/erpdb?user=bischeck&amp;password=bischeck
 \end_layout
 
 \begin_layout Plain Layout
@@ -4564,29 +3481,7 @@ $$HOSTALIAS$$
 
 \begin_layout Plain Layout
 
-			<driver>
-\change_deleted -2048955058 1392251102
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\change_deleted -2048955058 1392251105
-
-				
-\change_unchanged
-com.mysql.jdbc.Driver
-\change_deleted -2048955058 1392251111
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\change_deleted -2048955058 1392251111
-
-			
-\change_unchanged
-</driver>
+			<driver>com.mysql.jdbc.Driver</driver>
 \end_layout
 
 \begin_layout Plain Layout
@@ -4622,56 +3517,12 @@ com.mysql.jdbc.Driver
 
 \begin_layout Plain Layout
 
-				<thresholdclass>
-\change_deleted -2048955058 1392251117
-
+				<thresholdclass>Twenty4HourThreshold</thresholdclass>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_deleted -2048955058 1392251117
-
-					
-\change_unchanged
-Twenty4HourThreshold
-\change_deleted -2048955058 1392251122
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\change_deleted -2048955058 1392251122
-
-				
-\change_unchanged
-</thresholdclass>
-\end_layout
-
-\begin_layout Plain Layout
-
-				<serviceitemclass>
-\change_deleted -2048955058 1392251128
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\change_deleted -2048955058 1392251128
-
-					
-\change_unchanged
-SQLServiceItem
-\change_deleted -2048955058 1392251133
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\change_deleted -2048955058 1392251133
-
-				
-\change_unchanged
-</serviceitemclass>
+				<serviceitemclass>SQLServiceItem</serviceitemclass>
 \end_layout
 
 \begin_layout Plain Layout
@@ -4704,58 +3555,31 @@ In the host section the following elements are defined:
 \end_layout
 
 \begin_layout Itemize
-name - 
-\change_inserted -2048955058 1392249035
-(mandatory) 
-\change_unchanged
-the name of the host.
+name - (mandatory) the name of the host.
  
 \begin_inset Foot
 status open
 
 \begin_layout Plain Layout
-Must be the same name as the host name is configured with on the Nagios
- server.
+Must be the same name as the host nameconfiguredon the Nagios server.
 \end_layout
 
 \end_inset
 
  
-\change_inserted -2048955058 1392249049
-
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392249442
 inactive - (optional, default false) if set to true the host and all its
  services will not be configured.
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392249114
 alias - (optional) can be anything
-\change_unchanged
-
 \end_layout
 
 \begin_layout Itemize
-desc -
-\change_deleted -2048955058 1392249043
- a
-\change_unchanged
- 
-\change_inserted -2048955058 1392249040
-(
-\change_unchanged
-optional
-\change_inserted -2048955058 1392249037
-)
-\change_deleted -2048955058 1392249037
- 
-\change_unchanged
-description field 
+desc - (optional)description field 
 \end_layout
 
 \begin_layout Standard
@@ -4763,18 +3587,13 @@ In the service section the following elements are defined:
 \end_layout
 
 \begin_layout Itemize
-name - 
-\change_inserted -2048955058 1392249132
-(mandatory) the 
-\change_unchanged
-name of the service.
+name - (mandatory) the name of the service.
  
 \begin_inset Foot
 status open
 
 \begin_layout Plain Layout
-Must be the same name as the host name is configured with on the Nagios
- server.
+Must be the same name as the service name configured on the Nagios server.
 \end_layout
 
 \end_inset
@@ -4783,42 +3602,21 @@ Must be the same name as the host name is configured with on the Nagios
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392249466
 inactive - (optional, default false) if set to true the service and all
  its serviceitems will not be configured.
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392249450
 alias - (optional) can be anything
-\change_unchanged
-
 \end_layout
 
 \begin_layout Itemize
-desc -
-\change_deleted -2048955058 1392249140
- a
-\change_unchanged
- 
-\change_inserted -2048955058 1392249138
-(
-\change_unchanged
-optional
-\change_inserted -2048955058 1392249136
-)
-\change_unchanged
- description field 
+desc - (optional) description field 
 \end_layout
 
 \begin_layout Itemize
-schedule - 
-\change_inserted -2048955058 1392249198
-(one is mandatory) 
-\change_unchanged
-one to many service execution schedules can be defined.
+schedule - (one is mandatory) one to many service execution schedules can
+ be defined.
  See the section 
 \begin_inset CommandInset ref
 LatexCommand nameref
@@ -4826,147 +3624,69 @@ reference "label:Service-scheduling"
 
 \end_inset
 
- for more information about 
-\change_deleted -2048955058 1392593678
-configuration
-\change_inserted -2048955058 1392593682
-scheduling
-\change_unchanged
- options.
+ for more information about scheduling options.
  
 \end_layout
 
 \begin_layout Itemize
-sendserver - 
-\change_inserted -2048955058 1392249405
-(optional, default true) 
-\change_unchanged
-true or false to define if the service data should be sent to the configured
- monitoring servers, see 
+sendserver - (optional, default true) true or false to define if the service
+ data should be sent to the configured monitoring servers, see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand ref
-reference "label:server.xml"
+LatexCommand nameref
+reference "label:server.xml-1"
 
 \end_inset
 
-.
- 
-\begin_inset Note Greyedout
-status open
 
-\begin_layout Plain Layout
-[New in 0.4.0]
-\end_layout
-
-\end_inset
-
+\emph default
+\bar default
 .
  If set to false the measured data will only be placed in the Bischeck cache
  and be used to create virtual services and threshold rules.
 \end_layout
 
 \begin_layout Itemize
-url - 
-\change_inserted -2048955058 1392249229
-(mandatory) 
-\change_unchanged
-the connection specification for the server/service to monitor in a url
- format 
+url - (mandatory) the connection specification for the server/service to
+ monitor in an url format 
 \end_layout
 
 \begin_layout Itemize
-driver - 
-\change_inserted -2048955058 1392249243
-(optional) 
-\change_unchanged
-a class that is needed by the url specification.
+driver - (optional) a class that is needed by the url specification.
  The driver class should be placed in the 
 \emph on
-customlib
+$BISHOME/customlib
 \emph default
  directory.
  
 \end_layout
 
 \begin_layout Standard
-In the 
-\change_deleted -2048955058 1392378159
-service item
-\change_inserted -2048955058 1392378159
-serviceitem
-\change_unchanged
- section the following elements are defined:
+In the serviceitem section the following elements are defined:
 \end_layout
 
 \begin_layout Itemize
-name - 
-\change_inserted -2048955058 1392249260
-(mandatory) 
-\change_unchanged
-name of the 
-\change_deleted -2048955058 1392378160
-service item
-\change_inserted -2048955058 1392378160
-serviceitem
+name - (mandatory) name of the serviceitem
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392249269
 alias - (optional) can be anything
-\change_unchanged
-
 \end_layout
 
 \begin_layout Itemize
-desc -
-\change_deleted -2048955058 1392249277
- a
-\change_unchanged
- 
-\change_inserted -2048955058 1392249275
-(
-\change_unchanged
-optional
-\change_inserted -2048955058 1392249273
-)
-\change_unchanged
- description field
+desc - (optional) description field
 \end_layout
 
 \begin_layout Itemize
-execstatement - 
-\change_inserted -2048955058 1392249287
-(mandatory) 
-\change_unchanged
-the specification of what to be executed by the 
-\change_deleted -2048955058 1392378161
-service item
-\change_inserted -2048955058 1392378161
-serviceitem
-\change_unchanged
-.
- The statement will be dependent on the type of 
-\change_deleted -2048955058 1392378162
-service item
-\change_inserted -2048955058 1392378162
-serviceitem
-\change_unchanged
- class used.
+execstatement - (mandatory) the specification of what to be executed by
+ the serviceitem.
+ The statement will be dependent on the type of serviceitem class used.
 \end_layout
 
 \begin_layout Itemize
-serviceitemclass - 
-\change_inserted -2048955058 1392249298
-(mandatory) 
-\change_unchanged
-the ServiceItem class to use for the 
-\change_deleted -2048955058 1392378163
-service item
-\change_inserted -2048955058 1392378163
-serviceitem
-\change_unchanged
-.
+serviceitemclass - (mandatory) the ServiceItem class to use for the serviceitem.
  For ServiceItem classes that are part of the distribution the class name
  is enough.
  For custom developed ServiceItem classes the full class name should be
@@ -4978,16 +3698,7 @@ customlib
 \end_layout
 
 \begin_layout Itemize
-thresholdclass - 
-\change_inserted -2048955058 1392249315
-(optional) 
-\change_unchanged
-the Threshold class to be used by the 
-\change_deleted -2048955058 1392378164
-service item
-\change_inserted -2048955058 1392378164
-serviceitem
-\change_unchanged
+thresholdclass - (optional) the Threshold class to be used by the serviceitem
  configuration.
  For Threshold classes part of the distribution the class name is enough.
  For custom developed Threshold classes the full class name should be specified
@@ -4996,29 +3707,30 @@ serviceitem
 customlib
 \emph default
  directory.
-\change_inserted -2048955058 1392238617
+\end_layout
 
+\begin_layout Standard
+Remember that the order of the attributes are fixed and define by the schema
+ file.
 \end_layout
 
 \begin_layout Subsection
-
-\change_inserted -2048955058 1392250883
 Service and serviceitem template
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392251187
 Instead of specifying a service for each host a service template can be
  used.
- In the example below we now has two host using the same service template
- ordertemplate.
+ In the example below we two host using the same service template called
+ 
+\emph on
+ordertemplate
+\emph default
+.
  
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392251227
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
 inline false
@@ -5026,222 +3738,158 @@ status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251304
-
 ...
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250703
-
 	<host>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250972
 
 		<name>erpserver1</name>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250703
-
         <alias>172.25.1.113<alias>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251019
 
 		<desc>ERP server branch FOO</desc>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250829
-
 		<service>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250853
 
 			<template>ordertemplate</template>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250831
-
         </service>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250845
 
 	</host>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250979
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250983
 
 	<host>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250986
-
 		<name>erpserver2</name>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250988
 
         <alias>172.25.1.123<alias>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251027
-
 		<desc>ERP server branch BAR</desc>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250979
 
 		<service>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250979
-
 			<template>ordertemplate</template>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250979
 
         </service>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250979
-
 	</host>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250888
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250898
 
 	<servicetemplate templatename="ordertemplate">
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250910
-
 		<name>orders</name> 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250703
 
 		<desc>Order management</desc>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250703
-
 		<schedule>0 0/5 * * * ?</schedule>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250703
 
 		<url>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250703
-
 			jdbc:mysql://$$HOSTALIAS$$/erpdb?user=bischeck&amp;password=bischeck
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250703
 
 		</url>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250703
-
 		<driver>com.mysql.jdbc.Driver</driver>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250703
 
 		<serviceitem>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250703
-
 			<name>ediorders</name>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250703
 
 			<desc>Inbound edi orders</desc>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250703
-
 			<execstatement>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250703
 
 				select count(*) from orders where createdate=&apos;%%yyyy-MM-dd%%&apos;
      
@@ -5249,49 +3897,35 @@ status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250703
-
 			</execstatement> 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250703
 
 			<thresholdclass>Twenty4HourThreshold</thresholdclass>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250703
-
 			<serviceitemclass>SQLServiceItem</serviceitemclass>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392250703
 
 		</serviceitem>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250950
-
 	</servicetemplate>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392250703
-
 	
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251294
 
 ....
 \end_layout
@@ -5302,16 +3936,11 @@ status open
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392251324
 In the above example the serviceitem was part of the service template but
- we can also have a configuration where the serviceitem is described as
- a template.
+ the serviceitem can also be defined as a template.
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392251553
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
 inline false
@@ -5319,264 +3948,188 @@ status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 ...
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 	<host>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 		<name>erpserver1</name>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
         <alias>172.25.1.113<alias>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 		<desc>ERP server branch FOO</desc>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 		<service>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 			<template>ordertemplate</template>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
         </service>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 	</host>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 	<host>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 		<name>erpserver2</name>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
         <alias>172.25.1.123<alias>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 		<desc>ERP server branch BAR</desc>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 		<service>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 			<template>ordertemplate</template>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
         </service>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 	</host>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 	<servicetemplate templatename="ordertemplate">
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251474
-
 		<name>orders</name>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251502
 
 		<alias>tbl_order</alias>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 		<desc>Order management</desc>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 		<schedule>0 0/5 * * * ?</schedule>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 		<url>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 			jdbc:mysql://$$HOSTALIAS$$/erpdb?user=bischeck&amp;password=bischeck
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 		</url>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 		<driver>com.mysql.jdbc.Driver</driver>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251375
-
 		<serviceitem>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251531
 
 			<template>orderSQLtemplate</template>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251394
-
 		</serviceitem>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251441
 
 	</servicetemplate>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251442
-
 	
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251536
 
 	<serviceitemtemplate templatename="orderSQLtemplate">
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251348
-
 		<name>ediorders</name>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 		<desc>Inbound edi orders</desc>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 		<execstatement>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251519
 
 			select count(*) from $$SERVICEALIAS$$ where createdate=&apos;%%yyyy-MM-dd%%&a
 pos;     
@@ -5584,49 +4137,35 @@ pos;
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 		</execstatement> 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 		<thresholdclass>Twenty4HourThreshold</thresholdclass>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 		<serviceitemclass>SQLServiceItem</serviceitemclass>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251455
 
 	</serviceitemtemplate>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 	
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251324
-
 	
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251324
 
 ....
 \end_layout
@@ -5637,23 +4176,13 @@ pos;
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392395699
 With this structure a serivceitem template can be shared between multiple
  services and service templates.
- 
-\end_layout
-
-\begin_layout Standard
-
-\change_inserted -2048955058 1392251818
-In addition it's possible to override the settings in a template by using
+ In addition it's possible to override the settings in a template by using
  the service and serviceitem overrides.
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392252201
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
 inline false
@@ -5661,320 +4190,228 @@ status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 ...
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 	<host>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<name>erpserver1</name>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
         <alias>172.25.1.113<alias>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<desc>ERP server branch FOO</desc>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 		<service>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251842
-
 			<template>ordertemplate</template>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251906
 
 			<serviceoverride>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251981
-
             	<name>ordersInERP1</name>   
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251945
 
 				<alias>10.10.10.10</alias>   
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251996
-
 				<schedule>15M</schedule>      
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251924
 
 			</serviceoverride>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
         </service>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 	</host>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 	<host>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<name>erpserver2</name>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
         <alias>172.25.1.123<alias>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<desc>ERP server branch BAR</desc>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 		<service>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 			<template>ordertemplate</template>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
         </service>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 	</host>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 	<servicetemplate templatename="ordertemplate">
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<name>orders</name>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 		<alias>tbl_order</alias>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<desc>Order management</desc>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 		<schedule>0 0/5 * * * ?</schedule>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<url>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 			jdbc:mysql://$$HOSTALIAS$$/erpdb?user=bischeck&amp;password=bischeck
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		</url>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 		<driver>com.mysql.jdbc.Driver</driver>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<serviceitem>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392252055
 
 			<template>orderSQLtemplate</template>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392252064
-
 			<serviceitemoverride>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392252070
 
 				<name>SSHport</name>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392252071
-
 			</serviceitemoverride>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 		</serviceitem>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 	</servicetemplate>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 	
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 	<serviceitemtemplate templatename="orderSQLtemplate">
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 		<name>ediorders</name>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<desc>Inbound edi orders</desc>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<execstatement>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 			select count(*) from $$SERVICEALIAS$$ where createdate=&apos;%%yyyy-MM-dd%%&a
 pos;     
@@ -5982,49 +4419,35 @@ pos;
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		</execstatement> 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 		<thresholdclass>Twenty4HourThreshold</thresholdclass>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 		<serviceitemclass>SQLServiceItem</serviceitemclass>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 	</serviceitemtemplate>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 	
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392251780
-
 	
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392251780
 
 ....
 \end_layout
@@ -6035,22 +4458,16 @@ pos;
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392378165
 Service override are supported for all tags in a service except the reference
  to the serviceitem.
  Serviceitem overrides are support for all tags in the serviceitem.
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392252467
 Overrides are powerful, but it should be used with caution.
 \end_layout
 
 \begin_layout Subsection
-
-\change_inserted -2048955058 1392378270
 \begin_inset CommandInset label
 LatexCommand label
 name "label:Cache-template"
@@ -6061,22 +4478,334 @@ Cache template
 \end_layout
 
 \begin_layout Standard
+The cache template define how many items should be stored in the cache for
+ the specific service definition and what type of automated aggregation
+ that should be conducted.
+ Using a cache template is not mandatory, but there is no default aggregation
+ in that case.
+ 
+\end_layout
 
-\change_inserted -2048955058 1392593591
-\begin_inset Note Note
-status collapsed
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392593596
-TODO
-\change_unchanged
+...
+\end_layout
 
+\begin_layout Plain Layout
+
+	<servicetemplate templatename="ordertemplate">
+\end_layout
+
+\begin_layout Plain Layout
+
+		<name>orders</name>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<alias>tbl_order</alias>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<desc>Order management</desc>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<schedule>0 0/5 * * * ?</schedule>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<url>
+\end_layout
+
+\begin_layout Plain Layout
+
+			jdbc:mysql://$$HOSTALIAS$$/erpdb?user=bischeck&amp;password=bischeck
+\end_layout
+
+\begin_layout Plain Layout
+
+		</url>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<driver>com.mysql.jdbc.Driver</driver>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<serviceitem>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<template>orderSQLtemplate</template>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<serviceitemoverride>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<name>SSHport</name>
+\end_layout
+
+\begin_layout Plain Layout
+
+			</serviceitemoverride>
+\end_layout
+
+\begin_layout Plain Layout
+
+		</serviceitem>
+\end_layout
+
+\begin_layout Plain Layout
+
+	</servicetemplate>
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\end_layout
+
+\begin_layout Plain Layout
+
+	<serviceitemtemplate templatename="orderSQLtemplate">
+\end_layout
+
+\begin_layout Plain Layout
+
+		<name>ediorders</name>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<desc>Inbound edi orders</desc>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<execstatement>
+\end_layout
+
+\begin_layout Plain Layout
+
+			select count(*) from $$SERVICEALIAS$$ where createdate=&apos;%%yyyy-MM-dd%%&a
+pos;     
+\end_layout
+
+\begin_layout Plain Layout
+
+		</execstatement> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<thresholdclass>Twenty4HourThreshold</thresholdclass>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<serviceitemclass>SQLServiceItem</serviceitemclass>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<cache>
+\end_layout
+
+\begin_layout Plain Layout
+
+	        <template>cacheDef</template>
+\end_layout
+
+\begin_layout Plain Layout
+
+	    </cache>
+\end_layout
+
+\begin_layout Plain Layout
+
+	</serviceitemtemplate>
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\end_layout
+
+\begin_layout Plain Layout
+
+	<cachetemplate templatename="cacheDef">
+\end_layout
+
+\begin_layout Plain Layout
+
+		<aggregate>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<method>avg</method>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<useweekend>true</useweekend>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<retention>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<period>H</period>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<offset>168</offset>
+\end_layout
+
+\begin_layout Plain Layout
+
+			</retention>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<retention> 
+\end_layout
+
+\begin_layout Plain Layout
+
+				<period>D</period>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<offset>60</offset>
+\end_layout
+
+\begin_layout Plain Layout
+
+			</retention> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<retention>   
+\end_layout
+
+\begin_layout Plain Layout
+
+				<period>W</period>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<offset>53</offset>
+\end_layout
+
+\begin_layout Plain Layout
+
+			</retention> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		</aggregate> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		
+\end_layout
+
+\begin_layout Plain Layout
+
+		<purge> 
+\end_layout
+
+\begin_layout Plain Layout
+
+			<maxcount>1000</maxcount>   
+\end_layout
+
+\begin_layout Plain Layout
+
+    	</purge>   
+\end_layout
+
+\begin_layout Plain Layout
+
+	</cachetemplate> 
+\end_layout
+
+\begin_layout Plain Layout
+
+....
 \end_layout
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The cache template is support on a normal serviceitem and in a serviceitem
+ template.
+ In the above example a cache template is added in the serviceitem template
+ on line 27-29.
+\end_layout
+
+\begin_layout Standard
+On line 33 is a configuration to use an average based aggregation.
+ The example define that weekend data should be included in the aggregation.
+ On line 36 we define that hourly aggregation should be kept for 168 hours.
+ This means we will have a maximum of 168 items in the cache for the aggregated
+ hourly data.
+ See more about the aggregated service definition naming in section 
+\emph on
+\bar under
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:Aggregations"
+
+\end_inset
+
+.
+
+\emph default
+\bar default
+ The same rules apply for the other periods like day, week and month.
+\end_layout
+
+\begin_layout Standard
+The purge section on line 50 define how many items should be kept in the
+ cache for the service definition that use the cache template.
+ If not configured the property 
+\emph on
+lastStatusCacheSize
+\emph default
+ will be used.
 \end_layout
 
 \begin_layout Section
@@ -6090,9 +4819,12 @@ properties.xml
 \end_layout
 
 \begin_layout Standard
-The properties.xml include properties used by the core of Bischeck, but can
- also be used by custom developed services and threshold classes.
- The properties xml has a simple structure of key/value pair: 
+The properties.xml sets properties used by the core of Bischeck.
+ The 
+\emph on
+properties.xml
+\emph default
+ has a simple structure of key/value pair: 
 \end_layout
 
 \begin_layout Standard
@@ -6139,24 +4871,15 @@ status open
 \begin_layout Standard
 Any properties should have a default value that is set in code.
  
-\change_inserted -2048955058 1392394565
-
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392394566
 The properties.xml file can also include class specific properties typical
  used for custom developed service, serviceitem and threshold classes.
  A class specific property should have a key formatted in the following
- way - classname.propertyname 
-\end_layout
-
-\begin_layout Standard
-
-\change_inserted -2048955058 1392394567
-Any class specific properties must have a default value implemented by the
- class itself.
+ way - classname.propertyname.
+ Any class specific properties must have a default value implemented by
+ the class itself.
  E.g.
  for JDBCService there is a property called querytimeout that sets the max
  time in seconds before aborting the query.
@@ -6166,41 +4889,19 @@ Any class specific properties must have a default value implemented by the
 \end_layout
 
 \begin_layout Standard
-The following 
-\change_inserted -2048955058 1392394576
-general 
-\change_unchanged
-properties are currently used by core Bischeck:
+The following general properties are currently used by core Bischeck:
 \end_layout
 
 \begin_layout Itemize
 thresholdCacheClear- the time when the threshold cache should be evicted
  each day, default is "10 0 00 * * ? *".
- 
-\change_inserted -2048955058 1392380723
-This property could be set to a higher interval, but must at least be triggered
+ This property can be set to a higher interval, but must at least be triggered
  in the beginning of a new day.
- 
-\begin_inset Note Note
-status collapsed
-
-\begin_layout Plain Layout
-
-\change_inserted -2048955058 1392380629
-May be not possible to set.
-\change_unchanged
-
-\end_layout
-
-\end_inset
-
-
-\change_unchanged
-
 \end_layout
 
 \begin_layout Itemize
-pidfile - the pid file for Bischeck, default is "
+pidfile - the pid file holding the process id for the Bischeck process,
+ default is "
 \emph on
 /var/tmp/bischeck.pid
 \emph default
@@ -6221,46 +4922,36 @@ firstdayofweek - define the week numbering according to ISO 8601, default
 \begin_layout Itemize
 lastStatusCacheDumpDir - the directory where cache is stored, default is
  /var/tmp.
-
-\change_inserted -2048955058 1392238721
  
 \begin_inset Note Greyedout
 status open
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392380760
 Deprecated - not applicable with the redis cache.
-\change_unchanged
-
 \end_layout
 
 \end_inset
 
-
-\change_unchanged
  
 \end_layout
 
 \begin_layout Itemize
-lastStatusCacheSize - the 
-\change_inserted -2048955058 1392380480
-default 
-\change_unchanged
-maximum size of cached data per host, service and serviceitem, default is
- 500.
-
-\change_inserted -2048955058 1392380531
+lastStatusCacheSize - the default maximum size of cached data per service
+ definition , default is 500.
  This value is overridden by cache settings, see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
 LatexCommand nameref
 reference "label:Cache-template"
 
 \end_inset
 
- 
-\change_unchanged
 
+\emph default
+\bar default
+ 
 \end_layout
 
 \begin_layout Itemize
@@ -6274,12 +4965,18 @@ Service relation scheduling
 \end_inset
 
 , see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
 LatexCommand nameref
 reference "label:Service-scheduling"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
  Default is 10 seconds.
 \end_layout
@@ -6293,62 +4990,45 @@ erpserver-orders-ediorders[1:10],
  will return data even if not all index in the list has data.
  Read more about how this property affect the retrieval of cache data in
  section 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
 LatexCommand nameref
 reference "label:Null-value-in"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
 \end_layout
 
 \begin_layout Itemize
-stateOnNull - the Nagios state to be used if a execstatment in a 
-\change_deleted -2048955058 1392378166
-service item
-\change_inserted -2048955058 1392378166
-serviceitem
-\change_unchanged
- return null.
- The property can be set to an integer 0,1,2 or 3 or to 
-\change_inserted -2048955058 1392380813
-the 
-\change_deleted -2048955058 1392380815
-a 
-\change_unchanged
-string OK, WARNING, CRITICAL or UNKNOWN.
+stateOnNull - the state to be used if a execstatment in a serviceitem return
+ null.
+ The property can be set to an integer 0,1,2 or 3 or to the string OK, WARNING,
+ CRITICAL or UNKNOWN.
  The default is UNKNOWN.
 \end_layout
 
 \begin_layout Itemize
 saveNullOnConnectionError - this property define if a null value should
- be stored in the cache if 
-\change_deleted -2048955058 1392380837
-you have your
-\change_unchanged
- 
-\change_inserted -2048955058 1392380840
-the 
-\change_unchanged
-service class has a connection exception of any sort.
+ be stored in the cache if the service class has a connection exception
+ of any sort.
  The default is false.
  
-\change_inserted -2048955058 1392381347
-
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392394513
 NagiosUtil.extendedformat - define if the Nagios performance data should
- include the warning and critical levels as as its own data entity, so it
- can be stored in RRD and be plotted through pnp4nagios or equivalent solutions.
+ include the warning and critical levels as its own data entity so it can
+ be stored in RRD and be plotted through pnp4nagios or equivalent solutions.
  The extended format will look like the following example:
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392394447
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true"
 inline false
@@ -6356,14 +5036,10 @@ status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392395791
-
 response=0.000192;0.000167;0.000158;0; threshold=0.000176;0;0;0; 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392395795
 
 warning=0.000167;0;0;0; critical=0.000158;0;0;0; avg-exec-time=13ms
 \end_layout
@@ -6374,72 +5050,50 @@ warning=0.000167;0;0;0; critical=0.000158;0;0;0; avg-exec-time=13ms
 \end_layout
 
 \begin_layout Subsection
-
-\change_inserted -2048955058 1392394586
 Redis cache properties
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392394612
 The following properties control the connection to Redis:
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392381730
 cache.provider.redis.server - the hostname/IP of the redis server, default
  is localhost.
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392381732
 cache.provider.redis.port - the socket port where redis server listen, default
  is 6379.
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392381733
 cache.provider.redis.db - the redis database number to use, default is 0.
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392381734
 cache.provider.redis.auth - the authorization token for redis, default is empty
  string.
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392381736
 cache.provider.redis.timeout - the connection timeout, default is 2000 ms .
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392381847
 cache.provider.redis.poolsize - the size of the redis connection pool, default
  is 50.
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392560276
 \begin_inset Note Note
 status open
 
-\begin_layout Subsection
-
-\change_inserted -2048955058 1392560372
+\begin_layout Paragraph
 Internal surveillance excluded from version 1.0.0
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392560276
 Bischeck expose a large amount of information about the internal state through
  JMX, see more in the 
 \begin_inset Quotes eld
@@ -6456,14 +5110,10 @@ Bischeck installation and administration guide
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392560276
 The following properties control the internal Bischeck surveillance 
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392560276
 bischeckHostName - The hostname that should be used for the service definition
  sending the internal surveillance information, the default is 
 \emph on
@@ -6471,45 +5121,15 @@ bischeck
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392560276
 sendInternal - false
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392560276
 sendInternalInterval - "0 */5 * * * ? *" 
-\change_unchanged
-
 \end_layout
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-
-\change_deleted -2048955058 1392394558
-The properties.xml file can also include class specific properties typical
- used for custom developed service, service item and threshold classes.
- A class specific property should have a key formatted in the following
- way - classname.propertyname 
-\end_layout
-
-\begin_layout Standard
-
-\change_deleted -2048955058 1392394558
-Any class specific properties must have a default value implemented by the
- class itself.
- E.g.
- for JDBCService there is a property called querytimeout that sets the max
- time in seconds before aborting the query.
- This property has the name JDBCService.querytimeout and have a default value
- of 10 seconds.
- 
-\change_unchanged
 
 \end_layout
 
@@ -6524,7 +5144,7 @@ urlservice.xml
 \end_layout
 
 \begin_layout Standard
-The configuration define of the mapping between service url schema and Service
+The configuration define the mapping between service url schema and Service
  class.
  The urlservice xml has a structure of: 
 \end_layout
@@ -6602,20 +5222,26 @@ value – the Service class name.
  For custom developed Service classes the full class name should be specified
  and the classes or jar files should be located in the 
 \emph on
-customlib
+$BISHOME/customlib
 \emph default
  directory.
 \end_layout
 
 \begin_layout Standard
 For valid url's see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "label:Services-and-service"
 
 \end_inset
 
 
+\emph default
+\bar default
+.
 \end_layout
 
 \begin_layout Section
@@ -6630,6 +5256,9 @@ name "label:24thresholds.xml"
 
 \begin_layout Standard
 The threshold class Twenty4HourThreshold described in section 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
 LatexCommand nameref
 reference "label:Twenty4HourThreshold-class"
@@ -6637,10 +5266,9 @@ reference "label:Twenty4HourThreshold-class"
 \end_inset
 
 
-\change_inserted -2048955058 1392594683
- 
-\change_unchanged
-is configured through the 24thresholds.xml file.
+\emph default
+\bar default
+ is configured through the 24thresholds.xml file.
  
 \end_layout
 
@@ -7250,30 +5878,48 @@ servicedef
 servicedef
 \emph default
  can have one to many period specifications, see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "label:Period-definition"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
  The period specify what hoursID that should be used for a specific combination
  of months and weeks definitions, see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "label:Hours-definition"
 
 \end_inset
 
-for more information.
+
+\emph default
+\bar default
+ for more information.
  The period also define calculation method, warning and critical level,
  see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "label:Calculation-definition"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
 \end_layout
 
@@ -7283,10 +5929,7 @@ The
 hours
 \emph default
  tag support two different formats, the 24 hour listing or a from-to listing.
-\end_layout
-
-\begin_layout Standard
-If the 
+ If the 
 \emph on
 hours
 \emph default
@@ -7297,21 +5940,27 @@ hour
  tags, each represent on hour of the day.
  An hour tag can have a null value, meaning no threshold, a fixed value
  or an mathematical expression according to JEP, but with variables from
- any measured value existing in the last value cache, see 
+ any measured value existing in the service definition cache, see 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "label:Service-item-cache"
 
 \end_inset
 
 .
  For more information about threshold specifications please see 
+\emph on
+\bar under
+
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "label:Threshold-configuration"
 
 \end_inset
 
+
+\emph default
+\bar default
 .
  
 \end_layout
@@ -7328,8 +5977,8 @@ hourintervals
 \end_layout
 
 \begin_layout Itemize
-If there is overlapping hours exist the last hourinterval tag in the list
- have precedence.
+If there are overlapping hours existing in the last hourinterval tag, the
+ last define have precedence.
  In the above listing that means that the threshold for 12:00 are 
 \begin_inset Quotes eld
 \end_inset
@@ -7342,38 +5991,30 @@ erpserver-orders-ediorders[0]*0.4
 \end_layout
 
 \begin_layout Itemize
-Any hour that are not defined are treated as to have no threshold.
+Any hour that are not defined are treated as no threshold exist for the
+ time period.
  In the above example there are no thresholds for 00:00-09:00, 17:00-20:00
  and 22:00-00:00.
 \end_layout
 
 \begin_layout Standard
-The final section, holidays, describe days of the year where no threshold
- will be tested.
- For that reason the service will always return an OK state for a Bischeck
- services using the threshold class Twenty4HourThreshold.
-\change_inserted -2048955058 1392238943
-
+The final section, holidays, define days of the year where no threshold
+ will be evaluated.
+ A service will always return an OKAY state for these days.
 \end_layout
 
 \begin_layout Subsection
-
-\change_inserted -2048955058 1392593912
 Templates
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392594397
 If there are many service definitions that will use the same threshold definitio
 n they can be grouped in a servicedefgroup.
- The servicedefgroup can have multiple members, which are service definitions
- and one period template that they all share.
+ The servicedefgroup can have multiple members, where each member define
+ a service definition, and one period template that they all share.
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392594398
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},language=XML,numbers=right,tabsize=2"
 inline false
@@ -7381,293 +6022,207 @@ status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594408
-
 .....
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594416
 
 	<servicedefgroup>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594423
-
 		<member>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594462
 
 			<hostname>erpserver1</hostname>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594461
-
 			<servicename>shipments</servicename> 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594459
 
 			<serviceitemname>outboundshipment</serviceitemname>  
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594454
-
 		</member>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594447
 
 		<member>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594467
-
 			<hostname>erpserver2</hostname>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594449
 
 			<servicename>shipments</servicename> 
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594450
-
 			<serviceitemname>outboundshipment</serviceitemname>  
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594477
 
 		</member>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594484
-
 		
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392595123
 
 		<template>outboundShipments</template>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594493
-
 	</servicedefgroup>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594506
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594543
 
 	<servicedeftemplate templatename="outboundShipments">
-\change_unchanged
-
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594575
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594579
 
 		<period>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594398
 
 			<!-- valid if its a Friday --> 
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594398
-
 			<weeks> 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594398
 
 				<dayofweek>6</dayofweek>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594398
-
 			</weeks> 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594398
 
 			<calcmethod>&gt;</calcmethod> 
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594398
-
 			<warning>10</warning> 
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594398
-
 			<critical>30</critical> 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594398
 
 			<hoursIDREF>2</hoursIDREF> 
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594398
-
 		</period>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594398
 
 		
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594398
-
 		<period>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594398
 
 			<!-- This will be used if no 
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594398
-
 				other rule if applicable -->
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594398
 
 			<calcmethod>&gt;</calcmethod>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594398
-
 			<warning>10</warning> 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594398
 
 			<critical>30</critical> 
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594398
-
 			<hoursIDREF>31</hoursIDREF> 
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594398
 
 		</period>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594398
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594596
 
 	</servicedeftemplate> 
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594606
-
   
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392594608
-
 ....
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392594398
 
 \end_layout
 
@@ -7677,10 +6232,15 @@ status open
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392637670
-In the above example both erpserver1- shipments-outboundshipment and erpserver1-
- shipments-outboundshipment share the same threshold template named 
+In the above example both 
+\emph on
+erpserver1-shipments-outboundshipment
+\emph default
+ and 
+\emph on
+erpserver1- shipments-outboundshipment
+\emph default
+ share the same threshold template named 
 \emph on
 
 \begin_inset Quotes eld
@@ -7698,8 +6258,6 @@ l servicedef definitions.
 \end_layout
 
 \begin_layout Section
-
-\change_inserted -2048955058 1392637673
 \begin_inset CommandInset label
 LatexCommand label
 name "label:server.xml-1"
@@ -7710,16 +6268,12 @@ server.xml
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392637763
 The configuration file define the servers that Bischeck should be integrated
  with.
  The server.xml has a structure of: 
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392637673
 \begin_inset listings
 lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
 inline false
@@ -7727,208 +6281,153 @@ status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 <servers>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 	<server name="Nagios1">     
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 		<class>NSCAServer</class>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 		<property>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 			<key>hostAddress</key>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 			<value>localhost</value>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 		</property>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 		<property>       
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 			<key>encryptionMode</key>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 			<value>XOR</value>     
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 		</property>
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 		<property>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 			<key>password</key>       
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 			<value>change this</value>     
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 		</property>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 		<property>       
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 			<key>port</key>       
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 			<value>5667</value>     
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 		</property>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 		<property>       
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 			<key>connectionTimeout</key>       
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 			<value>5000</value>     
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 		</property> 
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 	</server>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 	<server name="Nagios2">     
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
-		......
+		<class>NSCAServer</class>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
+        ......
+\end_layout
+
+\begin_layout Plain Layout
 
 	</server>
 \end_layout
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392637673
-
 \end_layout
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1392637673
 
 </servers>
 \end_layout
@@ -7939,8 +6438,6 @@ status open
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392637940
 Each server that is integrated with Bischeck must be defined with the server
  tag and with a unique attribute name.
  This solution enable Bischeck to send data to multiple servers of the same
@@ -7957,14 +6454,10 @@ customlib
 \end_layout
 
 \begin_layout Subsection
-
-\change_inserted -2048955058 1392637957
 Circuit breaks
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392638193
 Circuit breaks are a technique to detect if the remote server is down or
  can not accept connections.
  If the remote server is not responding correctly after a number of configured
@@ -7982,52 +6475,37 @@ OPEN
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392638244
-Server integrtions that support the circuit break have 3 additional properties:
+Server classes that support the circuit break have 3 additional properties:
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392638255
 cbEnable - enable circuit break, default is false.
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392638353
 cbAttempts - the number of connection attempts before the circuit break
  is set in a OPEN state, default 5.
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392638298
-cbTimeout - the time in ms the circuit break will stay in the OPEN state
- before going to HALF-OPEN and retry connection, default is 60000.
+cbTimeout - the time in milliseconds that the circuit break will stay in
+ the OPEN state before going to HALF-OPEN and retry connection, default
+ is 60000.
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392638330
-Currently the following server integrations support circuit breaks:
+Currently the following server classes support circuit breaks:
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392638337
 NSCA
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392638578
 NRDP
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392638617
 The state of a circuit break can be instrumented through JMX.
 \end_layout
 
@@ -8045,7 +6523,7 @@ Service scheduling
 The service scheduling define when a service is triggered to be executed.
  For each service there can be multiple scheduling configurations, but at
  lest one is mandatory.
- The scheduling can be described in three ways.
+ The scheduling can be configured in three ways.
  
 \end_layout
 
@@ -8054,7 +6532,7 @@ Interval scheduling
 \end_layout
 
 \begin_layout Standard
-The simple format describe a interval execution that are repeated forever.
+The format describe an interval that are repeated forever.
  The format is just a number and a indicator defining the granularity in
  seconds (S), minutes (M) or hours (H).
  10M specify that the service should be executed every ten minutes.
@@ -8114,8 +6592,7 @@ http://www.quartz-scheduler.org
 
 
 \emph default
- which would schedule the service at 10:15am every Monday, Tuesday, Wednesday,
- Thursday and Friday.
+ which would schedule the service at 10:15am every Monday to Friday.
  For more cron examples please visit 
 \begin_inset Flex URL
 status open
@@ -8151,18 +6628,9 @@ Service relation scheduling
 \end_layout
 
 \begin_layout Standard
-\begin_inset Note Greyedout
-status open
-
-\begin_layout Plain Layout
-[New in 0.4.0]
-\end_layout
-
-\end_inset
-
 The service relation scheduling trigger a service to execute after another
  service has been scheduled.
- This is useful when a service is depending on data for another service
+ This is useful when a service is depending on data from another service
  for its thresholds or execution statement.
  The format is 
 \emph on
@@ -8209,28 +6677,10 @@ Configuration tools
 \begin_layout Standard
 Bischeck provides by default no additional tools for configuration other
  than the normal editor to manage the xml configuration files.
- The default configuration files in 
-\emph on
-etc
-\emph default
- directory are valid for the test example configuration, see 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "label:Getting-started"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard
-A web based configuration tool, 
-\change_deleted -2048955058 1392239042
-b
-\change_inserted -2048955058 1392239042
-B
-\change_unchanged
-isconf, is under development.
+A web based configuration tool, Bisconf, is under development.
  Bisconf is hosted on the Bischeck project site, 
 \begin_inset Flex URL
 status collapsed
@@ -8243,12 +6693,8 @@ http://www.bischeck.org
 \end_inset
 
 .
-
-\change_inserted -2048955058 1392239035
  Check release notes to see what version of Bischeck that is supported by
  Bisconf.
-\change_unchanged
-
 \end_layout
 
 \begin_layout Chapter
@@ -8314,20 +6760,14 @@ Thanks to all people who has developed all the great software that Bischeck
  Sweden for sponsoring the development and providing ideas and important
  feedback.
  
-\change_inserted -2048955058 1389459389
-
 \end_layout
 
 \begin_layout Standard
-
-\change_inserted -2048955058 1392593562
 Also like to thank the following companies that sponsor the Bischeck project
  with valuable commercial tools and development environments: 
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1389459626
 Contemplate support the Bischeck projects with the ThreadSafe tool for advanced
  static analysis for Java concurrency, 
 \begin_inset Flex URL
@@ -8335,11 +6775,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1389459627
-
 http://www.contemplateltd.com/threadsafe
-\change_unchanged
-
 \end_layout
 
 \end_inset
@@ -8348,8 +6784,6 @@ http://www.contemplateltd.com/threadsafe
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392239133
 YourKit is kindly supporting Bischeck open source projects with its full-feature
 d Java Profiler, 
 \begin_inset Flex URL
@@ -8357,11 +6791,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1389459659
-
 http://www.yourkit.com/java/profiler
-\change_unchanged
-
 \end_layout
 
 \end_inset
@@ -8370,23 +6800,17 @@ http://www.yourkit.com/java/profiler
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1392239134
 Cloudbees provide continues integration service through Jenkins, 
 \begin_inset Flex URL
 status open
 
 \begin_layout Plain Layout
 
-\change_inserted -2048955058 1392239134
-
 http://www.cloudbees.com/
 \end_layout
 
 \end_inset
 
-
-\change_unchanged
 
 \end_layout
 
