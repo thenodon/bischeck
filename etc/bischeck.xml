@@ -186,7 +186,7 @@
   <!--  Example cache -->
   <cachetemplate templatename="cacheDef">
       <aggregate>
-        <!-- Aggregate with using average -->
+        <!-- Aggregate with using max -->
         <method>max</method>
         <!-- Include weekend data in the aggregation -->
         <useweekend>true</useweekend>
