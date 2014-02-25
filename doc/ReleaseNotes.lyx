@@ -199,39 +199,76 @@ LatexCommand tableofcontents
 Release 1.0.0 - 2014-02-
 \end_layout
 
+\begin_layout Standard
+Release 1.0.0 is a major upgrade of Bischeck.
+ 
+\end_layout
+
 \begin_layout Subsection
 New features
 \end_layout
 
 \begin_layout Itemize
-The installation script 
+The installation script support installation as none root.
+ 
 \end_layout
 
 \begin_layout Itemize
-Redis cache
+Cache improvements 
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Cache purging
+Redis is now the default Bischeck cache.
+ With redis the persistence and availability of the cached data is improved.
+ Using Redis also enable third party to easy access the cached data.
+ 
+\end_layout
+
+\begin_layout Itemize
+The number of cached data can now be set by service definition through the
+ cache template configuration.
+\end_layout
+
+\begin_layout Itemize
+Automatic aggregations of cached service definition data is implement with
+ resolution of hour, day, week and month.
+\end_layout
+
+\begin_layout Itemize
+END statement
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Configuration templates and macros - 
+Configuration improvements
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Template override
+[FR-245] 
+\begin_inset Quotes eld
+\end_inset
+
+Templates for threshold and baseline definitions
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Itemize
-Macros
+Templates has been implement both for bischeck.xml and and 24thresholds.xml.
+ Templates will improve configuration reuse.
 \end_layout
 
 \begin_layout Itemize
-Queue END statement
+Template overrides 
+\end_layout
+
+\begin_layout Itemize
+Configuration macros 
 \end_layout
 
 \begin_layout Itemize
@@ -248,32 +285,81 @@ Inactivation of hosts and services
 
 \end_deeper
 \begin_layout Itemize
-Aggregations
+Aggregations support automatic aggregation of monitored data on hour, day,
+ week and month.
 \end_layout
 
 \begin_layout Itemize
-Prediction
+[FR-243] 
+\begin_inset Quotes eld
+\end_inset
+
+Least square method calculation
+\begin_inset Quotes erd
+\end_inset
+
+ - new mathematical function to do linear prediction and calculate slope.
 \end_layout
 
 \begin_layout Itemize
-Re architectures the execution with jetlang
+The execution flow has been changes from a synchronous process where each
+ ServiceJob thread executed the whole process from data collection to send
+ result to servers.
+ The new architecture is based on a asynchronous design between the ServiceJob
+ execution and the server integration.
+ Jetlang, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://code.google.com/p/jetlang/
+\end_layout
+
+\end_inset
+
+, is used to pass messages between the independent threads.
 \end_layout
 
 \begin_layout Itemize
-Servers integrations
+Servers integrations improvements:
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-NSCA and NRDP workers
+NSCA and NRDP workers - A worker pool enables parallel access to the NSCA
+ and NRDP server.
+ This enables better concurrency and throughput especially for 
+\begin_inset Quotes eld
+\end_inset
+
+slow
+\begin_inset Quotes erd
+\end_inset
+
+ servers like NSCA in daemon mode.
+ 
 \end_layout
 
 \begin_layout Itemize
-Circuit breaks 
+Circuit breaks - is an optional configuration for NSCA and NRDP.
+ If the remote serve fail in connection or is timing out circuit break will
+ OPEN and stop sending data to the remote server for a specific time period
+ before retrying.
+ This prevent Bischeck from overloading the remote server.
 \end_layout
 
 \begin_layout Itemize
-Nagios extended performance data 
+[FR-250] 
+\begin_inset Quotes eld
+\end_inset
+
+Adding warning and critical level values in the performance data
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
 \end_layout
 
 \end_deeper
@@ -285,13 +371,13 @@ logback
 \emph default
  is done in the 
 \emph on
-logback.xml
+$BISHOME/resources/logback.xml
 \emph default
- file located in the resources directory.
+ file.
 \end_layout
 
 \begin_layout Itemize
-JEP custom development 
+JEP custom development has been improved.
 \end_layout
 
 \begin_layout Itemize
@@ -336,11 +422,8 @@ Bischeck release notes
 \end_layout
 
 \begin_layout Itemize
-New java interface for Service and ServiceItem
-\end_layout
-
-\begin_layout Itemize
-All configuration management classes is moved to a separate java package
+Improved JMX monitoring especially for monitoring the different execution
+ steps with timers and counters.
 \end_layout
 
 \begin_layout Subsection
@@ -348,11 +431,44 @@ Bugs fixed and important issues
 \end_layout
 
 \begin_layout Itemize
-[TR-249]
+[TR-248] 
+\begin_inset Quotes eld
+\end_inset
+
+If bischeck output contains a decimal mark the systems locale settings affect
+ the bischeck output to NSCA
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Itemize
-[TR-251]
+[TR-249] 
+\begin_inset Quotes eld
+\end_inset
+
+Aggregated data can not be retrieved from the cache
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+[TR-251] 
+\begin_inset Quotes eld
+\end_inset
+
+Bug in the formatting of the threshold values
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+All configuration management classes is moved to a separate java package.
 \end_layout
 
 \begin_layout Itemize
@@ -366,6 +482,13 @@ Bisconf 0.3.1
 
 \begin_layout Itemize
 The DocManager utility has been removed.
+\end_layout
+
+\begin_layout Itemize
+New java interface for Service and ServiceItem.
+ This may break custom developed Service and Serviceitem classes.
+ Review javadoc to see the changes.
+ 
 \end_layout
 
 \begin_layout Subsection
