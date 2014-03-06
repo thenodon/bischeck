@@ -9332,7 +9332,13 @@ http://www.yourkit.com/java/profiler
 \end_layout
 
 \begin_layout Itemize
-Cloudbees provide continues integration service
+Cloudbees provide 
+\change_deleted 717047130 1394143553
+continues
+\change_inserted 717047130 1394143553
+continuous
+\change_unchanged
+ integration service
 \change_inserted 717047130 1394138297
 s
 \change_unchanged
