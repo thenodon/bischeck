@@ -81,11 +81,12 @@
 \papercolumns 1
 \papersides 1
 \paperpagestyle fancy
-\tracking_changes false
+\tracking_changes true
 \output_changes false
 \html_math_output 0
 \html_css_as_file 0
 \html_be_strict false
+\author 717047130 "Peter Monthan" 
 \end_header
 
 \begin_body
@@ -107,7 +108,13 @@ DRAFT - IN WORK - Version 1.0.0
 \begin_inset Newline linebreak
 \end_inset
 
-2014-02-XX
+2014-02-
+\change_deleted 717047130 1394143379
+XX
+\change_inserted 717047130 1394143379
+25
+\change_unchanged
+
 \end_layout
 
 \begin_layout Standard
@@ -241,7 +248,13 @@ Installation
 \end_layout
 
 \begin_layout Standard
-The latest binary version of Bischeck is available on 
+The latest binary version of Bischeck is available 
+\change_deleted 717047130 1394140928
+on
+\change_inserted 717047130 1394140928
+here
+\change_unchanged
+ 
 \begin_inset Flex URL
 status open
 
@@ -262,9 +275,18 @@ Download the distribution file and follow the steps below to install.
 \series bold
 root
 \series default
- privileges when running the installation if you like the init scripts to
- be installed for automatic startup and shutdown.
- Before installing please see the 
+ privileges when running the installation if you 
+\change_deleted 717047130 1394140955
+like
+\change_inserted 717047130 1394140955
+want
+\change_unchanged
+ the init scripts to be installed for automatic startup and shutdown.
+ Before installing
+\change_inserted 717047130 1394140961
+,
+\change_unchanged
+ please see the 
 \emph on
 \bar under
 
@@ -449,7 +471,11 @@ Usage for the bischeck installer
 \end_layout
 
 \begin_layout Standard
-By default the 
+By default
+\change_inserted 717047130 1394140983
+,
+\change_unchanged
+ the 
 \emph on
 install
 \emph default
@@ -488,14 +514,21 @@ The process id of the java process running Bischeck in daemon mode will
  be stored in a file, default in 
 \emph on
 /var/tmp/bischeck.pid
+\change_inserted 717047130 1394141046
+.
+\change_unchanged
+
 \emph default
 
 \begin_inset Foot
 status open
 
 \begin_layout Plain Layout
-The location of the pid file can be changed by setting in the Bischeck propertie
-s.xml file.
+The location of the pid file can be changed by 
+\change_inserted 717047130 1394141056
+a 
+\change_unchanged
+setting in the Bischeck properties.xml file.
  More info in the 
 \begin_inset Quotes eld
 \end_inset
@@ -505,21 +538,34 @@ Bischeck configuration guide
 
 \end_inset
 
+
+\change_deleted 717047130 1394141065
 .
- This file is used by the 
+ 
+\change_unchanged
+This file is used by the 
 \emph on
 bischeckd
 \emph default
- script to stop the java process running Bischeck and make sure that only
- one instance of Bischeck is started on the server.
+ script to stop the java process running Bischeck and 
+\change_deleted 717047130 1394141084
+make 
+\change_inserted 717047130 1394141084
+en
+\change_unchanged
+sure that only one instance of Bischeck is started on the server.
  
 \end_layout
 
 \begin_layout Standard
 
 \series bold
-If the installation is done as none root user, effective user id is not
- root, Bischeck will be installed as the user running the install script.
+If the installation is done as 
+\change_inserted 717047130 1394141094
+a 
+\change_unchanged
+none root user, effective user id is not root, Bischeck will be installed
+ as the user running the install script.
  This means that the init script, 
 \emph on
 bischeckd
@@ -529,7 +575,11 @@ bischeckd
 /etc/init.d
 \emph default
 .
- To start Bischeck the command line utility must be used, see 
+ To start Bischeck
+\change_inserted 717047130 1394141137
+,
+\change_unchanged
+ the command line utility must be used, see 
 \series default
 \emph on
 \bar under
@@ -552,7 +602,11 @@ Installation directory structure
 \end_layout
 
 \begin_layout Standard
-When the installation is complete the following directory structure exists:
+When the installation is complete
+\change_inserted 717047130 1394141145
+,
+\change_unchanged
+ the following directory structure exists:
 \end_layout
 
 \begin_layout Standard
@@ -632,9 +686,18 @@ Upgrading
 \end_layout
 
 \begin_layout Standard
-From version 0.3.2 upgrading is possible.
- Download the new version as described in the previous chapter, but to upgrade
- run the 
+From version 0.3.2
+\change_inserted 717047130 1394141154
+,
+\change_unchanged
+ upgrading is possible.
+ Download the new version as described in the previous chapter
+\change_deleted 717047130 1394141174
+, but
+\change_inserted 717047130 1394141176
+ and
+\change_unchanged
+ to upgrade run the 
 \emph on
 install
 \emph default
@@ -659,8 +722,11 @@ status open
 
 \begin_layout Standard
 The upgrade will automatically stop the currently running Bischeck and save
- the current installation in a directory parallel to the new version named
- 
+ the current installation in a directory parallel
+\change_inserted 717047130 1394141191
+l
+\change_unchanged
+ to the new version named 
 \emph on
 bischeck_x.y.z
 \emph default
@@ -689,8 +755,15 @@ The
 \emph on
  
 \emph default
--I switch must be used if the current installed Bischeck is not in the default
- installation directory.
+-I switch must be used if the current
+\change_inserted 717047130 1394141206
+ly
+\change_unchanged
+ installed 
+\change_inserted 717047130 1394141231
+version of 
+\change_unchanged
+Bischeck is not in the default installation directory.
 \end_layout
 
 \begin_layout Standard
@@ -698,8 +771,12 @@ The file
 \emph on
 migrationpath.txt
 \emph default
- describe the supported upgrade paths and the migration scripts that will
- run by the 
+ describe
+\change_inserted 717047130 1394141268
+s
+\change_unchanged
+ the supported upgrade paths and the migration scripts that will run by
+ the 
 \emph on
 install
 \emph default
@@ -707,7 +784,12 @@ install
 \end_layout
 
 \begin_layout Standard
-If the upgrade is successful Bischeck can be started manually by executing.
+If the upgrade is successful Bischeck can be started manually by executing
+\change_deleted 717047130 1394141280
+.
+\change_inserted 717047130 1394141280
+:
+\change_unchanged
  
 \end_layout
 
@@ -743,17 +825,43 @@ In the
 $BISHOME/etc
 \emph default
  directory there are working examples of all the configuration files.
- These works as an examples to get started with a simple Bischeck setup
- of monitoring the response time of a tcp ping on the ssh port, port 22,
- on localhost.
- You will find this familiar if you been using Nagios before and the example
- use the well known Nagios check command, 
+ These 
+\change_deleted 717047130 1394141310
+work
+\change_inserted 717047130 1394141311
+file
+\change_unchanged
+s 
+\change_inserted 717047130 1394141314
+serve 
+\change_unchanged
+as an examples to get started with a simple Bischeck setup of monitoring
+ the response time of a tcp ping on the ssh port, port 22, on localhost.
+ You will find this familiar if you 
+\change_inserted 717047130 1394141332
+have 
+\change_unchanged
+been using Nagios before and the example use
+\change_inserted 717047130 1394141340
+s
+\change_unchanged
+ the well known Nagios check command, 
 \emph on
 check_tcp
 \emph default
 .
- The example assume that you have the Nagios plugins installed.
- To get the example running you need to do the following steps:
+ The example assume
+\change_inserted 717047130 1394141346
+s
+\change_unchanged
+ that you have the Nagios plugins installed.
+ To get the example running you need to 
+\change_deleted 717047130 1394141358
+do
+\change_inserted 717047130 1394141359
+perform
+\change_unchanged
+ the following steps:
 \end_layout
 
 \begin_layout Enumerate
@@ -794,15 +902,33 @@ Edit the
 \emph on
 servers.xml
 \emph default
- file to add correct host name, line 12, and password , line 22, for your
- NSCA server.
- Even if you do not have a NSCA server defined Bischeck will still run,
- but with a connection error when trying to send data to NSCA.
+ file to add 
+\change_inserted 717047130 1394141385
+the 
+\change_unchanged
+correct host name, line 12, and password
+\change_deleted 717047130 1394141389
+ 
+\change_unchanged
+, line 22, for your NSCA server.
+ Even if you do not have a
+\change_inserted 717047130 1394141395
+n
+\change_unchanged
+ NSCA server defined
+\change_inserted 717047130 1394141400
+,
+\change_unchanged
+ Bischeck will still run, but with a connection error when trying to send
+ data to NSCA.
 \end_layout
 
 \begin_layout Enumerate
-Now you are done to start Bischeck and checkout what happens in the log
- file.
+Now you are done to start Bischeck and check
+\change_inserted 717047130 1394141408
+ 
+\change_unchanged
+out what happens in the log file.
  See 
 \emph on
 \bar under
@@ -816,7 +942,11 @@ reference "label:Logging"
 
 \emph default
 \bar default
- for more info about Bischeck logging.
+ for more info
+\change_inserted 717047130 1394141417
+rmation
+\change_unchanged
+ about Bischeck logging.
 \end_layout
 
 \begin_layout Standard
@@ -841,12 +971,22 @@ $ tail -f /usr/tmp/bischeck.log
 \end_layout
 
 \begin_layout Standard
-Maybe you ask your self why you should use Bischeck to do a 
+Maybe you ask your
+\change_deleted 717047130 1394141428
+ 
+\change_unchanged
+self why you should use Bischeck to do a 
 \emph on
 check_tcp
 \emph default
-? Well this is just a simple example, but when you have this running you
- can check out the 
+? 
+\change_deleted 717047130 1394141440
+Well t
+\change_inserted 717047130 1394141440
+T
+\change_unchanged
+his is just a simple example, but when you have this running you can check
+ out the 
 \emph on
 24thresholds.xml
 \emph default
@@ -869,12 +1009,34 @@ Jar customization
 \end_layout
 
 \begin_layout Standard
-To support custom jar files please place them in the directory 
+To 
+\change_inserted 717047130 1394141465
+enable 
+\change_unchanged
+support 
+\change_inserted 717047130 1394141468
+for 
+\change_unchanged
+custom jar files
+\change_inserted 717047130 1394141471
+,
+\change_unchanged
+ please place them in the directory 
 \emph on
 $BISHOME/customlib
 \emph default
 .
- This would typical be jdbc drivers, custom threshold classes, etc.
+ This 
+\change_deleted 717047130 1394141477
+would
+\change_inserted 717047130 1394141477
+can
+\change_unchanged
+ typical
+\change_inserted 717047130 1394141480
+ly
+\change_unchanged
+ be jdbc drivers, custom threshold classes, etc.
  Any jar file in the 
 \emph on
 $BISHOME/customlib
@@ -929,8 +1091,19 @@ Integration with pnp4nagios
 \begin_layout Standard
 pnp4nagios can create graph layouts depending on the check command used
  for the service on the Nagios server.
- Since Bischeck use a passive check we need to create a unique check command
- that match the pnp4nagios layout for Bischeck.
+ Since Bischeck use
+\change_inserted 717047130 1394141542
+s
+\change_unchanged
+ a passive check
+\change_inserted 717047130 1394141552
+,
+\change_unchanged
+ we need to create a unique check command that match
+\change_inserted 717047130 1394141556
+es
+\change_unchanged
+ the pnp4nagios layout for Bischeck.
  Create a link in the 
 \emph on
 libexec
@@ -955,13 +1128,20 @@ nagios$ ln -s check_dummy check_bischeck
 \end_layout
 
 \begin_layout Standard
-When describing the service always use the check_bischeck as the check command
- in the Nagios configuration.
+When describing the service
+\change_inserted 717047130 1394141570
+,
+\change_unchanged
+ always use the check_bischeck as the check command in the Nagios configuration.
  The 
 \emph on
 check_bischeck.php
 \emph default
- that control the pnp4nagios layout must be copied to the directory 
+ that control
+\change_inserted 717047130 1394141579
+s
+\change_unchanged
+ the pnp4nagios layout must be copied to the directory 
 \emph on
 pnp4nagios/share/templates
 \emph default
@@ -980,8 +1160,24 @@ Command line utilities
 \end_layout
 
 \begin_layout Standard
-There is a number of command line utilities available in Bischeck.
- All can be ran through the 
+There 
+\change_deleted 717047130 1394141599
+is
+\change_inserted 717047130 1394141599
+are
+\change_unchanged
+ a number of command line utilities available in Bischeck.
+ All 
+\change_inserted 717047130 1394141610
+of which 
+\change_unchanged
+can be r
+\change_deleted 717047130 1394141612
+a
+\change_inserted 717047130 1394141612
+u
+\change_unchanged
+n through the 
 \emph on
 bischeck 
 \emph default
@@ -994,7 +1190,11 @@ $BISHOME/bin
 \emph on
 bischeck
 \emph default
- script add it to your PATH variable.
+ script
+\change_inserted 717047130 1394141619
+,
+\change_unchanged
+ add it to your PATH variable.
 \end_layout
 
 \begin_layout Standard
@@ -1022,7 +1222,17 @@ The normal way to run Bischeck is as a daemon using the init.d script
 \emph on
 bischeckd
 \emph default
-, but is also possible to start Bischeck in continues running mode by executing:
+, but 
+\change_inserted 717047130 1394141630
+it 
+\change_unchanged
+is also possible to start Bischeck in 
+\change_deleted 717047130 1394141672
+continues
+\change_inserted 717047130 1394141672
+continuous
+\change_unchanged
+ running mode by executing:
 \end_layout
 
 \begin_layout Standard
@@ -1044,10 +1254,17 @@ $ bischeck Execute -d
 \begin_layout Standard
 Running in this way have limitations since the execution will not automatically
  be placed as a background process and the effective user id will be the
- user starting the process which may not have all permissions according
- to the installation.
+ user starting the process which may not have all 
+\change_inserted 717047130 1394141704
+necessary 
+\change_unchanged
+permissions according to the installation.
  Neither will the pid files be updated correctly.
- For production system always use the init.d script.
+ For production system
+\change_inserted 717047130 1394141714
+s,
+\change_unchanged
+ always use the init.d script.
  
 \end_layout
 
@@ -1088,8 +1305,25 @@ status open
 \end_layout
 
 \begin_layout Standard
-For testing purpose it can be good to just run Bischeck once and make sure
- that every thing is executing as expected.
+For testing purpose
+\change_inserted 717047130 1394141724
+s,
+\change_unchanged
+ it can be 
+\change_deleted 717047130 1394141737
+good
+\change_inserted 717047130 1394141738
+beneficial
+\change_unchanged
+ to 
+\change_deleted 717047130 1394141743
+just 
+\change_unchanged
+run Bischeck once and make sure that every
+\change_deleted 717047130 1394141747
+ 
+\change_unchanged
+thing is executing as expected.
  This is done by executing:
 \end_layout
 
@@ -1148,9 +1382,42 @@ Validating configuration files
 \end_layout
 
 \begin_layout Standard
-To validate if the xml configuration files are correct the following command
- will return 0 if correct.
- Use $? to see return status.
+To validate 
+\change_inserted 717047130 1394141791
+the correctness of
+\change_deleted 717047130 1394141794
+if
+\change_unchanged
+ the xml configuration files
+\change_inserted 717047130 1394141799
+,
+\change_unchanged
+ 
+\change_deleted 717047130 1394141806
+are correct
+\change_inserted 717047130 1394141806
+use
+\change_unchanged
+ the following command
+\change_inserted 717047130 1394141813
+,
+\change_unchanged
+ 
+\change_inserted 717047130 1394141811
+which 
+\change_unchanged
+will return 0 if 
+\change_inserted 717047130 1394141845
+files are 
+\change_unchanged
+correct.
+ Use $? to 
+\change_deleted 717047130 1394141824
+see
+\change_inserted 717047130 1394141825
+display
+\change_unchanged
+ return status.
 \end_layout
 
 \begin_layout Standard
@@ -1174,8 +1441,15 @@ Twenty4HourThreshold testing
 \end_layout
 
 \begin_layout Standard
-To verify which threshold rule that will used for a specific host, service
- and service item for a specific date run:
+To verify which threshold rule that will 
+\change_inserted 717047130 1394141853
+be 
+\change_unchanged
+used for a specific host, service and service item for a specific date
+\change_inserted 717047130 1394141862
+,
+\change_unchanged
+ run:
 \end_layout
 
 \begin_layout Standard
@@ -1196,10 +1470,33 @@ $ bischeck threshold.Twenty4HourThreshold -h erphost -s orders -i ediorders
 \end_layout
 
 \begin_layout Standard
-The above command will show which threshold definition that will be used
- for host erphost, service orders and serviceitem ediorders on seventh of
- December 2014.
- If -d is omitted the current date will be used.
+The above command will 
+\change_deleted 717047130 1394141873
+show
+\change_inserted 717047130 1394141874
+display
+\change_deleted 717047130 1394141882
+ which
+\change_unchanged
+ 
+\change_inserted 717047130 1394141891
+the 
+\change_unchanged
+threshold definition
+\change_inserted 717047130 1394141885
+s
+\change_unchanged
+ that will be used for host erphost, service orders and serviceitem ediorders
+ on 
+\change_inserted 717047130 1394141900
+the 
+\change_unchanged
+seventh of December 2014.
+ If -d is omitted
+\change_inserted 717047130 1394141904
+,
+\change_unchanged
+ the current date will be used.
 \end_layout
 
 \begin_layout Chapter
@@ -1222,12 +1519,31 @@ FIX
 
 \end_inset
 
-Bischeck use the Java JMX standard for internal monitoring.
- Bischeck expose a number of JMX MBeans that enables controlling and instrumenta
-tion of the running Bischeck daemon.
- For example Bischeck can be shutdown or reloaded through JMX.
- A reload operations is used to force Bischeck to re-read and deploy it's
- configuration files but without restarting the process.
+Bischeck use
+\change_inserted 717047130 1394141922
+s
+\change_unchanged
+ the Java JMX standard for internal monitoring.
+ Bischeck expose
+\change_inserted 717047130 1394141928
+s
+\change_unchanged
+ a number of JMX MBeans that enables controlling and instrumentation of
+ the running Bischeck daemon.
+ For example
+\change_inserted 717047130 1394141940
+,
+\change_unchanged
+ Bischeck can be shutdown or reloaded through JMX.
+ A reload operation
+\change_deleted 717047130 1394141946
+s
+\change_unchanged
+ is used to force Bischeck to re-read and deploy it
+\change_deleted 717047130 1394141953
+'
+\change_unchanged
+s configuration files but without restarting the process.
  
 \end_layout
 
@@ -1286,9 +1602,21 @@ jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.acce
 \end_layout
 
 \begin_layout Standard
-If authentication should be used please change the configuration of the
- roles and passwords in the files jmxremote.access and jmxremote.password.
- For more information how to configure JMX please visit 
+If authentication should be used
+\change_inserted 717047130 1394141970
+,
+\change_unchanged
+ please change the configuration of the roles and passwords in the files
+ jmxremote.access and jmxremote.password.
+ For more information 
+\change_inserted 717047130 1394141977
+on 
+\change_unchanged
+how to configure JMX
+\change_inserted 717047130 1394141980
+,
+\change_unchanged
+ please visit 
 \begin_inset Newline newline
 \end_inset
 
@@ -1328,8 +1656,11 @@ Operations
 \end_layout
 
 \begin_layout Standard
-Bischeck enable a number of attributes and operations that can be managed
- over JMX.
+Bischeck enable
+\change_inserted 717047130 1394142002
+s
+\change_unchanged
+ a number of attributes and operations that can be managed over JMX.
  Please read the javadoc for the MBean classes to understand the methods
  available or just start 
 \emph on
@@ -1351,8 +1682,18 @@ com.ingby.socbox.bischeck:type=Execute
 \begin_inset Newline linebreak
 \end_inset
 
-Include information about Bischeck version, configuration directory, reload
- count and reload time, information about class cache
+Include
+\change_inserted 717047130 1394142032
+s
+\change_unchanged
+ information about Bischeck version, configuration directory, reload count
+ and reload time
+\change_deleted 717047130 1394142050
+,
+\change_inserted 717047130 1394142051
+ and
+\change_unchanged
+ information about class cache
 \begin_inset Foot
 status open
 
@@ -1364,8 +1705,23 @@ This is related to the class loader to secure that classes are not reloaded
 \end_inset
 
 .
- Operations provided is shutdown and reload, where reload is a restart of
- Bischeck without a new process is created but only configuration is re-read.
+ Operations provided 
+\change_deleted 717047130 1394142077
+is
+\change_inserted 717047130 1394142077
+are
+\change_unchanged
+ shutdown and reload, where reload is a restart of Bischeck without 
+\change_inserted 717047130 1394142102
+the creation of 
+\change_unchanged
+a new process
+\change_deleted 717047130 1394142114
+ is created but only 
+\change_inserted 717047130 1394142135
+but the 
+\change_unchanged
+configuration is re-read.
  
 \end_layout
 
@@ -1402,9 +1758,16 @@ com.ingby.socbox.bischeck.servers:name=XYZ,type=CircuitBreak
 \begin_inset Newline linebreak
 \end_inset
 
-For server classes that implements a circuit break, this bean will display
- information about the current state, number of times the circuit break
- has been opened, etc.
+For server classes that implement
+\change_deleted 717047130 1394142157
+s
+\change_unchanged
+ a circuit break, this bean will display information about the current state,
+ 
+\change_inserted 717047130 1394142166
+the 
+\change_unchanged
+number of times the circuit break has been opened, etc.
  The circuit break can also be enabled/disabled and the timeout and fail
  count can be changed.
 \end_layout
@@ -1423,7 +1786,11 @@ target "http://metrics.codahale.com/"
 
 \end_inset
 
- and shows the following parameter for each defined timer:
+ and shows the following parameter
+\change_inserted 717047130 1394142188
+s
+\change_unchanged
+ for each defined timer:
 \end_layout
 
 \begin_layout Itemize
@@ -1501,10 +1868,28 @@ com.ingby.socbox.bischeck.service:name=executeTotalTimer,type=ServiceJob
 \emph default
 This is the most important metric since it shows the total count and execution
  time to process a service definition (a host, service(s) and serviceitem(s))
- every time it's scheduled.
- The execution time included connecting and retrieving data, execution of
- the serviceitem logic, cache writes and threshold calculation.
- It do not include the time to send data to the defined servers.
+ every time it
+\change_inserted 717047130 1394142235
+ 
+\change_deleted 717047130 1394142236
+'
+\change_inserted 717047130 1394142236
+i
+\change_unchanged
+s scheduled.
+ The execution time include
+\change_deleted 717047130 1394142247
+d
+\change_inserted 717047130 1394142247
+s
+\change_unchanged
+ connecting and retrieving data, execution of the serviceitem logic, cache
+ writes and threshold calculation.
+ It do
+\change_inserted 717047130 1394142255
+es
+\change_unchanged
+ not include the time to send data to the defined servers.
 \end_layout
 
 \begin_layout Itemize
@@ -1516,9 +1901,19 @@ com.ingby.socbox.bischeck.service:name=executeServiceTimer,type=ServiceJob
 
 
 \emph default
-This timer show the count and execution time to process a service definition.
- The execution time included connecting and retrieving data, execution of
- the serviceitem logic and cache writes.
+This timer show
+\change_inserted 717047130 1394142262
+s
+\change_unchanged
+ the count and execution time to process a service definition.
+ The execution time include
+\change_deleted 717047130 1394142272
+d
+\change_inserted 717047130 1394142272
+s
+\change_unchanged
+ connecting and retrieving data, execution of the serviceitem logic and
+ cache writes.
  This timer is part of the timer 
 \emph on
 executeTotal.
@@ -1533,8 +1928,12 @@ com.ingby.socbox.bischeck.service:name=executeThresholdTimer,type=ServiceJob
 
 
 \emph default
-This timer show the count and execution time to publish the result of executing
- the service definition to the queue so it can be processed by servers.
+This timer show
+\change_inserted 717047130 1394142349
+s
+\change_unchanged
+ the count and execution time to publish the result of executing the service
+ definition to the queue so it can be processed by servers.
  This timer is part of the timer 
 \emph on
 executeTotal.
@@ -1553,8 +1952,15 @@ com.ingby.socbox.bischeck.service:name=publishTimer,type=ServiceJob
 
 \emph default
 The time to publish the measured and threshold data to the configured servers.
- This do not include the time it actually take to send to the remote servers,
- that is included in respective 
+ This do
+\change_inserted 717047130 1394142386
+es
+\change_unchanged
+ not include the time it actually take
+\change_inserted 717047130 1394142399
+s
+\change_unchanged
+ to send to the remote servers, that is included in respective 
 \emph on
 XYZ_sendTimer
 \emph default
@@ -1631,7 +2037,13 @@ anager
 \end_inset
 
 The time to read and setup the configuration of Bischeck.
- This occure on start up and on every reload.
+ This occur
+\change_deleted 717047130 1394142456
+e
+\change_inserted 717047130 1394142456
+s
+\change_unchanged
+ on start up and on every reload.
 \end_layout
 
 \begin_layout Itemize
@@ -1645,8 +2057,19 @@ com.ingby.socbox.bischeck.cache:name=parseTimer,type=CacheEvaluator
 \emph default
 The execution time to parse and retrieve data from the fast cache and/or
  the redis cache.
- This include all different way to retrieved data based on index, index
- range, time and time range.
+ This include
+\change_inserted 717047130 1394142553
+s
+\change_unchanged
+ all different way
+\change_inserted 717047130 1394142562
+s
+\change_unchanged
+ to retrieve
+\change_deleted 717047130 1394142567
+d
+\change_unchanged
+ data based on index, index range, time and time range.
  Standard deviation could be high on this timer depending on difference
  in logic and query pattern.
  
@@ -1658,7 +2081,11 @@ com.ingby.socbox.bischeck.servers:name=XYZ_sendTimer,type=<Server class>
 \end_inset
 
 The time it took to send data to server XYZ.
- One timer exist for each server configured in the 
+ One timer exist
+\change_inserted 717047130 1394142597
+s
+\change_unchanged
+ for each server configured in the 
 \emph on
 server.xml
 \emph default
@@ -1676,8 +2103,11 @@ Building Bischeck from source
 \end_layout
 
 \begin_layout Standard
-To build Bischeck from source check out the Bischeck trunk from gforge.ingby.com:
- 
+To build Bischeck from source
+\change_inserted 717047130 1394142607
+,
+\change_unchanged
+ check out the Bischeck trunk from gforge.ingby.com: 
 \end_layout
 
 \begin_layout Standard
@@ -1698,8 +2128,15 @@ trunk bischeck
 \end_layout
 
 \begin_layout Standard
-To build a Bischeck distribution run from the directory where you checked
- out the Bischeck code: 
+To build a Bischeck distribution
+\change_inserted 717047130 1394142619
+,
+\change_unchanged
+ run 
+\change_inserted 717047130 1394142623
+ant 
+\change_unchanged
+from the directory where you checked out the Bischeck code: 
 \end_layout
 
 \begin_layout Standard
@@ -1742,7 +2179,11 @@ http://gforge.ingby.com/svn/bischeck/bischeck/tags
 \begin_layout Standard
 The dist directive will also convert all documentation in lyx format to
  pdf.
- This require the lyx
+ This require
+\change_inserted 717047130 1394142660
+s
+\change_unchanged
+ the lyx
 \begin_inset Foot
 status open
 
@@ -1777,7 +2218,11 @@ $ ant testng
 \end_layout
 
 \begin_layout Standard
-To set the Bischeck version number the 
+To set the Bischeck version number
+\change_inserted 717047130 1394142679
+,
+\change_unchanged
+ the 
 \emph on
 build.xml
 \emph default
@@ -1785,7 +2230,11 @@ build.xml
 \emph on
 app.version
 \emph default
- can overridden:
+ can 
+\change_inserted 717047130 1394142689
+be 
+\change_unchanged
+overridden:
 \end_layout
 
 \begin_layout Standard
@@ -1815,13 +2264,47 @@ Developing with Bischeck
 \end_layout
 
 \begin_layout Standard
-It's simple to develop your own service, serviceitem, threshold and server
+It
+\change_inserted 717047130 1394142716
+ 
+\change_deleted 717047130 1394142717
+'
+\change_inserted 717047130 1394142717
+i
+\change_unchanged
+s simple to develop your own service, serviceitem, threshold and server
  classes.
- To develop your own you must follow the interface that exist for each type.
- For service and serviceitems an abstract class exist with default implementatio
-n of most of the methods described in the interfaces.
- For more information check out the Bischeck javadoc that is generated using
- ant and also part of the distribution in the 
+ To develop your own you must follow the interface that exist
+\change_inserted 717047130 1394142743
+s
+\change_unchanged
+ for each type.
+ For service and serviceitems
+\change_inserted 717047130 1394142748
+,
+\change_unchanged
+ an abstract class exist
+\change_inserted 717047130 1394142751
+s
+\change_unchanged
+ with default implementation of most of the methods described in the interfaces.
+ For more information
+\change_inserted 717047130 1394142760
+,
+\change_unchanged
+ check out the Bischeck javadoc
+\change_inserted 717047130 1394142777
+,
+\change_unchanged
+ that is generated using ant and 
+\change_inserted 717047130 1394142790
+that 
+\change_deleted 717047130 1394142809
+also 
+\change_inserted 717047130 1394142792
+is 
+\change_unchanged
+part of the distribution in the 
 \emph on
 $BISHOME/docs/javadoc
 \emph default
@@ -1833,7 +2316,14 @@ Developing custom JEP functions
 \end_layout
 
 \begin_layout Standard
-To develop custom mathematical JEP functions that operates on cached data
+To develop custom mathematical JEP functions that operate
+\change_deleted 717047130 1394142855
+s
+\change_unchanged
+ on cached data
+\change_inserted 717047130 1394142858
+,
+\change_unchanged
  please see the JEP documentation, 
 \begin_inset Flex URL
 status collapsed
@@ -1846,13 +2336,26 @@ http://www.cse.msu.edu/SENS/Software/jep-2.23/doc/website/doc/doc_usage.htm
 \end_inset
 
 .
- To make the function recognized by Bischeck it should be put in a jar and
- copied to the 
+ To make 
+\change_deleted 717047130 1394142871
+the
+\change_inserted 717047130 1394142871
+a
+\change_unchanged
+ function recognized by Bischeck
+\change_inserted 717047130 1394142874
+,
+\change_unchanged
+ it should be put in a jar and copied to the 
 \emph on
 $BISHOME/customlib
 \emph default
  directory.
- Then the class must then be mapped to a name that will be used in the Bischeck.
+ T
+\change_deleted 717047130 1394142884
+hen t
+\change_unchanged
+he class must then be mapped to a name that will be used in the Bischeck.
  This is done in the file 
 \emph on
 jepextfunctions.xml
@@ -1866,8 +2369,11 @@ $BISHOME/resources
 \emph on
 jepextfunctions.xml
 \emph default
- file is a standard Java XML property file where the key is the name and
- the value is the class name that implements it.
+ file is a standard Java XML property file where the key is the name 
+\change_inserted 717047130 1394142912
+of the function 
+\change_unchanged
+and the value is the class name that implements it.
 \end_layout
 
 \begin_layout Chapter
@@ -1893,10 +2399,21 @@ Java
 
 \begin_layout Standard
 Bischeck should run on any operating system that supports Java 6 or higher.
- The installation script and init script are supported on Redhat and Debian
- equivalent Linux distributions.
- Running on Windows has been tested successfully but is not supported by
- the installation scripts.
+ The installation 
+\change_deleted 717047130 1394142928
+script 
+\change_unchanged
+and init script
+\change_inserted 717047130 1394142930
+s
+\change_unchanged
+ are supported on Redhat and Debian equivalent Linux distributions.
+ Running on 
+\change_inserted 717047130 1394142944
+Microsoft 
+\change_unchanged
+Windows has been tested successfully but is not supported by the installation
+ scripts.
 \end_layout
 
 \begin_layout Section
@@ -1904,7 +2421,11 @@ Redis
 \end_layout
 
 \begin_layout Standard
-Since version 1.0.0 of Bischeck redis, 
+Since version 1.0.0 of Bischeck
+\change_inserted 717047130 1394142957
+,
+\change_unchanged
+ redis, 
 \begin_inset Flex URL
 status open
 
@@ -1918,7 +2439,11 @@ http://www.redis.io
 , is the default memory cache.
  Redis provides a different range of persistence options like point-in-time
  snapshots and persistence logs.
- Redis also support replication and high-availability options.
+ Redis also support
+\change_inserted 717047130 1394142977
+s
+\change_unchanged
+ replication and high-availability options.
  
 \end_layout
 
@@ -1945,8 +2470,11 @@ cache.provider.redis.server - the hostname/IP of the redis server, default
 \end_layout
 
 \begin_layout Itemize
-cache.provider.redis.port - the socket port where redis server listen, default
- is 6379
+cache.provider.redis.port - the socket port where redis server listen
+\change_inserted 717047130 1394143038
+s
+\change_unchanged
+, default is 6379
 \end_layout
 
 \begin_layout Itemize
@@ -1954,8 +2482,11 @@ cache.provider.redis.db - the redis database number to use, default is 0
 \end_layout
 
 \begin_layout Itemize
-cache.provider.redis.auth - the authorization token for redis, default is empty
- string
+cache.provider.redis.auth - the authorization token for redis, default is 
+\change_inserted 717047130 1394143046
+the 
+\change_unchanged
+empty string
 \end_layout
 
 \begin_layout Itemize
@@ -1981,17 +2512,33 @@ cache.provider.redis.fastCacheSize
  If Bischeck finds the data in the fast cache on a read, access to redis
  is not needed.
  Data writes are always written to redis storage.
- The default value for the option is 0, meaning that the fast cache is 0
- size.
- Depending on how the cached data is used in your configuration increasing
- the fast cache can improve performance, but will also increase the heap
- space.
+ The default value for the option is 0, meaning that the fast cache is 
+\change_deleted 717047130 1394143144
+0 
+\change_unchanged
+size
+\change_inserted 717047130 1394143146
+ 0
+\change_unchanged
+.
+ Depending on how the cached data is used in your configuration
+\change_inserted 717047130 1394143251
+,
+\change_unchanged
+ increasing the fast cache can improve performance
+\change_deleted 717047130 1394143257
+,
+\change_unchanged
+ but will also increase the heap space.
 \end_layout
 
 \begin_layout Standard
 With redis it is possible to access the data in the cache at runtime.
- Redis provide many client libraries for different programming languages,
- 
+ Redis provide
+\change_inserted 717047130 1394143267
+s
+\change_unchanged
+ many client libraries for different programming languages, 
 \begin_inset Flex URL
 status collapsed
 
@@ -2012,9 +2559,41 @@ redis-cli
 \end_layout
 
 \begin_layout Standard
-The pre-version 1.0.0 cache should be regarded as deprecated.
- Many of the the new features available from 1.0.0 is not supported in the
- old implementation, like aggregations.
+The 
+\change_inserted 717047130 1394143308
+cache prior to 
+\change_deleted 717047130 1394143310
+pre-
+\change_unchanged
+version 1.0.0
+\change_inserted 717047130 1394143312
+,
+\change_unchanged
+ 
+\change_deleted 717047130 1394143315
+cache 
+\change_unchanged
+should be regarded as deprecated.
+ Many of the the new features available 
+\change_deleted 717047130 1394143331
+from
+\change_inserted 717047130 1394143333
+as of version
+\change_unchanged
+ 1.0.0 
+\change_deleted 717047130 1394143337
+is
+\change_inserted 717047130 1394143337
+are
+\change_unchanged
+ not supported in the old implementation, 
+\change_deleted 717047130 1394143345
+like
+\change_inserted 717047130 1394143347
+such as e.g.
+
+\change_unchanged
+ aggregations.
  
 \end_layout
 
@@ -2682,9 +3261,17 @@ Credits
 \end_layout
 
 \begin_layout Standard
-Thanks to all people who has developed all the great software that Bischeck
- depends on, and especially all who made Nagios and the Nagios community
- a success.
+Thanks to all people who ha
+\change_deleted 717047130 1394143434
+s
+\change_inserted 717047130 1394143434
+ve
+\change_unchanged
+ developed all the great software that Bischeck depends on
+\change_deleted 717047130 1394143439
+,
+\change_unchanged
+ and especially all who made Nagios and the Nagios community a success.
  A special thanks goes to Peter Johansson and his colleagues at DHL Freight
  Sweden for sponsoring the development and providing ideas and important
  feedback.
@@ -2692,13 +3279,23 @@ Thanks to all people who has developed all the great software that Bischeck
 \end_layout
 
 \begin_layout Standard
-Also like to thank the following companies that sponsor the Bischeck project
+
+\change_inserted 717047130 1394143452
+I would 
+\change_deleted 717047130 1394143454
+Also 
+\change_unchanged
+like to thank the following companies that sponsor the Bischeck project
  with valuable commercial tools and development environments: 
 \end_layout
 
 \begin_layout Itemize
-Contemplate support the Bischeck projects with the ThreadSafe tool for advanced
- static analysis for Java concurrency, 
+Contemplate support
+\change_inserted 717047130 1394143464
+s
+\change_unchanged
+ the Bischeck projects with the ThreadSafe tool for advanced static analysis
+ for Java concurrency, 
 \begin_inset Flex URL
 status collapsed
 
@@ -2729,7 +3326,21 @@ http://www.yourkit.com/java/profiler
 \end_layout
 
 \begin_layout Itemize
-Cloudbees provide continues integration service through Jenkins, 
+Cloudbees provide
+\change_inserted 717047130 1394143479
+s
+\change_unchanged
+ 
+\change_deleted 717047130 1394143544
+continues
+\change_inserted 717047130 1394143544
+continuous
+\change_unchanged
+ integration service
+\change_inserted 717047130 1394143531
+s
+\change_unchanged
+ through Jenkins, 
 \begin_inset Flex URL
 status open
 
