@@ -85,6 +85,7 @@
 \html_math_output 0
 \html_css_as_file 0
 \html_be_strict false
+\author -2048955058 "andersh,,," 
 \author 717047130 "Peter Monthan" 
 \end_header
 
@@ -995,11 +996,51 @@ s
 \change_inserted 717047130 1393510346
 ,
 \change_unchanged
- if the url has a schema part 
+ if the url has a schema 
+\change_inserted -2048955058 1394216152
+name
+\change_deleted -2048955058 1394216151
+part
+\change_unchanged
+ 
 \change_inserted 717047130 1393510411
 - VAD ÄR EN SCHEMA PART? - 
 \change_unchanged
-that is jdbc, the JDBCService class is used.
+that is jdbc, the JDBCService class is used
+\change_inserted -2048955058 1394216192
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1394221156
+The mapping between schema name and service class is done in the configuration
+ file urlservices.xml, see 
+\emph on
+\bar under
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:urlservice.xml"
+
+\end_inset
+
+
+\emph default
+\bar default
+.
+ For more information about uri structure please visit http://en.wikipedia.org/wik
+i/URI_scheme.
+\change_unchanged
+
+\end_layout
+
+\end_inset
+
+
+\change_unchanged
+.
  
 \change_inserted 717047130 1393510984
 The service in our example will have 
@@ -1010,7 +1051,11 @@ two
 \change_unchanged
  serviceitems
 \change_inserted 717047130 1393511023
-, one item per order type, 
+, one 
+\change_deleted -2048955058 1394214571
+item
+\change_inserted 717047130 1393511023
+ per order type, 
 \change_deleted 717047130 1393510993
  
 \change_unchanged
@@ -2039,23 +2084,12 @@ erpserver-orders-ediOrders[-30M]
 \emph on
 .
  
+\change_deleted -2048955058 1394214715
+
 \emph default
-This is useful since the relation between 
-\change_inserted 717047130 1393844201
-a 
-\change_unchanged
-static index and 
-\change_inserted 717047130 1393844207
-the 
-\change_unchanged
-service schedule do
-\change_inserted 717047130 1393844166
-es
-\change_unchanged
- not need to be known.
- 
-\change_inserted 717047130 1393844237
-KOLLA ATT DET BLEV RÄTT, jag har svårt att förstå det där med relationen!
+This is useful since the relation between a static index and the service
+ schedule does not need to be known.
+ KOLLA ATT DET BLEV RÄTT, jag har svårt att förstå det där med relationen!
 \change_unchanged
 
 \end_layout
@@ -3093,13 +3127,21 @@ and
 erphost-orders-phoneorders[0]
 \emph default
  are null.
+\change_inserted -2048955058 1394214911
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted -2048955058 1394214958
+All properties described above are global for service definitions.
 \change_inserted 717047130 1394134047
 
 \end_layout
 
 \begin_layout Standard
 
-\change_inserted 717047130 1394134073
+\change_deleted -2048955058 1394214964
 Är properties globala eller kan de anges per service?
 \change_unchanged
 
@@ -3914,10 +3956,25 @@ If we just need to check parts of a day for thresholds,
 \change_deleted 717047130 1394010366
 just 
 \change_unchanged
-set the hour to NULL and no calculation will be done for that time interval.
+set the hour to NULL and no calculation will be done for that time interval
+\change_inserted -2048955058 1394215081
+ that the hour is part of
+\change_unchanged
+.
 
 \change_inserted 717047130 1394010398
- Förklara det sista lite.
+ 
+\change_inserted -2048955058 1394215157
+For configuration examples please see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:24thresholds.xml"
+
+\end_inset
+
+.
+\change_deleted -2048955058 1394215159
+Förklara det sista lite.
  Vilken timme ska vi sätta till NULL och var gör vi det?
 \change_unchanged
 
@@ -4001,7 +4058,13 @@ which
 \change_inserted 717047130 1394133491
 s
 \change_unchanged
- that data is split in a status and a performance part seperated with 
+ that data is split in a status and a performance part 
+\change_deleted -2048955058 1394215349
+seperated
+\change_inserted -2048955058 1394215349
+separated
+\change_unchanged
+ with 
 \change_inserted 717047130 1394133504
 the 
 \change_unchanged
@@ -4251,6 +4314,9 @@ performance data
 
 \change_inserted 717047130 1394134297
  Vad är performance data?
+\change_inserted -2048955058 1394216008
+ Detta är Nagios specifikt, se ovan meningen med pipe sign.
+ 
 \change_unchanged
 
 \end_layout
@@ -4273,7 +4339,11 @@ ediOrders=12000;9900;7000;0; threshold=11000;0;0;0; avg-exec-time=223ms
 
 \begin_layout Standard
 The execution time of the serviceitem execute statement is always part of
- the performance data and reported as avg-exec-time in milliseconds.
+ the performance data and reported as 
+\emph on
+avg-exec-time
+\emph default
+ in milliseconds.
  With the pnp4nagios template that is provided 
 \change_deleted 717047130 1394134264
 by
@@ -4286,6 +4356,10 @@ with
 Det där bör nog förklaras.
  Vilken graph? Finns någon annan template som man kan få en graph med och
  varför vill man det?
+\change_inserted -2048955058 1394215972
+ Detta är egentligen inte någon Bischeck grej utan helt Nagios relaterat.
+ Så som med performance data så skall någon som håller på med nagios förstå
+ detta.
 \change_unchanged
 
 \begin_inset Newline newline
@@ -4557,14 +4631,20 @@ OpenTSDB text based protocol.
  
 \change_deleted 717047130 1394134727
 From
-\change_inserted 717047130 1394134730
-As of
+\change_deleted -2048955058 1394216707
+As of 
 \change_unchanged
- Bischeck 4
-\change_inserted 717047130 1394134732
-,
+Bischeck 
+\change_inserted -2048955058 1394216733
+send 4 
+\change_deleted -2048955058 1394216702
+4, 
 \change_unchanged
- lines are sent to OpenTSDB for each service definition.
+lines 
+\change_deleted -2048955058 1394216717
+are sent 
+\change_unchanged
+to OpenTSDB for each service definition.
  The lines include measured, threshold, warning and critical values.
  No state information is sent.
 \end_layout
@@ -7028,22 +7108,22 @@ status open
 \end_layout
 
 \begin_layout Standard
+
+\change_deleted -2048955058 1394219916
 A
 \change_deleted 717047130 1394136930
 ny
-\change_inserted 717047130 1394136931
-ll
-\change_unchanged
- properties should have a default value that is set in code.
-
-\change_inserted 717047130 1394136944
- Vilken kod? Bischecks?
-\change_unchanged
- 
+\change_deleted -2048955058 1394219916
+ll properties should have a default value that is set in code.
+ Vilken kod? Bischecks? 
 \end_layout
 
 \begin_layout Standard
-The properties.xml file can also include class specific properties
+The properties.xml file 
+\change_inserted -2048955058 1394219937
+include standard Bischeck properties but 
+\change_unchanged
+can also include class specific properties
 \change_deleted 717047130 1394136974
  typical
 \change_unchanged
@@ -7097,6 +7177,9 @@ thresholdCacheClear- the time when the threshold cache should be evicted
 
 \change_inserted 717047130 1394137085
  Vad betyder higher här? Vad menas med början av dagen, före lunch...?
+\change_inserted -2048955058 1394220046
+ Det betyder varje timme tex, men måste göras i början av varje dag.
+ Möjligen skulle man ta bort denna som en konfigurerbar property
 \change_unchanged
 
 \end_layout
@@ -9284,8 +9367,12 @@ Thanks to all people who has developed all the great software that Bischeck
 
 \begin_layout Standard
 
+\change_inserted -2048955058 1394220100
+The Bischeck project 
+\change_deleted -2048955058 1394220094
+I 
 \change_inserted 717047130 1394138260
-I would 
+would 
 \change_deleted 717047130 1394138261
 A
 \change_inserted 717047130 1394138261
