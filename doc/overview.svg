@@ -236,7 +236,7 @@
     </text>
   </g>
   <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="617" y="90.2932">
-    <tspan x="617" y="90.2932">bischeck</tspan>
+    <tspan x="617" y="90.2932">Bischeck</tspan>
   </text>
   <g>
     <rect style="fill: #e6e6fa" x="388.7" y="170.1" width="180" height="38"/>
@@ -325,7 +325,7 @@
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="362.8" y="424.1" width="332" height="113.193"/>
   </g>
   <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="626" y="417.294">
-    <tspan x="626" y="417.294">bisconf</tspan>
+    <tspan x="626" y="417.294">Bisconf</tspan>
   </text>
   <g>
     <rect style="fill: #e6e6fa" x="378.8" y="445.394" width="119.2" height="38"/>
@@ -383,8 +383,8 @@
       <tspan x="279" y="366"></tspan>
     </text>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="264" y="378">
-    <tspan x="264" y="378">redis</tspan>
+  <text font-size="12.9822" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="264" y="378">
+    <tspan x="264" y="378">Redis</tspan>
   </text>
   <g>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 388.9,217.6 A 116.463,116.463 0 0 0 286.191,302.705"/>
@@ -421,13 +421,11 @@
       <tspan x="478.9" y="221.5">Persistent cache</tspan>
     </text>
   </g>
-  <text font-size="15.7929" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="141" y="360">
-    <tspan x="141" y="360">?</tspan>
+  <text font-size="12.9822" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="76" y="368">
+    <tspan x="76" y="368">Other redis clients</tspan>
   </text>
   <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="168.86" y1="352.248" x2="250.161" y2="339.135"/>
-    <polygon style="fill: #000000" points="168.063,347.312 158.987,353.841 169.656,357.185 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="168.063,347.312 158.987,353.841 169.656,357.185 "/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="158" y1="354" x2="250.161" y2="339.135"/>
     <polygon style="fill: #000000" points="250.957,344.072 260.033,337.543 249.365,334.199 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="250.957,344.072 260.033,337.543 249.365,334.199 "/>
   </g>

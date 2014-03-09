@@ -95,11 +95,11 @@ Release Notes
 \end_layout
 
 \begin_layout Date
-DRAFT - IN WORK - Version 1.0.0
+Version 1.0.0
 \begin_inset Newline linebreak
 \end_inset
 
-2014-02-XX
+2014-03-15
 \end_layout
 
 \begin_layout Standard
@@ -135,8 +135,8 @@ http://creativecommons.org/licenses/by-sa/3.0/
 \end_inset
 
 .
- If you distribute this document, or a modified version of it, you must
- provide attribution to Ingenjörsbyn AB.
+ If you distribute this document, or a modified version of it, you have
+ to provide attribution to Ingenjörsbyn AB.
  and provide a link to the original.
  
 \begin_inset Newline newline
@@ -196,7 +196,7 @@ LatexCommand tableofcontents
 \end_layout
 
 \begin_layout Section
-Release 1.0.0 - 2014-02-
+Release 1.0.0 - 2014-03-15
 \end_layout
 
 \begin_layout Standard
@@ -221,7 +221,7 @@ Cache improvements
 \begin_layout Itemize
 Redis is now the default Bischeck cache.
  With redis the persistence and availability of the cached data is improved.
- Using Redis also enable third party to easy access the cached data.
+ Using Redis enable third party to easy access the cached data.
  
 \end_layout
 
@@ -236,7 +236,14 @@ Automatic aggregations of cached service definition data is implement with
 \end_layout
 
 \begin_layout Itemize
-END statement
+END statement is support in a list based cache query like 
+\emph on
+host-service-serviceitem[-24H:END]
+\emph default
+.
+ This will retrieve all data from 24 hours ago to the oldest data that exists
+ in the cache for the service definition.
+ 
 \end_layout
 
 \end_deeper
@@ -264,19 +271,15 @@ Templates has been implement both for bischeck.xml and and 24thresholds.xml.
 \end_layout
 
 \begin_layout Itemize
-Template overrides 
+Template overrides allowing overriding definitions in a template.
 \end_layout
 
 \begin_layout Itemize
-Configuration macros 
+Configuration macros enable dynamic configuration.
 \end_layout
 
 \begin_layout Itemize
-Aggregations configuration
-\end_layout
-
-\begin_layout Itemize
-Cache directives 
+Cache directives to control aggregation and cache sizing per service definition.
 \end_layout
 
 \begin_layout Itemize
@@ -285,8 +288,7 @@ Inactivation of hosts and services
 
 \end_deeper
 \begin_layout Itemize
-Aggregations support automatic aggregation of monitored data on hour, day,
- week and month.
+Automatic aggregation of monitored data on hour, day, week and month period.
 \end_layout
 
 \begin_layout Itemize
@@ -298,15 +300,15 @@ Least square method calculation
 \begin_inset Quotes erd
 \end_inset
 
- - new mathematical function to do linear prediction and calculate slope.
+ - new mathematical function to do linear prediction.
 \end_layout
 
 \begin_layout Itemize
 The execution flow has been changes from a synchronous process where each
  ServiceJob thread executed the whole process from data collection to send
- result to servers.
- The new architecture is based on a asynchronous design between the ServiceJob
- execution and the server integration.
+ monitoring result to servers.
+ The new architecture is based on an asynchronous design separating the
+ ServiceJob execution and the server integration.
  Jetlang, 
 \begin_inset Flex URL
 status collapsed
@@ -343,10 +345,10 @@ slow
 
 \begin_layout Itemize
 Circuit breaks - is an optional configuration for NSCA and NRDP.
- If the remote serve fail in connection or is timing out circuit break will
- OPEN and stop sending data to the remote server for a specific time period
- before retrying.
- This prevent Bischeck from overloading the remote server.
+ If the remote server connection fails or is timing-out the circuit break
+ will go to an OPEN state and stop sending data to the remote server for
+ a specific time period before retrying.
+ This prevents Bischeck from overloading the remote server.
 \end_layout
 
 \begin_layout Itemize
