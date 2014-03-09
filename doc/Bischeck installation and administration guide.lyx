@@ -657,7 +657,7 @@ status open
 
 \begin_layout Standard
 The upgrade will automatically stop the currently running Bischeck and save
- the current installation in a directory parallell to the new version named
+ the current installation in a directory parallel to the new version named
  
 \emph on
 bischeck_x.y.z
@@ -722,7 +722,112 @@ status open
 
 \end_inset
 
- 
+
+\end_layout
+
+\begin_layout Subsection
+Rollback upgrade
+\end_layout
+
+\begin_layout Standard
+In the event of an upgrade failure or if the new version of Bischeck do
+ not work properly a simple rollback can be conducted with the following
+ step.
+ The process assume that the installation directory is 
+\emph on
+/opt/socbox/addons/bischeck
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+Go to the parent directory of where Bischeck has been installed:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# cd /opt/socbox/addons/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Remove the newly installed Bischeck:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# rm -rf bischeck
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Move the old version, saved by the upgrade to bischeck_x.y.z where x.y.z is
+ the version number of the previous installed version, to the install directory:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# mv bischeck_x.y.z bischeck
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Replace the init script bischeckd with the old version:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# cp bischeck/bin/bischeckd /etc/init.d/bischeckd
+\end_layout
+
+\begin_layout Plain Layout
+
+# chmod 755 /etc/init.d/bischeckd 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1933,8 +2038,8 @@ $BISHOME/etc/property.xml
 \end_layout
 
 \begin_layout Itemize
-cache.provider.redis.server - the hostname/IP of the redis server, default
- is localhost
+cache.provider.redis.server - the hostname or IP address of the redis server,
+ default is localhost
 \end_layout
 
 \begin_layout Itemize
@@ -2695,7 +2800,7 @@ s:
 Contemplate supports the Bischeck projects with the ThreadSafe tool for
  advanced static analysis for Java concurrency, 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
