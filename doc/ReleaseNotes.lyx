@@ -498,7 +498,80 @@ Upgrading
 \end_layout
 
 \begin_layout Standard
-Release 1.0.0 support upgrade from release 0.4.3
+Release 1.0.0 support upgrade from release 0.4.3.
+ The install scripts upgrade option 
+\series bold
+will not 
+\series default
+migrate the 0.4.3 cache to Redis automatically.
+ After the upgrade has been ran the following steps must be conducted to
+ migrate the cached Bischeck data to Redis.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Make sure the Redis related properties in the 
+\emph on
+properties.xml
+\emph default
+ of the new installation is correct according to your Redis installation.
+ Please see the 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck installation and administration guide
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+ for more information.
+\end_layout
+
+\begin_layout Enumerate
+Run the data migration program supplied with Bischeck in the following way:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$BISHOME/bin/bischeck migration.MoveCache2Redis
+\end_layout
+
+\end_inset
+
+
+\emph on
+$BISHOME
+\emph default
+ should be replaced with the path to the location of the newly installed
+ Bischeck installation directory.
+ The program can be run with the 
+\emph on
+-v
+\emph default
+ option to show the data migration in verbose mode.
+ If the migration of cache data fails it can be rerun, but the Redis data
+ storage should be flushed using the Redis FLUSHDB command.
+ For more information about Redis please visit 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://redis.io/
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
