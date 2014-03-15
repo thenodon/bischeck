@@ -297,7 +297,43 @@ public class CalculateOnCacheTest {
         coc.execute();
         Assert.assertEquals(coc.getLatestExecuted(),"9.5");
     }
-    
+   
+    @Test (groups = { "ServiceItem" })
+    public void verifyAggregationNamingDash() throws Exception {
+        cache.clear();
+        
+        Service bis = new LastCacheService("servicename",null);
+        ServiceItem coc = new CalculateOnCache("serviceitemname");
+        coc.setService(bis);
+        
+        
+        long current = System.currentTimeMillis() - 10*300*1000;
+        
+        String host1 = "G1BS01";
+        String service1 ="Beam-35UTsonline/H/avg/weekend";
+        String serviceitem1 = "UTsonline";
+        String cachekey1 = Util.fullName(host1, service1, serviceitem1);
+        
+        System.out.println("CacheKey: " + cachekey1 );
+        
+        for (int i = 1; i < 11; i++) {
+            LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
+            cache.add(ls, cachekey1);
+                        
+        }
+        
+        host1 = "G1BS01";
+        service1 ="Beam\\-35UTsonline/H/avg/weekend";
+        serviceitem1 = "UTsonline";
+        cachekey1 = Util.fullName(host1, service1, serviceitem1);
+        
+        
+        System.out.println("Get index 0: "+ cache.getByIndex(host1, service1, serviceitem1, 0));
+        coc.setExecution("avg("+cachekey1+"[0],"+cachekey1+"[1])");
+        coc.execute();
+        Assert.assertEquals(coc.getLatestExecuted(),"9.5");
+    }
+   
 }
 
 
