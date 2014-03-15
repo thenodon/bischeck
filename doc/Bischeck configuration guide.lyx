@@ -3319,9 +3319,10 @@ Dash (-) is the separator character between host, service and serviceitem
  
 \series bold
 When using a host-service-serviceitem[X] expression in the execstatement
- tag of a serviceitem in the bischeck.xml configuration file, or in the hour
- tag of the 24threshold.xml configuration file, a dash (-) in any of the
- names must be quoted with a backslash (
+ tag of a serviceitem in the bischeck.xml configuration file, or in an the
+ hour tag and the hourinterval's threshold tag of a hours section in the
+ 24thrsholds.xml , a dash (-) in any of the names must be quoted with a backslash
+ (
 \backslash
 ), like:
 \end_layout
@@ -3335,18 +3336,40 @@ status open
 
 \begin_layout Plain Layout
 
-erp1_host.my
+avg(erp1_host.my
 \backslash
--domain.com-@service1-item[1]
+-domain.com-service-item[0:9])
 \end_layout
 
 \end_inset
 
 
+\series bold
+If macros are used, see 
+\emph on
+\bar under
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:Configuration-macros"
+
+\end_inset
+
+,
+\emph default
+\bar default
+ and they are replaced with host, service and serviceitem names that include
+ dash (-) they will automatically be quoted by Bischeck.
 \end_layout
 
 \end_deeper
 \begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Configuration-macros"
+
+\end_inset
+
 Configuration macros
 \end_layout
 

@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
@@ -115,7 +116,7 @@ public class ConfigMacroUtil {
     
     
     /**
-     * The method replace all NAME macros with the paramters 
+     * The method replace all NAME macros with the parameters 
      * @param strToReplace - the string to be replaces 
      * @param hostName 
      * @param serviceName
@@ -124,9 +125,10 @@ public class ConfigMacroUtil {
      */
     public static String replaceMacros(String strToReplace, String hostName, String serviceName, String serviceItemName) {
     	
-    	String str = strToReplace.replaceAll(HOST_NAME_MACRO, hostName);
-    	str = str.replaceAll(SERVICE_NAME_MACRO, serviceName);
-    	str = str.replaceAll(SERVICEITEM_NAME_MACRO, serviceItemName);
+    	String str = strToReplace.replaceAll(HOST_NAME_MACRO, hostName.replaceAll( ObjectDefinitions.getCacheKeySep(),ObjectDefinitions.getCacheDoubleQuoteString()));
+    	str = str.replaceAll(SERVICE_NAME_MACRO, serviceName.replaceAll( ObjectDefinitions.getCacheKeySep(),ObjectDefinitions.getCacheDoubleQuoteString()));
+    	str = str.replaceAll(SERVICEITEM_NAME_MACRO, serviceItemName.replaceAll( ObjectDefinitions.getCacheKeySep(),ObjectDefinitions.getCacheDoubleQuoteString()));
+    	
     	return str;
     
     }
@@ -141,43 +143,43 @@ public class ConfigMacroUtil {
     public static Host replaceMacros(Host host) {
     	
     	// Host replacement 
-    	String hostDesc = replaceMacroHost( host.getDecscription(), host);
+    	String hostDesc = replaceMacroHost( host.getDecscription(), host, false);
     	host.setDecscription(hostDesc);
     	
     	//Service replacement 
     	for (String serviceName: host.getServices().keySet()) {
     		Service service = host.getServiceByName(serviceName);
     		
-    		String serviceDesc = replaceMacroHost(service.getDecscription(), host);
-			serviceDesc= replaceMacroService(serviceDesc, service);
+    		String serviceDesc = replaceMacroHost(service.getDecscription(), host, false);
+			serviceDesc= replaceMacroService(serviceDesc, service, false);
 			service.setDecscription(serviceDesc);
 			
     		if (service.getSchedules() != null) {
     			List<String> scheduleList = new ArrayList<String>();
     			for (String schedule: service.getSchedules()) {
-    				String serviceSchedule = replaceMacroHost(schedule, host);
-    				serviceSchedule = replaceMacroService(serviceSchedule, service);
+    				String serviceSchedule = replaceMacroHost(schedule, host, false);
+    				serviceSchedule = replaceMacroService(serviceSchedule, service, false);
     				scheduleList.add(serviceSchedule);
     			}
     			service.setSchedules(scheduleList);
     		}
     
-    		String serviceUrl = replaceMacroHost(service.getConnectionUrl(), host);
-			serviceUrl = replaceMacroService(serviceUrl, service);
+    		String serviceUrl = replaceMacroHost(service.getConnectionUrl(), host, false);
+			serviceUrl = replaceMacroService(serviceUrl, service, false);
 			service.setConnectionUrl(serviceUrl);
 			
 			//Driver
 			
     		for (String serviceItemName : service.getServicesItems().keySet()) {
     			ServiceItem serviceItem = service.getServiceItemByName(serviceItemName);
-    			String serviceItemDesc = replaceMacroHost(serviceItem.getDecscription(), host);
-    			serviceItemDesc = replaceMacroService(serviceItemDesc, service);
-    			serviceItemDesc = replaceMacroServiceItem(serviceItemDesc, serviceItem);
+    			String serviceItemDesc = replaceMacroHost(serviceItem.getDecscription(), host, false);
+    			serviceItemDesc = replaceMacroService(serviceItemDesc, service, false);
+    			serviceItemDesc = replaceMacroServiceItem(serviceItemDesc, serviceItem, false);
     			serviceItem.setDecscription(serviceItemDesc);
     			
-    			String serviceItemExec = replaceMacroHost(serviceItem.getExecution(), host);
-    			serviceItemExec = replaceMacroService(serviceItemExec, service);
-    			serviceItemExec = replaceMacroServiceItem(serviceItemExec, serviceItem);
+    			String serviceItemExec = replaceMacroHost(serviceItem.getExecution(), host, true);
+    			serviceItemExec = replaceMacroService(serviceItemExec, service, true);
+    			serviceItemExec = replaceMacroServiceItem(serviceItemExec, serviceItem, true);
     			serviceItem.setExecution(serviceItemExec);
     			
     		}
@@ -188,13 +190,18 @@ public class ConfigMacroUtil {
     }
     
    
-    private static String replaceMacroHost(String source, Host host) {
+    private static String replaceMacroHost(String source, Host host, boolean quoting) {
     	if (source == null) {
     		return null;
     	}
     	
     	// Replace with all macros applicable for host
-    	String str = source.replaceAll(HOST_NAME_MACRO, host.getHostname());
+    	String str = null;
+    	if (quoting) {
+    		str = source.replaceAll(HOST_NAME_MACRO, host.getHostname().replaceAll( ObjectDefinitions.getCacheKeySep(),ObjectDefinitions.getCacheDoubleQuoteString()));
+    	} else {
+    		str = source.replaceAll(HOST_NAME_MACRO, host.getHostname());
+    	}
     	// Replace alias macro - if null empty string
     	if (host.getAlias() != null) {
     		str = str.replaceAll(HOST_ALIAS_MACRO, host.getAlias());
@@ -206,12 +213,16 @@ public class ConfigMacroUtil {
     }
     
     
-    private static String replaceMacroService(String source, Service service) {
+    private static String replaceMacroService(String source, Service service, boolean quoting) {
     	if (source == null) {
     		return null;
     	}
-    	
-    	String str = source.replaceAll(SERVICE_NAME_MACRO, service.getServiceName());
+    	String str = null;
+    	if (quoting) {
+    		str = source.replaceAll(SERVICE_NAME_MACRO, service.getServiceName().replaceAll( ObjectDefinitions.getCacheKeySep(),ObjectDefinitions.getCacheDoubleQuoteString()));
+    	} else {
+    		str = source.replaceAll(SERVICE_NAME_MACRO, service.getServiceName());
+    	}
     	// Replace alias macro - if null empty string
     	if (service.getAlias() != null) {
     		str = str.replaceAll(SERVICE_ALIAS_MACRO, service.getAlias());
@@ -223,12 +234,18 @@ public class ConfigMacroUtil {
     }
 
     
-    private static String replaceMacroServiceItem(String source, ServiceItem serviceItem) {
+    private static String replaceMacroServiceItem(String source, ServiceItem serviceItem, boolean quoting) {
     	if (source == null) {
     		return null;
     	}
     	
-    	String str = source.replaceAll(SERVICEITEM_NAME_MACRO, serviceItem.getServiceItemName());
+    	String str = null;
+    	if (quoting) {
+    		str = source.replaceAll(SERVICEITEM_NAME_MACRO, serviceItem.getServiceItemName().replaceAll( ObjectDefinitions.getCacheKeySep(),ObjectDefinitions.getCacheDoubleQuoteString()));
+    	} else {
+    		str = source.replaceAll(SERVICEITEM_NAME_MACRO, serviceItem.getServiceItemName());
+    	}
+    	
     	// Replace alias macro - if null empty string
     	if (serviceItem.getAlias() != null) {
     		str = str.replaceAll(SERVICEITEM_ALIAS_MACRO, serviceItem.getAlias());

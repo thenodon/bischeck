@@ -30,6 +30,8 @@ public abstract class ObjectDefinitions {
 
     private static final String CACHE_QUOTE_STRING = "\\\\" + CACHE_KEY_SEP;
     
+    private static final String CACHE_DOUBLE_QUOTE_STRING = "\\\\\\\\" + CACHE_KEY_SEP;
+        
     private static final String FINDTOFROMTIMEPATTERN = "(^-[0-9]+ *[HMSD]{1}:-[0-9]+ *[HMSD]{1} *$)|(^-[0-9]+ *[HMSD]{1}:"+CacheInf.ENDMARK+")";
         
     private static final String FINDINTIMEPATTERN = "^-[0-9]+ *[HMSD]{1} *$";
@@ -61,7 +63,7 @@ public abstract class ObjectDefinitions {
 
     
     /**
-     * The string used to quote with \
+     * The string used to quote - with \\\\-
      * @return
      */
     public static String getCacheQuoteString() {
@@ -69,6 +71,14 @@ public abstract class ObjectDefinitions {
     }
 
     
+    /**
+    * The string used to quote - with \\\\\\\\-
+    * @return
+    */
+    public static String getCacheDoubleQuoteString() {
+        return CACHE_DOUBLE_QUOTE_STRING;
+    }
+
     /**
      * Return the string to separate host, service and serviceitem in a 
      * string, -
