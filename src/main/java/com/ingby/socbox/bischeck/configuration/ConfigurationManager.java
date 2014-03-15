@@ -293,7 +293,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      */
     public static ConfigurationManager getInstance() {
         if (configMgr == null ) {
-            LOGGER.error("Configuration manager has not been initilized");
+            LOGGER.info("Configuration manager has not been initilized - must run ConfigurationManager.init()");
             throw new IllegalStateException("Configuration manager has not been created");
         }
         return configMgr;
