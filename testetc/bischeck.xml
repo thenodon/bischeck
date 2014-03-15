@@ -146,7 +146,7 @@
   <!-- SERVICE TEMPLATES -->
   <!--                   -->
   <servicetemplate templatename="sshporttemplate">  
-    <name>sshport</name>
+    <name>ssh-port</name>
     <desc>Monitor the ssh port response time $$SERVICENAME$$ </desc>
     <schedule>5S</schedule> 
     <schedule>10S</schedule>
