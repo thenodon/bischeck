@@ -510,11 +510,44 @@ migrate the 0.4.3 cache to Redis automatically.
 \end_layout
 
 \begin_layout Enumerate
+First run the migration according to the procedure in the 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck installation and administration guide
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+.
+\end_layout
+
+\begin_layout Enumerate
+Make sure Bischeck is 
+\series bold
+not
+\series default
+ started, but that Redis is started when doing the following steps.
+\end_layout
+
+\begin_layout Enumerate
 Make sure the Redis related properties in the 
 \emph on
 properties.xml
 \emph default
  of the new installation is correct according to your Redis installation.
+ The data migration program 
+\emph on
+MoveCache2Redis
+\emph default
+ will use the setting in the 
+\emph on
+properties.xml
+\emph default
+ or if not set use the default values.
  Please see the 
 \emph on
 
@@ -537,6 +570,7 @@ Run the data migration program supplied with Bischeck in the following way:
 
 
 \begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -547,17 +581,44 @@ $BISHOME/bin/bischeck migration.MoveCache2Redis
 
 \end_inset
 
+or if the cache file is located in different location then default:
+\emph on
+
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$BISHOME/bin/bischeck migration.MoveCache2Redis -f /tmp/lastStatusCacheDump
+\end_layout
+
+\end_inset
+
 
 \emph on
 $BISHOME
 \emph default
  should be replaced with the path to the location of the newly installed
  Bischeck installation directory.
- The program can be run with the 
+ The data migration program can be run with the 
 \emph on
 -v
 \emph default
  option to show the data migration in verbose mode.
+ You can also run the data migration just in test mode by using the flag
+ 
+\emph on
+-c
+\emph default
+.
  If the migration of cache data fails it can be rerun, but the Redis data
  storage should be flushed using the Redis FLUSHDB command.
  For more information about Redis please visit 

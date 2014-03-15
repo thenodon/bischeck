@@ -64,6 +64,14 @@ public class MoveCache2Redis {
 
 
 		try {
+            ConfigurationManager.getInstance();
+        } catch (java.lang.IllegalStateException e) {
+            ConfigurationManager.init();
+            ConfigurationManager.getInstance();  
+        }    
+		CacheFactory.init();
+		
+		try {
 			// parse the command line arguments
 			line = parser.parse( options, args );
 
@@ -86,15 +94,15 @@ public class MoveCache2Redis {
 			check = true;
 		}
 
+		String cacheFile = null;
 		if (!line.hasOption("cachefile")) {
-			System.out.println("Please supply cache file name");
-			System.exit(1); // NOPMD - System.exit okay from main()
+			cacheFile = ConfigurationManager.getInstance().getProperties().getProperty("lastStatusCacheDumpDir", "/var/tmp");
+			cacheFile = cacheFile+File.separatorChar + "lastStatusCacheDump";
+		} else {
+			cacheFile = line.getOptionValue("cachefile");
 		}
 
-		ConfigurationManager.init();
-		CacheFactory.init();
-		
-		loaddump(line.getOptionValue("cachefile"));
+		loaddump(cacheFile);
 
 		CacheFactory.destroy();
 		StdSchedulerFactory.getDefaultScheduler().shutdown();
