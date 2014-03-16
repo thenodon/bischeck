@@ -121,14 +121,14 @@ public class ServiceJob implements Job {
 					ServerMessageExecutor.getInstance().execute(service); 
 				}finally { 			
 					Long duration = contextPub.stop()/1000000;
-					LOGGER.debug("All servers execution time: {} ms", duration);
+					LOGGER.debug("Publish execution time: {} ms", duration);
 				}
 			}
 		} finally {
 			long executetime = timercontext.stop()/1000000;         	
 			if (LOGGER.isDebugEnabled()){
 				StringBuffer strbuf = new StringBuffer();
-				strbuf.append("Execution time service job ").
+				strbuf.append("Total execution time").
 					append(service.getHost().getHostname()).
 					append("-").
 					append(service.getServiceName()).
