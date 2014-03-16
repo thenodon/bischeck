@@ -19,6 +19,7 @@
 package com.ingby.socbox.bischeck.servers;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +30,7 @@ import com.googlecode.jsendnsca.MessagePayload;
 import com.googlecode.jsendnsca.NagiosException;
 import com.googlecode.jsendnsca.NagiosPassiveCheckSender;
 import com.googlecode.jsendnsca.NagiosSettings;
+import com.googlecode.jsendnsca.MessagePayload.UnknownHostRuntimeException;
 import com.googlecode.jsendnsca.builders.MessagePayloadBuilder;
 import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
@@ -86,11 +88,20 @@ public class NSCAWorker implements WorkerInf, Runnable {
     public void send(Service service) throws ServerException {
 
         NAGIOSSTAT level;
-        MessagePayload payload = new MessagePayloadBuilder()
-        .withHostname(service.getHost().getHostname())
-        .withServiceName(service.getServiceName())
-        .create();
-
+        MessagePayload payload = new MessagePayload(service.getHost().getHostname(), null, service.getServiceName(), "");
+        /*
+        try {
+        	payload = new MessagePayloadBuilder()
+        	.withHostname(service.getHost().getHostname())
+        	.withServiceName(service.getServiceName())
+        	.create();
+        	
+        } catch (UnknownHostRuntimeException e){
+        	LOGGER.error("Hostname can not be resolved correctly - check /etc/hosts or DNS settings", e);
+        	throw e;
+        }
+        */
+        
         /*
          * Check the last connection status for the Service
          */
