@@ -232,7 +232,7 @@ public final class ServerMessageExecutor {
 			}
 		} finally { 			
 			Long duration = context.stop()/1000000;
-			LOGGER.debug("All servers execution time: {} ms", duration);
+			LOGGER.debug("Internal execution time: {} ms", duration);
 		}
 	}
 }
