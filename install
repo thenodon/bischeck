@@ -181,7 +181,7 @@ eid=$(id -un)
     
 
 headline "Welcome to bischeck $VERSION installer"
-echo "Copyright Anders Håål, Ingenjörsbyn AB 2011-2013"
+echo "Copyright Anders Håål, Ingenjörsbyn AB 2011-2014"
 echo "Licensed under GPL version 2"
 
 while getopts U:I:J:uRXd:p:i:a name
