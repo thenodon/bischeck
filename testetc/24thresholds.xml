@@ -21,6 +21,40 @@
       
       
     <servicedeftemplate templatename="randthreshold">
+<period>
+    
+           <months> 
+              <month>2</month>
+              <dayofmonth>25</dayofmonth> 
+          </months>         
+          
+           <months> 
+              <month>2</month>
+          </months>           
+            
+           <months> 
+              <dayofmonth>24</dayofmonth> 
+          </months>         
+            
+            
+            <weeks> 
+                <week>13</week>
+                <dayofweek>2</dayofweek>
+            </weeks> 
+            
+            <weeks> 
+                <week>12</week>
+            </weeks> 
+            
+            <weeks> 
+                <dayofweek>1</dayofweek>
+            </weeks> 
+             
+            <calcmethod>&gt;</calcmethod> 
+            <warning>10</warning> 
+            <critical>30</critical> 
+            <hoursIDREF>1</hoursIDREF> 
+        </period>
         <period>
             <calcmethod>&gt;</calcmethod>
             <warning>5</warning>
