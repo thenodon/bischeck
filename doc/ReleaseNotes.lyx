@@ -196,6 +196,52 @@ LatexCommand tableofcontents
 \end_layout
 
 \begin_layout Section
+Release 1.0.1 - 2014-03-27
+\end_layout
+
+\begin_layout Standard
+Release 1.0.1 is a minor bug fix release, but fixing a major bug related to
+ threshold management.
+ 
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Standard
+None
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-255] 
+\begin_inset Quotes eld
+\end_inset
+
+Bug in class Twenty4HourThreshold when configure periods with months and
+ weeks
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This bug require immediate upgrade.
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 1.0.1 support upgrade from release 0.4.3 and 1.0.0.
+ If you upgrade from 0.4.3, please follow the upgrade instructions described
+ in the below upgrading section for 1.0.0.
+\end_layout
+
+\begin_layout Section
 Release 1.0.0 - 2014-03-15
 \end_layout
 
