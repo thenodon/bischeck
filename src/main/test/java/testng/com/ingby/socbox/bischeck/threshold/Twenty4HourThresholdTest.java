@@ -1,9 +1,15 @@
 package testng.com.ingby.socbox.bischeck.threshold;
 
 
+import java.util.Calendar;
+
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import ch.qos.logback.classic.Level;
+
+import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.service.Service;
@@ -67,6 +73,20 @@ public class Twenty4HourThresholdTest {
 
 		Assert.assertEquals(curstate.toString(),"OK");
 		
+	}
+	
+	@Test (groups = { "Threshold" } )
+	public void verifyConfiguration() throws ThresholdException {
+        Twenty4HourThreshold current = new Twenty4HourThreshold("host0","avgrand","avg");
+        		
+        
+            Calendar testdate = BisCalendar.getInstance();
+            int year = 2015;
+            int month = 1;
+            int day = 25; 
+            testdate.set(year,month,day);   
+            current.init(testdate);
+
 	}
 	
 }

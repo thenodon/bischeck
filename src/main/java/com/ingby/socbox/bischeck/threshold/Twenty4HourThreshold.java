@@ -561,12 +561,16 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
             while (weeksIter.hasNext()) {
                 XMLWeeks weeks = weeksIter.next();
-                if (weeks.getWeek().equals(week) && 
-                		isContentNull(weeks.getDayofweek())) {
+                
+                if (!isContentNull(weeks.getWeek()) && 
+                	weeks.getWeek().equals(week) && 
+                	isContentNull(weeks.getDayofweek())) {
+
                 	LOGGER.debug("Rule 6 - week is {} - hourid: {}", week, period.getHoursIDREF());
-                    assignPeriod(period);
-                    return period;
+                	assignPeriod(period);
+                	return period;
                 }
+
             }
         }
         return null;
@@ -587,13 +591,15 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             while (monthsIter.hasNext()) {
                 XMLMonths months = monthsIter.next();
 
-                if (months.getMonth().equals(month) &&
-                        isContentNull(months.getDayofmonth())) {
-                	
+                if (!isContentNull(months.getMonth()) &&
+                	months.getMonth().equals(month) &&
+                	isContentNull(months.getDayofmonth())) {
+
                 	LOGGER.debug("Rule 5 - month is {} - hourid: {}", month, period.getHoursIDREF());
-                    assignPeriod(period);
-                    return period;
+                	assignPeriod(period);
+                	return period;
                 }
+
             }
         }
 		return null;
@@ -615,7 +621,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 XMLWeeks weeks = weeksIter.next();
 
                 if (isContentNull(weeks.getWeek()) &&
-                        weeks.getDayofweek().equals(dayofweek)) {
+                    weeks.getDayofweek().equals(dayofweek)) {
+                	
                 	LOGGER.debug("Rule 4 - day of week is {} - hourid: {}", dayofweek, period.getHoursIDREF());
                     assignPeriod(period);
                     return period;
@@ -641,7 +648,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 XMLMonths months = monthsIter.next();
 
                 if (isContentNull(months.getMonth()) &&
-                        months.getDayofmonth().equals(dayofmonth)) {
+                    months.getDayofmonth().equals(dayofmonth)) {
+                	
                 	LOGGER.debug("Rule 3 - day of month is {} - hourid: {}", dayofmonth, period.getHoursIDREF());
                     assignPeriod(period);
                     return period;
@@ -667,12 +675,16 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             while (weeksIter.hasNext()) {
                 XMLWeeks weeks = weeksIter.next();
 
-                if (weeks.getWeek().equals(week) &&
-                        weeks.getDayofweek().equals(dayofweek)) {
+                if (!isContentNull(weeks.getWeek()) && 
+                	!isContentNull(weeks.getDayofweek()) &&
+                	weeks.getWeek().equals(week) &&
+                	weeks.getDayofweek().equals(dayofweek)) {
+                	
                 	LOGGER.debug("Rule 2 - week is {} and day is {} - hourid: {}", week, dayofweek, period.getHoursIDREF());
-                    assignPeriod(period);
-                    return period;
+                	assignPeriod(period);
+                	return period;
                 }
+
             }
         }
         return null;
@@ -685,21 +697,25 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         Integer dayofmonth = date.get(Calendar.DAY_OF_MONTH);
         
         Iterator<XMLPeriod> periodIter = listPeriod.iterator();
-
+        
         while (periodIter.hasNext()) {
             XMLPeriod period = periodIter.next();
 
             Iterator<XMLMonths> monthsIter= period.getMonths().iterator();
-
+            
             while (monthsIter.hasNext()) {
                 XMLMonths months = monthsIter.next();
 
-                if (months.getMonth().equals(month) &&
-                        months.getDayofmonth().equals(dayofmonth)) {
+                if (!isContentNull(months.getMonth()) && 
+                	!isContentNull(months.getDayofmonth()) &&
+                	months.getMonth().equals(month) &&
+                	months.getDayofmonth().equals(dayofmonth)) {
+
                 	LOGGER.debug("Rule 1 - month is {} and day is {} - hourid: {}", month, dayofmonth, period.getHoursIDREF());
-                    assignPeriod(period);
-                    return period;
+                	assignPeriod(period);
+                	return period;
                 }
+                
             }
         }
         return null;
@@ -837,7 +853,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     }
     
     
-    private void init(Calendar now) throws ThresholdException  {
+    public void init(Calendar now) throws ThresholdException  {
         
     	XMLTwenty4Threshold twenty4hourconfig;
 		try {
