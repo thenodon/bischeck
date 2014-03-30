@@ -32,7 +32,7 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 public class QueryDateTest {
 	
-	private Calendar now;
+	
 	private ConfigurationManager confMgmr;
 	
 	@BeforeTest
@@ -46,7 +46,6 @@ public class QueryDateTest {
             ConfigurationManager.initonce();
             confMgmr = ConfigurationManager.getInstance();  
         }    
-        now = BisCalendar.getInstance();	
     }
     
     @Test (groups = { "QueryDate" })
@@ -58,11 +57,15 @@ public class QueryDateTest {
     	String parsed = QueryDate.parse(parseit);
     	System.out.println(parsed);
     	
-    	 
+    	Calendar now = null;
+        now = BisCalendar.getInstance();	
+        	 
     	now.add(Calendar.MONTH,-1);
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date1 = sdf.format(now.getTime());
-        now.add(Calendar.MONTH,1);
+        
+        now = BisCalendar.getInstance();	
+        
         now.add(Calendar.DAY_OF_MONTH,2);
     	sdf = new SimpleDateFormat("yy.MM.dd");
         String date2 = sdf.format(now.getTime());
