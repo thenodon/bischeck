@@ -46,7 +46,7 @@ public class Min extends PostfixMathCommand {
 	}
 
 	/**
-	 * Calculates the result of summing up all parameters, which are assumed to
+	 * Calculate the min, which are assumed to
 	 * be of the Double type.
 	 */
 	@SuppressWarnings("unchecked")
@@ -54,32 +54,31 @@ public class Min extends PostfixMathCommand {
 	public void run(Stack stack) throws ParseException {
 		checkStack(stack);// check the stack
 	
-		if (supportNull) {
-			curNumberOfParameters = curNumberOfParameters - Util.deleteNullFromStack(stack);
-		}
-	
 		if (curNumberOfParameters < 1) {
-			throw new ParseException("No arguments for Sum");
+			throw new ParseException("No arguments for Min");
 		}
 
-		// initialize the result to the first argument
-		Object min = stack.pop();
+		Object min = (Object) new Double(Double.MAX_VALUE);;
 		Object param;
-		int i = 1;
-
-		// repeat summation for each one of the current parameters
-		while (i < curNumberOfParameters) {
-			// get the parameter from the stack
-			param = stack.pop();
-
-			// add it to the sum (order is important for String arguments)
-			if ((Double) min >= (Double) param) {
-				min = param;
-			}
-
-			i++;
-		}
-
-		stack.push(min);
+		int i = 0;
+        int j = 0;
+        // repeat summation for each one of the current parameters
+        while (i < (curNumberOfParameters)) {
+        	// get the parameter from the stack
+        	param = stack.pop();
+        	if (!(supportNull && param instanceof Null)) {
+        		if ((Double) min >= (Double) param) {
+    				min = param;
+    			}
+        		j++;
+        	}
+        	i++;
+        }
+		
+        if (j != 0 ) {
+        	stack.push(min);
+        } else { 
+        	stack.push(new Null());
+        }
 	}
 }

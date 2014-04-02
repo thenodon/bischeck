@@ -31,6 +31,7 @@ public class Util {
 	 * @param stack
 	 * @return the number of items removed from the stack
 	 */
+	@Deprecated
 	public static int deleteNullFromStack(Stack<Object> stack) {
 		int deletedNulls = 0;
 

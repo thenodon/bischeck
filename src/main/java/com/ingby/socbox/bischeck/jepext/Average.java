@@ -58,33 +58,36 @@ public class Average extends PostfixMathCommand {
 	public void run(Stack stack) throws ParseException {
 		checkStack(stack);// check the stack
 		
-		
-		if (supportNull) {
-			curNumberOfParameters -= Util.deleteNullFromStack(stack);
-		}
-		
 		if (curNumberOfParameters < 1) {
-			throw new ParseException("No arguments for Sum");
+			throw new ParseException("No arguments for Avg");
 		}
 
+		
 		// initialize the result to the first argument
-		Object sum = stack.pop();
+		Object sum = (Object) new Double(0);//stack.pop();
 		
 		Object param;
-		int i = 1;
-        
-		// repeat summation for each one of the current parameters
-		while (i < (curNumberOfParameters)) {
-			// get the parameter from the stack
-			param = stack.pop();
-			// add it to the sum (order is important for String arguments)
-			sum = addFun.add(param, sum);	
-			i++;
-		}
-		// Calculate the average 
-		sum = (Double) sum / i;
-		// push the result on the inStack
-		
-		stack.push(sum);
+		int i = 0;
+        int j = 0;
+        // repeat summation for each one of the current parameters
+        while (i < (curNumberOfParameters)) {
+        	// get the parameter from the stack
+        	param = stack.pop();
+        	if (!(supportNull && param instanceof Null)) {
+        		// add it to the sum (order is important for String arguments)
+        		sum = addFun.add(param, sum);	
+
+        		j++;
+        	}
+        	i++;
+        }
+		// Calculate the average
+        if (j != 0 ) {
+        	sum = (Double) sum / j;
+        	// push the result on the inStack
+        	stack.push(sum);
+        } else { 
+        	stack.push(new Null());
+        }
 	}
 }

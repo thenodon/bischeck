@@ -34,7 +34,7 @@ public class JEPExtTest {
 	private boolean supportNull = false;
 	@BeforeTest
     public void beforeTest() throws Exception {
-		ConfigurationManager confMgmr = ConfigurationManager.getInstance();
+		ConfigurationManager confMgmr = null;
 		
 		try {
             confMgmr = ConfigurationManager.getInstance();
@@ -47,8 +47,9 @@ public class JEPExtTest {
         }    
     
 		if (ConfigurationManager.getInstance().getProperties().
-				getProperty("notFullListParse","false").equalsIgnoreCase("true"))
+				getProperty("notFullListParse","false").equalsIgnoreCase("true")) {
 			supportNull=true;
+		}
 
 		parser = new ExecuteJEP();        // Create a new parser	
 	}
@@ -83,6 +84,9 @@ public class JEPExtTest {
 		Assert.assertEquals(calc(expr),new Float("24.0"));
 			
 		if (supportNull) {
+		
+			expr = "min(2,6,null,1,2)/min(2,6,4,null,2)";
+			Assert.assertEquals(calc(expr),new Float(0.5));
 			
 			System.out.println("Null in function tests");
 			
@@ -92,8 +96,8 @@ public class JEPExtTest {
 			expr = "avg(2,6,null,1,2)";
 			Assert.assertEquals(calc(expr),new Float(2.75));
 			
-			expr = "avg(2,6,null,1,2) / avg(2,6,null,1,2)";
-			Assert.assertEquals(calc(expr),new Float(1.0));
+			expr = "avg(2,6,null,1,2) / avg(1,3,null,1,1)";
+			Assert.assertEquals(calc(expr),new Float(1.8333334));
 			
 			expr = "avg(null,2,6,null,null,1,2,null) / sum(null,2,6,null,null,1,2,null) * 100";
 			Assert.assertEquals(calc(expr),new Float(25.0));
@@ -101,16 +105,56 @@ public class JEPExtTest {
 			expr = "avg(null,2,6,null,null,1,2,null) / (sum(null,2,6,null,null,1,2,null) * max(2,6,100,1,2))";
 			Assert.assertEquals(calc(expr),new Float(0.0025));
 			
-			expr = "avg(null,null) / avg(2,6,null,1,2)";
+			expr = "divNull(1, avg(2,6,1,2))";
+			Assert.assertEquals(calc(expr),new Float(0.36363637));
+			
+			expr = "divNull(null, avg(2,6,null,1,2))";
 			Assert.assertNull(calc(expr));
 			
 			expr = "avg(null*2,2)";
 			Assert.assertNull(calc(expr));
 		
+			expr = "avg(multNull(null,2),2)";
+			Assert.assertEquals(calc(expr),new Float("2.0"));
+			
 			expr = "multNull(null,6.0)";
 			Assert.assertNull(calc(expr));
 			
-		}else {
+			expr = "multNull(avg(null, null),0.5)";
+			Assert.assertNull(calc(expr));
+			
+			expr = "avg( multNull(avg(null, 1),0.5) , 10)";
+			Assert.assertEquals(calc(expr),new Float("5.25"));
+			
+			expr = "avg( 20, multNull(avg(null, 1),0.5) , 10)";
+			Assert.assertEquals(calc(expr),new Float(10.166666667));
+			
+			
+			expr = "avg(multNull(null,2), multNull(1,3))";
+			Assert.assertEquals(calc(expr),new Float("3"));
+			
+			expr = "avg(multNull(null,2), multNull(null,3))";
+			Assert.assertNull(calc(expr));
+			
+			expr = "avg(null, 6 ,max(null,null), 2, multNull(null,3), min(10,null,6))";
+			Assert.assertEquals(calc(expr), new Float(4.6666665));
+			
+			expr = "avg(9.250759E8, 9.3080077E8)* 1.2";
+			Assert.assertEquals(calc(expr),new Float(1.11352602E9));
+			
+			expr = "multNull(avg(1.09064474E9, 1.07112954E9),0.5)";
+			Assert.assertEquals(calc(expr),new Float(5.4044358E8));
+			
+			expr = "avg(multNull(avg(9.250759E8, 9.3080077E8),1.2), " +
+					"multNull(avg(1.09064474E9, 1.07112954E9),0.5))";
+			Assert.assertEquals(calc(expr),new Float(8.2698477E8));
+			
+			expr = "avg(multNull(avg(9.250759E8, 9.3080077E8),1.2), " +
+					"multNull(avg(null, null),0.5), " +
+					"multNull(avg(1.09064474E9, 1.07112954E9),0.5))";
+			Assert.assertEquals(calc(expr),new Float(8.2698477E8));
+			
+		} else {
 			System.out.println("Not Null in function tests");
 			expr = "avg(null,null,null,4,2)";
 			Assert.assertNull(calc(expr));
@@ -126,7 +170,76 @@ public class JEPExtTest {
 			
 			expr = "multNull(null,6.0)";
 			Assert.assertNull(calc(expr));
+
+			
+			expr = "min(2,6,1,2)/min(2,6,4,2)";
+			Assert.assertEquals(calc(expr),new Float(0.5));
+			
 		
+			expr = "avg(4,2)";	
+			Assert.assertEquals(calc(expr),new Float(3.0));
+			
+			expr = "avg(2,6,1,2)";
+			Assert.assertEquals(calc(expr),new Float(2.75));
+			
+			expr = "avg(2,6,1,2) / avg(1,3,1,1)";
+			Assert.assertEquals(calc(expr),new Float(1.8333334));
+			
+			expr = "avg(2,6,1,2) / sum(2,6,1,2) * 100";
+			Assert.assertEquals(calc(expr),new Float(25.0));
+			
+			expr = "avg(2,6,1,2) / (sum(2,6,1,2) * max(2,6,100,1,2))";
+			Assert.assertEquals(calc(expr),new Float(0.0025));
+			
+			expr = "divNull(1, avg(2,6,1,2))";
+			Assert.assertEquals(calc(expr),new Float(0.36363637));
+			
+			expr = "divNull(null, avg(2,6,null,1,2))";
+			Assert.assertNull(calc(expr));
+			
+			expr = "avg(null*2,2)";
+			Assert.assertNull(calc(expr));
+		
+			expr = "avg(multNull(null,2),2)";
+			Assert.assertNull(calc(expr));
+			
+			expr = "multNull(null,6.0)";
+			Assert.assertNull(calc(expr));
+			
+			expr = "multNull(avg(null, null),0.5)";
+			Assert.assertNull(calc(expr));
+			
+			expr = "avg( multNull(avg( 1),0.5) , 10)";
+			Assert.assertEquals(calc(expr),new Float("5.25"));
+			
+			expr = "avg( 20, multNull(avg( 1),0.5) , 10)";
+			Assert.assertEquals(calc(expr),new Float(10.166666667));
+			
+			
+			expr = "avg(multNull(null,2), multNull(1,3))";
+			Assert.assertNull(calc(expr));
+			
+			expr = "avg(multNull(null,2), multNull(null,3))";
+			Assert.assertNull(calc(expr));
+			
+			expr = "avg( 6 , 2, multNull(null,3), min(10,6))";
+			Assert.assertNull(calc(expr));
+			
+			expr = "avg(9.250759E8, 9.3080077E8)* 1.2";
+			Assert.assertEquals(calc(expr),new Float(1.11352602E9));
+			
+			expr = "multNull(avg(1.09064474E9, 1.07112954E9),0.5)";
+			Assert.assertEquals(calc(expr),new Float(5.4044358E8));
+			
+			expr = "avg(multNull(avg(9.250759E8, 9.3080077E8),1.2), " +
+					"multNull(avg(1.09064474E9, 1.07112954E9),0.5))";
+			Assert.assertEquals(calc(expr),new Float(8.2698477E8));
+			
+			expr = "avg(multNull(avg(9.250759E8, 9.3080077E8),1.2), " +
+					"multNull(avg(),0.5), " +
+					"multNull(avg(1.09064474E9, 1.07112954E9),0.5))";
+			Assert.assertNull(calc(expr));
+
 		}
 
     }

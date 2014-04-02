@@ -47,40 +47,40 @@ public class Max extends PostfixMathCommand {
 	}
 
 	/**
-	 * Calculates the result of summing up all parameters, which are assumed to
+	 * Calculate the max, which are assumed to
 	 * be of the Double type.
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run(Stack stack) throws ParseException {
 		checkStack(stack);// check the stack
-	
-		if (supportNull) {
-			curNumberOfParameters = curNumberOfParameters - Util.deleteNullFromStack(stack);
-		}
-	
+
 		if (curNumberOfParameters < 1) {
-			throw new ParseException("No arguments for Sum");
+			throw new ParseException("No arguments for Max");
 		}
+	
 
-		// initialize the result to the first argument
-		Object max = stack.pop();
+		Object max = (Object) new Double(0);;
 		Object param;
-		int i = 1;
-
-		// repeat summation for each one of the current parameters
-		while (i < curNumberOfParameters) {
-			// get the parameter from the stack
-			param = stack.pop();
-
-			// add it to the sum (order is important for String arguments)
-			if ((Double) max <= (Double) param) {
-				max = param;
-			}
-
-			i++;
-		}
-
-		stack.push(max);
+		int i = 0;
+        int j = 0;
+        // repeat summation for each one of the current parameters
+        while (i < (curNumberOfParameters)) {
+        	// get the parameter from the stack
+        	param = stack.pop();
+        	if (!(supportNull && param instanceof Null)) {
+        		if ((Double) max <= (Double) param) {
+    				max = param;
+    			}
+        		j++;
+        	}
+        	i++;
+        }
+		
+        if (j != 0 ) {
+        	stack.push(max);
+        } else { 
+        	stack.push(new Null());
+        }
 	}
 }
