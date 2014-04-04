@@ -95,11 +95,11 @@ Release Notes
 \end_layout
 
 \begin_layout Date
-Version 1.0.1
+Version 1.0.2
 \begin_inset Newline linebreak
 \end_inset
 
-2014-03-27
+2014-04-04
 \end_layout
 
 \begin_layout Standard
@@ -177,13 +177,28 @@ All other trademarks are the property of their respective owners.
 \end_layout
 
 \begin_layout Abstract
+\noindent
 
 \series bold
 Abstract
 \end_layout
 
 \begin_layout Abstract
+\noindent
 This document describe the release history of Bischeck.
+ For more information about specific bugs and feature requests please visit
+ 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://gforge.ingby.com/gf/project/bischeck/tracker
+\end_layout
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
@@ -193,6 +208,50 @@ LatexCommand tableofcontents
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Release 1.0.2 - 2014-04-04
+\end_layout
+
+\begin_layout Standard
+Release 1.0.2 is a minor bug fix release.
+ 
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Standard
+None
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-256] 
+\begin_inset Quotes eld
+\end_inset
+
+Error with Null value in the cache
+\begin_inset Quotes eld
+\end_inset
+
+.
+ It is strongly recommended that upgrade is done immediately.
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 1.0.2 support upgrade from release 0.4.3, 1.0.0 and 1.0.1.
+ If you upgrade from 0.4.3, please follow the upgrade instructions described
+ in the below upgrading section for 1.0.0.
 \end_layout
 
 \begin_layout Section
