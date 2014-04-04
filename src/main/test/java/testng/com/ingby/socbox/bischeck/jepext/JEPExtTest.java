@@ -154,6 +154,15 @@ public class JEPExtTest {
 					"multNull(avg(1.09064474E9, 1.07112954E9),0.5))";
 			Assert.assertEquals(calc(expr),new Float(8.2698477E8));
 			
+			expr ="avg(multNull(avg(7.9990118E8, 8.4381606E8),1.2), multNull(avg(7.2747757E8, 8.567257E8),1.2), multNull(avg(null, null),0.5), multNull(avg(8.657216E8,1.10524186E9),0.5), multNull(avg(8.1859027E8, 9.0977683E8),1.2), multNull(avg(7.8139014E8, 9.1235091E8),1.2), multNull(avg(8.2275789E8,9.4512352E8),1.2))";
+			Assert.assertEquals(calc(expr),new Float(9.239145E8));
+			
+			expr ="sum(null, null)";
+			Assert.assertNull(calc(expr));
+			
+			expr ="sum()";
+			Assert.assertNull(calc(expr));
+			
 		} else {
 			System.out.println("Not Null in function tests");
 			expr = "avg(null,null,null,4,2)";
