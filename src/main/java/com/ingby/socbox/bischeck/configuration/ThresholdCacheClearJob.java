@@ -51,7 +51,7 @@ public class ThresholdCacheClearJob implements Job {
 
     private static Scheduler sched;
 
-    public static void init(Properties prop) throws SchedulerException, ParseException {
+    public static void init(Properties prop) throws SchedulerException {
     	
     	
     	sched = StdSchedulerFactory.getDefaultScheduler();

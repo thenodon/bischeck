@@ -78,7 +78,7 @@ public class CachePurgeJob implements Job {
      * @throws SchedulerException
      * @throws ParseException
      */
-    public static void init(Properties prop) throws SchedulerException, ParseException {
+    public static void init(Properties prop) throws SchedulerException {
     	
     	
     	sched = StdSchedulerFactory.getDefaultScheduler();

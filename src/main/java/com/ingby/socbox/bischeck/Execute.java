@@ -55,6 +55,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.configuration.ConfigFileManager;
+import com.ingby.socbox.bischeck.configuration.ConfigurationJobs;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.internal.InternalSurveillance;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
@@ -72,7 +73,7 @@ public final class Execute implements ExecuteMBean {
     private Boolean shutdownRequested = false;
     private Boolean reloadRequested = false;
     private Integer reloadcount = 0;
-    private Long reloadtime = null;
+    private Long reloadtime = 0L;
     private Boolean allowReload = false;
 
     private static Execute exec = new Execute();
@@ -203,6 +204,7 @@ public final class Execute implements ExecuteMBean {
         try {
             sched = initScheduler();
             initTriggers(sched);
+            ConfigurationJobs.initScheduler();
         } catch (SchedulerException e) {
             LOGGER.error("Scheduler init failed", e);
             return FAILED;
@@ -568,7 +570,7 @@ public final class Execute implements ExecuteMBean {
         }
 
         return numberoftriggers
-                - ConfigurationManager.getInstance().numberOfAdminJobs();
+                - ConfigurationJobs.numberOfAdminJobs();
     }
 
     private String readBischeckVersion() {

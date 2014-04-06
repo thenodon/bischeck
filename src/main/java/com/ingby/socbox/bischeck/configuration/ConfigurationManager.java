@@ -258,7 +258,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         	configMgr.initURL2Service();
         	configMgr.initServers();
         	configMgr.initBischeckServices(runOnce);
-        	configMgr.initScheduler();
+        	//configMgr.initScheduler();
         	
         	ThresholdFactory.clearCache();
         	
@@ -334,11 +334,8 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         } catch (SchedulerException e) {
             LOGGER.error("Quartz scheduler failed with exception {}", e.getMessage(), e);
             throw new ConfigurationException(e);
-        } catch (ParseException e) {
-            LOGGER.error("Quartz scheduler failed with exception " + e.getMessage());
-            throw new ConfigurationException(e);
         }
-    }
+     }
     
     
     private void initBischeckServices(boolean once) 
