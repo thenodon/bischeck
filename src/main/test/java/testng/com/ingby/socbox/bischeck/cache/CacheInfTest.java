@@ -31,6 +31,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import testng.com.ingby.socbox.bischeck.TestUtils;
+
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
@@ -53,18 +55,7 @@ public class CacheInfTest {
 	
 	@BeforeClass
 	public void beforeTest() throws Exception {
-
-	    try {
-            confMgmr = ConfigurationManager.getInstance();
-        } catch (java.lang.IllegalStateException e) {
-            System.setProperty("bishome", ".");
-            System.setProperty("xmlconfigdir","testetc");
-            
-            ConfigurationManager.init();
-            confMgmr = ConfigurationManager.getInstance();  
-        }    		
-		//caches.put("LastStatusCache", new com.ingby.socbox.bischeck.cache.provider.laststatuscache.)
-		
+		confMgmr = TestUtils.getConfigurationManager();	
 	}
 
 	

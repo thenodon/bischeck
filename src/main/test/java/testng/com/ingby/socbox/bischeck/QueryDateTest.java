@@ -33,19 +33,10 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 public class QueryDateTest {
 	
 	
-	private ConfigurationManager confMgmr;
 	
 	@BeforeTest
     public void beforeTest() throws Exception {
-        try {
-            confMgmr = ConfigurationManager.getInstance();
-        } catch (java.lang.IllegalStateException e) {
-            System.setProperty("bishome", ".");
-            System.setProperty("xmlconfigdir","testetc");
-            
-            ConfigurationManager.initonce();
-            confMgmr = ConfigurationManager.getInstance();  
-        }    
+		TestUtils.getConfigurationManager();    
     }
     
     @Test (groups = { "QueryDate" })

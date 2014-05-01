@@ -7,7 +7,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import ch.qos.logback.classic.Level;
+import testng.com.ingby.socbox.bischeck.TestUtils;
+
 
 import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
@@ -19,7 +20,6 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactoryException;
 import com.ingby.socbox.bischeck.threshold.ThresholdException;
-import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.ingby.socbox.bischeck.threshold.Twenty4HourThreshold;
 
@@ -28,19 +28,7 @@ public class Twenty4HourThresholdTest {
 
 	@BeforeClass
     public void beforeTest() throws Exception {
-	
-				
-		try {
-            confMgmr = ConfigurationManager.getInstance();
-        } catch (java.lang.IllegalStateException e) {
-            System.setProperty("bishome", ".");
-            System.setProperty("xmlconfigdir","testetc");
-            
-            ConfigurationManager.init();
-            confMgmr = ConfigurationManager.getInstance();  
-        }    
-		
-		
+		confMgmr = TestUtils.getConfigurationManager(); 
 	}
 
 	@Test (groups = { "Threshold" } )

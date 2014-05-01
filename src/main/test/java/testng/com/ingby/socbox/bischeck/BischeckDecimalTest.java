@@ -34,15 +34,7 @@ public class BischeckDecimalTest {
     
     @BeforeTest
     public void beforeTest() throws Exception {
-        try {
-            confMgmr = ConfigurationManager.getInstance();
-        } catch (java.lang.IllegalStateException e) {
-            System.setProperty("bishome", ".");
-            System.setProperty("xmlconfigdir","testetc");
-            
-            ConfigurationManager.init();
-            confMgmr = ConfigurationManager.getInstance();  
-        }
+    	confMgmr = TestUtils.getConfigurationManager();
             
     }   
     

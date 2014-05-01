@@ -40,16 +40,7 @@ public class ConfigUtilTest {
     ConfigurationManager confMgmr = null; 
 	@BeforeTest
     public void beforeTest() throws Exception {
-	    try {
-            confMgmr = ConfigurationManager.getInstance();
-        } catch (java.lang.IllegalStateException e) {
-            System.setProperty("bishome", ".");
-            System.setProperty("xmlconfigdir","testetc");
-            
-            ConfigurationManager.initonce();
-            confMgmr = ConfigurationManager.getInstance();  
-        }   
-	
+		confMgmr = TestUtils.getConfigurationManager();
 	}
     
     @Test (groups = { "ConfigUtil" })
