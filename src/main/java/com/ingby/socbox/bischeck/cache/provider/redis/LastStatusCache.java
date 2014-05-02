@@ -22,6 +22,8 @@ package com.ingby.socbox.bischeck.cache.provider.redis;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -230,9 +232,33 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         LOGGER.info("Fast cache disabled");
         fastCacheEnable  = false;
     }
+
     
+    public Map<String,Long> getKeys(String pattern) {
+    	Jedis jedis = null;
+    	
+    	HashMap<String,Long> lists = new HashMap<String,Long>();
+        
+    	try {
+            jedis = jedispool.getResource();
+            
+            Set<String> keys = jedis.keys(pattern);
+            
+            for(String key : keys) {
+            	if (jedis.type(key).equalsIgnoreCase("list")) {
+            		lists.put(key, jedis.llen(key));
+            	}
+            }
+        } catch (JedisConnectionException je) {
+            connectionFailed(je);
+        } finally {
+            jedispool.returnResource(jedis);
+        }
+        return lists;
+    }
+
     
-    public void updateRuntimeMetaData() {
+    private void updateRuntimeMetaData() {
         Map<String, Host> hostsmap = ConfigurationManager.getInstance().getHostConfig();
         Jedis jedis = null;
         try {
@@ -260,7 +286,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
     }
 
-    public void warmUpFastCache() {
+    private void warmUpFastCache() {
         Map<String, Host> hostsmap = ConfigurationManager.getInstance().getHostConfig();
         Jedis jedis = null;
         try {
