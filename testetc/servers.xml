@@ -87,6 +87,18 @@
             <key>apiUrl</key>
             <value>https://localhost/v1/metrics</value>
         </property>
+        <property>
+            <key>email</key>
+            <value>foo@bar.org</value>
+        </property>
+        <property>
+            <key>authToken</key>
+            <value>111111111111111111111111111111111111111111111111</value>
+        </property>
+        <property>
+            <key>serviceAndItemName</key>
+            <value>true</value>
+        </property>
     </server>
 
 
