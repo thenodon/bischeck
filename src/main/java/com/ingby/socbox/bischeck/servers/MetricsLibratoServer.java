@@ -28,13 +28,16 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ingby.socbox.bischeck.BischeckDecimal;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
-import com.librato.metrics.APIUtil;
+import com.librato.metrics.HttpPoster;
 import com.librato.metrics.LibratoBatch;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.util.Base64;
+import com.librato.metrics.NingHttpPoster;
+import com.librato.metrics.Sanitizer;
+//import com.ning.http.client.AsyncHttpClient;
+//import com.ning.http.util.Base64;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -51,21 +54,21 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 
 	static Map<String,MetricsLibratoServer> servers = new HashMap<String,MetricsLibratoServer>();
 
-	private String instanceName;
+	private String  instanceName;
 
 	private String  apiUrl;
 	private String  authToken;
 	private String  email;
 	private Integer connectionTimeout;
 	private Boolean sendThreshold;
-	private String nameSeparator;
+	private String  nameSeparator;
 	private Boolean serviceAndItemName;
-	private String doNotSendRegex;
-	private String doNotSendRegexDelim;
+	private String  doNotSendRegex;
+	private String  doNotSendRegexDelim;
 	private MatchServiceToSend msts = null;
-    		
-	private LibratoBatch batch;
-	private AsyncHttpClient.BoundRequestBuilder builder;
+    private HttpPoster poster;
+    
+	//private AsyncHttpClient.BoundRequestBuilder builder;
 
 	
 	private MetricsLibratoServer(String name) {
@@ -130,14 +133,7 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
         doNotSendRegexDelim = prop.getProperty("doNotSendRegexDelim",
         		defaultproperties.getProperty("doNotSendRegexDelim"));
 
-		AsyncHttpClient httpclient = new AsyncHttpClient();
-
-		builder = httpclient.preparePost(apiUrl);
-
-		// Create the basic auth based on email and authtoken
-		String auth = String.format("Basic %s", Base64.encode((email + ":" + authToken).getBytes())); 
-		builder.addHeader("Authorization", auth);
-		builder.addHeader("Content-Type", "application/json");
+        poster = NingHttpPoster.newPoster(email, authToken, apiUrl); 
 		
 		msts = new MatchServiceToSend(MatchServiceToSend.convertString2List(doNotSendRegex,doNotSendRegexDelim));
 
@@ -159,26 +155,26 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 			}
 		}
 		
-		batch = new LibratoBatch(LibratoBatch.DEFAULT_BATCH_SIZE, 
-				APIUtil.noopSanitizer, 
+		LibratoBatch batch = new LibratoBatch(LibratoBatch.DEFAULT_BATCH_SIZE, 
+				Sanitizer.LAST_PASS, 
 				connectionTimeout,  
 				TimeUnit.MILLISECONDS, 
-				"bischeck");
+				"bischeck", poster);
 
-		String logmesg = addMetrics(service);
+		String logmesg = addMetrics(batch, service);
 
 		if (LOGGER.isInfoEnabled())
-			LOGGER.info(ServerUtil.logFormat(instanceName, service,logmesg));
+			LOGGER.info(ServerUtil.logFormat(instanceName, service, logmesg));
 		
 		if (serviceAndItemName) {	
-			connectAndSend(service.getHost().getHostname());
+			connectAndSend(batch, service.getHost().getHostname());
 		} else {
-			connectAndSend(service.getHost().getHostname()+nameSeparator+service.getServiceName());
+			connectAndSend(batch, service.getHost().getHostname()+nameSeparator+service.getServiceName());
 		}
 	}
 
 
-	private void connectAndSend(String source) {
+	private void connectAndSend(LibratoBatch batch, String source) {
 		Long duration = null;
 		final String timerName = instanceName+"_sendTimer";
 		final Timer timer = Metrics.newTimer(MetricsLibratoServer.class, 
@@ -187,7 +183,7 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 
 		long currentTimeInSec = System.currentTimeMillis()/1000;
 		try {
-			batch.post(builder, source, currentTimeInSec);
+			batch.post(source, currentTimeInSec);
 		}catch (Exception e) {
 			LOGGER.error("Network error - check connection", e);
 		} finally { 		
@@ -197,7 +193,7 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 	}
 
 	
-	private String addMetrics(Service service) {
+	private String addMetrics(LibratoBatch batch, Service service) {
 		StringBuffer strbuf = new StringBuffer();
 		strbuf.append(" ");
 		
@@ -227,13 +223,13 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 				strbuf.append(" ").
 					append(metricName).
 					append("_threshold=").
-					append(serviceItem.getThreshold().getThreshold());
+					append(new BischeckDecimal(serviceItem.getThreshold().getThreshold()));
 				
 				batch.addGaugeMeasurement(metricName.toString()+"_threshold",
 						new BigDecimal(serviceItem.getThreshold().getThreshold()));   	
 			}
 		}
-
+		
 		return strbuf.toString();
 	}
 
