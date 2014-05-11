@@ -50,6 +50,7 @@ classpath=$bishome/resources:$bishome:$bishome/lib/*:$bishome/customlib/*
 
 if [ "x$program" = "xExecute" -a "x$arg" = "x-d" ] ; then
   java $jmx -Dbishome=$bishome -classpath $classpath com.ingby.socbox.bischeck.$program $arg
+#  java -Dbishome=$bishome -javaagent:$bishome/lib/jolokia-jvm-1.2.0-agent.jar=config=$bishome/src/main/resources/jolokia.conf -classpath $classpath com.ingby.socbox.bischeck.$program $arg
 else
   java -Dbishome=$bishome -classpath $classpath com.ingby.socbox.bischeck.$program $arg
 fi
