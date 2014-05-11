@@ -63,6 +63,7 @@ public class NRDPWorker implements WorkerInf, Runnable {
     private URL url;
     private Integer connectionTimeout;
     
+    
     public NRDPWorker(String instanceName, BlockingQueue<Service> bq, ServerCircuitBreak circuitBreak, String urlstr, String cmd, Integer connectionTimeout) {
         
         this.nagutil = new NagiosUtil();
@@ -106,6 +107,7 @@ public class NRDPWorker implements WorkerInf, Runnable {
         LOGGER.debug("{} -Thread {} going out of service ", instanceName, Thread.currentThread().getName());
     }
 
+    
     @Override
     public void send(Service service) throws ServerException {
 
@@ -188,8 +190,12 @@ public class NRDPWorker implements WorkerInf, Runnable {
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                 } 
-                
+                              
                 InputStream is = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+                if (LOGGER.isDebugEnabled()) {
+                	LOGGER.debug("NRDP return string - {}", convertStreamToString(is));
+                	is.reset();
+                }
                 
                 Document doc = null;
 
@@ -200,10 +206,13 @@ public class NRDPWorker implements WorkerInf, Runnable {
                 NodeList responselist = doc.getElementsByTagName(rootNode);  
                 String result = (String) ((Element) responselist.item(0)).getElementsByTagName("status").  
                     item(0).getChildNodes().item(0).getNodeValue().trim();  
+                
+                LOGGER.debug("NRDP return status is: {}", result);
+                
                 if (!result.equals("0")) {  
                     String message = (String) ((Element) responselist.item(0)).getElementsByTagName("message").  
                         item(0).getChildNodes().item(0).getNodeValue().trim();  
-                    LOGGER.error("{} - nrdp returned message \"{}\" for xml: {}",instanceName, message, xml);
+                    LOGGER.error("{} - nrdp returned message \"{}\" for xml: {}", instanceName, message, xml);
                 }
             } catch (SAXException e) {
                 LOGGER.error("{} - Could not parse response xml", instanceName, e);
@@ -229,6 +238,7 @@ public class NRDPWorker implements WorkerInf, Runnable {
     
         LOGGER.debug("{} - Message: {}", instanceName, payload);
         HttpURLConnection conn;
+        
         conn = (HttpURLConnection) url.openConnection();
 
         conn.setDoOutput(true);
@@ -280,6 +290,10 @@ public class NRDPWorker implements WorkerInf, Runnable {
         return utfenc;
     }
 
+    static String convertStreamToString(java.io.InputStream is) {	
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
 
 }
 
