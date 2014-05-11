@@ -218,6 +218,10 @@ public abstract class CacheUtil {
 							serviceitem,
 							System.currentTimeMillis() + CacheUtil.calculateByTime(indexstr)*1000));
 		} else {
+			/*
+			 * Format x[X]
+			 * Where X is the index
+			 */
 			strbuf.append(
 					cache.getByIndex( 
 							host,

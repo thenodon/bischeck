@@ -61,6 +61,7 @@ public class CacheEvaluator {
 		return cacheeval.getParsedStatement();
 	}
 
+	
 	/**
 	 * 
 	 * @param statement
@@ -166,6 +167,7 @@ public class CacheEvaluator {
 		return cacheNameList;
 	}
 
+	
 	private List<String> getValues(List<String> listofenties) {
 		List<String> valueList = new ArrayList<String>();
 
