@@ -248,6 +248,12 @@ public final class Execute implements ExecuteMBean {
                     "Pid file already exist - check if bischeck already running");
         }
 
+        Boolean disableCertificateValidation = Boolean.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("disableCertificateValidation","false"));
+        if (disableCertificateValidation) {
+        	SSLTrustManager.disableCertificateValidation();
+        }
+        
+        
         ConfigurationManager.getInstance().getPidFile().deleteOnExit();
 
         setupProperties();
