@@ -97,30 +97,33 @@ public final class NRDPServer implements Server, MessageServerInf {
 
     
 	private void init(String name) {
-	    String  hostAddress;
-	    Integer port;
-	    String  password;
-	    String  path;
 	    
-	        
 		Properties defaultproperties = getServerProperties();
 		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
-		hostAddress = prop.getProperty("hostAddress",
+		String hostAddress = prop.getProperty("hostAddress",
 				defaultproperties.getProperty("hostAddress"));
 
-		port = Integer.parseInt(prop.getProperty("port", 
+		Integer port = Integer.parseInt(prop.getProperty("port", 
 				defaultproperties.getProperty("port")));
 
-		password = prop.getProperty("password",
+		String password = prop.getProperty("password",
 				defaultproperties.getProperty("password"));
 
-		path = prop.getProperty("path",
+		String path = prop.getProperty("path",
 				defaultproperties.getProperty("path"));
+
+		Boolean ssl = Boolean.valueOf(prop.getProperty("ssl",
+				defaultproperties.getProperty("ssl")));
 
 		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
 				defaultproperties.getProperty("connectionTimeout")));
-
-		urlstr = "http://" + hostAddress + ":" + port + "/" + path +"/";
+		
+		String protocol = "http://";
+		if (ssl) {
+			protocol = "https://";
+		}
+		
+		urlstr = protocol + hostAddress + ":" + port + "/" + path +"/";
 		cmd="token="+password+"&cmd=submitcheck&XMLDATA=";
 		
 		circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
@@ -183,6 +186,7 @@ public final class NRDPServer implements Server, MessageServerInf {
         defaultproperties.setProperty("port","80");
         defaultproperties.setProperty("path","nrdp");
         defaultproperties.setProperty("password","");
+        defaultproperties.setProperty("ssl","false");
         defaultproperties.setProperty("connectionTimeout","5000");
 
         return defaultproperties;
@@ -200,7 +204,5 @@ public final class NRDPServer implements Server, MessageServerInf {
 	        LOGGER.info("{} - Increase worker pool size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize());
 	    }
 	}
-	
-	
-	
+		
 }
