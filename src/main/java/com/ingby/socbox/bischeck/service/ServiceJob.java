@@ -48,7 +48,6 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
-import com.ingby.socbox.bischeck.threshold.Threshold;
 import com.ingby.socbox.bischeck.threshold.ThresholdException;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
@@ -61,6 +60,7 @@ import com.yammer.metrics.core.TimerContext;
  * object. That include both connection setup and {@link ServiceItem} execution 
  * and threshold validation
  * 
+ * TODO rewrite the whole handling of states
  */
 public class ServiceJob implements Job {
 
@@ -222,6 +222,9 @@ public class ServiceJob implements Job {
 	 */
 	private void executeJob(Service service) {
 
+		// Initial state
+		service.setLevel(NAGIOSSTAT.OK);
+		
 		for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
 			ServiceItem serviceitem = serviceitementry.getValue();
 
@@ -230,8 +233,13 @@ public class ServiceJob implements Job {
 			LOGGER.debug("Executing ServiceItem: {}", fullservicename);
 
 			synchronized (service) {
+				LOGGER.debug("{} State before execute service {}", fullservicename, service.getLevel().toString());
+				
 				executeService(service, serviceitem);
+				LOGGER.debug("{} State after execute service {}", fullservicename, service.getLevel().toString());
+				
 				executeThreshold(service, serviceitem);
+				LOGGER.debug("{} State after threshold service {}", fullservicename, service.getLevel().toString());
 			}
 		} 
 	}
@@ -257,10 +265,9 @@ public class ServiceJob implements Job {
 
 			if (service.isConnectionEstablished()) {
 				try {
+			
 					serviceitem.execute();
-					try {
-						service.closeConnection();
-					} catch (ServiceException ignore) {}
+			
 				} catch (ServiceItemException si) {
 					LOGGER.warn("{} execution prepare and/or query \"{}\" failed",
 							si.getServiceItemName(), 
@@ -274,11 +281,14 @@ public class ServiceJob implements Job {
 							serviceitem.getExecution(), 
 							se);
 					setLevelOnError(service);
-					
+				} finally {
+					try {
+						service.closeConnection();
+					} catch (ServiceException ignore) {}
 				}
 			}
-		}
-		finally {
+		} finally {
+			
 			long executetime = context.stop()/1000000;         	
 			serviceitem.setExecutionTime(executetime);
 			LOGGER.debug("Time to execute {} : {} ms",
@@ -290,8 +300,8 @@ public class ServiceJob implements Job {
 
 	private void executeThreshold(Service service, ServiceItem serviceitem) {
 
-		NAGIOSSTAT servicestate= NAGIOSSTAT.OK;
-
+		NAGIOSSTAT currentState = service.getLevel();
+		
 		final Timer timer = Metrics.newTimer(ServiceJob.class, 
 				"executeThresholdTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext ctxthreshold = timer.time();
@@ -299,25 +309,23 @@ public class ServiceJob implements Job {
 		// Get the threshold class
 		try {
 			serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
-		
-
-		
+				
 			// Always report the state for the worst service item 
 			LOGGER.debug("{} last executed value {}", serviceitem.getServiceItemName(), serviceitem.getLatestExecuted());
-			NAGIOSSTAT curstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
+			NAGIOSSTAT newState = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
 
 			CacheFactory.getInstance().add(service,serviceitem);
 
-			if (curstate.val() > servicestate.val() ) { 
-				servicestate = curstate;
+			if (newState.val() > currentState.val() ) { 
+				currentState = newState;
 			}
 		} catch (ThresholdException te) {
 			LOGGER.warn("Threshold excution failed", te);
-			servicestate = levelOnError();
+			currentState = levelOnError();
 		} finally {
 			ctxthreshold.stop();
 		}
-		service.setLevel(servicestate);
+		service.setLevel(currentState);
 	}
 
 

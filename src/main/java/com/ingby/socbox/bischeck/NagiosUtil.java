@@ -140,9 +140,11 @@ public class NagiosUtil {
             }
 
             // Building the performance string 
-            perfmessage.append(performanceMessage(serviceItem, warnValue, critValue,
+            if (!currentMeasure.isNull()) {
+            	perfmessage.append(performanceMessage(serviceItem, warnValue, critValue,
                     threshold, currentMeasure));
-                
+            }
+            
             totalexectime = (totalexectime + serviceItem.getExecutionTime());
             count++;
         }

@@ -40,8 +40,32 @@ public class BischeckDecimalTest {
     
 	@Test (groups = { "Util" })
 	public void verifyPerfData() {
+		
+		String nullString = null;
+		
+		BischeckDecimal decEva = new BischeckDecimal(nullString);
+		Assert.assertTrue(decEva.isNull(),"isNull");
+		
+		decEva = new BischeckDecimal("null");
+		Assert.assertTrue(decEva.isNull(),"isNull");
 	    
-	    BischeckDecimal decEva = new BischeckDecimal("0.1000");
+		Float nullFloat = null;
+		decEva = new BischeckDecimal(nullFloat);
+		
+		Assert.assertTrue(decEva.isNull(),"isNull");
+		
+		decEva = new BischeckDecimal("1.0");
+	    Assert.assertFalse(decEva.isNull(),"isNotNull");
+	    Assert.assertEquals(decEva.getScale(), 0);
+	    Assert.assertEquals(decEva.getPrecision(), 1);
+	    Assert.assertEquals(decEva.getNrOfIntegers(), 1);
+	    Assert.assertEquals(decEva.getBigDecimal().toPlainString(),"1");
+	    Assert.assertEquals(decEva.getIntegers(),"1");
+	    Assert.assertEquals(decEva.getDecimals(),"");
+	    
+		
+	    decEva = new BischeckDecimal("0.1000");
+	    Assert.assertFalse(decEva.isNull(),"isNotNull");
 	    Assert.assertEquals(decEva.getScale(), 4);
 	    Assert.assertEquals(decEva.getPrecision(), 5);
 	    Assert.assertEquals(decEva.getNrOfIntegers(), 0);
@@ -50,6 +74,17 @@ public class BischeckDecimalTest {
 	    Assert.assertEquals(decEva.getDecimals(),"1000");
         
 	    decEva = new BischeckDecimal("-0.1000");
+        Assert.assertEquals(decEva.getScale(), 4);
+        Assert.assertEquals(decEva.getPrecision(), 5);
+        Assert.assertEquals(decEva.getNrOfIntegers(), 0);
+        Assert.assertEquals(decEva.getBigDecimal().toPlainString(),"-0.1000");
+        Assert.assertEquals(decEva.toString(),"-0.1000");
+        Assert.assertTrue(decEva.isIntergerZero());
+        Assert.assertTrue(decEva.isNegative());
+        Assert.assertEquals(decEva.getIntegers(),"0");
+        Assert.assertEquals(decEva.getDecimals(),"1000");
+        
+        decEva = new BischeckDecimal(" -0.1000	");
         Assert.assertEquals(decEva.getScale(), 4);
         Assert.assertEquals(decEva.getPrecision(), 5);
         Assert.assertEquals(decEva.getNrOfIntegers(), 0);
