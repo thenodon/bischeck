@@ -76,8 +76,6 @@ public class ExecuteServiceOnDemand implements DynamicMBean {
     }
 
 	
-	
-	
 	@Override
 	public Object getAttribute(String attribute)
 			throws AttributeNotFoundException, MBeanException,
@@ -184,9 +182,8 @@ public class ExecuteServiceOnDemand implements DynamicMBean {
 	private boolean executeSeriveImmediate(String hostName, String serviceName, Service service) {
 		Scheduler sched = null;
 		try {
+
 			sched = StdSchedulerFactory.getDefaultScheduler();
-
-
 
 			Trigger trigger = newTrigger()
 					.withIdentity(service.getServiceName()+"Trigger-OnDemand", hostName+"TriggerGroupOnDemand")
@@ -205,7 +202,7 @@ public class ExecuteServiceOnDemand implements DynamicMBean {
 			JobDataMap jobmap = new JobDataMap(map);
 			JobDetail job = newJob(ServiceJob.class)
 					.withIdentity(serviceName,hostName)
-					.withDescription(hostName + "-"+ serviceName + "-ONDEMAND")
+					.withDescription(hostName + "-"+ serviceName + "-OnDemand")
 					.usingJobData(jobmap).build();
 
 			sched.scheduleJob(job, trigger);

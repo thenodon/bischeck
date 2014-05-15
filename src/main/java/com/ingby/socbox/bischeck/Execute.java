@@ -59,6 +59,7 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationJobs;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.internal.InternalSurveillance;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
+import com.ingby.socbox.bischeck.service.ExecuteServiceOnDemand;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
 
@@ -93,7 +94,8 @@ public final class Execute implements ExecuteMBean {
     private static long shutdownsleep = SHUTDOWNSLEEPDEF;
     private static String bischeckversion;
     private static Thread dumpthread;
-
+    
+    private static ExecuteServiceOnDemand exon = new ExecuteServiceOnDemand();
     
     public static void main(String[] args) {
 
