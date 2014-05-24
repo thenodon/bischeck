@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.threshold;
 
@@ -25,35 +25,66 @@ package com.ingby.socbox.bischeck.threshold;
  *
  */
 public class ThresholdContainer {
-    private Float floatThreshold = null;
-    private String expThreshold = null;
-    private boolean expInd = false;
-    
-    public Float getFloatThreshold() {
-        return floatThreshold;
-    }
+	private Float floatThreshold = null;
+	private String expThreshold = null;
+	private boolean expInd = false;
 
-    
-    public void setFloatThreshold(Float floatThreshold) {
-        this.floatThreshold = floatThreshold;
-        this.expInd = false;
-    }
-    
-    
-    public String getExpThreshold() {
-        return expThreshold;
-    }
-    
-    
-    public void setExpThreshold(String expThreshold) {
-        this.expThreshold = expThreshold;
-        this.expInd = true;
-    }
-    
-    
-    public boolean isExpInd() {
-        return expInd;
-    }
-    
-    
+	private Float warning;
+	private Float critical;
+
+
+
+	public Float getFloatThreshold() {
+		return floatThreshold;
+	}
+
+
+	public void setFloatThreshold(Float floatThreshold) {
+		this.floatThreshold = floatThreshold;
+		this.expInd = false;
+	}
+
+
+	public String getExpThreshold() {
+		return expThreshold;
+	}
+
+
+	public void setExpThreshold(String expThreshold) {
+		this.expThreshold = expThreshold;
+		this.expInd = true;
+	}
+
+
+	public boolean isExpInd() {
+		return expInd;
+	}
+
+	public Float getWarning() {
+		if (this.warning == null) {
+			return null;
+		}
+
+		return this.warning;
+	}
+
+
+	public void setWarning(Float warning) {
+		this.warning = warning;
+	}
+
+
+	public Float getCritical() {
+		if (this.critical == null) {
+			return null;
+		}
+
+		return this.critical;
+	}
+
+
+	public void setCritical(Float critical) {
+		this.critical = critical;
+	}
+
 }

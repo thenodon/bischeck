@@ -42,7 +42,7 @@ public abstract class Util {
 
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     
-    private final static Pattern FORMAT_HOUR_MINUTE = Pattern.compile("^([01]?[0-9]|2[0-3]):[0]?[0]$");
+    private final static Pattern FORMAT_HOUR_MINUTE = Pattern.compile("^([01]?[0-9]|2[0-4]):[0]?[0]$");
     private final static Pattern ISNULLIN = Pattern.compile(".*null.*");
     private static Map<String,DecimalFormat> decFormatMapCache = new HashMap<String, DecimalFormat>();
     
@@ -282,6 +282,14 @@ public abstract class Util {
         } else {
             return false;
         }
+    }
+    
+    public static String integerToTimeString(Integer num) {
+    	if (num < 10) {
+    		return "0"+num;
+    	} else {
+    		return ""+num;
+    	}
     }
     
     
