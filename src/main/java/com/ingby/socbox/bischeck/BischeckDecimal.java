@@ -222,6 +222,10 @@ public class BischeckDecimal {
 	 * @return
 	 */
 	public Float getFloat() {
+		if (isNull()) {
+			return null;
+		}
+		
 		if (isNegative) {
 			return (new Float(stringValue) * (-1));
 		} else {
@@ -235,6 +239,10 @@ public class BischeckDecimal {
 	 * @return
 	 */
 	public String toString() {
+		if (isNull()) {
+			return null;
+		}
+		
 		if (isNegative) {
 			return ("-"+stringValue);
 		} else {
