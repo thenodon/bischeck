@@ -69,10 +69,10 @@ public class CacheCli {
 		CommandLine line = null;
 		// create the Options
 		Options options = new Options();
-		options.addOption( "u", "usage", false, "show usage." );
-		options.addOption( "p", "pipemode", false, "Read from stdin" );
-		options.addOption( "T", "notime", false, "Do not show execution time" );
-		options.addOption( "P", "noparse", false, "Do not show parsed expression" );
+		options.addOption( "u", "usage", false, "show usage" );
+		options.addOption( "p", "pipemode", false, "read from stdin" );
+		options.addOption( "T", "notime", false, "do not show execution time" );
+		options.addOption( "P", "noparse", false, "do not show parsed expression" );
 
 		try {
 			line = cmdParser.parse( options, args );

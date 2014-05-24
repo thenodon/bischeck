@@ -115,7 +115,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         CommandLine line = null;
        
         Options options = new Options();
-        options.addOption( "u", "usage", false, "show usage." );
+        options.addOption( "u", "usage", false, "show usage" );
         options.addOption( "d", "date", true, "date to test, e.g. 20100811" );
         options.addOption( "h", "host", true, "host to test");
         options.addOption( "s", "service", true, "service to test");
