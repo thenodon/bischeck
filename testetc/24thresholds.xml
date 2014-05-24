@@ -19,9 +19,93 @@
         <template>mythreshold</template>    
     </servicedefgroup>
       
+    <servicedefgroup>
+        <member>
+           <hostname>h1</hostname>
+            <servicename>s1</servicename>
+            <serviceitemname>i1</serviceitemname>
+        </member>
+        <template>testthreshold</template>    
+    </servicedefgroup>
+
+
+    <servicedeftemplate templatename="testthreshold">
+        <period>
+            <calcmethod>&gt;</calcmethod>
+            <warning>5</warning>
+            <critical>10</critical>
+            <hoursIDREF>100</hoursIDREF>
+        </period>
+
+        <period>
+           <months> 
+              <month>2</month>
+              <dayofmonth>25</dayofmonth> 
+          </months>         
+            <calcmethod>&gt;</calcmethod>
+            <warning>10</warning>
+            <critical>20</critical>
+            <hoursIDREF>101</hoursIDREF>
+        </period>
+        
+        <period>
+           <weeks> 
+              <week>1</week>
+              <dayofweek>2</dayofweek> 
+          </weeks>         
+            <calcmethod>&gt;</calcmethod>
+            <warning>10</warning>
+            <critical>20</critical>
+            <hoursIDREF>102</hoursIDREF>
+        </period>
+        
+        <period>
+           <weeks> 
+              <dayofweek>4</dayofweek> 
+          </weeks>         
+            <calcmethod>&gt;</calcmethod>
+            <warning>10</warning>
+            <critical>20</critical>
+            <hoursIDREF>103</hoursIDREF>
+        </period>
+        
+        <period>
+           <weeks> 
+              <week>2</week> 
+          </weeks>         
+            <calcmethod>&gt;</calcmethod>
+            <warning>10</warning>
+            <critical>20</critical>
+            <hoursIDREF>104</hoursIDREF>
+        </period>
+        
+        <period>
+           <months> 
+              <month>11</month>
+              <dayofmonth>23</dayofmonth> 
+          </months>         
+            <calcmethod>&gt;</calcmethod>
+            <warning>10</warning>
+            <critical>20</critical>
+            <hoursIDREF>102</hoursIDREF>
+        </period>
+        
+        <period>
+           <months> 
+              <month>3</month>
+              <dayofmonth>25</dayofmonth> 
+          </months>         
+            <calcmethod>&gt;</calcmethod>
+            <warning>10</warning>
+            <critical>20</critical>
+            <hoursIDREF>200</hoursIDREF>
+        </period>
+    </servicedeftemplate>
+
+
       
     <servicedeftemplate templatename="randthreshold">
-<period>
+        <period>
     
            <months> 
               <month>2</month>
@@ -69,7 +153,7 @@
             <calcmethod>&gt;</calcmethod>
             <warning>5</warning>
             <critical>10</critical>
-            <hoursIDREF>1</hoursIDREF>
+            <hoursIDREF>0</hoursIDREF>
         </period>
     </servicedeftemplate>
 
@@ -89,6 +173,183 @@
         </hourinterval>
     </hours>
 
+    <hours hoursID="100">
+        <hourinterval>
+            <from>00:00</from>
+            <to>23:00</to>
+            <threshold>1000</threshold>
+        </hourinterval>
+    </hours>
+
+    <hours hoursID="101">
+        
+        <hourinterval>
+            <from>00:00</from>
+            <to>02:00</to>
+            <threshold>1000</threshold>
+        </hourinterval>
+         
+        <hourinterval>
+            <from>02:00</from>
+            <to>04:00</to>
+            <threshold>2000</threshold>
+            <warning>20</warning>
+            <critical>30</critical>
+        </hourinterval>
+     
+        <hourinterval>
+            <from>04:00</from>
+            <to>06:00</to>
+            <threshold>1000</threshold>
+        </hourinterval>
+         
+        <hourinterval>
+            <from>06:00</from>
+            <to>08:00</to>
+            <threshold>2000</threshold>
+            <warning>20</warning>
+            <critical>30</critical>
+        </hourinterval>
+
+        <hourinterval>
+            <from>08:00</from>
+            <to>10:00</to>
+            <threshold>1000</threshold>
+        </hourinterval>
+         
+        <hourinterval>
+            <from>10:00</from>
+            <to>12:00</to>
+            <threshold>2000</threshold>
+            <warning>20</warning>
+            <critical>30</critical>
+        </hourinterval>
+
+
+        <hourinterval>
+            <from>12:00</from>
+            <to>14:00</to>
+            <threshold>1000</threshold>
+        </hourinterval>
+         
+        <hourinterval>
+            <from>14:00</from>
+            <to>16:00</to>
+            <threshold>2000</threshold>
+            <warning>20</warning>
+            <critical>30</critical>
+        </hourinterval>
+        <hourinterval>
+            <from>16:00</from>
+            <to>18:00</to>
+            <threshold>1000</threshold>
+        </hourinterval>
+         
+        <hourinterval>
+            <from>18:00</from>
+            <to>20:00</to>
+            <threshold>2000</threshold>
+            <warning>20</warning>
+            <critical>30</critical>
+        </hourinterval>
+        <hourinterval>
+            <from>20:00</from>
+            <to>22:00</to>
+            <threshold>1000</threshold>
+        </hourinterval>
+         
+        <hourinterval>
+            <from>22:00</from>
+            <to>24:00</to>
+            <threshold>2000</threshold>
+            <warning>20</warning>
+            <critical>30</critical>
+        </hourinterval>
+        
+    </hours>       
+    
+    <hours hoursID="102">
+        
+        <hourinterval>
+            <from>00:00</from>
+            <to>02:00</to>
+            <threshold>1000</threshold>
+        </hourinterval>
+         
+        
+        <hourinterval>
+            <from>04:00</from>
+            <to>06:00</to>
+            <threshold>1000</threshold>
+        </hourinterval>
+         
+                 
+        <hourinterval>
+            <from>10:00</from>
+            <to>12:00</to>
+            <threshold>2000</threshold>
+            <warning>20</warning>
+            <critical>30</critical>
+        </hourinterval>
+
+        <hourinterval>
+            <from>16:00</from>
+            <to>24:00</to>
+            <threshold>1000</threshold>
+        </hourinterval>
+         
+    </hours>       
+    <hours hoursID="200">
+    <!-- 00:00 -->
+      <hour>500</hour> 
+      <!-- 01:00 -->  
+      <hour>1500</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 02:00 -->
+      <hour>4000</hour> 
+      <!-- 21:00 -->
+      <hour>9000</hour> 
+      <!-- 22:00 -->
+      <hour>10000</hour> 
+      <!-- 23:00 -->
+      <hour>11000</hour> 
+    </hours>
+
     <holiday year="2014">
       <dayofyear>0101</dayofyear>
       <dayofyear>0106</dayofyear>
@@ -104,4 +365,21 @@
       <dayofyear>1225</dayofyear>
       <dayofyear>1226</dayofyear>
     </holiday>
+
+    <holiday year="2015">
+      <dayofyear>0101</dayofyear>
+      <dayofyear>0106</dayofyear>
+      <dayofyear>0422</dayofyear>
+      <dayofyear>0424</dayofyear>
+      <dayofyear>0425</dayofyear>
+      <dayofyear>0501</dayofyear>
+      <dayofyear>0602</dayofyear>
+      <dayofyear>0606</dayofyear>
+      <dayofyear>0612</dayofyear>
+      <dayofyear>0625</dayofyear>
+      <dayofyear>1105</dayofyear>
+      <dayofyear>1225</dayofyear>
+      <dayofyear>1226</dayofyear>
+    </holiday>
+
 </twenty4threshold>
