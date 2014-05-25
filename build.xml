@@ -9,7 +9,7 @@
     <!-- ==== File and Directory Names =================================== -->
     <property name="app.name" value="bischeck" />
     <property name="app.path" value="/${app.name}" />
-    <property name="app.version" value="1.0.2"/>
+    <property name="app.version" value="1.1.0_RC1"/>
     <property name="build.home" value="${basedir}/target" />
     <property name="dist.home" value="${basedir}/dist" />
     <property name="bin.home" value="${basedir}/bin" />
@@ -133,6 +133,7 @@
         <jacoco:coverage destfile="${coverageoutput.dir}/jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
           <testng outputdir="${testoutput.dir}">
             <sysproperty key="bishome" value="${basedir}"/>
+          	<sysproperty key="xmlconfigdir" value="testetc"/>
 
             <classpath>
                 <pathelement path="${build.home}/classes"/>
