@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import org.nfunk.jep.ParseException;
 
-import ch.qos.logback.classic.Level;
-
 import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.BischeckDecimal;
 import com.ingby.socbox.bischeck.Util;
@@ -203,6 +201,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     
     public String show(int hourThreshold,int minuteThreshold, Float metric, int verbose) {
+    	String lineSep = System.getProperty("line.separator");
     	StringBuilder showConfig = new StringBuilder();
     	if (isHoliday) {
     		showConfig.append("Is holiday");
@@ -210,7 +209,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     	}
     	
     	if (verbose > 0) {
-    		showConfig.append(getCurrentRule()).append(System.getProperty("line.separator"));
+    		showConfig.append(getCurrentRule()).append(lineSep);
     	}
     	
     	if (verbose > 1) {
@@ -228,7 +227,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     				append(" warning=").append(thresholdByPeriod[i].getWarning()). 
     				append(" critical=").append(thresholdByPeriod[i].getCritical());
     			}
-    			showConfig.append(System.getProperty("line.separator"));
+    			showConfig.append(lineSep);
     		}
     	
 			//System.out.print(showConfig.toString());

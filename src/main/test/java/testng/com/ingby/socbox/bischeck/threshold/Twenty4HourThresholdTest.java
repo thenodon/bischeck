@@ -76,6 +76,7 @@ public class Twenty4HourThresholdTest {
 		int minuteThreshold;
 		Float metric = null;
 		
+		String lineSep = System.getProperty("line.separator");
 		//////
 		current = new Twenty4HourThreshold("h1","s1","i1");
 
@@ -103,7 +104,7 @@ public class Twenty4HourThresholdTest {
 		minuteThreshold = 10;
 
 		Assert.assertEquals(current.show(hourThreshold, minuteThreshold, metric, 1),
-				"Rule 7 - default - hourid: 100" + System.lineSeparator() +
+				"Rule 7 - default - hourid: 100" + lineSep +
 				"@14:10 Threshold=1000 (>) warning=950(0.95) critical=900(0.9)");
 
 		
@@ -119,7 +120,7 @@ public class Twenty4HourThresholdTest {
 		minuteThreshold = 10;
 
 		Assert.assertEquals(current.show(hourThreshold, minuteThreshold, metric, 1),
-				"Rule 1 - month is 2 and day is 25 - hourid: 101" + System.lineSeparator() +
+				"Rule 1 - month is 2 and day is 25 - hourid: 101" + lineSep +
 				"@14:10 Threshold=2000 (>) warning=1600(0.8) critical=1400(0.7)");
 
 
@@ -135,7 +136,7 @@ public class Twenty4HourThresholdTest {
 		minuteThreshold = 10;
 
 		Assert.assertEquals(current.show(hourThreshold, minuteThreshold, metric, 1),
-				"Rule 1 - month is 2 and day is 25 - hourid: 101" + System.lineSeparator() +
+				"Rule 1 - month is 2 and day is 25 - hourid: 101" + lineSep +
 				"@03:10 Threshold=1833.3334 (>) warning=1466.6667(0.8) critical=1283.3334(0.7)");
 
 	
@@ -151,7 +152,7 @@ public class Twenty4HourThresholdTest {
 		minuteThreshold = 10;
 
 		Assert.assertEquals(current.show(hourThreshold, minuteThreshold, metric, 1),
-				"Rule 1 - month is 2 and day is 25 - hourid: 101" + System.lineSeparator() +
+				"Rule 1 - month is 2 and day is 25 - hourid: 101" + lineSep +
 				"@21:10 Threshold=1166.6666 (>) warning=1049.9999(0.9) critical=933.3333(0.8)");
 
 	}
