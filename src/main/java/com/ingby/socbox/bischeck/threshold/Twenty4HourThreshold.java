@@ -123,8 +123,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         options.addOption( "H", "hour", true, "hour of the day");
         options.addOption( "M", "minute", true, "minute of the day");
         options.addOption( "m", "metric", true, "measured metric value");
-        options.addOption( "v", "ruleVerbose", false, "verbose show show rule");
-        options.addOption( "V", "hourVerbose", false, "verbose show the hour configuration");
+        options.addOption( "v", "verbose", true, "verbose level 1 show rule, level 2 show hours definition");
         
         try {
             line = parser.parse( options, args );
@@ -190,15 +189,11 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
             int verbose = 0;
 
-            if (line.hasOption("ruleVerbose")) {
-            	verbose += 1;
+            if (line.hasOption("verbose")) {
+            	verbose = Integer.parseInt(line.getOptionValue("verbose"));
             	
             }
             
-            if (line.hasOption("hourVerbose")) {
-            	verbose += 2;
-            	
-            }
             System.out.println(current.show(hourThreshold, minuteThreshold, metric, verbose));
             
             System.exit(0); // NOPMD - System.exit okay from main()
@@ -1001,7 +996,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     				LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), thresholdByPeriod[i].getExpThreshold());
     				    				
     			} else {
-    				LOGGER.debug("Hour {} threshold=", Util.integerToTimeString(i), this.thresholdByPeriod[i].getFloatThreshold());
+    				LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), this.thresholdByPeriod[i].getFloatThreshold());
 
     			}
     		}
@@ -1047,7 +1042,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     				LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), thresholdByPeriod[i].getExpThreshold());
     				
     			} else {
-    				LOGGER.debug("Hour {} threshold=", Util.integerToTimeString(i), this.thresholdByPeriod[i].getFloatThreshold());
+    				LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), this.thresholdByPeriod[i].getFloatThreshold());
 
     			}
     		}
