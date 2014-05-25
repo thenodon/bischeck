@@ -102,11 +102,11 @@ Configuration guide
 \end_layout
 
 \begin_layout Date
-Version 1.0.0 
+Version 1.1.0 (DRAFT) 
 \begin_inset Newline newline
 \end_inset
 
-2014-03-15
+2014-06-10 (TARGET DATE)
 \end_layout
 
 \begin_layout Standard
@@ -2914,6 +2914,21 @@ path - the URL path for NRDP, default is nrdp.
 password - the NRDP server token, no default value.
 \end_layout
 
+\begin_layout Itemize
+ssl - enable HTTPS connection to the NRDP server, default is false.
+ 
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[1.1.0]
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
 \begin_layout Standard
 The resulting URL will have the following format:
 \end_layout
@@ -3243,6 +3258,131 @@ doNotSendRegexDelim - The delimiter to separate regular expressions in the
 .
 \end_layout
 
+\begin_layout Section
+Librato
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[1.1.0]
+\end_layout
+
+\end_inset
+
+ Librato is a commercial cloud based monitoring service, 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://metrics.librato.com
+\end_layout
+
+\end_inset
+
+.
+ With the Librato integration metrics data can be pushed to Librato.
+ Librato do not currently support any means to receive the Bischeck threshold
+ calculated state.
+\end_layout
+
+\begin_layout Standard
+The Librato naming is based on two fields - source and metric name.
+ By default the Bischeck host and service name is used as the source name
+ separated with the 
+\emph on
+nameSeperator
+\emph default
+ property and the serviceitem name as the metric name.
+ If the property 
+\emph on
+serviceAndItemName
+\emph default
+ is set to true the source name will only be the Bischeck host name and
+ the metric will be the service and serviceitem name separated with the
+ 
+\emph on
+nameSeperator
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+If property 
+\emph on
+sendThreshold
+\emph default
+ is true the calculated threshold will be named as 
+\emph on
+metricsname
+\emph default
+_threshold in Librato.
+\end_layout
+
+\begin_layout Standard
+The configuration parameters to define in file server.xml for Librato are:
+\end_layout
+
+\begin_layout Itemize
+class - MetricsLibratoServer
+\end_layout
+
+\begin_layout Itemize
+apiUrl - the url to the Librato service, default https://metrics-api.librato.com/v
+1/metrics.
+\end_layout
+
+\begin_layout Itemize
+email - the email address of the Librato registered account.
+\end_layout
+
+\begin_layout Itemize
+authToken - the authToken generated for the Librato account.
+\end_layout
+
+\begin_layout Itemize
+sendThreshold - send the threshold value in addition to the measured metric
+ data, default is true.
+\end_layout
+
+\begin_layout Itemize
+nameSeparator - the separator to use between names for source or metric
+ name, default is dash, "-".
+\end_layout
+
+\begin_layout Itemize
+serviceAndItemName - by default the serviceitem name is used as the Librato
+ use the service and serviceitem as the Librato metric name, default is
+ false.
+ 
+\end_layout
+
+\begin_layout Itemize
+connectionTimeout - the timeout time in milliseconds before Bischeck gives
+ up on the connection, default is 5000.
+\end_layout
+
+\begin_layout Itemize
+doNotSendRegex - A list of regular expressions.
+ Default is no regular expressions.
+\end_layout
+
+\begin_layout Itemize
+doNotSendRegexDelim - The delimiter to separate regular expressions in the
+ property doNotSendRegex, default is 
+\begin_inset Quotes eld
+\end_inset
+
+%
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Chapter
 \begin_inset CommandInset label
 LatexCommand label
@@ -3261,7 +3401,7 @@ $BISHOME/etc
  directory.
  The distribution package includes all xml schema files, xsd, used for validatio
 n of the configuration files.
- For detailed information, please review the xsd files located in the directory
+ For detailed information, please review the xsd files located in the directoryi
 \emph on
  $BISHOME/resources
 \emph default
@@ -5128,6 +5268,27 @@ saveNullOnConnectionError - this property defines if a null value should
 \end_layout
 
 \begin_layout Itemize
+disableCertificateValidation
+\emph on
+ - 
+\emph default
+this property disable SSL (X.509) certification validation for connection
+ over HTTPS, like NRDP.
+ Default is false.
+ 
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[1.1.0]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
 NagiosUtil.extendedformat - defines if the Nagios performance data should
  include the warning and critical levels as its own data entity so it can
  be stored in the RRD database on the Nagios server.
@@ -6113,6 +6274,179 @@ Any hour that is not defined is treated as no threshold exist for the time
 The final section, holidays, define days of the year where no threshold
  will be evaluated.
  A service will always return an OKAY state for these days.
+\end_layout
+
+\begin_layout Subsection
+Warning and critical override
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[1.1.0]
+\end_layout
+
+\end_inset
+
+ If different levels of warning and critical is required depending of the
+ time of the day it's possible to override the warning and critical level
+ set in the period.
+ This is only support for hors sections using the hourinterval configuration.
+ 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Description
+
+	....
+ 
+\end_layout
+
+\begin_layout Description
+
+	<period>
+\end_layout
+
+\begin_layout Description
+
+   	<months> 
+\end_layout
+
+\begin_layout Description
+
+			<dayofmonth>25</dayofmonth> 
+\end_layout
+
+\begin_layout Description
+
+		</months> 
+\end_layout
+
+\begin_layout Description
+
+		<calcmethod>&gt;</calcmethod> 
+\end_layout
+
+\begin_layout Description
+
+		<warning>10</warning> 
+\end_layout
+
+\begin_layout Description
+
+		<critical>20</critical> 
+\end_layout
+
+\begin_layout Description
+
+		<hoursIDREF>101</hoursIDREF> 
+\end_layout
+
+\begin_layout Description
+
+	</period> 
+\end_layout
+
+\begin_layout Description
+
+	....
+ 
+\end_layout
+
+\begin_layout Description
+
+	<hours hoursID="101"> 
+\end_layout
+
+\begin_layout Description
+
+		<hourinterval> 
+\end_layout
+
+\begin_layout Description
+
+			<from>00:00</from> 
+\end_layout
+
+\begin_layout Description
+
+			<to>11:00</to> 
+\end_layout
+
+\begin_layout Description
+
+			<threshold>1000</threshold> 
+\end_layout
+
+\begin_layout Description
+
+		</hourinterval> 
+\end_layout
+
+\begin_layout Description
+
+		<hourinterval> 
+\end_layout
+
+\begin_layout Description
+
+			<from>12:00</from> 
+\end_layout
+
+\begin_layout Description
+
+			<to>24:00</to> 
+\end_layout
+
+\begin_layout Description
+
+			<threshold>2000</threshold> 
+\end_layout
+
+\begin_layout Description
+
+			<!-- Override the values from the period section --> 
+\end_layout
+
+\begin_layout Description
+
+			<warning>20</warning> 
+\end_layout
+
+\begin_layout Description
+
+			<critical>30</critical> 
+\end_layout
+
+\begin_layout Description
+
+		</hourinterval> 
+\end_layout
+
+\begin_layout Description
+
+	</hours>
+\end_layout
+
+\begin_layout Description
+
+	....
+ 
+\end_layout
+
+\end_inset
+
+Between 00 - 11:59 the warning and critical values in the period section
+ will be used and between 12 and 23:59 the warning and critical "override"
+ values are used.
+ For the threshold between 11 and 12 the linear equation will be used to
+ calculate the threshold value starting at 1000 at 11:00 and 2000 at 12:00,
+ but the warning and critical will in that time interval be the values from
+ the period section.
 \end_layout
 
 \begin_layout Subsection

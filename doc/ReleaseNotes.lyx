@@ -95,11 +95,11 @@ Release Notes
 \end_layout
 
 \begin_layout Date
-Version 1.0.2
+Version 1.1.0 (DRAFT)
 \begin_inset Newline linebreak
 \end_inset
 
-2014-04-04
+2014-06-10 (TARGET DATE)
 \end_layout
 
 \begin_layout Standard
@@ -208,6 +208,541 @@ LatexCommand tableofcontents
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Release 1.1.0 - 2014-
+\end_layout
+
+\begin_layout Standard
+Release 1.1.0 is a minor upgrade of Bischeck with some new features.
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+Command line utility to explore cache content.
+ Support for full syntax of Bischeck mathematical expression to enable simple
+ testing of threshold expressions and virtual services.
+ For more information see the 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck - Installation and administration guide
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+.
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Server integration with Librato, 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://metrics.librato.com/
+\end_layout
+
+\end_inset
+
+.
+ The server integration with Librato enables Bischeck metrics to be sent
+ to Librato's cloud monitoring service.
+ For more information see the 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck - Configuration guide
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+NRDP server integration is supported over SSL.
+ Use the property 
+\emph on
+ssl
+\emph default
+ in the server.xml in the NRDP section to enable SSL.
+ Default is false.
+\end_layout
+
+\begin_layout Itemize
+Support to disable SSL (X.509) certification validation for connection over
+ HTTPS, like NRDP.
+ Set the property 
+\emph on
+disableCertificateValidation
+\emph default
+ in the properties.xml.
+ Disable validation have its risks - you have been warned.
+ The default is false.
+ 
+\begin_inset Newline newline
+\end_inset
+
+A more secure way to manage certificates is to create a local keystore for
+ Bischeck, see 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://docs.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html
+\end_layout
+
+\end_inset
+
+.
+ This will also require setup of additional system properties to 
+\emph on
+java
+\emph default
+ that has to be added in the 
+\emph on
+$BISHOME/bin/bischeck
+\emph default
+ script.
+ Loads of documentation exists on the web.
+\end_layout
+
+\begin_layout Itemize
+Support for Jolokia, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.jolokia.org/
+\end_layout
+
+\end_inset
+
+, for JMX remoting.
+ Jolokia is a jmx agent that support HTTP/JSON access and remove all the
+ problems with the standard JMX agent that use RMI.
+ RMI is especially problematic in any network environment with firewalls.
+ With Jolokia its simple to tunnel the JMX connection over 
+\emph on
+ssh
+\emph default
+.
+ Jolokia provides fine grain security and access capabilities.
+ 
+\begin_inset Newline newline
+\end_inset
+
+The RMI based JMX agent is still the default, but that will change in the
+ future releases of Bischeck.
+ If you like to use Jolokia with Bischeck 1.1.0 just uncomment row 53 and
+ comment row 52 in the 
+\emph on
+$BISHOME/bin/bischeck
+\emph default
+ script.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Two additional configuration files has been added to the 
+\emph on
+$BISHOME/resources
+\emph default
+ directory to control the behavior of Jolokia:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+jolokia.conf - basic setting, like port.
+ Read more in the 
+\begin_inset Quotes eld
+\end_inset
+
+JVM agent
+\begin_inset Quotes erd
+\end_inset
+
+ chapter at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.jolokia.org/reference/html/agents.html
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+jolokia-access.xml - define policy based security.
+ More info at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.jolokia.org/reference/html/security.html
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+[FR-252] 
+\begin_inset Quotes eld
+\end_inset
+
+Adding the hour level to the period definition
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This feature request enable fine grain granularity of the warning and critical
+ level for a specific hour interval.
+ 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,tabsize=4"
+inline false
+status open
+
+\begin_layout Description
+
+	....
+ 
+\end_layout
+
+\begin_layout Description
+
+	<period>
+\end_layout
+
+\begin_layout Description
+
+   	<months> 
+\end_layout
+
+\begin_layout Description
+
+			<dayofmonth>25</dayofmonth> 
+\end_layout
+
+\begin_layout Description
+
+		</months> 
+\end_layout
+
+\begin_layout Description
+
+		<calcmethod>&gt;</calcmethod> 
+\end_layout
+
+\begin_layout Description
+
+		<warning>10</warning> 
+\end_layout
+
+\begin_layout Description
+
+		<critical>20</critical> 
+\end_layout
+
+\begin_layout Description
+
+		<hoursIDREF>101</hoursIDREF> 
+\end_layout
+
+\begin_layout Description
+
+	</period> 
+\end_layout
+
+\begin_layout Description
+
+	....
+ 
+\end_layout
+
+\begin_layout Description
+
+	<hours hoursID="101"> 
+\end_layout
+
+\begin_layout Description
+
+		<hourinterval> 
+\end_layout
+
+\begin_layout Description
+
+			<from>00:00</from> 
+\end_layout
+
+\begin_layout Description
+
+			<to>11:00</to> 
+\end_layout
+
+\begin_layout Description
+
+			<threshold>1000</threshold> 
+\end_layout
+
+\begin_layout Description
+
+		</hourinterval> 
+\end_layout
+
+\begin_layout Description
+
+		<hourinterval> 
+\end_layout
+
+\begin_layout Description
+
+			<from>12:00</from> 
+\end_layout
+
+\begin_layout Description
+
+			<to>24:00</to> 
+\end_layout
+
+\begin_layout Description
+
+			<threshold>2000</threshold> 
+\end_layout
+
+\begin_layout Description
+
+			<!-- Override the values from the period section --> 
+\end_layout
+
+\begin_layout Description
+
+			<warning>20</warning> 
+\end_layout
+
+\begin_layout Description
+
+			<critical>30</critical> 
+\end_layout
+
+\begin_layout Description
+
+		</hourinterval> 
+\end_layout
+
+\begin_layout Description
+
+	</hours>
+\end_layout
+
+\begin_layout Description
+
+	....
+ 
+\end_layout
+
+\end_inset
+
+Between 00 - 11:59 the warning and critical values in the period section
+ will be used and between 12 and 23:59 the warning and critical "override"
+ values are used.
+ For the threshold between 11 and 12 the linear equation will be used to
+ calculate the threshold value starting at 1000 at 11:00 and 2000 at 12:00,
+ but the warning and critical will in that time interval be the values from
+ the period section.
+ For more information see the 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck - Configuration guide
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+Testing of thresholds rules has been enhanced.
+ The 
+\emph on
+bin/bischeck threshold.Twenty4HourThreshold
+\emph default
+ command will list the resolved threshold configuration depending on the
+ service definition and date, and in addition calculate the state and threshold
+ for specific measured value and at the time of the day.
+ For thresholds that are based on cached expression the threshold will be
+ calculate if the data are available in the cache.
+ For more information see the 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck - Installation and administration guide
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+.
+\end_layout
+
+\begin_layout Itemize
+[FR-254] 
+\begin_inset Quotes eld
+\end_inset
+
+Enable to test service in op5 web interface
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This request is not limited to Nagios/OP5, but the capability to on-demand
+ execute a service and its serviceitems in Bischeck.
+ This functionality has been implemented using JMX.
+ The MBean is called 
+\emph on
+com.ingby.socbox.bischeck.service:type=ExecuteServiceOnDemand
+\emph default
+ and have a method with the following signature:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+boolean execute(java.lang.String host,java.lang.String service)
+\end_layout
+
+\end_inset
+
+If you using Jolokia as JMX agent a valid call to execute the service sshport
+ for host moon would be:
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ curl http://localhost:7777/jolokia/exec/com.ingby.socbox.bischeck.service:type=Exe
+cuteServiceOnDemand/execute/moon/sshport
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+{"timestamp":1400018354,"status":200,"request":{"operation":"execute","mbean":"c
+om.ingby.socbox.bischeck.service:type=ExecuteServiceOnDemand","arguments":["moon","s
+shport"],"type":"exec"},"value":true}
+\end_layout
+
+\end_inset
+
+To use the function from Nagios as a check command their are a number of
+ things to consider when implementing a check command (we have not done
+ that, thats your task):
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Use the $HOSTNAME$ macro has the host parameter
+\end_layout
+
+\begin_layout Itemize
+Use the $SERVICEDESC$ macros has the service parameter
+\end_layout
+
+\begin_layout Itemize
+Make sure that check command return the same status as the current status
+ since the 
+\begin_inset Quotes eld
+\end_inset
+
+real
+\begin_inset Quotes erd
+\end_inset
+
+ status will come from Bischeck through the normal passive check and not
+ from the check command.
+ That means that the check command must also use the macro $SERVICESTATEID$
+ to return the same value so the state is not changed.
+ 
+\end_layout
+
+\begin_layout Itemize
+Its also important to understand that the on-demand function will not return
+ any performance data.
+ The MBean only return true if the job could be scheduled and false if the
+ host and/or service name do not exists or that the scheduling fail.
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-257] 
+\begin_inset Quotes eld
+\end_inset
+
+No Nagios state on null
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This bug caused no state information to be sent to Nagios if any serviceitems
+ for a service if the serviceitems metrics was null.
+ 
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 1.1.0 support upgrade from release 0.4.3, 1.0.0, 1.0.1 and 1.0.2.
+ If you upgrade from 0.4.3, please follow the upgrade instructions described
+ in the below upgrading section for 1.0.0.
 \end_layout
 
 \begin_layout Section
