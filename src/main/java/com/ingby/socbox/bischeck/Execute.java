@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -240,14 +242,22 @@ public final class Execute implements ExecuteMBean {
      * exit. Close all standard file - in, out and error. Add shutdown hooks for
      * OS signals to get controlled process exit.
      * 
-     * @throws Exception
-     *             if the pid file already exist.
+     * @throws Exception if the disable SSL X.509 validation fail
      */
     private void deamonInit() throws Exception {
 
         Boolean disableCertificateValidation = Boolean.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("disableCertificateValidation","false"));
         if (disableCertificateValidation) {
-        	SSLTrustManager.disableCertificateValidation();
+        	
+        	try {
+				SSLTrustManager.disableCertificateValidation();
+			} catch (KeyManagementException e) {
+				LOGGER.error("Disable SSL X.509 certification validation", e);
+				throw new Exception(e);
+			} catch (NoSuchAlgorithmException e) {
+				LOGGER.error("Disable SSL X.509 certification validation", e);
+				throw new Exception(e);
+			}
         }
         
         
