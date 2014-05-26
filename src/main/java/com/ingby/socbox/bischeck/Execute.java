@@ -244,11 +244,6 @@ public final class Execute implements ExecuteMBean {
      *             if the pid file already exist.
      */
     private void deamonInit() throws Exception {
-        if (ConfigurationManager.getInstance().getPidFile().exists()) {
-            LOGGER.error("Pid file already exist - check if bischeck already running");
-            throw new Exception(
-                    "Pid file already exist - check if bischeck already running");
-        }
 
         Boolean disableCertificateValidation = Boolean.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("disableCertificateValidation","false"));
         if (disableCertificateValidation) {
