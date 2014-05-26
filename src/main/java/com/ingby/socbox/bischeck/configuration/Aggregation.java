@@ -1,3 +1,21 @@
+/*
+#
+# Copyright (C) 2010-2014 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+*/
 package com.ingby.socbox.bischeck.configuration;
 
 import java.util.ArrayList;
@@ -55,10 +73,10 @@ public class Aggregation {
 				return "";
 			}
 			public String scheduleInclWeekend() {
-				return "0 0 * ? * *";
+				return " 0 * ? * *";
 			}
 			public String schedule() {
-				return "0 0 * ? * MON-FRI";
+				return " 0 * ? * MON-FRI";
 			}
 			public String minRetention() {
                 return "25";
@@ -81,10 +99,10 @@ public class Aggregation {
 				return "/H/";
 			}
 			public String scheduleInclWeekend() {
-				return "0 59 23 ? * *";
+				return " 59 23 ? * *";
 			}
 			public String schedule() {
-				return "0 59 23 ? * MON-FRI";
+				return " 59 23 ? * MON-FRI";
 			}
 			public String minRetention() {
                 return "7";
@@ -107,10 +125,10 @@ public class Aggregation {
 				return "/D/";
 			}
 			public String scheduleInclWeekend() {
-				return "0 59 23 ? * SUN";
+				return " 59 23 ? * SUN";
 			}
 			public String schedule() {
-				return "0 59 23 ? * FRI";
+				return " 59 23 ? * FRI";
 			}
 			public String minRetention() {
                 return "5";
@@ -134,10 +152,10 @@ public class Aggregation {
 				return "/W/";
 			}
 			public String scheduleInclWeekend() {
-				return "0 59 23 L * ?";
+				return " 59 23 L * ?";
 			}
 			public String schedule() {
-				return "0 59 23 L * ?";
+				return " 59 23 L * ?";
 			}
 			public String minRetention() {
                 return "1";
@@ -328,10 +346,12 @@ public class Aggregation {
 	private List<String> getAggregatedSchedule(AGGREGATION agg, Boolean useWeekend) {
 		List<String> schedules = new ArrayList<String>();
 
+		int randomInt = (int) (Math.random() * 60);
+
 		if (useWeekend) {
-			schedules.add(agg.scheduleInclWeekend());
+				schedules.add(randomInt + agg.scheduleInclWeekend());
 		} else {
-			schedules.add(agg.schedule());
+				schedules.add(randomInt + agg.schedule());
 		}
 
 		return schedules;
