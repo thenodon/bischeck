@@ -263,10 +263,10 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         	ThresholdFactory.clearCache();
         	
         	// Verify if the pid file is writable
-        	if (!configMgr.checkPidFile()) {
-        		LOGGER.error("Can not write to pid file {}", configMgr.getPidFile());
-        		throw new ConfigurationException("Can not write to pid file " + configMgr.getPidFile());
-        	}
+//        	if (!configMgr.checkPidFile()) {
+//        		LOGGER.error("Can not write to pid file {}", configMgr.getPidFile());
+//        		throw new ConfigurationException("Can not write to pid file " + configMgr.getPidFile());
+//        	}
         	
         } catch (ConfigurationException e) {
         	LOGGER.error("Configuration Manager initzialization failed with {}", e.getMessage(),e);
@@ -1195,22 +1195,22 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      * Check if the Bischeck pid file exists or not
      * @return
      */
-    public  boolean checkPidFile() {
-        File pidfile = getPidFile();
-        if (pidfile.exists()) {
-        	if (pidfile.canWrite())
-        		return true;
-        	else
-        		return false;
-        }
-        else {
-        	if (new File(pidfile.getParent()).canWrite()) {
-        		return true;
-        	} else {
-        		return false;
-        	}
-        }
-    }
+//    public  boolean checkPidFile() {
+//        File pidfile = getPidFile();
+//        if (pidfile.exists()) {
+//        	if (pidfile.canWrite())
+//        		return true;
+//        	else
+//        		return false;
+//        }
+//        else {
+//        	if (new File(pidfile.getParent()).canWrite()) {
+//        		return true;
+//        	} else {
+//        		return false;
+//        	}
+//        }
+//    }
     
     
     /**
