@@ -91,7 +91,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
     
     private JedisPoolWrapper jedispool = null;
     
-    private Lookup lu = null;
+    //private Lookup lu = null;
 
     private AtomicLong fastcachehitcount = new AtomicLong();
     private AtomicLong rediscachehitcount = new AtomicLong();
@@ -102,7 +102,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         
         jedispool = new JedisPoolWrapper(redisserver,redisport,redistimeout,redisauth,redisdb,jedisPoolSize);    
         
-        lu  = Lookup.init(jedispool);
+        //lu  = Lookup.init(jedispool);
      }
 
     /**
@@ -444,7 +444,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         
         String key = Util.fullName( hostName, serviceName, serviceItemName);
         
-        lu.setOptimizIndex(key, index);
+        //lu.setOptimizIndex(key, index);
         
         LastStatus ls = null;
         
@@ -525,7 +525,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         
         String key = Util.fullName( hostName, serviceName, serviceItemName);
 
-        lu.setOptimizIndex(key, toIndex);
+        //lu.setOptimizIndex(key, toIndex);
         
         
         List<LastStatus> lslist = new  ArrayList<LastStatus>();
