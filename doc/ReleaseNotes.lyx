@@ -732,7 +732,13 @@ No Nagios state on null
 .
  This bug caused no state information to be sent to Nagios if any serviceitems
  for a service if the serviceitems metrics was null.
- 
+\end_layout
+
+\begin_layout Itemize
+Bischeck is not longer checking if the pid file exist on start up.
+ This was removed since it's problematic from Java in a standard way determine
+ the pid of the running process.
+ Instead the its now up to the bischeckd script.
 \end_layout
 
 \begin_layout Subsection
