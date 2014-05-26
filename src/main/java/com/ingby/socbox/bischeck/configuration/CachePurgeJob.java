@@ -63,7 +63,8 @@ import com.yammer.metrics.core.TimerContext;
  * &lt;retention&gt;.
  * <br>
  * The class take one property cachePurgeJobCron that is a cron expression when
- * the purge job should be run. The default is every hour, "0 2/5 * * * ? *" 
+ * the purge job should be run. The default is every five minutes with start 
+ * 2 minutes after the hour , "0 2/5 * * * ? *" 
  */
 public class CachePurgeJob implements Job {
 
