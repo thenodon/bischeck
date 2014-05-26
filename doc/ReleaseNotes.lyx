@@ -738,7 +738,21 @@ No Nagios state on null
 Bischeck is not longer checking if the pid file exist on start up.
  This was removed since it's problematic from Java in a standard way determine
  the pid of the running process.
- Instead the its now up to the bischeckd script.
+ Instead the its now up to the 
+\emph on
+bischeckd
+\emph default
+ script.he
+\end_layout
+
+\begin_layout Itemize
+If many services definitions are configured with aggregation the peek load
+ every hour can be very high.
+ In previous release the schedule was kicked off with a cron definition
+ where the second was set to 0.
+ With 1.1.0 the second field will be set to a random value between 0-59.
+ This distribute the scheduling off aggregation over a interval of a minute.
+ 
 \end_layout
 
 \begin_layout Subsection
