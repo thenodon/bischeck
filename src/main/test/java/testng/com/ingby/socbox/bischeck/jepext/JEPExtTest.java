@@ -155,6 +155,17 @@ public class JEPExtTest {
 			expr ="sum()";
 			Assert.assertNull(calc(expr));
 			
+			expr ="stddev(2, 4, 4, 4, 5, 5, 7, 9 )";
+			Assert.assertEquals(calc(expr),new Float(2.0));
+			
+			expr ="avg(stddev(2, 4, 4, 4, 5, 5, 7, 9 ), stddev(2, 4, 4, 4, 5, 5, 7, 9 ))";
+			Assert.assertEquals(calc(expr),new Float(2.0));
+			
+
+			expr ="avg(stddev(2, 4, 4, 4, 5, 5, 7, 9 ), multNull(4,stddev(2, 4, 4, 4, 5, 5, 7, 9 )))";
+			Assert.assertEquals(calc(expr),new Float(5.0));
+			
+			
 		} else {
 			System.out.println("Not Null in function tests");
 			expr = "avg(null,null,null,4,2)";
