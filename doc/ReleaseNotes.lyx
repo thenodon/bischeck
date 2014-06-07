@@ -239,10 +239,9 @@ Bischeck - Installation and administration guide
 
 \emph default
 .
-\begin_inset Note Note
-status open
+\end_layout
 
-\begin_layout Plain Layout
+\begin_layout Itemize
 Server integration with Librato, 
 \begin_inset Flex URL
 status open
@@ -254,7 +253,7 @@ https://metrics.librato.com/
 
 \end_inset
 
-.
+, is now supported.
  The server integration with Librato enables Bischeck metrics to be sent
  to Librato's cloud monitoring service.
  For more information see the 
@@ -270,11 +269,6 @@ Bischeck - Configuration guide
 
 \emph default
 .
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Itemize
@@ -413,6 +407,10 @@ http://www.jolokia.org/reference/html/security.html
 \end_layout
 
 \end_deeper
+\begin_layout Itemize
+Add function to calculate standard deviation on a series of data.
+\end_layout
+
 \begin_layout Itemize
 [FR-252] 
 \begin_inset Quotes eld
