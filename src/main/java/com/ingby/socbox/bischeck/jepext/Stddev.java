@@ -89,11 +89,11 @@ public class Stddev extends org.nfunk.jep.function.Sum {
         	sum = (Double) sum / numberNotNull;
         	// push the result on the inStack
         	Double stdsum = new Double(0);
-        	for (int stdcount = 0; stdcount < square.length; stdcount++) {
+        	for (int stdcount = 0; stdcount < numberNotNull; stdcount++) {
         		stdsum += Math.pow((square[stdcount]-(Double) sum),2);  
         	}
         	
-        	Double stdev = Math.sqrt(stdsum/square.length);
+        	Double stdev = Math.sqrt(stdsum/numberNotNull);
         	
         	stack.push(stdev);
         } else { 
