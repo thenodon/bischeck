@@ -73,7 +73,8 @@ public class ExecuteJEP {
         parser.addFunction("multNull", new com.ingby.socbox.bischeck.jepext.NullableMultiply());
         parser.addFunction("divNull", new com.ingby.socbox.bischeck.jepext.NullableDivide());
         parser.addFunction("stddev", new com.ingby.socbox.bischeck.jepext.Stddev());
-        
+        parser.addFunction("median", new com.ingby.socbox.bischeck.jepext.Median());
+            
         // Add additional functions if available
         URL Url = ExecuteJEP.class.getClassLoader().getResource(RESOURCEFILENAME);
              
