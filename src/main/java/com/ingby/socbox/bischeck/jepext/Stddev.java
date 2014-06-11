@@ -62,7 +62,7 @@ public class Stddev extends org.nfunk.jep.function.Sum {
 			throw new ParseException("No arguments for Stddev");
 		}
 		
-		Object sum = (Object) new Double(0);//stack.pop();
+		Object sum = (Object) new Double(0);
 		
 		Object param;
 		int paramCount = 0;

@@ -60,7 +60,7 @@ public class Median extends org.nfunk.jep.function.Sum {
 		
 		checkStack(stack);
 		if (curNumberOfParameters < 1) {
-			throw new ParseException("No arguments for Stddev");
+			throw new ParseException("No arguments for Median");
 		}
 		
 		
