@@ -158,14 +158,28 @@ public class JEPExtTest {
 			expr ="stddev(2, 4, 4, 4, 5, 5, 7, 9 )";
 			Assert.assertEquals(calc(expr),new Float(2.0));
 			
+			expr ="stddev(2, 4, 4, 4, null, 5, 5, 7, 9 )";
+			Assert.assertEquals(calc(expr),new Float(2.0));
+			
+			expr ="stddev( null, null )";
+			Assert.assertNull(calc(expr));
+			
 			expr ="avg(stddev(2, 4, 4, 4, 5, 5, 7, 9 ), stddev(2, 4, 4, 4, 5, 5, 7, 9 ))";
 			Assert.assertEquals(calc(expr),new Float(2.0));
 			
-
 			expr ="avg(stddev(2, 4, 4, 4, 5, 5, 7, 9 ), multNull(4,stddev(2, 4, 4, 4, 5, 5, 7, 9 )))";
 			Assert.assertEquals(calc(expr),new Float(5.0));
 			
-			
+			System.out.println("Median");
+			expr ="median(2, 4)";
+			Assert.assertEquals(calc(expr),new Float(3.0));
+
+			expr ="median(2, 3, 4)";
+			Assert.assertEquals(calc(expr),new Float(3.0));
+
+			expr ="median(2, 3, 4, 5)";
+			Assert.assertEquals(calc(expr),new Float(3.5));
+
 		} else {
 			System.out.println("Not Null in function tests");
 			expr = "avg(null,null,null,4,2)";
