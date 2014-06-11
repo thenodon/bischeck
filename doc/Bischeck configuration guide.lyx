@@ -85,7 +85,6 @@
 \html_math_output 0
 \html_css_as_file 0
 \html_be_strict false
-\author -2048955058 "andersh,,," 
 \end_header
 
 \begin_body
@@ -103,11 +102,11 @@ Configuration guide
 \end_layout
 
 \begin_layout Date
-Version 1.1.0 (DRAFT) 
+Version 1.1.0
 \begin_inset Newline newline
 \end_inset
 
-2014-06-10 (TARGET DATE)
+2014-06-16
 \end_layout
 
 \begin_layout Standard
@@ -1731,32 +1730,22 @@ min(x1,x2,x3,...) - Calculate the min value of the list of numbers.
 \end_layout
 
 \begin_layout Itemize
-multNull(
-\change_deleted -2048955058 1402143637
-(
-\change_unchanged
-x1,x2,x3,...) - Multiply the numbers in the list.
+multNull(x1,x2,x3,...) - Multiply the numbers in the list.
  If any of the numbers are null, the function will return null.
 \end_layout
 
 \begin_layout Itemize
 divNull(x1,x2) - Divide the numbers.
  If any of the numbers are null the function will return null.
-\change_inserted -2048955058 1402143611
-
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1402476491
 stdev(x1,x2,x3,...) - Calculate the standard deviation of the list of numbers.
  
 \begin_inset Note Greyedout
 status open
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1402143717
 [1.1.0]
 \end_layout
 
@@ -1766,24 +1755,18 @@ status open
 \end_layout
 
 \begin_layout Itemize
-
-\change_inserted -2048955058 1402476516
 median(x1,x2,x3,...) - Calculate the median value of the list of numbers.
  
 \begin_inset Note Greyedout
 status open
 
 \begin_layout Plain Layout
-
-\change_inserted -2048955058 1402476492
 [1.1.0]
 \end_layout
 
 \end_inset
 
  
-\change_unchanged
-
 \end_layout
 
 \begin_layout Subsection
@@ -7247,26 +7230,18 @@ Credits
 \end_layout
 
 \begin_layout Standard
-Thanks to all people who has developed all the great software that Bischeck
- depends on and especially all who made Nagios and the Nagios community
- a success.
- A special thanks goes to Peter Johansson and his colleagues at DHL Freight
- Sweden for sponsoring the development and providing ideas and important
- feedback.
+Thanks to all people and organizations who developed all the great open
+ source software that Bischeck depends on.
+ The Bischeck project would like to thank the following companies for sponsoring
+ the project with valuable commercial tools and development environments:
  
-\end_layout
-
-\begin_layout Standard
-The Bischeck project would like to thank the following companies that sponsor
- the Bischeck project with valuable commercial tools and development environment
-s: 
 \end_layout
 
 \begin_layout Itemize
 Contemplate supports the Bischeck projects with the ThreadSafe tool for
  advanced static analysis for Java concurrency, 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -7282,7 +7257,7 @@ http://www.contemplateltd.com/threadsafe
 YourKit is kindly supporting Bischeck open source projects with its full-feature
 d Java Profiler, 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -7291,17 +7266,32 @@ http://www.yourkit.com/java/profiler
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Itemize
-Cloudbees provide continuous integration services through Jenkins, 
+Cloudbees provides continuous integration services through Jenkins, 
 \begin_inset Flex URL
 status open
 
 \begin_layout Plain Layout
 
 http://www.cloudbees.com/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Librato to provide test environment, 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://metrics.librato.com/
 \end_layout
 
 \end_inset
