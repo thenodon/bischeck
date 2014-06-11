@@ -408,7 +408,11 @@ http://www.jolokia.org/reference/html/security.html
 
 \end_deeper
 \begin_layout Itemize
-Add function to calculate standard deviation on a series of data.
+Add function to calculate the standard deviation on a series of data.
+\end_layout
+
+\begin_layout Itemize
+Add function to calculate the median value on a series of data.
 \end_layout
 
 \begin_layout Itemize

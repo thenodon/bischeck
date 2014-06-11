@@ -1748,7 +1748,7 @@ divNull(x1,x2) - Divide the numbers.
 
 \begin_layout Itemize
 
-\change_inserted -2048955058 1402143717
+\change_inserted -2048955058 1402476491
 stdev(x1,x2,x3,...) - Calculate the standard deviation of the list of numbers.
  
 \begin_inset Note Greyedout
@@ -1757,6 +1757,25 @@ status open
 \begin_layout Plain Layout
 
 \change_inserted -2048955058 1402143717
+[1.1.0]
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\change_inserted -2048955058 1402476516
+median(x1,x2,x3,...) - Calculate the median value of the list of numbers.
+ 
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+
+\change_inserted -2048955058 1402476492
 [1.1.0]
 \end_layout
 
