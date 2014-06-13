@@ -3257,6 +3257,37 @@ http://www.opensource.org/licenses/bsd-license.php
 \end_layout
 
 \end_deeper
+\begin_layout Itemize
+perf4j-0.9.16.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://repository.codehaus.org/org/perf4j/perf4j/0.9.16/perf4j-0.9.16.jar
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Standard
 All jar files are distributed as part of Bischeck and located in the 
 \emph on
