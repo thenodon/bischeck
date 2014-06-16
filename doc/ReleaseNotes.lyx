@@ -758,14 +758,33 @@ If many services definitions are configured with aggregation the peek load
  
 \end_layout
 
+\begin_layout Itemize
+The 
+\emph on
+install
+\emph default
+ script with the upgrade option 
+\emph on
+-X
+\emph default
+ will copy existing 
+\emph on
+logback.xml
+\emph default
+ configuration in addition to all configuration files in the 
+\emph on
+etc
+\emph default
+ directory.
+\end_layout
+
 \begin_layout Subsection
 Upgrading
 \end_layout
 
 \begin_layout Standard
-Release 1.1.0 support upgrade from release 0.4.3, 1.0.0, 1.0.1 and 1.0.2.
- If you upgrade from 0.4.3, please follow the upgrade instructions described
- in the below upgrading section for 1.0.0.
+Release 1.1.0 support upgrade from release 1.0.0, 1.0.1 and 1.0.2.
+ If you upgrade from 0.4.3 please upgrade to version 1.0.x first.
 \end_layout
 
 \begin_layout Section

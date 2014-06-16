@@ -2,5 +2,5 @@
 
 # Copy old configuration files 
 cp -a $2/etc/* $1/etc
-
+cp -a $2/resources/logback.xml $1/resources
 
