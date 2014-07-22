@@ -23,8 +23,8 @@
     <property name="javagensrc.home" value="${basedir}/src/main/generated" />
     <property name="scriptsrc.home" value="${basedir}/src/main/scripts" />
     <property name="migscriptsrc.home" value="${basedir}/src/main/migscripts" />
-    <property name="javac_target" value="6" />
-    <property name="javac_src" value="6" />
+    <property name="javac_target" value="7" />
+    <property name="javac_src" value="7" />
     <property name="version.file" value="${basedir}/version.txt" />
 	<property name="testoutput.dir" value="${basedir}/test-output" />
 	<property name="coverageoutput.dir" value="${basedir}/coverage-output" />
@@ -268,7 +268,7 @@
             
             <classpath refid="compile.classpath" />
             
-            <link offline="false" href="http://java.sun.com/javase/6/docs/api/" />
+            <link offline="false" href="http://java.sun.com/javase/7/docs/api/" />
             
             <fileset dir="${javasrc.home}" defaultexcludes="yes">
                 <include name="**/*.java"/>

@@ -25,11 +25,13 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
 
 /**
@@ -46,17 +48,22 @@ public class LastStatus implements Serializable, Cloneable {
 	private Long timestamp = null;
 	private Float threshold = null;
 	private String calcmethod = null;
-
+	private NAGIOSSTAT state = null;
+	
 	public LastStatus(String measuredValue, Float thresholdValue, Long timestamp) {
 		this.timestamp = timestamp;
 		this.value = measuredValue;
 		this.threshold = thresholdValue;
+		this.state = NAGIOSSTAT.OK;
 	}
 
+	
 	public LastStatus(String measuredValue, Float thresholdValue) {
 		this.timestamp = System.currentTimeMillis();
 		this.value = measuredValue;
 		this.threshold = thresholdValue;
+		this.state = NAGIOSSTAT.OK;
+		
 	}
 
 
@@ -65,6 +72,7 @@ public class LastStatus implements Serializable, Cloneable {
 		this.value = serviceitem.getLatestExecuted();
 		this.threshold = serviceitem.getThreshold().getThreshold();
 		this.calcmethod  = serviceitem.getThreshold().getCalcMethod();
+		this.state = serviceitem.getEvaluatedThreshold();
 	}
 
 
@@ -81,6 +89,7 @@ public class LastStatus implements Serializable, Cloneable {
 		this.timestamp = ls.getTimestamp();
 		this.calcmethod = ls.getCalcmetod();
 		this.threshold = ls.getThreshold();
+		this.state = NAGIOSSTAT.valueOf(ls.getState());
 	}
 
 	
@@ -105,7 +114,15 @@ public class LastStatus implements Serializable, Cloneable {
 		} else {
 			this.calcmethod = json.getString("calcmethod");
 		}
-
+		try {
+			if (json.getString("state") == null || json.getString("state").equalsIgnoreCase("null")) {
+				this.state = null;
+			} else {
+				this.state = NAGIOSSTAT.valueOf(json.getString("state"));
+			}
+		} catch (JSONException jex) {
+			this.state = null;
+		}
 		this.timestamp = json.getLong("timestamp");
 	}
 
@@ -129,6 +146,9 @@ public class LastStatus implements Serializable, Cloneable {
 		return timestamp;
 	}
 
+	public String getState() {
+		return state.toString();
+	}
 	
 	public LastStatus copy(){
 		LastStatus copy = new LastStatus(this); 
@@ -156,6 +176,12 @@ public class LastStatus implements Serializable, Cloneable {
 			json.put("calcmethod", "null");
 		} else {
 			json.put("calcmethod", this.calcmethod);
+		}
+		
+		if (state == null) {
+			json.put("state", NAGIOSSTAT.UNKNOWN.toString());
+		} else {
+			json.put("state", this.state.toString());
 		}
 
 		return json.toString();

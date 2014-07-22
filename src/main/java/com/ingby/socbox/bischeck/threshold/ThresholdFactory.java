@@ -41,7 +41,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 public class ThresholdFactory {
 
 	private static ConcurrentHashMap<String,Threshold> cache = new ConcurrentHashMap<String,Threshold>();
-	private static List<Class<?>> unregistercache = Collections.synchronizedList(new ArrayList<Class<?>>());
+	private static List<Class<?>> unregistercache = new ArrayList<Class<?>>();
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ThresholdFactory.class);
 

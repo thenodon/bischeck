@@ -76,7 +76,7 @@ public final class Lookup {
 			keyid = "" + keyname.hashCode();
 			Jedis jedis = jedispool.getResource();
 			try {
-				name2IdMap.put(keyname, keyid);
+				name2IdMap.putIfAbsent(keyname, keyid);
 				jedis.hset(DICTIONARY, keyname, keyid);
 			} catch (JedisConnectionException je) {
 				LOGGER.error("Redis connection failed, {}", je.getMessage(),je);

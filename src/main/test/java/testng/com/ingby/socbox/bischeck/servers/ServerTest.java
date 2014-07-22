@@ -3,12 +3,13 @@ package testng.com.ingby.socbox.bischeck.servers;
 import java.util.Properties;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import testng.com.ingby.socbox.bischeck.TestUtils;
 
+import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
@@ -20,7 +21,6 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactoryException;
-import com.ingby.socbox.bischeck.threshold.Threshold;
 import com.ingby.socbox.bischeck.threshold.ThresholdException;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 
@@ -30,9 +30,12 @@ public class ServerTest {
 	private ServerMessageExecutor serverexecutor;
 	private Properties url2service;
 	
-	@BeforeTest
+	@BeforeClass
 	public void beforeTest() throws Exception {
-		confMgmr = TestUtils.getConfigurationManager();
+		confMgmr = TestUtils.getConfigurationManager();    
+		CacheFactory.init();
+		//CacheInf cache = CacheFactory.getInstance();
+		
 		url2service = confMgmr.getURL2Service();
 		serverexecutor = ServerMessageExecutor.getInstance();
 		
@@ -59,8 +62,7 @@ public class ServerTest {
 		
 		Assert.assertEquals(service.getServiceName(), "myShell");
 		
-		ServiceItem serviceItem = null; 
-		serviceItem = ServiceItemFactory.createServiceItem("myShellItem", "CheckCommandServiceItem");
+		ServiceItem	serviceItem = ServiceItemFactory.createServiceItem("myShellItem", "CheckCommandServiceItem");
 
 		serviceItem.setService(service);
 		serviceItem.setExecution("{\"check\":\"echo Ok\\|time=10;;;;\",\"label\":\"time\"}");
@@ -83,12 +85,12 @@ public class ServerTest {
 		serviceItem.setExecutionTime(100L);
 		service.closeConnection();
 
-		serverexecutor.execute(service);
+		serverexecutor.publish(service);
 
 		
 	}
 	
-	@AfterTest 
+	@AfterClass
 	public void unregisterServers()  {
 
 		serverexecutor.unregisterAll();

@@ -123,13 +123,33 @@ public abstract class Util {
         return s.length() - 1 - index;
     }
     
+      
+    /**
+     * Create a full quoted host-service name that quote dash if it exists in 
+     * the name based on host, service and service item name with - separator
+     * @param service
+     * @param serviceitem
+     * @return
+     */
+    public static String fullQoutedHostServiceName(Service service) {
+        return fullQouteHostServiceName(service.getHost().getHostname(), service.getServiceName());
+    }
     
-    private static int getNumberOfDecimalPlace(String value) {
-        final int index = value.indexOf('.');
-        if (index < 0) {
-            return 0;
-        }
-        return value.length() - 1 - index;
+    
+    /**
+     * Create a full quoted host-service name that quote dash if it exists in 
+     * the name based on host, service and service item name with - separator
+     * @param hostname
+     * @param servicename
+     * @return
+     */
+    public static String fullQouteHostServiceName(String hostname, String servicename) {
+        
+        StringBuffer strbuf = new StringBuffer();
+        
+        strbuf.append(hostname.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
+        strbuf.append(servicename.replaceAll(DASH, QOUTED_DASH));
+        return strbuf.toString();
     }
     
     
@@ -272,7 +292,7 @@ public abstract class Util {
     /**
      * Check if the input string include the string "null"
      * @param isnullin
-     * @return
+     * @return 
      */
     public static boolean hasStringNull(String isnullin){
         Matcher mat = ISNULLIN.matcher(isnullin);
@@ -283,7 +303,13 @@ public abstract class Util {
             return false;
         }
     }
-    
+
+    /**
+     * Take an integer and return a String with 0 in the beginning 
+     * if the integer is <10
+     * @param num 
+     * @return the padded string
+     */
     public static String integerToTimeString(Integer num) {
     	if (num < 10) {
     		return "0"+num;

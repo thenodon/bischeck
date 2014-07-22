@@ -31,7 +31,6 @@ import org.testng.annotations.Test;
 
 import testng.com.ingby.socbox.bischeck.TestUtils;
 
-import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 import com.ingby.socbox.bischeck.cache.CacheException;
@@ -167,7 +166,7 @@ public class CacheTest {
 
 		int count = 2000;
 		int secinterval = 300; 
-		long current = System.currentTimeMillis() - count*secinterval*1000;
+		long current = System.currentTimeMillis() - count*secinterval*1000L;
 
 		CacheInf cache = CacheFactory.getInstance();
 		

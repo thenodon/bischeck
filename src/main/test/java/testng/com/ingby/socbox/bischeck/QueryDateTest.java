@@ -28,7 +28,6 @@ import org.testng.annotations.Test;
 
 import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.QueryDate;
-import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 public class QueryDateTest {
 	

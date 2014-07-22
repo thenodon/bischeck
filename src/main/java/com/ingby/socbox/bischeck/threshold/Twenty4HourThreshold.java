@@ -796,7 +796,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 if (isContentNull(weeks.getWeek()) &&
                     weeks.getDayofweek().equals(dayofweek)) {
                 	
-                	currentRule = String.format("Rule 4 - day of week is {} - hourid: {}", dayofweek, period.getHoursIDREF());
+                	currentRule = String.format("Rule 4 - day of week is %s - hourid: %s", dayofweek, period.getHoursIDREF());
                 	LOGGER.debug(currentRule);
                 	
                 	assignPeriod(period);

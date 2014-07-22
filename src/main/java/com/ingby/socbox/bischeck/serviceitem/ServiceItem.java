@@ -22,6 +22,8 @@ package com.ingby.socbox.bischeck.serviceitem;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.threshold.Threshold;
+import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
+
 
 /**
  * The interface describe all methods needed to create a ServiceItem compatible 
@@ -182,4 +184,9 @@ public interface ServiceItem {
      */
 	void setAlias(String alias);
 
+	/////////////////////
+	
+	NAGIOSSTAT evaluateThreshold();
+	
+	NAGIOSSTAT getEvaluatedThreshold();
 }

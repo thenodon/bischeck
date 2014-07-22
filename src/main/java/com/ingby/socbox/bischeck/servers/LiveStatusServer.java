@@ -48,18 +48,29 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(LiveStatusServer.class);
 
-	static Map<String,LiveStatusServer> servers = new HashMap<String,LiveStatusServer>();
+	private static Map<String,LiveStatusServer> servers = new HashMap<String,LiveStatusServer>();
 
-	private String instanceName;
+	private final String instanceName;
 
-	private String  hostAddress;
-	private Integer port;
-	private Integer connectionTimeout;
+	private final String  hostAddress;
+	private final Integer port;
+	private final Integer connectionTimeout;
 
-	private NagiosUtil nagutil = new NagiosUtil();
+	private final NagiosUtil nagutil = new NagiosUtil();
 	
 	private LiveStatusServer(String name) {
 		instanceName=name;
+		Properties defaultproperties = getServerProperties();
+		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+		hostAddress = prop.getProperty("hostAddress",
+				defaultproperties.getProperty("hostAddress"));
+
+		port = Integer.parseInt(prop.getProperty("port", 
+				defaultproperties.getProperty("port")));
+
+		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
+				defaultproperties.getProperty("connectionTimeout")));
+
 	}
 
 	
@@ -75,7 +86,7 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 		
 		if (!servers.containsKey(name) ) {
 			servers.put(name,new LiveStatusServer(name));
-			servers.get(name).init(name);
+			//servers.get(name).init(name);
 		}
 		return servers.get(name);
 	}
@@ -90,20 +101,20 @@ public final class LiveStatusServer implements Server, MessageServerInf {
     }
     
     
-	private void init(String name) {
-		
-		Properties defaultproperties = getServerProperties();
-		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
-		hostAddress = prop.getProperty("hostAddress",
-				defaultproperties.getProperty("hostAddress"));
-
-		port = Integer.parseInt(prop.getProperty("port", 
-				defaultproperties.getProperty("port")));
-
-		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
-				defaultproperties.getProperty("connectionTimeout")));
-
-	}
+//	private void init(String name) {
+//		
+//		Properties defaultproperties = getServerProperties();
+//		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+//		hostAddress = prop.getProperty("hostAddress",
+//				defaultproperties.getProperty("hostAddress"));
+//
+//		port = Integer.parseInt(prop.getProperty("port", 
+//				defaultproperties.getProperty("port")));
+//
+//		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
+//				defaultproperties.getProperty("connectionTimeout")));
+//
+//	}
 
 	
 	@Override

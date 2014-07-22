@@ -52,16 +52,16 @@ import com.yammer.metrics.core.TimerContext;
 public final class GraphiteServer implements Server, MessageServerInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GraphiteServer.class);
-    static Map<String,GraphiteServer> servers = new HashMap<String,GraphiteServer>();
+    private static Map<String,GraphiteServer> servers = new HashMap<String,GraphiteServer>();
     
     
-    private String instanceName;
-    private int port;
-    private String hostAddress;
-    private int connectionTimeout;
-	private String doNotSendRegex;
-	private String doNotSendRegexDelim;
-	private MatchServiceToSend msts = null;
+    private final String instanceName;
+    private final int port;
+    private final String hostAddress;
+    private final int connectionTimeout;
+	private final String doNotSendRegex;
+	private final String doNotSendRegexDelim;
+	private final MatchServiceToSend msts;
     
     private GraphiteServer (String name) {
     

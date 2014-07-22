@@ -17,22 +17,15 @@
 #
 */
 
-package com.ingby.socbox.bischeck.cache.provider.laststatuscache;
+package com.ingby.socbox.bischeck.service;
 
-public interface LastStatusCacheMBean {
-    
-    String BEANNAME = "com.ingby.socbox.bischeck.cache.provider.laststatuscache:name=stats,type=LastStatusCache";
-    
-    int getLastStatusCacheCount();
-    String[] getCacheKeys();
-    
-    /**
-     * Dump the cache to a simple xml
-     */
-    void dump2file();
-    
-    /**
-     * Clear cache content
-     */
-    void clearCache();
+
+/**
+ *  
+ *
+ */
+public interface ServiceStateInf {
+
+	ServiceState getServiceState();
+	void setServiceState();
 }

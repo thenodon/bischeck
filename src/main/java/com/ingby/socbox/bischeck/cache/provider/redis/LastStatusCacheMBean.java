@@ -41,11 +41,6 @@ public interface LastStatusCacheMBean {
     String[] getCacheKeys();
     
     /**
-     * Dump the cache to a simple xml
-     */
-    void dump2file();
-    
-    /**
      * Clear cache content
      */
     void clearCache();

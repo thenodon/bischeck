@@ -97,18 +97,20 @@ public class ExecuteJEP {
 			}
 		}
 		
-		for(String jepFunctionName : properties.stringPropertyNames()) {
-			String className = properties.getProperty(jepFunctionName);
-			try {
-				parser.removeFunction(jepFunctionName);
-				parser.addFunction(jepFunctionName, (PostfixMathCommandI) ClassCache.getClassByName(className).newInstance());
-				LOGGER.debug("Jep extended function {} loaded with classname {}", jepFunctionName, className);
-			} catch (ClassNotFoundException e) {
-				LOGGER.warn("Class {} could not be found", className, e);
-			} catch (InstantiationException e) {
-				LOGGER.warn("Class {} can not be instantiated", className, e);
-			} catch (IllegalAccessException e) {
-				LOGGER.warn("Class {} could not be instantiated", className, e);
+		if (properties != null) {
+			for(String jepFunctionName : properties.stringPropertyNames()) {
+				String className = properties.getProperty(jepFunctionName);
+				try {
+					parser.removeFunction(jepFunctionName);
+					parser.addFunction(jepFunctionName, (PostfixMathCommandI) ClassCache.getClassByName(className).newInstance());
+					LOGGER.debug("Jep extended function {} loaded with classname {}", jepFunctionName, className);
+				} catch (ClassNotFoundException e) {
+					LOGGER.warn("Class {} could not be found", className, e);
+				} catch (InstantiationException e) {
+					LOGGER.warn("Class {} can not be instantiated", className, e);
+				} catch (IllegalAccessException e) {
+					LOGGER.warn("Class {} could not be instantiated", className, e);
+				}
 			}
 		}
 	}

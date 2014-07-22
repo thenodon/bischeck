@@ -54,50 +54,22 @@ import com.ingby.socbox.bischeck.service.Service;
 public final class NRDPServer implements Server, MessageServerInf {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(NRDPServer.class);
-	private String instanceName;
-    private ServerCircuitBreak circuitBreak;
+	private final String instanceName;
+    private final ServerCircuitBreak circuitBreak;
     
     private final int MAX_QUEUE = 10;
-    private LinkedBlockingQueue<Service> subTaskQueue;
+    private final LinkedBlockingQueue<Service> subTaskQueue;
    
     private ExecutorService execService;
 
     
-	static Map<String,NRDPServer> servers = new HashMap<String, NRDPServer>();
+	private static Map<String,NRDPServer> servers = new HashMap<String, NRDPServer>();
 
-	private String urlstr;
-	private String cmd;
-	private Integer connectionTimeout;
+	private final String urlstr;
+	private final String cmd;
+	private final Integer connectionTimeout;
 	
 	private NRDPServer(String name) {
-		instanceName=name;
-
-        subTaskQueue = new LinkedBlockingQueue<Service>();
-        execService = Executors.newCachedThreadPool();
-        
-	}
-
-	
-	/**
-     * Retrieve the Server object. The method is invoked from class ServerExecutor
-     * execute method. The created Server object is placed in the class internal 
-     * Server object list.
-     * @param name the name of the configuration in server.xml like
-     * {@code &lt;server name="my"&gt;}
-     * @return Server object
-     */
-	synchronized public static Server getInstance(String name) {
-		
-		if (!servers.containsKey(name) ) {
-			servers.put(name,new NRDPServer(name));
-			servers.get(name).init(name);
-		}
-		return servers.get(name);
-	}
-
-    
-	private void init(String name) {
-	    
 		Properties defaultproperties = getServerProperties();
 		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
 		String hostAddress = prop.getProperty("hostAddress",
@@ -126,9 +98,69 @@ public final class NRDPServer implements Server, MessageServerInf {
 		urlstr = protocol + hostAddress + ":" + port + "/" + path +"/";
 		cmd="token="+password+"&cmd=submitcheck&XMLDATA=";
 		
+		instanceName=name;
+
+        subTaskQueue = new LinkedBlockingQueue<Service>();
+        execService = Executors.newCachedThreadPool();
+
 		circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
 	    execService.execute(new NRDPWorker(instanceName, subTaskQueue, circuitBreak, urlstr, cmd, connectionTimeout));
+
+		        
 	}
+
+	
+	/**
+     * Retrieve the Server object. The method is invoked from class ServerExecutor
+     * execute method. The created Server object is placed in the class internal 
+     * Server object list.
+     * @param name the name of the configuration in server.xml like
+     * {@code &lt;server name="my"&gt;}
+     * @return Server object
+     */
+	synchronized public static Server getInstance(String name) {
+		
+		if (!servers.containsKey(name) ) {
+			servers.put(name,new NRDPServer(name));
+//			servers.get(name).init(name);
+		}
+		return servers.get(name);
+	}
+
+    
+//	private void init(String name) {
+//	    
+//		Properties defaultproperties = getServerProperties();
+//		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+//		String hostAddress = prop.getProperty("hostAddress",
+//				defaultproperties.getProperty("hostAddress"));
+//
+//		Integer port = Integer.parseInt(prop.getProperty("port", 
+//				defaultproperties.getProperty("port")));
+//
+//		String password = prop.getProperty("password",
+//				defaultproperties.getProperty("password"));
+//
+//		String path = prop.getProperty("path",
+//				defaultproperties.getProperty("path"));
+//
+//		Boolean ssl = Boolean.valueOf(prop.getProperty("ssl",
+//				defaultproperties.getProperty("ssl")));
+//
+//		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
+//				defaultproperties.getProperty("connectionTimeout")));
+//		
+//		String protocol = "http://";
+//		if (ssl) {
+//			protocol = "https://";
+//		}
+//		
+//		urlstr = protocol + hostAddress + ":" + port + "/" + path +"/";
+//		cmd="token="+password+"&cmd=submitcheck&XMLDATA=";
+//		
+//		circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
+//	    execService.execute(new NRDPWorker(instanceName, subTaskQueue, circuitBreak, urlstr, cmd, connectionTimeout));
+//	}
 
 	
 	@Override
@@ -167,7 +199,8 @@ public final class NRDPServer implements Server, MessageServerInf {
         }
         LOGGER.info("{} - All workers stopped", instanceName);
         circuitBreak.destroy();
-        circuitBreak = null;
+        // Todo check the behavior at reload
+//        circuitBreak = null;
     }
 	
     

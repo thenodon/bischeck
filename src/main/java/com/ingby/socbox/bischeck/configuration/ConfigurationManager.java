@@ -24,7 +24,6 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.io.File;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -48,7 +47,6 @@ import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.CronExpression;
-import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
@@ -258,16 +256,9 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         	configMgr.initURL2Service();
         	configMgr.initServers();
         	configMgr.initBischeckServices(runOnce);
-        	//configMgr.initScheduler();
         	
         	ThresholdFactory.clearCache();
-        	
-        	// Verify if the pid file is writable
-//        	if (!configMgr.checkPidFile()) {
-//        		LOGGER.error("Can not write to pid file {}", configMgr.getPidFile());
-//        		throw new ConfigurationException("Can not write to pid file " + configMgr.getPidFile());
-//        	}
-        	
+        	        	
         } catch (ConfigurationException e) {
         	LOGGER.error("Configuration Manager initzialization failed with {}", e.getMessage(),e);
         	throw e;
@@ -325,18 +316,6 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         }
     }
 
-    
-    private void initScheduler() throws ConfigurationException {
-        try {
-        	CachePurgeJob.init(bischeckProperties);
-            ThresholdCacheClearJob.init(bischeckProperties);
-            adminJobsCount = 2;
-        } catch (SchedulerException e) {
-            LOGGER.error("Quartz scheduler failed with exception {}", e.getMessage(), e);
-            throw new ConfigurationException(e);
-        }
-     }
-    
     
     private void initBischeckServices(boolean once) 
     		throws ConfigurationException {

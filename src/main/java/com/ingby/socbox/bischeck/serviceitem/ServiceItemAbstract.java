@@ -22,6 +22,7 @@ package com.ingby.socbox.bischeck.serviceitem;
 import com.ingby.socbox.bischeck.QueryDate;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.threshold.Threshold;
+import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
  * The ServiceItemAbstract class provide most of the methods needed by a 
@@ -55,7 +56,7 @@ public abstract class ServiceItemAbstract {
     protected Long exectime;
     protected Threshold threshold;
 	private String classname;
-
+	private NAGIOSSTAT curstate;
     
     public void setService(Service service) {
         this.service = service;
@@ -155,4 +156,12 @@ public abstract class ServiceItemAbstract {
 		this.alias = alias;
 	}
 
+	public NAGIOSSTAT evaluateThreshold() {
+		curstate = getThreshold().getState(getLatestExecuted());
+		return curstate;
+	}
+	
+	public NAGIOSSTAT getEvaluatedThreshold() {
+		return curstate;
+	}
 }

@@ -49,13 +49,13 @@ import com.yammer.metrics.core.TimerContext;
 public final class OpenTSDBServer implements Server,  MessageServerInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OpenTSDBServer.class);
-    static Map<String,OpenTSDBServer> servers = new HashMap<String,OpenTSDBServer>();
+    private static Map<String,OpenTSDBServer> servers = new HashMap<String,OpenTSDBServer>();
     
     
-    private String instanceName;
-    private int port;
-    private String hostAddress;
-    private int connectionTimeout;
+    private final String instanceName;
+    private final int port;
+    private final String hostAddress;
+    private final int connectionTimeout;
     
     private OpenTSDBServer (String name) {
     	Properties defaultproperties = getServerProperties();

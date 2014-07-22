@@ -52,58 +52,26 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(MetricsLibratoServer.class);
 
-	static Map<String,MetricsLibratoServer> servers = new HashMap<String,MetricsLibratoServer>();
+	private static Map<String,MetricsLibratoServer> servers = new HashMap<String,MetricsLibratoServer>();
 
-	private String  instanceName;
+	private final String  instanceName;
 
-	private String  apiUrl;
-	private String  authToken;
-	private String  email;
-	private Integer connectionTimeout;
-	private Boolean sendThreshold;
-	private String  nameSeparator;
-	private Boolean serviceAndItemName;
-	private String  doNotSendRegex;
-	private String  doNotSendRegexDelim;
-	private MatchServiceToSend msts = null;
-    private HttpPoster poster;
+	private final String  apiUrl;
+	private final String  authToken;
+	private final String  email;
+	private final Integer connectionTimeout;
+	private final Boolean sendThreshold;
+	private final String  nameSeparator;
+	private final Boolean serviceAndItemName;
+	private final String  doNotSendRegex;
+	private final String  doNotSendRegexDelim;
+	private final MatchServiceToSend msts;
+    private final HttpPoster poster;
     
 	//private AsyncHttpClient.BoundRequestBuilder builder;
 
 	
 	private MetricsLibratoServer(String name) {
-		instanceName=name;
-	}
-
-
-	/**
-	 * Retrieve the Server object. The method is invoked from class ServerExecutor
-	 * execute method. The created Server object is placed in the class internal 
-	 * Server object list.
-	 * @param name the name of the configuration in server.xml like
-	 * {@code &lt;server name="my"&gt;}
-	 * @return Server object
-	 */
-	synchronized public static Server getInstance(String name) {
-
-		if (!servers.containsKey(name) ) {
-			servers.put(name,new MetricsLibratoServer(name));
-			servers.get(name).init(name);
-		}
-		return servers.get(name);
-	}
-
-
-	/**
-	 * Unregister the server and its configuration
-	 * @param name of the server instance
-	 */
-	synchronized public static void unregister(String name) {
-		servers.remove(name);
-	}
-
-
-	private void init(String name) {
 
 		Properties defaultproperties = getServerProperties();
 		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
@@ -137,6 +105,33 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 		
 		msts = new MatchServiceToSend(MatchServiceToSend.convertString2List(doNotSendRegex,doNotSendRegexDelim));
 
+		instanceName=name;
+	}
+
+
+	/**
+	 * Retrieve the Server object. The method is invoked from class ServerExecutor
+	 * execute method. The created Server object is placed in the class internal 
+	 * Server object list.
+	 * @param name the name of the configuration in server.xml like
+	 * {@code &lt;server name="my"&gt;}
+	 * @return Server object
+	 */
+	synchronized public static Server getInstance(String name) {
+
+		if (!servers.containsKey(name) ) {
+			servers.put(name,new MetricsLibratoServer(name));
+		}
+		return servers.get(name);
+	}
+
+
+	/**
+	 * Unregister the server and its configuration
+	 * @param name of the server instance
+	 */
+	synchronized public static void unregister(String name) {
+		servers.remove(name);
 	}
 
 

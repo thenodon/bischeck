@@ -63,15 +63,8 @@ public class CacheInfTest {
 	@Test (groups = { "Cache" } )
 	public void verifyCache() throws CacheException {
 
-		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.laststatuscache.LastStatusCache");
-		CacheInf cache = CacheFactory.getInstance();
-		cache.clear(hostName, serviceName, serviceItemName);
-		verifyCacheImp(cache);
-		cache.clear(hostName, serviceName, serviceItemName);
-		CacheFactory.destroy();
-		
 		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
-		cache = CacheFactory.getInstance();
+		CacheInf cache = CacheFactory.getInstance();
 		cache.clear(hostName, serviceName, serviceItemName);
 		verifyCacheImp(cache);
 		cache.clear(hostName, serviceName, serviceItemName);

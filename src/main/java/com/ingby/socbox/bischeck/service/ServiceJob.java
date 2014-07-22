@@ -44,6 +44,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
+import com.ingby.socbox.bischeck.cache.CacheStateInf;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
@@ -118,7 +119,7 @@ public class ServiceJob implements Job {
 						"publishTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 				final TimerContext contextPub = timerPub.time();
 				try {
-					ServerMessageExecutor.getInstance().execute(service); 
+					ServerMessageExecutor.getInstance().publish(service); 
 				}finally { 			
 					Long duration = contextPub.stop()/1000000;
 					LOGGER.debug("Publish execution time: {} ms", duration);
@@ -220,67 +221,98 @@ public class ServiceJob implements Job {
 	 * @throws ServiceItemException 
 	 * @throws ServiceException 
 	 */
-	private void executeJob(Service service) {
+	public void executeJob(Service service) {
 
 		// Initial state
 		service.setLevel(NAGIOSSTAT.OK);
-		
+		/*
+		if (service instanceof ServiceStateInf ) {
+			LOGGER.debug("{}: current state is {}",Util.fullQoutedHostServiceName(service), ((ServiceStateInf) service).getServiceState().getState());
+		}
+		*/
 		for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
 			ServiceItem serviceitem = serviceitementry.getValue();
 
 			String fullservicename = Util.fullName(service, serviceitem);
 			
 			LOGGER.debug("Executing ServiceItem: {}", fullservicename);
-
+			
 			synchronized (service) {
 				LOGGER.debug("{} State before execute service {}", fullservicename, service.getLevel().toString());
 				
-				executeService(service, serviceitem);
-				LOGGER.debug("{} State after execute service {}", fullservicename, service.getLevel().toString());
-				
-				executeThreshold(service, serviceitem);
-				LOGGER.debug("{} State after threshold service {}", fullservicename, service.getLevel().toString());
+				try {
+					service.openConnection();
+								
+					executeService(service, serviceitem);
+					LOGGER.debug("{} State after execute service {}", fullservicename, service.getLevel().toString());
+
+					executeThreshold(service, serviceitem);
+					LOGGER.debug("{} State after threshold service {}", fullservicename, service.getLevel().toString());
+
+					CacheFactory.getInstance().add(service,serviceitem);
+
+				} catch (ServiceException e) {
+					// If the connection fail
+					service.setLevel(levelOnError());
+					
+					if (saveNullOnConnectionError) {
+						serviceitem.setLatestExecuted("null");
+						// Will get state on serviceitem that is unknown
+						CacheFactory.getInstance().add(service,serviceitem);
+					}
+					LOGGER.warn("Connection to {} failed for {}", Util.obfuscatePassword(service.getConnectionUrl()), 
+							Util.fullQoutedName(service, serviceitem), e);
+					
+				}
+
 			}
 		} 
+		LOGGER.debug("Resolved service state for {} set to {}", Util.fullQoutedHostServiceName(service), service.getLevel());
+		
+		
+		// All serviceitems executed and evaluated with thresholds, check if a state change occurred and save it
+		saveStateChange(service);
 	}
 
-
+	
 	private void executeService(Service service, ServiceItem serviceitem) {
 		final Timer timer = Metrics.newTimer(ServiceJob.class, 
 				"executeServiceTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 
 		try {
-			try {
-				service.openConnection();
-			} catch (ServiceException e) {
-
-				if (saveNullOnConnectionError) {
-					serviceitem.setLatestExecuted("null");
-					CacheFactory.getInstance().add(service,serviceitem);
-				}
-				LOGGER.warn("Connection to {} failed", Util.obfuscatePassword(service.getConnectionUrl()), e);
-				setLevelOnError(service);
-			}
+			// Move outside
+//			try {
+//				service.openConnection();
+//			} catch (ServiceException e) {
+//
+//				if (saveNullOnConnectionError) {
+//					serviceitem.setLatestExecuted("null");
+//					CacheFactory.getInstance().add(service,serviceitem);
+//				}
+//				LOGGER.warn("Connection to {} failed for {}", Util.obfuscatePassword(service.getConnectionUrl()), 
+//						Util.fullQoutedName(service, serviceitem), e);
+//				service.setLevel(levelOnError());
+//			}
 
 			if (service.isConnectionEstablished()) {
 				try {
-			
+
 					serviceitem.execute();
 			
-				} catch (ServiceItemException si) {
+				} catch (ServiceItemException|ServiceException sexp) {
 					LOGGER.warn("{} execution prepare and/or query \"{}\" failed",
-							si.getServiceItemName(), 
+							Util.fullQoutedName(service, serviceitem), 
 							serviceitem.getExecution(), 
-							si);
-					setLevelOnError(service);
+							sexp);
+					service.setLevel(levelOnError());
 					
-				} catch (ServiceException se) {
-					LOGGER.warn("{} execution prepare and/or query \"{}\" failed",
-							se.getServiceName(), 
-							serviceitem.getExecution(), 
-							se);
-					setLevelOnError(service);
+//				} catch (ServiceException se) {
+//					LOGGER.warn("{} execution prepare and/or query \"{}\" failed",
+//							se.getServiceName(), 
+//							serviceitem.getExecution(), 
+//							se);
+//					service.setLevel(levelOnError());
 				} finally {
 					try {
 						service.closeConnection();
@@ -297,11 +329,11 @@ public class ServiceJob implements Job {
 		}
 	}
 
-
+	
 	private void executeThreshold(Service service, ServiceItem serviceitem) {
 
 		NAGIOSSTAT currentState = service.getLevel();
-		
+
 		final Timer timer = Metrics.newTimer(ServiceJob.class, 
 				"executeThresholdTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext ctxthreshold = timer.time();
@@ -312,31 +344,77 @@ public class ServiceJob implements Job {
 				
 			// Always report the state for the worst service item 
 			LOGGER.debug("{} last executed value {}", serviceitem.getServiceItemName(), serviceitem.getLatestExecuted());
-			NAGIOSSTAT newState = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
-
-			CacheFactory.getInstance().add(service,serviceitem);
-
-			if (newState.val() > currentState.val() ) { 
-				currentState = newState;
-			}
+			//NAGIOSSTAT curstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
+			NAGIOSSTAT lastState = serviceitem.evaluateThreshold();
+			LOGGER.debug("Service {} Item {} resolved to {}, current {}",service.getServiceName(), serviceitem.getServiceItemName(),lastState.toString(), currentState.toString());
+			
+			// move to the outside
+			//CacheFactory.getInstance().add(service,serviceitem);
+			
+			currentState = resolveServiceState(currentState, lastState);
+			
 		} catch (ThresholdException te) {
 			LOGGER.warn("Threshold excution failed", te);
 			currentState = levelOnError();
 		} finally {
 			ctxthreshold.stop();
 		}
+		LOGGER.debug("Service {} set to {}", service.getServiceName(), currentState.toString());
 		service.setLevel(currentState);
+
 	}
 
+	/**
+	 * Resolve the state to the most severe of the current 
+	 * @param currentstate the state currently set
+	 * @param laststate the state from the last serviceitem
+	 * @return
+	 */
+	private NAGIOSSTAT resolveServiceState(NAGIOSSTAT currentstate,
+			NAGIOSSTAT laststate) {
+		// TODO manage unknown in relation to warning and critical
+		if (laststate.val() > currentstate.val() ) { 
+			currentstate = laststate;
+		}
+		return currentstate;
+	}
 
+	
+	/**
+	 * Check if the service support state change, {@link ServiceStateInf}, and 
+	 * if the the {@link ServiceState) for the {@link Service} indicate that 
+	 * a state change occurred the change is written to the cache if the cache
+	 * support {@link CacheStateInf} 
+ 	 * @param service
+	 */
+	private void saveStateChange(Service service) {
+		
+		if (service instanceof ServiceStateInf && CacheFactory.getInstance() instanceof CacheStateInf) {
+			// TODO This is not nice since its not encapsulated in the Service
+			((ServiceStateInf) service).setServiceState();
+			
+			if ( ((ServiceStateInf) service).getServiceState().isStateChange() && 
+				   CacheFactory.getInstance() instanceof CacheStateInf ) {
+				LOGGER.info("State change {} from {} ({}) to {} ({})", Util.fullQoutedHostServiceName(service),
+						((ServiceStateInf) service).getServiceState().getPreviousState(),
+						((ServiceStateInf) service).getServiceState().getPreviousStateLevel(),
+						((ServiceStateInf) service).getServiceState().getState(),
+						((ServiceStateInf) service).getServiceState().getStateLevel());
+				
+				((CacheStateInf) CacheFactory.getInstance()).addState(service);
+			}
+		}
+	}
+	
+	
 	/**
 	 * Implements the rule when check can not be executed due to underlying
 	 * Service and/or ServiceItem
 	 * @param service
 	 */
-	private void setLevelOnError(Service service) {
-		service.setLevel(NAGIOSSTAT.CRITICAL);
-	}
+//	private void setLevelOnError(Service service) {
+//		service.setLevel(NAGIOSSTAT.CRITICAL);
+//	}
 
 	private NAGIOSSTAT levelOnError() {
 		return NAGIOSSTAT.CRITICAL;

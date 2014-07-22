@@ -32,8 +32,6 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
-
 
 /**
  * Service to connect and execute Livestatus query
@@ -63,7 +61,9 @@ public class LivestatusService extends ServiceAbstract implements Service {
     
     @Override
     public void openConnection() throws ServiceException {
-    	URI uri;
+    	super.openConnection();
+    	
+    	URI uri = null;
     	try {   
     		uri = new URI(this.getConnectionUrl());
     		clientSocket = new Socket(uri.getHost(), uri.getPort());

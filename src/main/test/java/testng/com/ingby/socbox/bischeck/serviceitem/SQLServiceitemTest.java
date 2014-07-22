@@ -31,14 +31,12 @@ import org.testng.annotations.Test;
 
 import testng.com.ingby.socbox.bischeck.TestUtils;
 
-
-import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
-import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.host.Host;
 
 import com.ingby.socbox.bischeck.service.JDBCService;
 import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
@@ -47,25 +45,29 @@ public class SQLServiceitemTest {
 
 
 
-	private ConfigurationManager confMgmr;
 	private CacheInf cache;
+	private Host host;
 	private JDBCService jdbc;
 	private SQLServiceItem sql;
 
 	@BeforeClass
 	public void beforeTest() throws Exception {
 
-		confMgmr = TestUtils.getConfigurationManager();    
-
+		TestUtils.getConfigurationManager();    
+		CacheFactory.init();
+		
+		host = new Host("host");
 		jdbc = new JDBCService("test",null);
-		jdbc.setConnectionUrl("jdbc:derby:memory:myDB;create=true");
+		jdbc.setConnectionUrl("jdbc:derby:memory:myDBxyz;create=true");
 		jdbc.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
 		sql = new SQLServiceItem("serviceItemName");
 		sql.setService(jdbc);
+		host.addService(jdbc);
+		jdbc.setHost(host);
 
 		// Create table
 		//Creating a database table
-		Connection con = DriverManager.getConnection("jdbc:derby:memory:myDB;create=true");
+		Connection con = DriverManager.getConnection("jdbc:derby:memory:myDBxyz;create=true");
 		Statement stat = con.createStatement();
 
 		stat.execute("create table test (id INT, value INT, createdate date)");
@@ -97,7 +99,8 @@ public class SQLServiceitemTest {
 			ls = new LastStatus("3", (float) 1.0);
 			cache.add(ls, Util.fullName("host3", "web", "state"));
 
-
+			
+			
 			jdbc.openConnection();
 
 			sql.setExecution("select sum(value) from test");

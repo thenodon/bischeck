@@ -26,12 +26,9 @@ import org.testng.annotations.Test;
 
 import testng.com.ingby.socbox.bischeck.TestUtils;
 
-
-import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
-import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceException;
@@ -44,13 +41,12 @@ public class CheckCommandServiceitemTest {
 
 
 
-	private ConfigurationManager confMgmr;
 	private CacheInf cache;
 	private Service shell;
 	@BeforeClass
 	public void beforeTest() throws Exception {
 
-		confMgmr = TestUtils.getConfigurationManager();
+		TestUtils.getConfigurationManager();
 		
 		shell = new ShellService("serviceName",null);
 

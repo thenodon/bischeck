@@ -48,7 +48,7 @@ import com.yammer.metrics.core.TimerContext;
  * ServerMessageExecutor manage the messages asynchronously between a 
  * executing {@link ServiceJob} and the configured {@link Server} 
  * implementations. <br>
- * The {@link ServiceJob} call the {@link #execute(Service)} method that will
+ * The {@link ServiceJob} call the {@link #publish(Service)} method that will
  * publish the {@link Service} object that will be subscribed by the 
  * {@link MessageServerInf#onMessage(Service)}.
  * 
@@ -183,7 +183,7 @@ public final class ServerMessageExecutor {
 	 * @param service the Service object that contain data to be send to the 
 	 * servers.
 	 */
-	public void execute(Service service) {
+	public void publish(Service service) {
 
 		channel.publish(service);
 	}

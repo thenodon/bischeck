@@ -33,18 +33,20 @@ import org.slf4j.LoggerFactory;
  * This service execute shell scripts on the local server.
  *
  */
-public class ShellService extends ServiceAbstract implements Service {
+public class ShellService extends ServiceAbstract implements Service, ServiceStateInf {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ShellService.class);
 	
-    public ShellService (String serviceName, Properties notUsed) {
+	
+	public ShellService (String serviceName, Properties notUsed) {
         this.serviceName = serviceName;
     }
 
     
     @Override
     public void openConnection() throws ServiceException { 
-        setConnectionEstablished(true);
+    	super.openConnection();
+    	setConnectionEstablished(true);
     }
 
     
@@ -99,7 +101,8 @@ public class ShellService extends ServiceAbstract implements Service {
     	}
     	
     	return ret;    	
-    }    
+    }
+
 }
 
 

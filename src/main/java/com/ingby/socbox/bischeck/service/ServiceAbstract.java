@@ -53,6 +53,10 @@ public abstract class ServiceAbstract {
     private boolean connectionEstablished = false;
     private Boolean sendServiceData = true;
     
+    private ServiceState fsm = null;
+    
+
+    
     public String getServiceName() {
         return serviceName;
     }
@@ -87,6 +91,14 @@ public abstract class ServiceAbstract {
         this.driverClassName = driverClassName;
     }
 
+    
+    void openConnection() throws ServiceException{
+    	// Create the service state object at first open
+    	if (fsm == null) {
+    		fsm = ServiceState.ServiceStateFactory((Service) this);
+    	}
+    }
+    
     
     public void setHost(Host host) {
         this.host = host;
@@ -166,4 +178,15 @@ public abstract class ServiceAbstract {
 	public void setAlias(String alias) {
 		this.alias = alias;
 	}
+
+	// ServiceStateInf
+    public ServiceState getServiceState() {
+		return fsm;
+	}
+
+
+	public void setServiceState() {
+		fsm.setState(getLevel());
+		
+	}    
 }

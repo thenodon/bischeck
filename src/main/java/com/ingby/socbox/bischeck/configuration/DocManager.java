@@ -40,8 +40,6 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
-import com.ingby.socbox.bischeck.configuration.ConfigXMLInf.XMLCONFIG;
-
 
 
 

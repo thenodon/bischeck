@@ -19,8 +19,6 @@
 
 package com.ingby.socbox.bischeck.configuration;
 
-import java.text.ParseException;
-
 import java.util.Date;
 import java.util.Properties;
 

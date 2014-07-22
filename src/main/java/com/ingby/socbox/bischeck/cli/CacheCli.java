@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -239,7 +238,9 @@ public class CacheCli {
 			} catch (Exception e) {
 				console.println ("Could not restore " + e.getMessage());
 			}
-			history.flush();
+			if (history != null) {
+				history.flush();
+			}
 		}
 	}
 

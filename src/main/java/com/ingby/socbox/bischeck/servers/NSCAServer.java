@@ -45,19 +45,19 @@ import com.ingby.socbox.bischeck.service.Service;
 public final class NSCAServer implements Server, MessageServerInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NSCAServer.class);
-    private String instanceName;
-    private ServerCircuitBreak circuitBreak;
+    private final String instanceName;
+    private final ServerCircuitBreak circuitBreak;
     
     private final int MAX_QUEUE = 10;
-    private LinkedBlockingQueue<Service> subTaskQueue;
+    private final LinkedBlockingQueue<Service> subTaskQueue;
     
-    private ExecutorService execService;
+    private final ExecutorService execService;
     
     /**
      * The server map is used to manage multiple configuration based on the 
      * same NSCAServer class.
      */
-    static Map<String,NSCAServer> servers = new HashMap<String,NSCAServer>();
+    private static Map<String,NSCAServer> servers = new HashMap<String,NSCAServer>();
     private NagiosSettings settings;
     
     
@@ -74,7 +74,7 @@ public final class NSCAServer implements Server, MessageServerInf {
 
         if (!servers.containsKey(name) ) {
             servers.put(name,new NSCAServer(name));
-            servers.get(name).init(name);
+            //servers.get(name).init(name);
         }
         return servers.get(name);
     }
@@ -111,7 +111,7 @@ public final class NSCAServer implements Server, MessageServerInf {
         }
         LOGGER.info("{} - All workers stopped",instanceName);
         circuitBreak.destroy();
-        circuitBreak = null;
+        //circuitBreak = null;
     }
     
     /**
@@ -122,16 +122,20 @@ public final class NSCAServer implements Server, MessageServerInf {
         instanceName=name;
         subTaskQueue = new LinkedBlockingQueue<Service>();
         execService = Executors.newCachedThreadPool();
-    }
-    
-    
-    
-    private void init(String name) {
         settings = getNSCAConnection(name);
         circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
         execService.execute(new NSCAWorker(name, subTaskQueue,circuitBreak, settings));
        
     }
+    
+    
+    
+//    private void init(String name) {
+//        settings = getNSCAConnection(name);
+//        circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
+//        execService.execute(new NSCAWorker(name, subTaskQueue,circuitBreak, settings));
+//       
+//    }
     
     
     private NagiosSettings getNSCAConnection(String name)  {

@@ -23,7 +23,6 @@ package com.ingby.socbox.bischeck.cache.provider.redis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +42,19 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import com.ingby.socbox.bischeck.MBeanManager;
+import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CachePurgeInf;
 import com.ingby.socbox.bischeck.cache.CacheQueue;
+import com.ingby.socbox.bischeck.cache.CacheStateInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
-import com.ingby.socbox.bischeck.cache.provider.redis.Lookup;
+import com.ingby.socbox.bischeck.cache.LastStatusState;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceState;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
@@ -58,13 +63,15 @@ import com.yammer.metrics.core.TimerContext;
 
 /**
  * This is the Bischeck based redis cache class. The cache implements a two level 
- * cache - fast cache and redis cache. The fast cache is by default 100 slot fifo 
+ * cache - fast cache and redis cache. The fast cache is by default a 500 slot fifo 
  * cache implemented on the heap. On write data is stored both in the fast heap 
  * cache and in the redis cache. On query the fast cache is first evaluated and
  * then the redis cache is queried.<p>
- * The cache has low memory footprint compare with the old all in heap cache 
- * since redis store data so effective.<p>
- * The class is controlled by X properties:<br>
+ * The cache has low memory footprint compare with the old "all on" heap cache 
+ * since redis store data so effectively.<br>
+ * Data is stored in redis as a linked list with the youngest data at index 0. 
+ * The key is the servicedef name.<p>
+ * The class is controlled by the following properties:<br>
  * cache.provider.redis.server - the ip or name of where the redis service reside, default is 
  * localhost.<br>
  * <ul>
@@ -76,15 +83,12 @@ import com.yammer.metrics.core.TimerContext;
  * </ul>
  */
 
-public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatusCacheMBean {
+public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatusCacheMBean , CacheStateInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusCache.class);
 
     private ConcurrentHashMap<String,CacheQueue<LastStatus>> fastCache = null;
-
-    
-    private static int fastCacheSize = 0;
-    
+  
     private static LastStatusCache lsc; 
     
     private static MBeanManager mbsMgr = null;
@@ -96,12 +100,22 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
     private AtomicLong fastcachehitcount = new AtomicLong();
     private AtomicLong rediscachehitcount = new AtomicLong();
     private boolean fastCacheEnable = true;
+    private final int fastCacheSize;
     
-    private LastStatusCache(String redisserver, int redisport, int redistimeout, String redisauth, int redisdb, int jedisPoolSize) {
+    private LastStatusCache(String redisserver, int redisport, int redistimeout, String redisauth, int redisdb, int jedisPoolSize, int fastCacheSize) {
         fastCache = new ConcurrentHashMap<String,CacheQueue<LastStatus>>();
+        
         
         jedispool = new JedisPoolWrapper(redisserver,redisport,redistimeout,redisauth,redisdb,jedisPoolSize);    
         
+        this.fastCacheSize = fastCacheSize;
+        if (this.fastCacheSize == 0) {
+            this.disableFastCache();
+        } else {
+            LOGGER.info("Fast cache enable with size {}", this.fastCacheSize);
+            warmUpFastCache();
+        }
+    
         //lu  = Lookup.init(jedispool);
      }
 
@@ -116,6 +130,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         return lsc;
     }
     
+    
     synchronized public static void init() throws CacheException {
         if (lsc == null) {
 
@@ -125,8 +140,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
            int redisdb;
            int redistimeout;
            int jedisPoolSize;
+           int fastCacheSize = 0;
            
-            redisserver = ConfigurationManager.getInstance().getProperties().
+           redisserver = ConfigurationManager.getInstance().getProperties().
                     getProperty("cache.provider.redis.server","localhost");
 
             try {
@@ -176,33 +192,28 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
                         ConfigurationManager.getInstance().getProperties().getProperty("cache.provider.redis.poolsize","50"),ne);
                 jedisPoolSize = 50;
             }
+
+            try {
+                fastCacheSize = Integer.parseInt(
+                        ConfigurationManager.getInstance().getProperties().
+                        getProperty("cache.provider.redis.fastCacheSize","0"));
+             } catch (NumberFormatException ne) {
+                fastCacheSize = 0;
+            }
+
             
-            
-            lsc = new LastStatusCache(redisserver, redisport, redistimeout, redisauth, redisdb, jedisPoolSize);
+            lsc = new LastStatusCache(redisserver, redisport, redistimeout, redisauth, redisdb, jedisPoolSize, fastCacheSize);
             lsc.testConnection();
     
             mbsMgr = new MBeanManager(lsc, BEANNAME);
             mbsMgr.registerMBeanserver();     
             
-            try {
-                fastCacheSize = Integer.parseInt(
-                        ConfigurationManager.getInstance().getProperties().
-                        getProperty("cache.provider.redis.fastCacheSize","0"));
-                if (fastCacheSize == 0) {
-                    lsc.disableFastCache();
-                } else {
-                    LOGGER.info("Fast cache enable with size {}", fastCacheSize);
-                    lsc.warmUpFastCache();
-                }
-            } catch (NumberFormatException ne) {
-                fastCacheSize = 0;
-                lsc.disableFastCache();
-            }
             
             lsc.updateRuntimeMetaData();
         }
         
     }
+
 
     public static synchronized void destroy() {
         if (lsc != null) {
@@ -219,6 +230,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         
         lsc = null;
     }
+    
     
     /*
      ***********************************************
@@ -373,7 +385,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
                 synchronized (fastCache) {
                     if (fastCache.get(key) == null) {
                         fifo = new CacheQueue<LastStatus>(fastCacheSize);
-                        fastCache.put(key, fifo);
+                        fastCache.putIfAbsent(key, fifo);
                     }
                 }
                 
@@ -793,7 +805,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         String key = Util.fullName( hostName, serviceName, serviceItemName);
         
         // Clear fast cache data
-        if (fastCache == null) {
+        if (fastCache != null && fastCache.get(key) != null) {
             fastCache.get(key).clear();
         }
         
@@ -850,14 +862,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         } else {
             return (int) (fastcachehitcount.get()*100/(rediscachehitcount.get()+fastcachehitcount.get()));
         }
-    }
-    /*
-     * (non-Javadoc)
-     * @see com.ingby.socbox.bischeck.LastStatusCacheMBean#dump2file()
-     */    
-    @Override
-    public void dump2file() {
-        //Do nothing - redis this
     }
 
     /*
@@ -921,7 +925,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
             ServiceItem serviceItem) {
         
         String key = "config/"+Util.fullName(host.getHostname(),service.getServiceName(), serviceItem.getServiceItemName());
+        jedis.hset(key,"hostName",host.getHostname());
         jedis.hset(key,"hostDesc",checkNull(host.getDecscription()));
+        
+        jedis.hset(key,"serviceName",service.getServiceName());
         jedis.hset(key,"serviceDesc",checkNull(service.getDecscription()));
         jedis.hset(key,"serviceConnectionUrl",service.getConnectionUrl());
         jedis.hset(key,"serviceDriverClass",checkNull(service.getDriverClassName()));
@@ -930,6 +937,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
             jedis.hset(key,"serviceSchedule-"+i ,checkNull(schedule));
             i++;
         }
+        
+        jedis.hset(key,"serviceItemName",serviceItem.getServiceItemName());
         jedis.hset(key,"serviceItemDesc",checkNull(serviceItem.getDecscription()));
         jedis.hset(key,"serviceItemExecuteStatement",checkNull(serviceItem.getExecutionStat()));
         jedis.hset(key,"serviceItemClassName",checkNull(serviceItem.getClassName()));
@@ -1254,5 +1263,80 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
             jedispool.returnResource(jedis);
         }
     }
-
+    
+	@Override
+	public void addState(Service service) {
+		StringBuilder key = new StringBuilder();
+        key.append("state/");
+        key.append(service.getHost().getHostname()).append(ObjectDefinitions.getCacheKeySep());
+        key.append(service.getServiceName());
+        
+		
+        Jedis jedis = null;
+        final Timer timer = Metrics.newTimer(LastStatusCache.class, 
+				"stateWriteTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext context = timer.time();
+        
+        try {
+            jedis = jedispool.getResource();
+            
+            // Add redis
+            LastStatusState lss = new LastStatusState(service);
+            //jedis.lpush(strbui.toString(), ls.getJson());
+            
+            // score is current time in millisecond
+            jedis.zadd(key.toString(), (double) System.currentTimeMillis(), lss.getJson());
+        } catch (JedisConnectionException je) {
+            connectionFailed(je);
+        } finally {
+        	context.stop();
+            jedispool.returnResource(jedis);
+        }
+	}
+	
+	
+	public ServiceState getState(Service service) {
+	
+		StringBuilder key = new StringBuilder();
+        key.append("state/");
+        key.append(service.getHost().getHostname()).append(ObjectDefinitions.getCacheKeySep());
+        key.append(service.getServiceName());
+        
+		
+        Jedis jedis = null;
+        final Timer timer = Metrics.newTimer(LastStatusCache.class, 
+				"stateReadTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext context = timer.time();
+        
+		Set<String> stateJson = null;
+		
+        try {
+            jedis = jedispool.getResource();
+            
+            // get the maximum score limited to 1
+            stateJson = jedis.zrevrangeByScore(key.toString(), "+inf", "-inf" , 0, 1);
+           
+        } catch (JedisConnectionException je) {
+            connectionFailed(je);
+        } finally {
+        	context.stop();
+            jedispool.returnResource(jedis);
+        }
+        // If no state exists in cache
+        if (stateJson == null || stateJson.isEmpty() || stateJson.size() > 1) {
+        	return new ServiceState();
+        } 
+        
+        String lastState = stateJson.iterator().next();
+        JSONObject json = null;
+		try { 
+			json = (JSONObject) JSONSerializer.toJSON(lastState);
+		} catch (ClassCastException ce) {
+			LOGGER.warn("Cast exception on json string <" + lastState + ">", ce);
+			return new ServiceState();
+		}
+		
+		return new ServiceState(json);
+	}
+		
 }

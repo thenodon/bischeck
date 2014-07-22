@@ -9,7 +9,6 @@ import org.testng.annotations.Test;
 import testng.com.ingby.socbox.bischeck.TestUtils;
 
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
-import com.ingby.socbox.bischeck.configuration.ValidateConfiguration;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
 import com.ingby.socbox.bischeck.service.ServiceFactoryException;

@@ -30,22 +30,17 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
-
 /**
  * Service to connect and execute JDBC/SQL.
  */
-public class JDBCService extends ServiceAbstract implements Service {
+public class JDBCService extends ServiceAbstract implements Service, ServiceStateInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(JDBCService.class);
     
     static private int querytimeout = 10;
     private Connection connection;
     
-    static {
-        
-    }
-
+    
     
     public JDBCService (String serviceName, Properties bischeckProperties) {
         this.serviceName = serviceName;
@@ -64,6 +59,8 @@ public class JDBCService extends ServiceAbstract implements Service {
     
     @Override
     public void openConnection() throws ServiceException {
+    	super.openConnection();
+    	
     	try {
     		this.connection = DriverManager.getConnection(this.getConnectionUrl());
     	} catch (SQLException sqle) {
@@ -122,6 +119,7 @@ public class JDBCService extends ServiceAbstract implements Service {
 
         return null;
     }    
+
 }
 
 
