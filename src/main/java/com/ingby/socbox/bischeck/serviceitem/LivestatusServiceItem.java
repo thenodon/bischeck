@@ -29,7 +29,6 @@ import net.sf.json.JSONSerializer;
 
 import com.ingby.socbox.bischeck.QueryNagiosPerfData;
 import com.ingby.socbox.bischeck.Util;
-import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceException;
 
 /**
