@@ -82,6 +82,7 @@ public final class Execute implements ExecuteMBean {
     private static Execute exec = new Execute();
 
     private MBeanManager mbsMgr = null;
+	private Scheduler sched = null;
     
     private static final int RESTART = 1000;
     private static final int OKAY = 0;
@@ -203,28 +204,30 @@ public final class Execute implements ExecuteMBean {
         shutdownRequested = false;
         reloadRequested = false;
 
-        Scheduler sched = null;
-
-        try {
-            sched = initScheduler();
-            initTriggers(sched);
-            ConfigurationJobs.initScheduler();
-        } catch (SchedulerException e) {
-            LOGGER.error("Scheduler init failed", e);
-            return FAILED;
+        
+        if (!start()) {
+        	return FAILED;
         }
+//        try {
+//            sched  = initScheduler();
+//            initTriggers(sched);
+//            ConfigurationJobs.initScheduler();
+//        } catch (SchedulerException e) {
+//            LOGGER.error("Scheduler init failed", e);
+//            return FAILED;
+//        }
 
         /*
          * Enter loop if deamonMode
          */
         deamonLoop();
 
-        try {
-            sched.shutdown(true);
-            LOGGER.info("Scheduler shutdown");
-        } catch (SchedulerException e) {
-            LOGGER.warn("Stopping Quartz scheduler failed", e);
-        }
+//        try {
+//            sched.shutdown(true);
+//            LOGGER.info("Scheduler shutdown");
+//        } catch (SchedulerException e) {
+//            LOGGER.warn("Stopping Quartz scheduler failed", e);
+//        }
 
         ServerMessageExecutor.getInstance().unregisterAll();
         
@@ -452,6 +455,31 @@ public final class Execute implements ExecuteMBean {
      * 
      * JMX methods
      */
+
+    @Override
+    public boolean start() {
+    	try {
+            sched  = initScheduler();
+            initTriggers(sched);
+            ConfigurationJobs.initScheduler();
+        } catch (SchedulerException e) {
+            LOGGER.error("Scheduler init failed", e);
+            return false;
+        }
+    	return true;
+    }
+    
+    @Override
+    public boolean stop() {
+    	try {
+            sched.shutdown(true);
+            LOGGER.info("Scheduler shutdown");
+        } catch (SchedulerException e) {
+            LOGGER.warn("Stopping Quartz scheduler failed", e);
+            return false;
+        }
+    	return true;
+    }
 
     @Override
     public void shutdown() {

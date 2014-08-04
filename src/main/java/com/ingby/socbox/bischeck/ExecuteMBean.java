@@ -41,6 +41,17 @@ public interface ExecuteMBean {
      */
     void shutdown();
 
+    /**
+     * Start the execution scheduler
+     * @return 
+     */
+    boolean start();
+    
+    /**
+     * Stop the execution scheduler
+     * @return 
+     */
+    boolean stop();
     
     /**
      * Reload/restart bischeck with the configuration in the etc directory 
