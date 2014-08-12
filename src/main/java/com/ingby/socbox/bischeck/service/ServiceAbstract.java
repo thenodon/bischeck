@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
@@ -187,6 +188,25 @@ public abstract class ServiceAbstract {
 
 	public void setServiceState() {
 		fsm.setState(getLevel());
+	}
+	
+	public Map<String, String> getNotificationData() {
+		Map<String,String> notification = new HashMap<String, String>();
+		notification.put("host", getHost().getHostname());
+		notification.put("service", getServiceName());
+		notification.put("state", getLevel().toString());
+		notification.put("incident_key", getServiceState().getCurrentIncidentId());
+		notification.put("resolved", getServiceState().isResolved().toString());
 		
-	}    
+		notification.put("description", new StringBuilder().
+				append(getHost().getHostname()).
+				append("-").
+				append(getServiceName()). 
+				append(" : ").
+				append(getLevel()). 
+				append(" : "). 
+				append(new NagiosUtil().createNagiosMessage((Service) this)).toString());
+
+		return notification;
+	}
 }

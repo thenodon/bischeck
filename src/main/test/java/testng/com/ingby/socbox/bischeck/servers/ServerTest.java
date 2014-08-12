@@ -85,7 +85,7 @@ public class ServerTest {
 		serviceItem.setExecutionTime(100L);
 		service.closeConnection();
 
-		serverexecutor.publish(service);
+		serverexecutor.publishServer(service);
 
 		
 	}

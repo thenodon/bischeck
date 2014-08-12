@@ -37,9 +37,9 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 /**
  * The class format the state changes for a service. 
  */
-public class LastStatusState implements Serializable, Cloneable {
+public class LastStatusNotification implements Serializable, Cloneable {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusState.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusNotification.class);
 
 	
 	private static final long serialVersionUID = 1L;
@@ -51,7 +51,7 @@ public class LastStatusState implements Serializable, Cloneable {
 	private Service service;
 
 	
-	public LastStatusState(Service service) {
+	public LastStatusNotification(Service service) {
 		this.service = service;	
 	}
 
@@ -84,24 +84,14 @@ public class LastStatusState implements Serializable, Cloneable {
 		json.put("timestamp",currentTime);
 		json.put("date",new Date(currentTime).toString());
 		json.put("state",((ServiceStateInf) service).getServiceState().getState());
-		json.put("previousState",((ServiceStateInf) service).getServiceState().getPreviousState());
-		if (service instanceof ServiceStateInf) {
-			if (((ServiceStateInf) service).getServiceState().isHardState()) {
-				json.put("type",HARD);
-			} else {
-				json.put("type",SOFT);
-			}
+		if (((ServiceStateInf) service).getServiceState().isResolved()) {
+			json.put("notification","resolved");
 		} else {
-			json.put("type",NA);
+			json.put("notification","alert");
 		}
-
-		json.put("softCount", ((ServiceStateInf) service).getServiceState().getSoftCount());
-
-		json.put("connectionStatus", service.isConnectionEstablished());
 		
-		for (ServiceItem item : service.getServicesItems().values()) {
-			json.put(item.getServiceItemName(),(new LastStatus(item)).getJson());
-		}
+		json.put("incident_key",((ServiceStateInf) service).getServiceState().getCurrentIncidentId());
+				
 		
 		return json.toString();
 	}

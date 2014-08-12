@@ -119,12 +119,25 @@ public class ServiceJob implements Job {
 						"publishTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 				final TimerContext contextPub = timerPub.time();
 				try {
-					ServerMessageExecutor.getInstance().publish(service); 
+					ServerMessageExecutor.getInstance().publishServer(service); 
 				}finally { 			
 					Long duration = contextPub.stop()/1000000;
-					LOGGER.debug("Publish execution time: {} ms", duration);
+					LOGGER.debug("Publish to servers time: {} ms", duration);
 				}
 			}
+			
+			if (((ServiceStateInf) service).getServiceState().isNotification()) {
+				final Timer timerPubNotification = Metrics.newTimer(ServiceJob.class, 
+						"publishNotificationTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+				final TimerContext contextPubNotification = timerPubNotification.time();
+				try {
+					ServerMessageExecutor.getInstance().publishNotifiers(service); 
+				}finally { 			
+					Long duration = contextPubNotification.stop()/1000000;
+					LOGGER.debug("Publish to notifiers time: {} ms", duration);
+				}
+			}
+			
 		} finally {
 			long executetime = timercontext.stop()/1000000;         	
 			if (LOGGER.isDebugEnabled()){
@@ -393,6 +406,7 @@ public class ServiceJob implements Job {
 			// TODO This is not nice since its not encapsulated in the Service
 			((ServiceStateInf) service).setServiceState();
 			
+			Long score = null;
 			if ( ((ServiceStateInf) service).getServiceState().isStateChange() && 
 				   CacheFactory.getInstance() instanceof CacheStateInf ) {
 				LOGGER.info("State change {} from {} ({}) to {} ({})", Util.fullQoutedHostServiceName(service),
@@ -401,8 +415,17 @@ public class ServiceJob implements Job {
 						((ServiceStateInf) service).getServiceState().getState(),
 						((ServiceStateInf) service).getServiceState().getStateLevel());
 				
-				((CacheStateInf) CacheFactory.getInstance()).addState(service);
+				score = ((CacheStateInf) CacheFactory.getInstance()).addState(service);
 			}
+
+			if (((ServiceStateInf) service).getServiceState().isNotification()&& 
+					   CacheFactory.getInstance() instanceof CacheStateInf) {
+				LOGGER.info("Notification change {} {} {}", Util.fullQoutedHostServiceName(service),
+						((ServiceStateInf) service).getServiceState().getState(),
+						((ServiceStateInf) service).getServiceState().getCurrentIncidentId());
+				((CacheStateInf) CacheFactory.getInstance()).addNotification(service, score);
+			}
+
 		}
 	}
 	

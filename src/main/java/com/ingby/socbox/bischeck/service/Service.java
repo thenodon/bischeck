@@ -224,4 +224,6 @@ public interface Service {
 
 
 	void setAlias(String alias);
+
+	public Map<String, String> getNotificationData();
 }

@@ -19,6 +19,8 @@
 
 package com.ingby.socbox.bischeck.service;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -38,6 +40,7 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 public class ServiceState {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ServiceState.class);    
+
 
 
 	public enum State {
@@ -117,9 +120,13 @@ public class ServiceState {
 	private NAGIOSSTAT previousState = NAGIOSSTAT.UNKNOWN;
 	private int maxSoft = 3; 
 	private State previousFSM = State.OKAY_HARD;
-	private boolean initChange = true;
+	private boolean writeOnFirstStateEntry = false;
 	private boolean softInc = false;
-
+	private SecureRandom random = new SecureRandom();
+	private String currentIncidentId = "";
+	private boolean resolved = true;
+	private boolean notify = false;
+	private boolean stateChange = true;
 	/**
 	 * The state factory call the 
 	 * @param service
@@ -138,14 +145,23 @@ public class ServiceState {
 		previousFSM = State.OKAY_HARD;
 	}
 
-
+	public ServiceState(boolean writeOnFirstStateEntry) {
+		this();
+		this.writeOnFirstStateEntry = writeOnFirstStateEntry;
+	}
+	
+	
 	public ServiceState(int maxSoft) {
 		this.maxSoft = maxSoft;
 		fsm = State.OKAY_HARD;
 		previousFSM = State.OKAY_HARD;
 	}
 
-
+	public ServiceState(int maxSoft, boolean writeOnFirstStateEntry) {
+		this(maxSoft);
+		this.writeOnFirstStateEntry = writeOnFirstStateEntry;
+	}
+	
 	public ServiceState(NAGIOSSTAT state) {
 		currentState = state;
 		previousState = state;
@@ -158,7 +174,11 @@ public class ServiceState {
 		}
 	}
 
-
+	public ServiceState(NAGIOSSTAT state, boolean writeOnFirstStateEntry) {
+		this(state);
+		this.writeOnFirstStateEntry = writeOnFirstStateEntry;
+	}
+		
 	public ServiceState(NAGIOSSTAT state, int maxSoft) {
 		this.maxSoft = maxSoft; 
 		currentState = state;
@@ -173,6 +193,11 @@ public class ServiceState {
 		softCount = maxSoft;		
 	}
 
+	public ServiceState(NAGIOSSTAT state, int maxSoft, boolean writeOnFirstStateEntry) {
+		this(state, maxSoft);
+		this.writeOnFirstStateEntry = writeOnFirstStateEntry;
+	}
+	
 
 	// TODO implement - also move laststatusstate json to the ServiceStateInf and implement in abstract method!
 	public ServiceState(JSONObject json) {
@@ -181,39 +206,96 @@ public class ServiceState {
 			currentState = NAGIOSSTAT.valueOf(json.getString("state"));
 			previousState = NAGIOSSTAT.valueOf(json.getString("previousState"));
 			softCount = json.getInt("softCount");
-
+			String typeOfState = json.getString("type");
+			
 			if (currentState.equals(NAGIOSSTAT.CRITICAL) || currentState.equals(NAGIOSSTAT.WARNING)){
-				if (softCount == 0 ) {
+				
+				if ("HARD".equals(typeOfState)) {
 					fsm = State.PROBLEM_HARD;
-
-
-				} else if (softCount != 0 ) {
+					if (softCount != 0) {
+						previousFSM = State.PROBLEM_SOFT;
+					} else {
+						previousFSM = State.PROBLEM_HARD;
+					}
+				} else {
 					fsm = State.PROBLEM_SOFT;
-
+					if (previousState.equals(NAGIOSSTAT.OK)) {
+						previousFSM = State.OKAY_HARD;
+					} else {
+						previousFSM = State.PROBLEM_SOFT;
+					}
 				}
-			}
-
-			if (previousState.equals(NAGIOSSTAT.CRITICAL) || previousState.equals(NAGIOSSTAT.WARNING)){
-				if (softCount == 0 ) {
-					previousFSM = State.PROBLEM_HARD;
-
-
-				} else if (softCount != 0 ) {
-					previousFSM = State.PROBLEM_SOFT;
-
+			} else if (previousState.equals(NAGIOSSTAT.CRITICAL) || previousState.equals(NAGIOSSTAT.WARNING)){
+				
+				if (currentState.equals(NAGIOSSTAT.OK)) {
+					fsm = State.OKAY_HARD;
+					if (softCount != 0) {
+						previousFSM = State.PROBLEM_SOFT;
+						} else {
+							previousFSM = State.PROBLEM_HARD;
+						}
+				} else {
+					if (("HARD".equals(typeOfState))) {
+						fsm = State.PROBLEM_HARD;
+					} else {
+						fsm = State.PROBLEM_SOFT;
+					}
 				}
 			} else {
+				fsm = State.OKAY_HARD;
 				previousFSM = State.OKAY_HARD;
 			}
-
 		}
 		LOGGER.debug("Construct state {}",this.toString());
 	}
 
 
+	public ServiceState(JSONObject stateJson, String incident_key) {
+		this(stateJson);
+		currentIncidentId = incident_key;
+	}
+
+
 	/**
-	 * Set the current NAGIOSSTAT
-	 * @param state
+	 * Set the current NAGIOSSTAT and process the state change.<br>
+	 * The following state changes is handled:<br>
+	 * <ul>
+	 * <li>OKAY_HARD -> PROBLEM_SOFT this cover okay-> warning or critical
+	 * <ul>
+	 * <li>notify false</li>
+	 * <li>stateChange true</li>
+	 * <li>resolved false</li>
+	 * </ul>
+	 * </li><li>PROBLEM_SOFT -> PROBLEM_HARD this cover warning or critical goes 
+	 * from soft to hard
+	 * <ul>
+	 * <li>notify true</li>
+	 * <li>stateChange true</li>
+	 * <li>resolved false</li>
+	 * </ul>
+	 * </li><li>PROBLEM_SOFT -> OKAY_HARD this cover warning or critical goes 
+	 * from soft to okay from a soft state
+	  * <ul>
+	 * <li>notify false</li>
+	 * <li>stateChange true</li>
+	 * <li>resolved false</li>
+	 * </ul>
+	* </li><li>PROBLEM_HARD -> OKAY_HARD this cover when warning or critical goes 
+	 * to okay from hard state
+	 *  * <ul>
+	 * <li>notify true</li>
+	 * <li>stateChange true</li>
+	 * <li>resolved true</li>
+	 * </ul>
+	 *</li><li>PROBLEM_SOFT -> PROBLEM_SOFT 
+	  * <ul>
+	 * <li>notify false</li>
+	 * <li>stateChange true</li>
+	 * <li>resolved false</li>
+	 * </ul>
+	* </li>
+	* </ul>
+	 * @param state this is the new {@link NAGIOSSTAT} for the {@link Service}
 	 */
 	public void setState(NAGIOSSTAT state) {
 		previousState = currentState;
@@ -226,9 +308,94 @@ public class ServiceState {
 		} else {
 			softInc = false;
 		}
+
+		setInternalStates();
 	}
+	
+	private void setInternalStates() {
+		if (writeOnFirstStateEntry) {
+			// First time after service is started
+			writeOnFirstStateEntry = false;
+			// Make sure a item is written to cache
+			
+				stateChange = true;
+				resolved = false;
+				notify = false;
+			
+//			if (getState().equals(NAGIOSSTAT.OK) && (getPreviousState().equals(NAGIOSSTAT.CRITICAL) || getPreviousState().equals(NAGIOSSTAT.WARNING))) {
+//				// TODO this must be based on reading last from cache
+//				resolved = false;
+//				notify = false;
+//			} else {
+//				resolved = true;
+//				notify = false;
+//			}
+		} else if (previousFSM.equals(State.OKAY_HARD) &&
+				fsm.equals(State.PROBLEM_SOFT)  ) {
+			resolved = false;
+			notify = false;
 
+			stateChange= true;
+		} else if (previousFSM.equals(State.PROBLEM_SOFT) &&
+				fsm.equals(State.PROBLEM_HARD)  ) {
 
+			// This means its a new incident
+			nextIncidentId();
+			// new incident and not resolved 
+			resolved = false;
+			notify = true;
+
+			stateChange = true;
+		} else if (previousFSM.equals(State.PROBLEM_SOFT) &&
+				fsm.equals(State.OKAY_HARD)  ) {
+			resolved = true;
+			notify = false;
+
+			stateChange = true;
+
+		} else if (previousFSM.equals(State.PROBLEM_HARD) &&
+				fsm.equals(State.OKAY_HARD)  ) {
+			resolved = true;
+			notify = true;
+			stateChange = true;
+
+		} else if (previousFSM.equals(State.OKAY_HARD) && fsm.equals(State.OKAY_HARD)) {
+			resolved = true;
+			notify = false;
+			stateChange = false;
+		} else if (previousFSM.equals(State.PROBLEM_HARD) && fsm.equals(State.PROBLEM_HARD)) {
+			if ((getState() == NAGIOSSTAT.CRITICAL && previousState == NAGIOSSTAT.WARNING) ||
+				(getState() == NAGIOSSTAT.WARNING && previousState == NAGIOSSTAT.CRITICAL)
+				) {
+				// This means its an update on existing incident
+				resolved = false;
+				notify = true;
+				stateChange = true;
+			} else if ((getState() == NAGIOSSTAT.CRITICAL && previousState == NAGIOSSTAT.CRITICAL) ||
+				(getState() == NAGIOSSTAT.WARNING && previousState == NAGIOSSTAT.WARNING)
+				) {
+				resolved = false;
+				notify = false;
+				stateChange = false;
+			}
+				
+//		} else if (currentState.equals(NAGIOSSTAT.WARNING) && 
+//				previousState.equals(NAGIOSSTAT.CRITICAL)) {
+//
+//			stateChange = true;
+//
+//		} else if (currentState.equals(NAGIOSSTAT.CRITICAL) && 
+//				previousState.equals(NAGIOSSTAT.WARNING)) {
+//
+//			stateChange = true;
+//
+		} else if (isSoftState() && isSoftCountInc()) {
+			resolved = false;
+			notify = false;
+			stateChange =  true;
+			
+		} 
+	}
 	/**
 	 * Get the current NAGIOSSTAT
 	 * @return
@@ -272,6 +439,7 @@ public class ServiceState {
 		return softInc;
 	}
 
+	
 	public boolean isHardState() {
 		if (softCount == 0) {
 			return true;
@@ -280,7 +448,7 @@ public class ServiceState {
 	}
 
 
-	public boolean isSoftState() {
+	public Boolean isSoftState() {
 		if (softCount == 0) {
 			return false;
 		}
@@ -293,70 +461,32 @@ public class ServiceState {
 	 * of the alarm.
 	 * @return true if notification is applicable
 	 */
-	public boolean isNotification() {
-		if (previousFSM.equals(State.PROBLEM_SOFT) &&
-				fsm.equals(State.PROBLEM_HARD)  ) {
-			return true;
-		} else if (previousFSM.equals(State.PROBLEM_HARD) &&
-				fsm.equals(State.OKAY_HARD)  ) {
-			return true;
-		} 
+	public Boolean isNotification() {
+		return notify;
+	}
 
-		return false;
+	
+	public Boolean isResolved() {
+		return resolved;
 	}
 
 
 	/**
-	 * The method return if there is a major state change. <br>
-	 * OKAY_HARD -> PROBLEM_SOFT this cover okay-> warning or critical<br>
-	 * PROBLEM_SOFT -> PROBLEM_HARD this cover warning or critical goes 
-	 * from soft to hard<br>
-	 * PROBLEM_SOFT -> OKAY_HARD this cover warning or critical goes 
-	 * from soft to okay from a soft state<br>
-	 * PROBLEM_HARD -> OKAY_HARD this cover when warning or critical goes 
-	 * to okay from hard state<br>
-	 * WARNING -> CRITICAL independent of soft or hard state
-	 * CRITICAL -> WARNING independent of soft or hard state
-	 * 
+	 * The method return if there is a major state change. 
 	 * @return true if a major state change
 	 */
-	public boolean isStateChange() {
-		// always write out when created, make sense since it could be long time since used
-		if (initChange) {
-			initChange = false;
-			return true;
-		}
-		
-		if (previousFSM.equals(State.OKAY_HARD) &&
-				fsm.equals(State.PROBLEM_SOFT)  ) {
-			return true;
-		} else if (previousFSM.equals(State.PROBLEM_SOFT) &&
-				fsm.equals(State.PROBLEM_HARD)  ) {
-			return true;
+	public Boolean isStateChange() {
+		return stateChange;
+	}
+	
+	private String nextIncidentId() {
+		currentIncidentId = new BigInteger(130, random).toString(32);
+		LOGGER.debug("New incident id created {}", currentIncidentId);
+		return currentIncidentId;
+	}
 
-		} else if (previousFSM.equals(State.PROBLEM_SOFT) &&
-				fsm.equals(State.OKAY_HARD)  ) {
-			return true;
-
-		} else if (previousFSM.equals(State.PROBLEM_HARD) &&
-				fsm.equals(State.OKAY_HARD)  ) {
-			return true;
-
-		} else if (currentState.equals(NAGIOSSTAT.WARNING) && 
-				previousState.equals(NAGIOSSTAT.CRITICAL)) {
-
-			return true;
-
-		} else if (currentState.equals(NAGIOSSTAT.CRITICAL) && 
-				previousState.equals(NAGIOSSTAT.WARNING)) {
-
-			return true;
-
-		} else if (isSoftState() && isSoftCountInc()) {
-			return true;
-		}
-
-		return false;
+	public String getCurrentIncidentId() {
+		return currentIncidentId;
 	}
 
 	public String toString() {
@@ -365,6 +495,10 @@ public class ServiceState {
 		strbui.append("\"state\": \"").append(currentState);
 		strbui.append("\", \"previousState\" : \"").append(previousState);
 		strbui.append("\", \"level\": \"").append(fsm);
+		strbui.append("\", \"previousLevel\": \"").append(previousFSM);
+		strbui.append("\", \"softCount\": \"").append(softCount);
+		strbui.append("\", \"incident_key\": \"").append(currentIncidentId);
+		
 		strbui.append("\"}");
 		return strbui.toString();
 	}

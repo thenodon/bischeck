@@ -56,6 +56,7 @@ import ch.qos.logback.classic.Level;
 import com.ingby.socbox.bischeck.MBeanManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.host.Host;
+import com.ingby.socbox.bischeck.notifications.Notifier;
 import com.ingby.socbox.bischeck.servers.Server;
 import com.ingby.socbox.bischeck.service.RunAfter;
 import com.ingby.socbox.bischeck.service.Service;
@@ -852,21 +853,33 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     @SuppressWarnings("unchecked")
     private Class<?> getServerClass(String clazzname) throws ClassNotFoundException { 
 
-    	Class<Server> clazz = null;
+    	Class<?> clazz = null;
 
-    	try {
-    		clazz=(Class<Server>) Class.forName("com.ingby.socbox.bischeck.servers." +clazzname);
-    	} catch (ClassNotFoundException e) {
-    		try {
-    			clazz=(Class<Server>) Class.forName(clazzname);
-    		}catch (ClassNotFoundException ee) {
-    			LOGGER.error("Server class {} not found.",  clazzname);
-    			throw ee;
-    		}
+    	if (isClass("com.ingby.socbox.bischeck.servers." +clazzname)) {
+    		clazz=(Class<Server>) Class.forName("com.ingby.socbox.bischeck.servers." + clazzname);
+    	} else if (isClass("com.ingby.socbox.bischeck.notifications." + clazzname)){
+    		clazz=(Class<Notifier>) Class.forName("com.ingby.socbox.bischeck.notifications." + clazzname);	
+    	} else if (isClass(clazzname)){
+    		clazz=(Class<Server>) Class.forName(clazzname);
+    	} else {
+    		throw new ClassNotFoundException(clazzname);
     	}
+
     	return clazz;
     }
 
+    private boolean isClass(String className) {
+        boolean exist = true;
+        try 
+        {
+            Class.forName(className);
+        } 
+        catch (ClassNotFoundException e) 
+        {
+            exist = false;
+        }
+        return exist;
+    }
 
     private Properties setServerProperties(
             Iterator<com.ingby.socbox.bischeck.xsd.servers.XMLProperty> propIter) {
@@ -1202,6 +1215,10 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      */
     public Properties getServerProperiesByName(String name) {
         if (initDone.get()) {
+        	// Check if null then send an empty Properties
+        	if (serversMap.get(name) == null) {
+        		return new Properties();
+        	}
             return serversMap.get(name);
         } else { 
             LOGGER.error("Configuration manager not initilized (getServerProperiesByName)");
