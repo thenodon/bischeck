@@ -28,7 +28,7 @@ import com.ingby.socbox.bischeck.cache.CacheEvaluator;
  * Service to connect and execute LastStatus cache queries
  * 
  */
-public class LastCacheService extends ServiceAbstract implements Service {
+public class LastCacheService extends ServiceAbstract implements Service, ServiceStateInf {
 
     
     

@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * Service to connect and execute Livestatus query
  *
  */
-public class LivestatusService extends ServiceAbstract implements Service {
+public class LivestatusService extends ServiceAbstract implements Service, ServiceStateInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(LivestatusService.class);
     
