@@ -161,6 +161,7 @@ public final class Execute implements ExecuteMBean {
 
         dumpthread.start();
         
+        
         LOGGER.info("******************* Shutdown ********************");
         
         System.exit(retStat); // NOPMD - System.exit okay from main()
@@ -208,26 +209,13 @@ public final class Execute implements ExecuteMBean {
         if (!start()) {
         	return FAILED;
         }
-//        try {
-//            sched  = initScheduler();
-//            initTriggers(sched);
-//            ConfigurationJobs.initScheduler();
-//        } catch (SchedulerException e) {
-//            LOGGER.error("Scheduler init failed", e);
-//            return FAILED;
-//        }
-
+        
         /*
          * Enter loop if deamonMode
          */
         deamonLoop();
 
-//        try {
-//            sched.shutdown(true);
-//            LOGGER.info("Scheduler shutdown");
-//        } catch (SchedulerException e) {
-//            LOGGER.warn("Stopping Quartz scheduler failed", e);
-//        }
+        stop();
 
         ServerMessageExecutor.getInstance().unregisterAll();
         
@@ -245,7 +233,7 @@ public final class Execute implements ExecuteMBean {
      * exit. Close all standard file - in, out and error. Add shutdown hooks for
      * OS signals to get controlled process exit.
      * 
-     * @throws Exception if the disable SSL X.509 validation fail
+     * @throws Exception disable off SSL X.509 validation failed
      */
     private void deamonInit() throws Exception {
 
@@ -255,10 +243,10 @@ public final class Execute implements ExecuteMBean {
         	try {
 				SSLTrustManager.disableCertificateValidation();
 			} catch (KeyManagementException e) {
-				LOGGER.error("Disable SSL X.509 certification validation", e);
+				LOGGER.error("Disable SSL X.509 certification validation failed", e);
 				throw new Exception(e);
 			} catch (NoSuchAlgorithmException e) {
-				LOGGER.error("Disable SSL X.509 certification validation", e);
+				LOGGER.error("Disable SSL X.509 certification validation failed", e);
 				throw new Exception(e);
 			}
         }
