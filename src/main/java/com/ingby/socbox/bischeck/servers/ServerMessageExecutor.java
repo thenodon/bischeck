@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.notifications.Notifier;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
@@ -48,7 +49,7 @@ import com.yammer.metrics.core.TimerContext;
  * ServerMessageExecutor manage the messages asynchronously between a 
  * executing {@link ServiceJob} and the configured {@link Server} 
  * implementations. <br>
- * The {@link ServiceJob} call the {@link #publish(Service)} method that will
+ * The {@link ServiceJob} call the {@link #publishServer(Service)} method that will
  * publish the {@link Service} object that will be subscribed by the 
  * {@link MessageServerInf#onMessage(Service)}.
  * 
@@ -69,9 +70,12 @@ public final class ServerMessageExecutor {
 	
 	private static final String GETINSTANCE = "getInstance";
 	private static final String UNREGISTER = "unregister";
-	private Channel<Service> channel = null;
+	//private Channel<Service> channel = null;
 	private ExecutorService execService = null;
     private PoolFiberFactory poolFactory = null;
+
+	private MemoryChannel<Service> channelServers;
+	private MemoryChannel<Service> channelNotifiers;
 
    
     /**
@@ -84,7 +88,8 @@ public final class ServerMessageExecutor {
 		// TODO - check how the pool size of this is managed compared to fixed
 		execService = Executors.newFixedThreadPool(serverSet.size()*10);
         poolFactory = new PoolFiberFactory(execService);
-        channel = new MemoryChannel<Service>();
+        channelServers = new MemoryChannel<Service>();
+        channelNotifiers = new MemoryChannel<Service>();
 
 		Iterator<String> iter = serverSet.keySet().iterator();
 
@@ -95,7 +100,7 @@ public final class ServerMessageExecutor {
 
 				Method method = serverSet.get(instanceName).getMethod(GETINSTANCE,String.class);
 				// invoke the getinstance() for each server
-				Server server = (Server) method.invoke(null,instanceName);
+				MessageServerInf server = (MessageServerInf) method.invoke(null,instanceName);
 				
 				if (server instanceof Callback) {
 					
@@ -103,7 +108,13 @@ public final class ServerMessageExecutor {
 			        fiber.start();
 			        
 			        //add subscription for message on receiver thread
-			        Disposable disposable = channel.subscribe(fiber, (Callback<Service>) server);
+			        Disposable disposable = null;
+			        if (server instanceof Server) {
+			        	disposable = channelServers.subscribe(fiber, (Callback<Service>) server);
+			        } else if (server instanceof Notifier) {
+			        	disposable = channelNotifiers.subscribe(fiber, (Callback<Service>) server);
+			        }
+				
 			        // Add the disposable so it can be removed when shutdown
 			        serverUnSub.put(instanceName, disposable);
 				}
@@ -183,9 +194,12 @@ public final class ServerMessageExecutor {
 	 * @param service the Service object that contain data to be send to the 
 	 * servers.
 	 */
-	public void publish(Service service) {
+	public void publishServer(Service service) {
+		channelServers.publish(service);
+	}
 
-		channel.publish(service);
+	public void publishNotifiers(Service service) {
+		channelNotifiers.publish(service);
 	}
 
 
