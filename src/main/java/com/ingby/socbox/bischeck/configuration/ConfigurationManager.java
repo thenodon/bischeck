@@ -149,13 +149,13 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
 
         } catch (org.apache.commons.cli.ParseException e) {
             System.out.println( "Command parse error:" + e.getMessage() );
-            System.exit(FAILED); // NOPMD - System.exit okay from main()
+            Util.ShellExit(FAILED); 
         }
 
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "ConfigurationManager", options );
-            System.exit(OKAY); // NOPMD - System.exit okay from main()
+            Util.ShellExit(OKAY); 
         }
 
         ConfigurationManager.initonce();
@@ -164,7 +164,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         ((ch.qos.logback.classic.Logger) LOGGER).setLevel(Level.WARN);
         
         if (line.hasOption("verify")) {
-            System.exit(ValidateConfiguration.verify()); // NOPMD - System.exit okay from main()
+            Util.ShellExit(ValidateConfiguration.verify());
         }
 
         if (line.hasOption("pidfile")) {

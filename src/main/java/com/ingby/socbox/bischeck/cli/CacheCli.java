@@ -33,6 +33,7 @@ import org.apache.commons.cli.Options;
 import org.nfunk.jep.ParseException;
 
 import com.ingby.socbox.bischeck.BischeckDecimal;
+import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheEvaluator;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
@@ -78,13 +79,13 @@ public class CacheCli {
 
 		} catch (org.apache.commons.cli.ParseException e) {
 			System.out.println( "Command parse error:" + e.getMessage() );
-			System.exit(1); // NOPMD - System.exit okay from main()
+			Util.ShellExit(1);
 		}
 
 		if (line.hasOption("usage")) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp( "CacheCli", options );
-			System.exit(0); // NOPMD - System.exit okay from main()
+			Util.ShellExit(0);
 		}
 
 

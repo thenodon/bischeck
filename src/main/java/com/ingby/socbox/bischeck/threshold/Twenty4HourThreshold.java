@@ -128,13 +128,13 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             
         } catch (org.apache.commons.cli.ParseException e) {
             System.out.println( "Command parse error:" + e.getMessage() );
-            System.exit(1);  // NOPMD - System.exit okay from main()
+            Util.ShellExit(1);
         }
 
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "Twenty4HourThreshold", options );
-            System.exit(0);  // NOPMD - System.exit okay from main()
+            Util.ShellExit(0);
         }
 
         ConfigurationManager.init();
@@ -165,7 +165,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             			line.getOptionValue("host") + "-" +
             			line.getOptionValue("service")  + "-" +
             			line.getOptionValue("item"));
-            	System.exit(0); // NOPMD - System.exit okay from main()
+            	Util.ShellExit(0);
             }
             
             Calendar c = BisCalendar.getInstance();
@@ -194,7 +194,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             
             System.out.println(current.show(hourThreshold, minuteThreshold, metric, verbose));
             
-            System.exit(0); // NOPMD - System.exit okay from main()
+            Util.ShellExit(0);
         }           
         
     }

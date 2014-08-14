@@ -31,6 +31,7 @@ import org.apache.commons.cli.Options;
 
 
 
+import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigFileManager;
 import com.ingby.socbox.bischeck.configuration.ConfigXMLInf;
 import com.ingby.socbox.bischeck.xsd.properties.XMLProperties;
@@ -59,13 +60,13 @@ public class Properties2ServerProperties {
 
         } catch (org.apache.commons.cli.ParseException e) {
             System.out.println( "Command parse error:" + e.getMessage() );
-            System.exit(1);  // NOPMD - System.exit okay from main()
+            Util.ShellExit(1);
         }
 
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "DB2XMLConvert", options );
-            System.exit(0); // NOPMD - System.exit okay from main()
+            Util.ShellExit(0);
         }
 
         

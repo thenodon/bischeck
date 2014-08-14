@@ -119,13 +119,13 @@ public final class Execute implements ExecuteMBean {
         	System.out.println("Command parse error:" + e.getMessage());
         	HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("Bischeck", options);
-            System.exit(FAILED); // NOPMD - System.exit okay from main()
+            Util.ShellExit(FAILED);
         }
 
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("Bischeck", options);
-            System.exit(OKAY); // NOPMD - System.exit okay from main()
+            Util.ShellExit(OKAY); 
         }
 
         dumpthread = new Thread() {
@@ -152,7 +152,7 @@ public final class Execute implements ExecuteMBean {
                 LOGGER.error(
                         "Creating bischeck Configuration Manager failed with: {}",
                         e.getMessage(), e);
-                System.exit(FAILED); // NOPMD - System.exit okay from main()
+                Util.ShellExit(FAILED); 
             }
 
             retStat = Execute.getInstance().deamon();
@@ -164,7 +164,7 @@ public final class Execute implements ExecuteMBean {
         
         LOGGER.info("******************* Shutdown ********************");
         
-        System.exit(retStat); // NOPMD - System.exit okay from main()
+        Util.ShellExit(retStat); 
     }
 
     private Execute() {

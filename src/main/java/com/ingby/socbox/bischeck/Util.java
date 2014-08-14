@@ -317,7 +317,10 @@ public abstract class Util {
     		return ""+num;
     	}
     }
-    
+
+    public static void ShellExit(int exitCode) {
+    	System.exit(exitCode);
+    }
     
 }
 

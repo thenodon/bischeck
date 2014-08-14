@@ -35,6 +35,8 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
+import com.ingby.socbox.bischeck.Util;
+
 
 public class JDBCtest {
 	private static boolean verbose = false;
@@ -62,7 +64,7 @@ public class JDBCtest {
 			System.out.println("Command parse error:" + e.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("JDBCtest", options);
-			System.exit(1);
+			Util.ShellExit(1);
 		}
 
 		if (line.hasOption("verbose")) {
@@ -72,13 +74,13 @@ public class JDBCtest {
 		if (line.hasOption("usage")) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("Bischeck", options);
-			System.exit(0); // NOPMD - System.exit okay from main()
+			Util.ShellExit(0);
 		}
 
 		String driverclassname = null;
 		if (!line.hasOption("driver")) {
 			System.out.println("Driver class must be set");
-			System.exit(1);
+			Util.ShellExit(1);
 		} else {
 			driverclassname = line.getOptionValue("driver");
 			outputln("DriverClass: " + driverclassname);
@@ -87,7 +89,7 @@ public class JDBCtest {
 		String connectionname = null;
 		if (!line.hasOption("connection")) {
 			System.out.println("Connection url must be set");
-			System.exit(1);
+			Util.ShellExit(1);
 		} else {
 			connectionname = line.getOptionValue("connection");
 			outputln("Connection: " + connectionname);

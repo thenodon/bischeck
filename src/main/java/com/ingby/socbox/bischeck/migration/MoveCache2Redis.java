@@ -37,6 +37,7 @@ import org.apache.commons.cli.Options;
 import org.quartz.impl.StdSchedulerFactory;
 
 
+import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.LastStatus;
@@ -77,13 +78,13 @@ public class MoveCache2Redis {
 
 		} catch (org.apache.commons.cli.ParseException e) {
 			System.out.println( "Command parse error:" + e.getMessage() );
-			System.exit(1); // NOPMD - System.exit okay from main()
+			Util.ShellExit(1);
 		}
 
 		if (line.hasOption("usage")) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp( "MoveCache2Redis", options );
-			System.exit(0); // NOPMD - System.exit okay from main()
+			Util.ShellExit(0);
 		}
 		
 		if (line.hasOption("verbose")) {
