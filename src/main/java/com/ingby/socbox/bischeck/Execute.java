@@ -259,6 +259,7 @@ public final class Execute implements ExecuteMBean {
         try {
             System.in.close();
         } catch (IOException ignore) {
+        	LOGGER.info("Could not close stdin");
         }
 
         System.out.close();
@@ -604,9 +605,6 @@ public final class Execute implements ExecuteMBean {
 
     private String readBischeckVersion() {
         String version;
-        FileInputStream fstream = null;
-        DataInputStream in = null;
-        BufferedReader br = null;
         String path = null;
 
         if (System.getProperty(BIS_HOME_DIRECTORY) != null) {
@@ -615,30 +613,16 @@ public final class Execute implements ExecuteMBean {
             LOGGER.error("System property bishome must be set");
         }
 
-        try {
-            fstream = new FileInputStream(path + File.separator + "version.txt");
-
-            in = new DataInputStream(fstream);
-            br = new BufferedReader(new InputStreamReader(in));
-            version = br.readLine();
+        try (FileInputStream fstream = new FileInputStream(path + File.separator + "version.txt");
+        	DataInputStream in = new DataInputStream(fstream);
+        	BufferedReader br = new BufferedReader(new InputStreamReader(in))
+        	){
+        	version = br.readLine();
             LOGGER.info("Bisheck version is {}", version);
         } catch (Exception ioe) {
             version = "N/A";
             LOGGER.warn("Can not determine the bischeck version", ioe);
-        } finally {
-            try {
-                br.close();
-            } catch (Exception ignore) {
-            }
-            try {
-                in.close();
-            } catch (Exception ignore) {
-            }
-            try {
-                fstream.close();
-            } catch (Exception ignore) {
-            }
-        }
+        } 
         return version;
     }
 
