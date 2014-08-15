@@ -74,7 +74,6 @@ public final class NSCAServer implements Server, MessageServerInf {
 
         if (!servers.containsKey(name) ) {
             servers.put(name,new NSCAServer(name));
-            //servers.get(name).init(name);
         }
         return servers.get(name);
     }
@@ -115,7 +114,6 @@ public final class NSCAServer implements Server, MessageServerInf {
         }
         LOGGER.info("{} - All workers stopped",instanceName);
         circuitBreak.destroy();
-        //circuitBreak = null;
     }
     
     /**
@@ -131,15 +129,6 @@ public final class NSCAServer implements Server, MessageServerInf {
         execService.execute(new NSCAWorker(name, subTaskQueue,circuitBreak, settings));
        
     }
-    
-    
-    
-//    private void init(String name) {
-//        settings = getNSCAConnection(name);
-//        circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
-//        execService.execute(new NSCAWorker(name, subTaskQueue,circuitBreak, settings));
-//       
-//    }
     
     
     private NagiosSettings getNSCAConnection(String name)  {

@@ -238,11 +238,7 @@ public class ServiceJob implements Job {
 
 		// Initial state
 		service.setLevel(NAGIOSSTAT.OK);
-		/*
-		if (service instanceof ServiceStateInf ) {
-			LOGGER.debug("{}: current state is {}",Util.fullQoutedHostServiceName(service), ((ServiceStateInf) service).getServiceState().getState());
-		}
-		*/
+		
 		for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
 			ServiceItem serviceitem = serviceitementry.getValue();
 
@@ -294,20 +290,6 @@ public class ServiceJob implements Job {
 		final TimerContext context = timer.time();
 
 		try {
-			// Move outside
-//			try {
-//				service.openConnection();
-//			} catch (ServiceException e) {
-//
-//				if (saveNullOnConnectionError) {
-//					serviceitem.setLatestExecuted("null");
-//					CacheFactory.getInstance().add(service,serviceitem);
-//				}
-//				LOGGER.warn("Connection to {} failed for {}", Util.obfuscatePassword(service.getConnectionUrl()), 
-//						Util.fullQoutedName(service, serviceitem), e);
-//				service.setLevel(levelOnError());
-//			}
-
 			if (service.isConnectionEstablished()) {
 				try {
 
@@ -320,12 +302,6 @@ public class ServiceJob implements Job {
 							sexp);
 					service.setLevel(levelOnError());
 					
-//				} catch (ServiceException se) {
-//					LOGGER.warn("{} execution prepare and/or query \"{}\" failed",
-//							se.getServiceName(), 
-//							serviceitem.getExecution(), 
-//							se);
-//					service.setLevel(levelOnError());
 				} finally {
 					try {
 						service.closeConnection();
@@ -357,13 +333,10 @@ public class ServiceJob implements Job {
 				
 			// Always report the state for the worst service item 
 			LOGGER.debug("{} last executed value {}", serviceitem.getServiceItemName(), serviceitem.getLatestExecuted());
-			//NAGIOSSTAT curstate = serviceitem.getThreshold().getState(serviceitem.getLatestExecuted());
+
 			NAGIOSSTAT lastState = serviceitem.evaluateThreshold();
 			LOGGER.debug("Service {} Item {} resolved to {}, current {}",service.getServiceName(), serviceitem.getServiceItemName(),lastState.toString(), currentState.toString());
-			
-			// move to the outside
-			//CacheFactory.getInstance().add(service,serviceitem);
-			
+						
 			currentState = resolveServiceState(currentState, lastState);
 			
 		} catch (ThresholdException te) {
@@ -430,15 +403,6 @@ public class ServiceJob implements Job {
 	}
 	
 	
-	/**
-	 * Implements the rule when check can not be executed due to underlying
-	 * Service and/or ServiceItem
-	 * @param service
-	 */
-//	private void setLevelOnError(Service service) {
-//		service.setLevel(NAGIOSSTAT.CRITICAL);
-//	}
-
 	private NAGIOSSTAT levelOnError() {
 		return NAGIOSSTAT.CRITICAL;
 	}

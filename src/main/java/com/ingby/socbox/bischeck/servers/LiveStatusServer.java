@@ -86,7 +86,6 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 		
 		if (!servers.containsKey(name) ) {
 			servers.put(name,new LiveStatusServer(name));
-			//servers.get(name).init(name);
 		}
 		return servers.get(name);
 	}
@@ -100,22 +99,6 @@ public final class LiveStatusServer implements Server, MessageServerInf {
     	servers.remove(name);
     }
     
-    
-//	private void init(String name) {
-//		
-//		Properties defaultproperties = getServerProperties();
-//		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
-//		hostAddress = prop.getProperty("hostAddress",
-//				defaultproperties.getProperty("hostAddress"));
-//
-//		port = Integer.parseInt(prop.getProperty("port", 
-//				defaultproperties.getProperty("port")));
-//
-//		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
-//				defaultproperties.getProperty("connectionTimeout")));
-//
-//	}
-
 	
 	@Override
     public String getInstanceName() {

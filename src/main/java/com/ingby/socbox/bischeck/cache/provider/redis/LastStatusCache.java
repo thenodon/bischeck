@@ -97,8 +97,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 	private JedisPoolWrapper jedispool = null;
 
-	//private Lookup lu = null;
-
 	private AtomicLong fastcachehitcount = new AtomicLong();
 	private AtomicLong rediscachehitcount = new AtomicLong();
 	private boolean fastCacheEnable = true;
@@ -118,7 +116,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			warmUpFastCache();
 		}
 
-		//lu  = Lookup.init(jedispool);
 	}
 
 	/**
@@ -458,8 +455,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 		String key = Util.fullName( hostName, serviceName, serviceItemName);
 
-		//lu.setOptimizIndex(key, index);
-
 		LastStatus ls = null;
 
 		Jedis jedis = null;
@@ -538,9 +533,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 
 		String key = Util.fullName( hostName, serviceName, serviceItemName);
-
-		//lu.setOptimizIndex(key, toIndex);
-
 
 		List<LastStatus> lslist = new  ArrayList<LastStatus>();
 		List<String> lsstr = null;
@@ -1353,7 +1345,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			 jedis = jedispool.getResource();
 
 			 // get the maximum score limited to 1
-			 //stateJson = jedis.zrevrangeByScore(key.toString(), "+inf", "-inf" , 0, 1);
 			 returnTulpe = jedis.zrevrangeByScoreWithScores(key.toString(), "+inf", "-inf" , 0, 1);
 
 		 } catch (JedisConnectionException je) {
@@ -1376,8 +1367,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		 try { 
 			 stateJson = (JSONObject) JSONSerializer.toJSON(lastState.getElement());
 			 stateScore =  lastState.getScore();
-			 // TODO - check if the last notification have a score of last state we need to update ServiceState 
-			 // with incident_key
 		 } catch (ClassCastException ce) {
 			 LOGGER.warn("Cast exception on json string < {} >", lastState, ce);
 			 return new ServiceState(true);

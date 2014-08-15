@@ -89,22 +89,8 @@ public class NSCAWorker implements WorkerInf, Runnable {
 
         NAGIOSSTAT level;
         MessagePayload payload = new MessagePayload(service.getHost().getHostname(), null, service.getServiceName(), "");
-        /*
-        try {
-        	payload = new MessagePayloadBuilder()
-        	.withHostname(service.getHost().getHostname())
-        	.withServiceName(service.getServiceName())
-        	.create();
-        	
-        } catch (UnknownHostRuntimeException e){
-        	LOGGER.error("Hostname can not be resolved correctly - check /etc/hosts or DNS settings", e);
-        	throw e;
-        }
-        */
         
-        /*
-         * Check the last connection status for the Service
-         */
+        // Check the last connection status for the Service
         if ( service.isConnectionEstablished() ) {
             level = service.getLevel();
             payload.setMessage(level + nagutil.createNagiosMessage(service));

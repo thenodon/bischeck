@@ -230,7 +230,6 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     			showConfig.append(lineSep);
     		}
     	
-			//System.out.print(showConfig.toString());
 		}
 		
 		BischeckDecimal value = null;

@@ -207,7 +207,7 @@ public class DocManager implements ConfigXMLInf {
     private void genIndex(File outputdir) throws IOException {
         String nl = System.getProperty("line.separator");
         
-        StringBuffer indexbuf = new StringBuffer();
+        StringBuilder indexbuf = new StringBuilder();
         
         indexbuf.append("<html>").append(nl).
         append("<link rel=\"stylesheet\" type=\"text/css\" href=\"bischeck.css\">").append(nl).

@@ -98,11 +98,6 @@ public final class Lookup {
 	
 	
 	public void setOptimizIndex(String keyname, long index){
-//		Optimizer opti = optimizerMap.get(keyname);
-//		if (opti == null) {
-//			optimizerMap.put(keyname, new Optimizer(keyname));
-//			opti = optimizerMap.get(keyname);
-//		}	
 		
 		Optimizer opti = optimizerMap.putIfAbsent(keyname, new Optimizer(keyname));
 		synchronized (opti) {

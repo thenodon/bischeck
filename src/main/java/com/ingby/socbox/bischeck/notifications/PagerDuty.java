@@ -91,6 +91,7 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 		
 	}
 
+
 	synchronized public static PagerDuty getInstance(String name) {
 
 		if (!notificator.containsKey(name) ) {

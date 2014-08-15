@@ -122,45 +122,9 @@ public final class NRDPServer implements Server, MessageServerInf {
 		
 		if (!servers.containsKey(name) ) {
 			servers.put(name,new NRDPServer(name));
-//			servers.get(name).init(name);
 		}
 		return servers.get(name);
 	}
-
-    
-//	private void init(String name) {
-//	    
-//		Properties defaultproperties = getServerProperties();
-//		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
-//		String hostAddress = prop.getProperty("hostAddress",
-//				defaultproperties.getProperty("hostAddress"));
-//
-//		Integer port = Integer.parseInt(prop.getProperty("port", 
-//				defaultproperties.getProperty("port")));
-//
-//		String password = prop.getProperty("password",
-//				defaultproperties.getProperty("password"));
-//
-//		String path = prop.getProperty("path",
-//				defaultproperties.getProperty("path"));
-//
-//		Boolean ssl = Boolean.valueOf(prop.getProperty("ssl",
-//				defaultproperties.getProperty("ssl")));
-//
-//		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
-//				defaultproperties.getProperty("connectionTimeout")));
-//		
-//		String protocol = "http://";
-//		if (ssl) {
-//			protocol = "https://";
-//		}
-//		
-//		urlstr = protocol + hostAddress + ":" + port + "/" + path +"/";
-//		cmd="token="+password+"&cmd=submitcheck&XMLDATA=";
-//		
-//		circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
-//	    execService.execute(new NRDPWorker(instanceName, subTaskQueue, circuitBreak, urlstr, cmd, connectionTimeout));
-//	}
 
 	
 	@Override

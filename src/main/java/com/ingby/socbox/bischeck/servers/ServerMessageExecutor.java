@@ -70,7 +70,6 @@ public final class ServerMessageExecutor {
 	
 	private static final String GETINSTANCE = "getInstance";
 	private static final String UNREGISTER = "unregister";
-	//private Channel<Service> channel = null;
 	private ExecutorService execService = null;
     private PoolFiberFactory poolFactory = null;
 

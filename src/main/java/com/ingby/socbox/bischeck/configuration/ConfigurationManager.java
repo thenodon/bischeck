@@ -1181,28 +1181,6 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     public  File getPidFile() {
         return new File(bischeckProperties.getProperty("pidfile","/var/tmp/bischeck.pid"));
     }
-
-    
-    /**
-     * Check if the Bischeck pid file exists or not
-     * @return
-     */
-//    public  boolean checkPidFile() {
-//        File pidfile = getPidFile();
-//        if (pidfile.exists()) {
-//        	if (pidfile.canWrite())
-//        		return true;
-//        	else
-//        		return false;
-//        }
-//        else {
-//        	if (new File(pidfile.getParent()).canWrite()) {
-//        		return true;
-//        	} else {
-//        		return false;
-//        	}
-//        }
-//    }
     
     
     /**

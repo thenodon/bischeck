@@ -196,7 +196,6 @@ public class CacheCli {
 
 				if (line.matches("^list.*")) {
 					String[] patternArray = line.split("^list");
-					//console.println(patternArray[0] + ":" + patternArray[1]);
 					String pattern = "*";
 					if (patternArray.length == 2 && !patternArray[1].trim().isEmpty()) {
 						pattern = patternArray[1];

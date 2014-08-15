@@ -36,8 +36,6 @@ import com.librato.metrics.HttpPoster;
 import com.librato.metrics.LibratoBatch;
 import com.librato.metrics.NingHttpPoster;
 import com.librato.metrics.Sanitizer;
-//import com.ning.http.client.AsyncHttpClient;
-//import com.ning.http.util.Base64;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;

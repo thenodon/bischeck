@@ -40,7 +40,7 @@ public interface Server {
     /**
      * Get the name of the server set in the server.xml tag server, like:<br>
      * <code>
-     * <server name="NSCA-1">
+     * &lt;server name="NSCA-1"&gt;
      * </code>
      * 
      * @return the name of the server instance

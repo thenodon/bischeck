@@ -64,7 +64,7 @@ public class Average extends PostfixMathCommand {
 
 		
 		// initialize the result to the first argument
-		Object sum = (Object) new Double(0);//stack.pop();
+		Object sum = (Object) new Double(0);
 		
 		Object param;
 		int i = 0;
