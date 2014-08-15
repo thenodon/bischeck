@@ -317,48 +317,33 @@ public class ServiceState {
 			// First time after service is started
 			writeOnFirstStateEntry = false;
 			// Make sure a item is written to cache
-			
-				stateChange = true;
-				resolved = false;
-				notify = false;
-			
-//			if (getState().equals(NAGIOSSTAT.OK) && (getPreviousState().equals(NAGIOSSTAT.CRITICAL) || getPreviousState().equals(NAGIOSSTAT.WARNING))) {
-//				// TODO this must be based on reading last from cache
-//				resolved = false;
-//				notify = false;
-//			} else {
-//				resolved = true;
-//				notify = false;
-//			}
+			stateChange = true;
+			resolved = false;
+			notify = false;
+
 		} else if (previousFSM.equals(State.OKAY_HARD) &&
 				fsm.equals(State.PROBLEM_SOFT)  ) {
 			resolved = false;
 			notify = false;
-
 			stateChange= true;
 		} else if (previousFSM.equals(State.PROBLEM_SOFT) &&
 				fsm.equals(State.PROBLEM_HARD)  ) {
-
 			// This means its a new incident
 			nextIncidentId();
 			// new incident and not resolved 
 			resolved = false;
 			notify = true;
-
 			stateChange = true;
 		} else if (previousFSM.equals(State.PROBLEM_SOFT) &&
 				fsm.equals(State.OKAY_HARD)  ) {
 			resolved = true;
 			notify = false;
-
 			stateChange = true;
-
 		} else if (previousFSM.equals(State.PROBLEM_HARD) &&
 				fsm.equals(State.OKAY_HARD)  ) {
 			resolved = true;
 			notify = true;
 			stateChange = true;
-
 		} else if (previousFSM.equals(State.OKAY_HARD) && fsm.equals(State.OKAY_HARD)) {
 			resolved = true;
 			notify = false;
@@ -378,22 +363,10 @@ public class ServiceState {
 				notify = false;
 				stateChange = false;
 			}
-				
-//		} else if (currentState.equals(NAGIOSSTAT.WARNING) && 
-//				previousState.equals(NAGIOSSTAT.CRITICAL)) {
-//
-//			stateChange = true;
-//
-//		} else if (currentState.equals(NAGIOSSTAT.CRITICAL) && 
-//				previousState.equals(NAGIOSSTAT.WARNING)) {
-//
-//			stateChange = true;
-//
 		} else if (isSoftState() && isSoftCountInc()) {
 			resolved = false;
 			notify = false;
 			stateChange =  true;
-			
 		} 
 	}
 	/**
