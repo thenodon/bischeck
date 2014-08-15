@@ -167,7 +167,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
 
     private String getMessage(Service service) {
 
-        StringBuffer strbuf = new StringBuffer();
+        StringBuilder strbuf = new StringBuilder();
         long currenttime = System.currentTimeMillis()/1000;
         for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
             ServiceItem serviceItem = serviceItementry.getValue();
@@ -240,7 +240,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     }
     
     
-    private StringBuffer formatRow(StringBuffer strbuf, 
+    private StringBuilder formatRow(StringBuilder strbuf, 
             long currenttime, 
             String host, 
             String servicename, 

@@ -118,7 +118,7 @@ public class InternalSurveillance implements Job {
 	 */
 	public String executeTimers() {
 		
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 
 		MetricPredicate predicate =MetricPredicate.ALL;
 		for (Entry<String, SortedMap<MetricName, Metric>> entry : getMetricsRegistry().getGroupedMetrics(
@@ -152,7 +152,7 @@ public class InternalSurveillance implements Job {
 	 */
 	public String tpsTimers() {
 
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 
 
 		MetricPredicate predicate =MetricPredicate.ALL;
@@ -188,7 +188,7 @@ public class InternalSurveillance implements Job {
 		double loadAvg = osMxBean.getSystemLoadAverage();
 		long uptime = rtMxBean == null ? 1 : rtMxBean.getUptime();
 		
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 		strbuf.append("Uptime=");    
 		strbuf.append(uptime);
 		strbuf.append(";;;; ");

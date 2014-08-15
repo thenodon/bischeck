@@ -98,6 +98,10 @@ public final class NSCAServer implements Server, MessageServerInf {
         
         execService.shutdownNow();
         
+        try {
+			execService.awaitTermination(5000, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e1) {}
+			
         
         LOGGER.info("{} - Shutdown is done", instanceName);
         

@@ -268,7 +268,7 @@ public class NRDPWorker implements WorkerInf, Runnable {
      */
     private String xmlNRDPFormat(NAGIOSSTAT level, String hostname,
             String servicename, String serviceOutput) {
-        StringBuffer strbuf = new StringBuffer();
+        StringBuilder strbuf = new StringBuilder();
 
         // Check encoding and character set and how it works out
         strbuf.append("<?xml version='1.0' encoding='utf-8'?>");

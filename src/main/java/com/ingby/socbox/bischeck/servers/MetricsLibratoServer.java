@@ -189,13 +189,13 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
 
 	
 	private String addMetrics(LibratoBatch batch, Service service) {
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 		strbuf.append(" ");
 		
 		for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
 			ServiceItem serviceItem = serviceItementry.getValue();
 			
-			StringBuffer metricName = new StringBuffer();
+			StringBuilder metricName = new StringBuilder();
 			
 			if (serviceAndItemName) {
 				metricName.append(service.getServiceName()).

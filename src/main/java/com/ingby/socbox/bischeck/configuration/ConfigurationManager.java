@@ -414,7 +414,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
             // Set the macro values
             ConfigMacroUtil.replaceMacros(host);
             if (LOGGER.isDebugEnabled()) {
-            	StringBuffer strbuf = ConfigMacroUtil.dump(host);
+            	StringBuilder strbuf = ConfigMacroUtil.dump(host);
             	LOGGER.debug(strbuf.toString());
             }
         }
@@ -1271,7 +1271,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     public String getPurgeConfigurations() {
     	final String separator = System.getProperty("line.separator");
     	
-        StringBuffer strbuf = new StringBuffer();
+        StringBuilder strbuf = new StringBuilder();
         TreeMap<String, String> treeMap = new TreeMap<String,String>();
         
         treeMap.putAll(getPurgeMap());
@@ -1286,7 +1286,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     public String getServiceDefinitions() {
     	final String separator = System.getProperty("line.separator");
     	
-        StringBuffer strbuf = new StringBuffer();
+        StringBuilder strbuf = new StringBuilder();
         TreeSet<String> set = new TreeSet<String>();
         
         Map<String,Host> hosts = getHostConfig();

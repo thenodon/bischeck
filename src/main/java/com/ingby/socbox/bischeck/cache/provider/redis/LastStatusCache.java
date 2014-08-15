@@ -637,7 +637,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			return null;
 		}
 
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 		for (LastStatus ls : lslist) {
 			strbuf.append(ls.getValue()).append(separator);
 		}
@@ -673,7 +673,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			return null;
 		}
 
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 		for (LastStatus ls : lslist) {
 			strbuf.append(ls.getValue()).append(separator);
 		}
@@ -697,7 +697,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			return null;
 		}
 
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 		for (LastStatus ls : lslist) {
 			strbuf.append(ls.getValue()).append(separator);
 		}

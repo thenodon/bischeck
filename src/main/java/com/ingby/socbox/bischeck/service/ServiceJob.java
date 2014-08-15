@@ -141,7 +141,7 @@ public class ServiceJob implements Job {
 		} finally {
 			long executetime = timercontext.stop()/1000000;         	
 			if (LOGGER.isDebugEnabled()){
-				StringBuffer strbuf = new StringBuffer();
+				StringBuilder strbuf = new StringBuilder();
 				strbuf.append("Total execution time").
 					append(service.getHost().getHostname()).
 					append("-").

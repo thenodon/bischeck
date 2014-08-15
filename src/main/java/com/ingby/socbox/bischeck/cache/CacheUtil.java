@@ -119,7 +119,7 @@ public abstract class CacheUtil {
 	public static String parseIndexString( CacheInf cache, String indexstr,
 			String host, String service, String serviceitem) {
 		
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 		
 		if (indexstr.contains(CacheInf.JEPLISTSEP)) {
 			// Check the format of the index

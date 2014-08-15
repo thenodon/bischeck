@@ -74,7 +74,7 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
          *  
          */
         JSONObject jsonStatement = JSONObject.fromObject(this.getExecution());
-        StringBuffer strbuf = new StringBuffer();
+        StringBuilder strbuf = new StringBuilder();
         if (!validateExecStatement(jsonStatement)) {
         	LOGGER.warn("Not a valid livestatus operation {}", jsonStatement.toString());
     		ServiceItemException si = new ServiceItemException(new IllegalArgumentException("Not a valid livestatus operation " + jsonStatement.toString()));

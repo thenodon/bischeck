@@ -210,7 +210,7 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 	
 	private String format(NAGIOSSTAT level, String hostname,
 			String servicename, String output) {
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 
 		long timeinsec = System.currentTimeMillis()/1000;
 		strbuf.append("COMMAND ");

@@ -56,14 +56,14 @@ public class ConfigMacroUtil {
      * @param host
      * @return the full configuration
      */
-    public static StringBuffer dump(Host host) {
+    public static StringBuilder dump(Host host) {
     	final String separator = System.getProperty("line.separator");
     	
         if (host == null) {
-            return new StringBuffer().append("");
+            return new StringBuilder().append("");
         }
         
-    	StringBuffer strbuf = new StringBuffer();
+    	StringBuilder strbuf = new StringBuilder();
     	
     	strbuf.append("Host> ").append(host.getHostname()).append(separator);
     	strbuf.append("alias: ");

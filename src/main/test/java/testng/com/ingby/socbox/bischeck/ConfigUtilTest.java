@@ -67,7 +67,7 @@ public class ConfigUtilTest {
     	service.setHost(host);
     	host.addService(service);
     	
-    	StringBuffer strbuf = ConfigMacroUtil.dump(host);
+    	StringBuilder strbuf = ConfigMacroUtil.dump(host);
     	System.out.println(strbuf.toString());
     	
     	ConfigMacroUtil.replaceMacros(host);

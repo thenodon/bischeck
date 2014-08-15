@@ -194,7 +194,7 @@ public class ConfigFileManager {
 		} catch (JAXBException e) {
 			
 			if (vec.hasEvents()) {
-				StringBuffer strbuf = new StringBuffer();
+				StringBuilder strbuf = new StringBuilder();
 				for( ValidationEvent event: vec.getEvents() ){
 
 					strbuf.append(event.getMessage());

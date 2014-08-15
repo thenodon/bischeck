@@ -54,7 +54,7 @@ public class ServerUtil {
 	 * @return the string to log
 	 */
 	public static String logFormat(String instanceName, String hostName, String serviceName, String message) {
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 		strbuf.append(instanceName).
 		append(":").
 		append(hostName).

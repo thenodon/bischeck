@@ -65,8 +65,8 @@ public class NagiosUtil {
      */
     public String createNagiosMessage(Service service) {
         
-        StringBuffer message = new StringBuffer();
-        StringBuffer perfmessage = new StringBuffer();
+        StringBuilder message = new StringBuilder();
+        StringBuilder perfmessage = new StringBuilder();
         
         message.append(" ");
         perfmessage.append(" ");
@@ -153,10 +153,10 @@ public class NagiosUtil {
     }
     
     
-    private StringBuffer performanceMessage(
+    private StringBuilder performanceMessage(
             ServiceItem serviceItem, BischeckDecimal warnValue,
             BischeckDecimal critValue, BischeckDecimal threshold, BischeckDecimal currentMeasure) {
-        StringBuffer perfmessage = new StringBuffer();
+        StringBuilder perfmessage = new StringBuilder();
         
         perfmessage.append(serviceItem.getServiceItemName()).append("=");
         if (currentMeasure != null) {

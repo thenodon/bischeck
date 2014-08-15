@@ -1134,7 +1134,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     
     private String monthAndDay(int month, int dayofmonth) {
 
-        StringBuffer monthandday = new StringBuffer();
+        StringBuilder monthandday = new StringBuilder();
 
         if (month<10) {
             monthandday.append("0").append(month);
