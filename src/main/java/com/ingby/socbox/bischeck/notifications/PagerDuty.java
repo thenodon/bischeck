@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HttpsURLConnection;
+
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 import net.sf.json.util.JSONBuilder;
@@ -20,11 +23,10 @@ import net.sf.json.util.JSONBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ingby.socbox.bischeck.NagiosUtil;
+import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationException;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
-import com.ingby.socbox.bischeck.servers.LiveStatusServer;
 import com.ingby.socbox.bischeck.servers.MessageServerInf;
 import com.ingby.socbox.bischeck.service.JDBCService;
 import com.ingby.socbox.bischeck.service.Service;
@@ -37,15 +39,21 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
-//TODO nice formated text, writing notification to redis use same timestamp so the service can be found by query
-public class PagerDuty implements Notifier, MessageServerInf {
+public final class PagerDuty implements Notifier, MessageServerInf {
 	private final static Logger LOGGER = LoggerFactory.getLogger(PagerDuty.class);
 
-	//PagerDuty replaced by interface 
 	private static HashMap<String, PagerDuty> notificator = new HashMap<String,PagerDuty>();
 
-	
-	public static void main(String[] args) throws ConfigurationException {
+	private String serviceKey;
+	private int connectionTimeout;
+	private URL url;
+	private final String instanceName;
+	private boolean sendMessage;
+	private ServiceKeyRouter skr;
+
+	private String defaultServiceKey;
+
+	public static void main(final String[] args) throws ConfigurationException {
 		ConfigurationManager confMgmr;
 		try {
 			confMgmr = ConfigurationManager.getInstance();
@@ -78,8 +86,8 @@ public class PagerDuty implements Notifier, MessageServerInf {
 
 		PagerDuty pd = PagerDuty.getInstance("Test");
 		
-			//pd.sendAlert(jdbcService);
-			pd.sendResolve(jdbcService.getNotificationData());
+			pd.sendAlert(jdbcService.getNotificationData());
+			//pd.sendResolve(jdbcService.getNotificationData());
 		
 	}
 
@@ -91,20 +99,14 @@ public class PagerDuty implements Notifier, MessageServerInf {
 		return notificator.get(name);
 	}
 
-	private String serviceKey;
-	private int connectionTimeout;
-	private URL url;
-	private String instanceName;
-
-	private boolean sendMessage;
-
+		
 	private PagerDuty(String name) {
 
 		instanceName = name;
 		Properties defaultproperties = getNotificationProperties();
 		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
 
-		String urlName = prop.getProperty("url",
+		final String urlName = prop.getProperty("url",
 				defaultproperties.getProperty("url"));
 
 		try {
@@ -116,6 +118,10 @@ public class PagerDuty implements Notifier, MessageServerInf {
 
 		serviceKey = prop.getProperty("service_key", 
 				defaultproperties.getProperty("service_key"));
+		
+		defaultServiceKey = prop.getProperty("default_service_key");
+		
+		skr = new ServiceKeyRouter(serviceKey,defaultServiceKey);
 
 		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
 				defaultproperties.getProperty("connectionTimeout")));
@@ -135,6 +141,7 @@ public class PagerDuty implements Notifier, MessageServerInf {
 
 		defaultproperties.setProperty("url","https://events.pagerduty.com/generic/2010-04-15/create_event.json");
 		defaultproperties.setProperty("service_key","Sign up to get your own");
+		defaultproperties.setProperty("default_service_key","");
 		defaultproperties.setProperty("connectionTimeout","5000");
 		defaultproperties.setProperty("send","true");
 
@@ -146,17 +153,24 @@ public class PagerDuty implements Notifier, MessageServerInf {
      * Unregister the server and its configuration
      * @param name of the server instance
      */
-    synchronized public static void unregister(String name) {
+    synchronized public static void unregister(final String name) {
     	notificator.remove(name);
     }
 
 	public void sendAlert(Map<String, String> notificationData) {
 		Writer message = new StringWriter();
 
+		final String key = skr.getServiceKey(notificationData.get("host"),notificationData.get("service"));
+		if (key == null) {
+			LOGGER.error("Service for {} do not have a service key defined. Will not be sent by instance {}.", 
+					Util.fullQouteHostServiceName(notificationData.get("host"),notificationData.get("service")),
+					instanceName);
+			return;
+		}
 		new JSONBuilder(message)
 		.object()
 		.key("service_key")
-		.value(serviceKey)
+		.value(key)
 		.key("incident_key")
 		.value(notificationData.get("incident_key"))
 		.key("event_type")
@@ -172,21 +186,17 @@ public class PagerDuty implements Notifier, MessageServerInf {
 		.endObject()
 		.endObject();
 		
-		LOGGER.debug("Alert message to PagerDuty: {}", message.toString());
-		
 		JSONObject json = null;
 		try {
-			LOGGER.debug("sendMessage {}", sendMessage);
 			if (sendMessage) {
 				json = sendMessage(message);
 			}
 		} catch (IOException e) {
-			LOGGER.error("Sedning trigger message to PagerDuty for {} failed.", instanceName, e);
+			LOGGER.error("Sedning trigger message to {} failed.", instanceName, e);
 		}
+
+		LOGGER.info("Alert message to {} : {}", instanceName, message.toString());
 		
-		LOGGER.info("Alert message to PagerDuty: {}", message.toString());
-		
-		//success(json, ((ServiceStateInf) service).getServiceState().getCurrentIncidentId());
 		success(json, notificationData.get("incident_key"));
 
 	}
@@ -194,11 +204,18 @@ public class PagerDuty implements Notifier, MessageServerInf {
 
 	public void sendResolve(Map<String, String> notificationData) {
 		Writer message = new StringWriter();
-
+		
+		String key = skr.getServiceKey(notificationData.get("host"),notificationData.get("service"));
+		if (key == null) {
+			LOGGER.error("Service for {} do not have a service key defined. Will not be sent by instance {}.", 
+					Util.fullQouteHostServiceName(notificationData.get("host"),notificationData.get("service")),
+					instanceName);
+			return;
+		}
 		new JSONBuilder(message)
 		.object()
 		.key("service_key")
-		.value(serviceKey)
+		.value(key)
 		.key("incident_key")
 		.value(notificationData.get("incident_key"))
 		.key("event_type")
@@ -209,20 +226,20 @@ public class PagerDuty implements Notifier, MessageServerInf {
 		
 		JSONObject json = null;
 		try {
-			LOGGER.debug("sendMessage {}", sendMessage);
 			if (sendMessage) {
 				json = sendMessage(message);
 			}
 		} catch (IOException e) {
-			LOGGER.error("Sedning alert message to PagerDuty for {} failed.", instanceName, e);
+			LOGGER.error("Sedning resolve message to {} failed.", instanceName, e);
 		}
-		LOGGER.info("Resolve message to PagerDuty: {}", message.toString());
+		LOGGER.info("Resolve message to {} : {}", instanceName, message.toString());
 		
 		success(json, notificationData.get("incident_key"));
 	}
 
-	private JSONObject sendMessage(Writer myWriter) throws IOException {
-		String payload = myWriter.toString();
+
+	private JSONObject sendMessage(final Writer message) throws IOException {
+		String payload = message.toString();
 		HttpURLConnection conn = null;
 
 		final String timerName = instanceName+"_sendTimer";
@@ -260,7 +277,8 @@ public class PagerDuty implements Notifier, MessageServerInf {
 			}
 			
 			if (!incidentKey.equals(json.getString("incident_key"))) {
-				LOGGER.error("Response incident key, {}, do not match expected, {}", json.getString("incident_key"), incidentKey);
+				LOGGER.error("Response incident key, {}, do not match expected, {} for instance {}", 
+						json.getString("incident_key"), incidentKey, instanceName);
 				return false;
 			}
 		}
@@ -268,7 +286,7 @@ public class PagerDuty implements Notifier, MessageServerInf {
 	}
 
 	
-	private JSONObject responseHTTP(HttpURLConnection conn) throws IOException {
+	private JSONObject responseHTTP(final HttpURLConnection conn) throws IOException {
 		BufferedReader br = null;
 		StringBuilder sb = null;
 		
@@ -289,10 +307,14 @@ public class PagerDuty implements Notifier, MessageServerInf {
 		}
 		
 		JSONObject json = null;
-		if (sb != null || sb.toString() != null || !sb.toString().isEmpty()) {
+		if (sb.toString().isEmpty()) {
+			LOGGER.error("HTTPS response for instance {} returned no data", instanceName);
+		} else {
 			json = (JSONObject) JSONSerializer.toJSON(sb.toString());
-			if (json == null || json.size() != 3 || !json.has("status") || !json.has("incident_key")) {
-				LOGGER.error("PagerDuty returned faulty json message {}", sb.toString());
+			if (json == null ) {
+				LOGGER.error("PagerDuty returned null json object for message {} for instance {}", sb.toString(), instanceName);
+			} else if (json.size() != 3 || !json.has("status") || !json.has("incident_key")) {
+				LOGGER.error("PagerDuty returned faulty json message for {} for instance {}", sb.toString(), instanceName);
 			}
 		}
 		
@@ -300,7 +322,7 @@ public class PagerDuty implements Notifier, MessageServerInf {
 	}
 
 	
-	private boolean postHTTP(HttpURLConnection conn, String payload) throws IOException {
+	private boolean postHTTP(HttpURLConnection conn, final String payload) throws IOException {
 		OutputStreamWriter wr = null;
 
 		try {
@@ -310,13 +332,16 @@ public class PagerDuty implements Notifier, MessageServerInf {
 			int returnStatus = conn.getResponseCode();
 			if (returnStatus != HttpURLConnection.HTTP_OK) {
 				if (returnStatus == HttpURLConnection.HTTP_BAD_REQUEST) {
-					LOGGER.error("PagerDuty responded with {}, check Bischeck configuration", returnStatus);
+					LOGGER.error("PagerDuty responded with {} for instance {}, check Bischeck configuration", 
+							instanceName, returnStatus);
 					return false;
 				} else if (returnStatus == HttpURLConnection.HTTP_FORBIDDEN) {
-					LOGGER.error("PagerDuty responded with {}, probably making to many API calls to PagerDuty", returnStatus);
+					LOGGER.error("PagerDuty responded with {} for instance {}, probably making to many API calls to PagerDuty", 
+							instanceName, returnStatus);
 					return false;
 				} else if (returnStatus >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
-					LOGGER.error("PagerDuty responded with {}, check PagerDuty server status and vaildate your account settings", returnStatus);
+					LOGGER.error("PagerDuty responded with {} for instance {}, check PagerDuty server status and vaildate your account settings", 
+							instanceName, returnStatus);
 					return false;
 				}
 			}
@@ -331,13 +356,13 @@ public class PagerDuty implements Notifier, MessageServerInf {
 	}
 
 
-	private HttpURLConnection createHTTPConnection(String payload)
+	private HttpURLConnection createHTTPConnection(final String payload)
 			throws IOException {
 
 		LOGGER.debug("{} - Message: {}", instanceName, payload);
-		HttpURLConnection conn;
+		HttpsURLConnection conn;
 
-		conn = (HttpURLConnection) url.openConnection();
+		conn = (HttpsURLConnection) url.openConnection();
 
 		conn.setDoOutput(true);
 
@@ -352,6 +377,7 @@ public class PagerDuty implements Notifier, MessageServerInf {
 		conn.setRequestProperty("Accept","text/html,application/xhtml+xml,application/xml");
 		conn.setRequestProperty("Accept-Language","en-US,en;q=0.8");
 		conn.setRequestProperty("Accept-Charset","ISO-8859-1,utf-8");
+		LOGGER.debug("Open connection for instance {} : {}", instanceName, conn.toString());
 		return conn;
 	}
 
