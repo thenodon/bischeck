@@ -93,7 +93,7 @@ public abstract class Util {
         Float roundedFloat = null;
         if (d != null) {
             int nrdec = getNumberOfDecimalPlace(d);
-            StringBuffer strbuf = new StringBuffer();
+            StringBuilder strbuf = new StringBuilder();
             strbuf.append("#.");
             for (int i = 0; i< nrdec; i++) {
                 strbuf.append("#");
@@ -145,7 +145,7 @@ public abstract class Util {
      */
     public static String fullQouteHostServiceName(String hostname, String servicename) {
         
-        StringBuffer strbuf = new StringBuffer();
+        StringBuilder strbuf = new StringBuilder();
         
         strbuf.append(hostname.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
         strbuf.append(servicename.replaceAll(DASH, QOUTED_DASH));
@@ -173,7 +173,7 @@ public abstract class Util {
      * @return the host-service-serviceitem string
      */
     public static String fullName(String hostname, String servicename , String serviceitemname) {
-        StringBuffer strbuf = new StringBuffer();
+        StringBuilder strbuf = new StringBuilder();
         
         strbuf.append(hostname).append(ObjectDefinitions.getCacheKeySep());
         strbuf.append(servicename).append(ObjectDefinitions.getCacheKeySep());
@@ -218,7 +218,7 @@ public abstract class Util {
      */
     public static String fullQoutedName(String hostname, String servicename , String serviceitemname) {
             
-        StringBuffer strbuf = new StringBuffer();
+        StringBuilder strbuf = new StringBuilder();
         
         strbuf.append(hostname.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
         strbuf.append(servicename.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
@@ -239,7 +239,7 @@ public abstract class Util {
      */
     public static String fullQoutedName(String hostname, String servicename , String serviceitemname, String insert) {
         
-        StringBuffer strbuf = new StringBuffer();
+        StringBuilder strbuf = new StringBuilder();
         
         strbuf.append(hostname.replaceAll(DASH, QOUTED_DASH)).append(ObjectDefinitions.getCacheKeySep());
         strbuf.append(servicename.replaceAll(DASH, QOUTED_DASH));

@@ -24,7 +24,7 @@ import com.yammer.metrics.core.TimerContext;
  * The main class to manage parsing and execution of cache data in
  * 
  */
-public class CacheEvaluator {
+public final class CacheEvaluator {
 
 	private final static Logger LOGGER = LoggerFactory
 			.getLogger(CacheEvaluator.class);
@@ -36,16 +36,16 @@ public class CacheEvaluator {
 	private static final Pattern PATTERN_HOST_SERVICE_SERVICEITEM = Pattern
 			.compile(ObjectDefinitions.getHostServiceItemRegexp());
 
-	static boolean notNullSupport = ConfigurationManager.getInstance()
-			.getProperties().getProperty("notFullListParse", "false")
-			.equalsIgnoreCase("false");
+	private static boolean notNullSupport = "false".equalsIgnoreCase(ConfigurationManager.getInstance()
+			.getProperties().getProperty("notFullListParse", "false"));
+			
 
 	/**
 	 * 
 	 * @param statement
 	 * @return
 	 */
-	public static String parse(String statement) {
+	public static String parse(final String statement) {
 		final Timer timer = Metrics.newTimer(CacheEvaluator.class, "parseTimer",
 				TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
@@ -102,8 +102,8 @@ public class CacheEvaluator {
 
 		cacheEntriesName = parseParameters(statement);
 
-		// If no cache definition present return the orignal string
-		if (cacheEntriesName.size() == 0) {
+		// If no cache definition present return the original string
+		if (cacheEntriesName.isEmpty()) {
 			parsedstatement = statement;
 		}
 		

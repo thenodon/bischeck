@@ -105,31 +105,31 @@ public class Properties2ServerProperties {
     	
     	while (iter.hasNext()) {
     		XMLProperty property = iter.next(); 
-    		if( property.getKey().equals("nscaserver")) {
+    		if( "nscaserver".equals(property.getKey())) {
     			com.ingby.socbox.bischeck.xsd.servers.XMLProperty newprop = new com.ingby.socbox.bischeck.xsd.servers.XMLProperty();
     			newprop.setKey("hostAddress");
     			newprop.setValue(property.getValue());
     			serverproplist.add(newprop);
     			deletelist.add(property);
-    		} else if (property.getKey().equals("nscaencryption")) {
+    		} else if ("nscaencryption".equals(property.getKey())) {
     			com.ingby.socbox.bischeck.xsd.servers.XMLProperty newprop = new com.ingby.socbox.bischeck.xsd.servers.XMLProperty();
     			newprop.setKey("encryptionMode");
     			newprop.setValue(property.getValue());
     			serverproplist.add(newprop);
     			deletelist.add(property);
-    		} else if  (property.getKey().equals("nscapassword")) {
+    		} else if  ("nscapassword".equals(property.getKey())) {
     			com.ingby.socbox.bischeck.xsd.servers.XMLProperty newprop = new com.ingby.socbox.bischeck.xsd.servers.XMLProperty();
     			newprop.setKey("password");
     			newprop.setValue(property.getValue());
     			serverproplist.add(newprop);
     			deletelist.add(property);
-    		} else if  (property.getKey().equals("nscaport")) {
+    		} else if  ("nscaport".equals(property.getKey())) {
     			com.ingby.socbox.bischeck.xsd.servers.XMLProperty newprop = new com.ingby.socbox.bischeck.xsd.servers.XMLProperty();
     			newprop.setKey("port");
     			newprop.setValue(property.getValue());
     			serverproplist.add(newprop);
     			deletelist.add(property);
-    		} else if (property.getKey().equals("cacheclear")) {
+    		} else if ("cacheclear".equals(property.getKey())) {
     			property.setKey("thresholdCacheClear");
     		}
     		
