@@ -84,12 +84,13 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
     
     @Override 
     public String executeStmt(String exec) throws ServiceException {
-    	Statement statement = null;
-    	ResultSet res = null;
-    	try {
-    		statement = this.connection.createStatement();
+    	
+    	
+    	try (Statement statement = this.connection.createStatement();
+    		 ResultSet res = statement.executeQuery(exec);
+    		){
+    		
     		statement.setQueryTimeout(querytimeout);
-    		res = statement.executeQuery(exec);
 
     		if (res.next()) { //Changed from first - not working with as400 jdbc driver
     			return (res.getString(1));
@@ -99,18 +100,7 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
     		ServiceException se = new ServiceException(sqle);
     		se.setServiceName(this.serviceName);
     		throw se;
-    	} finally {
-    		try {	
-    			if (res != null) {
-    				res.close();
-    			}
-    		} catch(SQLException ignore) {}    
-    		try {
-    			if (statement != null) {
-    				statement.close();
-    			}
-    		} catch(SQLException ignore) {}    
-    	}
+    	} 
 
     	return null;
     }    

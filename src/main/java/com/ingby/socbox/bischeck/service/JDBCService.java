@@ -89,13 +89,13 @@ public class JDBCService extends ServiceAbstract implements Service, ServiceStat
     
     @Override 
     public String executeStmt(String exec) throws ServiceException {
-        Statement statement = null;
-        ResultSet res = null;
-        try {
-            statement = this.connection.createStatement();
-            statement.setQueryTimeout(querytimeout);
-            res = statement.executeQuery(exec);
-
+        
+    	try (Statement statement = this.connection.createStatement();
+       		 ResultSet res = statement.executeQuery(exec);
+       		){
+       	
+        	statement.setQueryTimeout(querytimeout);
+            
             if (res.next()) {//Changed from first - not working with as400 jdbc driver
                 return (res.getString(1));
             }
@@ -104,19 +104,8 @@ public class JDBCService extends ServiceAbstract implements Service, ServiceStat
     		ServiceException se = new ServiceException(sqle);
     		se.setServiceName(this.serviceName);
     		throw se;
-        } finally {
-            try {
-            	if (res != null) {
-            		res.close();
-            	}
-            } catch(SQLException ignore) {}    
-            try {
-            	if (statement != null) {
-            		statement.close();
-            	}
-            } catch(SQLException ignore) {}    
         }
-
+    	
         return null;
     }    
 

@@ -146,24 +146,21 @@ public final class GraphiteServer implements Server, MessageServerInf {
 
 
 	private void connectAndSend(String message) {
-		
-        Socket graphiteSocket = null;
-        PrintWriter out = null;
         
         final String timerName = instanceName+"_sendTimer";
         final Timer timer = Metrics.newTimer(GraphiteServer.class, 
         		timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
         final TimerContext context = timer.time();
         
-        try {
-            InetAddress addr = InetAddress.getByName(hostAddress);
-            SocketAddress sockaddr = new InetSocketAddress(addr, port);
+        try (Socket  graphiteSocket = new Socket();
+        	 PrintWriter	out = new PrintWriter(graphiteSocket.getOutputStream(), true)
+        	){
 
-            graphiteSocket = new Socket();
-            
+        	InetAddress addr = InetAddress.getByName(hostAddress);
+            SocketAddress sockaddr = new InetSocketAddress(addr, port);
+    
             graphiteSocket.connect(sockaddr,connectionTimeout);
                         
-            out = new PrintWriter(graphiteSocket.getOutputStream(), true);
             out.println(message);
             out.flush();
             
@@ -172,15 +169,7 @@ public final class GraphiteServer implements Server, MessageServerInf {
         } catch (IOException e) {
             LOGGER.error("Network error - check Graphite server and that service is started", e);
         } finally {
-        	if (out != null) {
-        		out.close();
-        	}
-        	try {
-        		if (graphiteSocket != null) {
-        			graphiteSocket.close();
-        		}
-            } catch (IOException ignore) {}    
-        
+        	
         	long duration = context.stop()/1000000;
         	LOGGER.debug("Graphite send execute: {} ms", duration);
         

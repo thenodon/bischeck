@@ -288,23 +288,16 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 
 	
 	private JSONObject responseHTTP(final HttpURLConnection conn) throws IOException {
-		BufferedReader br = null;
 		StringBuilder sb = null;
 		
-		try {
-			br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))){
+			
 			sb = new StringBuilder();
 
 			String line;
 			while ((line = br.readLine()) != null) {
 				sb.append(line);
 			} 
-		} finally {
-			if(br != null) {
-				try {
-					br.close();
-				} catch (IOException ignore) {}
-			}
 		}
 		
 		JSONObject json = null;
@@ -324,10 +317,9 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 
 	
 	private boolean postHTTP(HttpURLConnection conn, final String payload) throws IOException {
-		OutputStreamWriter wr = null;
-
-		try {
-			wr = new OutputStreamWriter(conn.getOutputStream());
+		 
+		try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream())) {
+			
 			wr.write(payload);
 			wr.flush();
 			int returnStatus = conn.getResponseCode();
@@ -346,13 +338,8 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 					return false;
 				}
 			}
-		} finally {
-			if (wr != null) {
-				try {
-					wr.close();
-				} catch (IOException ignore) {}
-			}
-		}
+		} 
+		
 		return true;
 	}
 

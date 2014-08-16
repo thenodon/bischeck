@@ -150,14 +150,13 @@ public class NRDPWorker implements WorkerInf, Runnable {
         final TimerContext context = timer.time();
 
         HttpURLConnection conn = null;
-        OutputStreamWriter wr = null;
+        
     
-        try {
+        try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream())){
             LOGGER.debug("{} - Url: {}",instanceName, urlstr);
             String payload = cmd+xml;
             conn = createHTTPConnection(payload);
             
-            wr = new OutputStreamWriter(conn.getOutputStream());
             wr.write(payload);
             wr.flush();
             
@@ -179,11 +178,11 @@ public class NRDPWorker implements WorkerInf, Runnable {
             /*
              * Getting the value for status and message tags
              */
-            try {
-
-                BufferedReader br
+            try ( BufferedReader br
                 = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-     
+               ) {
+
+                
                 StringBuilder sb = new StringBuilder();
      
                 String line;
@@ -216,18 +215,12 @@ public class NRDPWorker implements WorkerInf, Runnable {
                 }
             } catch (SAXException e) {
                 LOGGER.error("{} - Could not parse response xml", instanceName, e);
-            }
+            } 
             
         }catch (IOException e) {
             LOGGER.error("{} - Network error - check nrdp server and that service is started", instanceName, e);
             throw new ServerException(e);
         } finally { 
-            try {
-                if (wr != null) {
-                    wr.close();
-                }
-            } catch (IOException ignore) {}
-            
             long duration = context.stop()/1000000;
             LOGGER.debug("{} - Nrdp send execute: {} ms", instanceName, duration);
         }

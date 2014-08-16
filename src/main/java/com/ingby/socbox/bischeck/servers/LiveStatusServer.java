@@ -160,15 +160,13 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 				timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 
-        Socket clientSocket = null; 
-        PrintWriter out = null;
-        
-		try {
-			clientSocket = new Socket(hostAddress, port);
+		try (Socket clientSocket = new Socket(hostAddress, port);
+			 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+			){
+			
 			clientSocket.setSoTimeout(connectionTimeout);
 			
-			out = new PrintWriter(clientSocket.getOutputStream(), true);
-            out.println(xml);
+			out.println(xml);
             out.flush();
 
 		} catch (UnknownHostException e) {
@@ -176,14 +174,6 @@ public final class LiveStatusServer implements Server, MessageServerInf {
 		} catch (IOException e) {
 			LOGGER.error("Network error - check livestatus server and that service is started", e);
 		} finally { 
-			if (out != null) {
-				out.close();
-			}
-			try {
-				if (clientSocket != null) {
-					clientSocket.close();
-				}
-			} catch (IOException ignore) {}
 
 			long duration = context.stop()/1000000;
 			LOGGER.debug("Livestatus send execute: {} ms", duration);
