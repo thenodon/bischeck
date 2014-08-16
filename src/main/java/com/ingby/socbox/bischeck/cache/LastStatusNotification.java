@@ -22,16 +22,10 @@ package com.ingby.socbox.bischeck.cache;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceStateInf;
-import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
@@ -39,14 +33,8 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  */
 public class LastStatusNotification implements Serializable, Cloneable {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusNotification.class);
-
 	
 	private static final long serialVersionUID = 1L;
-
-	private static final String HARD = "HARD";
-	private static final String SOFT = "SOFT";
-	private static final String NA = "N/A";
 
 	private Service service;
 
