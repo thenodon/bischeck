@@ -98,8 +98,8 @@ public class CacheCli {
 		}    
 
 		Boolean supportNull = false;
-		if (ConfigurationManager.getInstance().getProperties().
-				getProperty("notFullListParse","false").equalsIgnoreCase("true")) {
+		if ("true".equalsIgnoreCase(ConfigurationManager.getInstance().getProperties().
+				getProperty("notFullListParse","false"))) {
 			supportNull = true;
 		}
 
@@ -190,7 +190,7 @@ public class CacheCli {
 					continue;
 				}
 
-				if (line == null || line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ) {
+				if (line == null || "quit".equalsIgnoreCase(line) || "exit".equalsIgnoreCase(line) ) {
 					break;
 				}
 
@@ -215,7 +215,7 @@ public class CacheCli {
 					continue;
 				}
 
-				if (line.equalsIgnoreCase("help")) {
+				if ("help".equalsIgnoreCase(line)) {
 					showhelp(console);
 					continue;
 				}

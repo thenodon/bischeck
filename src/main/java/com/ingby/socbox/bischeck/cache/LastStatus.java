@@ -103,19 +103,19 @@ public class LastStatus implements Serializable, Cloneable {
 		}
 
 		this.value = json.getString("value");
-		if (json.getString("threshold").equalsIgnoreCase("null")) {
+		if ("null".equalsIgnoreCase(json.getString("threshold"))) {
 			this.threshold = null;
 		} else {
 			this.threshold = Float.parseFloat(json.getString("threshold"));
 		}
 
-		if (json.getString("calcmethod").equalsIgnoreCase("null")) {
+		if ("null".equalsIgnoreCase(json.getString("calcmethod"))) {
 			this.calcmethod = null;
 		} else {
 			this.calcmethod = json.getString("calcmethod");
 		}
 		try {
-			if (json.getString("state") == null || json.getString("state").equalsIgnoreCase("null")) {
+			if (json.getString("state") == null || "null".equalsIgnoreCase(json.getString("state"))) {
 				this.state = null;
 			} else {
 				this.state = NAGIOSSTAT.valueOf(json.getString("state"));

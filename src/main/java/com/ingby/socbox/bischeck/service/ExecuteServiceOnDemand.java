@@ -118,7 +118,7 @@ public class ExecuteServiceOnDemand implements DynamicMBean {
 	@Override
 	public Object invoke(String actionName, Object[] params, String[] signature)
 			throws MBeanException, ReflectionException {
-		if (actionName.equals("execute") &&
+		if ("execute".equals(actionName) &&
                 (params != null && params.length == 2) &&
                 (signature != null && signature.length == 2)) {
          

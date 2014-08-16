@@ -52,7 +52,7 @@ public class TestThreshold implements Threshold {
             return null;
         }
         
-        if (calcMethod.equalsIgnoreCase("<")) {
+        if ("<".equalsIgnoreCase(calcMethod)) {
             return (1-this.warning)+1;
         } else {
             return this.warning;
@@ -70,7 +70,7 @@ public class TestThreshold implements Threshold {
         if (this.critical == null) {
             return null;
         }
-        if (calcMethod.equalsIgnoreCase("<")) {
+        if ("<".equalsIgnoreCase(calcMethod)) {
             return (1-this.critical)+1;
         } else {
             return this.critical;

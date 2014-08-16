@@ -244,7 +244,11 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		fastCacheEnable  = false;
 	}
 
-
+	/**
+	 * Return all list keys in the cache based on supplied pattern. 
+	 * @param pattern to match key name against.
+	 * @return a map with the match keys and the size of the list 
+	 */
 	public Map<String,Long> getKeys(String pattern) {
 		Jedis jedis = null;
 
@@ -256,7 +260,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 			Set<String> keys = jedis.keys(pattern);
 
 			for(String key : keys) {
-				if (jedis.type(key).equalsIgnoreCase("list")) {
+				if ("list".equalsIgnoreCase(jedis.type(key))) {
 					lists.put(key, jedis.llen(key));
 				}
 			}

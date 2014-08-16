@@ -42,11 +42,11 @@ public class NagiosUtil {
             this.formatWarnCrit = false;
         }
         
-        this.formatWarnCrit = new Boolean(extendFormat);
+        this.formatWarnCrit = Boolean.valueOf(extendFormat);
     }
     
-    public NagiosUtil(boolean extended) {
-    	this.formatWarnCrit = new Boolean(extended);
+    public NagiosUtil(final boolean extended) {
+    	this.formatWarnCrit = Boolean.valueOf(extended);
     }
     
     public void setExtended() {
@@ -63,7 +63,7 @@ public class NagiosUtil {
      * @param service
      * @return nagios return message
      */
-    public String createNagiosMessage(Service service) {
+    public String createNagiosMessage(final Service service) {
         
         StringBuilder message = new StringBuilder();
         StringBuilder perfmessage = new StringBuilder();
@@ -95,7 +95,7 @@ public class NagiosUtil {
                 
                 method = serviceItem.getThreshold().getCalcMethod();
 
-                if (method.equalsIgnoreCase("=")) {
+                if ("=".equalsIgnoreCase(method)) {
                     Float warnfloat = new Float ((1-serviceItem.getThreshold().getWarning())*currentThreshold);
                     Float critfloat = new Float ((1-serviceItem.getThreshold().getCritical())*currentThreshold);;
                     warnValue = new BischeckDecimal(warnfloat).scaleBy(threshold);
@@ -108,9 +108,9 @@ public class NagiosUtil {
                     append(threshold.toString()).
                     append(" ").append(method).append(" ").
                     append(warnValue.toString()).
-                    append(" ").append(method).append(" ").append(" +-W ").append(method).append(" ").
+                    append(" ").append(method).append("  +-W ").append(method).append(" ").
                     append(critValue.toString()).
-                    append(" ").append(method).append(" ").append(" +-C ").append(method).append(" ) ");
+                    append(" ").append(method).append("  +-C ").append(method).append(" ) ");
                     
                 } else {
                     Float warnfloat = new Float (serviceItem.getThreshold().getWarning()*currentThreshold);
@@ -125,9 +125,9 @@ public class NagiosUtil {
                     append(threshold.toString()).
                     append(" ").append(method).append(" ").
                     append(warnValue.toString()).
-                    append(" ").append(method).append(" ").append(" W ").append(method).append(" ").
+                    append(" ").append(method).append("  W ").append(method).append(" ").
                     append(critValue.toString()).
-                    append(" ").append(method).append(" ").append(" C ").append(method).append(" ) ");
+                    append(" ").append(method).append("  C ").append(method).append(" ) ");
                     
                 }
 
@@ -170,33 +170,32 @@ public class NagiosUtil {
         if (critValue != null) {
             perfmessage.append(critValue.toString());
         }
-        perfmessage.append(";0; ");
         
-        perfmessage.append("threshold=");
+        perfmessage.append(";0; threshold=");
         
-        if (threshold != null) {
-            perfmessage.append(threshold.toString());
-        } else {
+        if (threshold == null) {
         	//TODO this is compatibility, should be set to U  
-        	perfmessage.append(0);
+        	perfmessage.append("0");
+        } else {
+        	perfmessage.append(threshold.toString());
         }
         perfmessage.append(";0;0;0; ");
         
         if (isExtended()) {
         	if (threshold != null) {
-        		perfmessage.append("warning=");
-        		perfmessage.append(warnValue.toString());
-        		perfmessage.append(";0;0;0; ");
-        		perfmessage.append("critical=");
-        		perfmessage.append(critValue.toString());
-        		perfmessage.append(";0;0;0; ");
+        		perfmessage.append("warning=").
+        		append(warnValue.toString()).
+        		append(";0;0;0; ").
+        		append("critical=").
+        		append(critValue.toString()).
+        		append(";0;0;0; ");
         	} else {
-        		perfmessage.append("warning=");
-        		perfmessage.append("0");
-        		perfmessage.append(";0;0;0; ");
-        		perfmessage.append("critical=");
-        		perfmessage.append("0");
-        		perfmessage.append(";0;0;0; ");
+        		perfmessage.append("warning=").
+        		append("0").
+        		append(";0;0;0; ").
+        		append("critical=").
+        		append("0").
+        		append(";0;0;0; ");
         	}
         }
         return perfmessage;

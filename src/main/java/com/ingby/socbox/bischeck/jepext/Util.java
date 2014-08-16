@@ -14,8 +14,8 @@ public class Util {
 	 */
 	public static boolean getSupportNull() {
 		try {
-			if (ConfigurationManager.getInstance().getProperties().
-					getProperty("notFullListParse","false").equalsIgnoreCase("true")) {
+			if ("true".equalsIgnoreCase(ConfigurationManager.getInstance().getProperties().
+					getProperty("notFullListParse","false"))) {
 				return true;
 			} else {
 				return false;

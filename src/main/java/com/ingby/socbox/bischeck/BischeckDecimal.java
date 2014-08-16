@@ -256,7 +256,7 @@ public class BischeckDecimal {
 	 * @return
 	 */
 	public boolean isNull() {
-		if (stringValue == null || stringValue.equalsIgnoreCase("null")) {
+		if (stringValue == null || "null".equalsIgnoreCase(stringValue)) {
 			return true;
 		}
 		return false;

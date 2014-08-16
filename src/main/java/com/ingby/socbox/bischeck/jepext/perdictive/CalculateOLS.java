@@ -83,7 +83,7 @@ public final class CalculateOLS {
     		throw new CalculateOLSException("Forcast must be => 1");
     	}
     	
-    	if (!(resolution.equalsIgnoreCase("H") || resolution.equalsIgnoreCase("D") || resolution.equalsIgnoreCase("W"))) { 
+    	if (!("H".equalsIgnoreCase(resolution) || "D".equalsIgnoreCase(resolution) || "W".equalsIgnoreCase(resolution))) { 
     		throw new CalculateOLSException("Support resolution interval are H,D or W");
     	}
     	
@@ -118,18 +118,8 @@ public final class CalculateOLS {
     		String resolution,
     		String timeOffSet) throws CalculateOLSException  {
     	
-    	if (!(resolution.equalsIgnoreCase("H") || resolution.equalsIgnoreCase("D") || resolution.equalsIgnoreCase("W"))) { 
-    		throw new CalculateOLSException("Support resolution interval are H,D or W");
-    	}
-    	
-    	this.hostName = hostName;
-    	this.serviceName = serviceName;
-    	this.serviceItemName = serviceItemName;
-    	this.resolutionMethod = getResolutioMethod(resolutionMethod);
-    	this.forecast = 0;
-    	this.timeOffSet = timeOffSet;
-		bucketSize = bucketSize(resolution); 
-				
+    	this(hostName, serviceName, serviceItemName, resolutionMethod, resolution, 0, timeOffSet);
+    		
 	}
 
     
@@ -171,19 +161,18 @@ public final class CalculateOLS {
 
 	/**
 	 * Calculate the slope of the predicted linear equation 
-	 * @return the slope value 
+	 * @return the slope value or null if there is no value to predict on
 	 */
 	public Double getPredictiveSignificance() {
 		
 		PredictArray pa = createPredictionArray();
-		if (pa == null) {
-			return null;
-		}
 		
-		SimpleRegression regression = createRegression(pa);
-		
-		Double state = regression.getSignificance();
+		Double state = null;
 
+		if (pa != null) {
+			SimpleRegression regression = createRegression(pa);
+			state = regression.getSignificance();
+		}
 		return state;
 	}
 
@@ -204,11 +193,11 @@ public final class CalculateOLS {
 	
 	private int bucketSize(String resolution) {
 		int bucketsize = 0;
-		if (resolution.equalsIgnoreCase("H")) {
+		if ("H".equalsIgnoreCase(resolution)) {
 			bucketsize = 1*60*60*1000;
-		} else if (resolution.equalsIgnoreCase("D")) {
+		} else if ("D".equalsIgnoreCase(resolution)) {
 			bucketsize = 24*60*60*1000;
-		} else if (resolution.equalsIgnoreCase("W")) {
+		} else if ("W".equalsIgnoreCase(resolution)) {
 			bucketsize = 24*7*60*60*1000;
 		}
 		return bucketsize;
@@ -220,7 +209,7 @@ public final class CalculateOLS {
 		
 		List<LastStatus> lslist = null;
 		
-		if (timeOffSet.equalsIgnoreCase("END")) {
+		if ("END".equalsIgnoreCase(timeOffSet)) {
 			 lslist = cache.getLastStatusListAll(hostName, 
 					serviceName, 
 					serviceItemName);

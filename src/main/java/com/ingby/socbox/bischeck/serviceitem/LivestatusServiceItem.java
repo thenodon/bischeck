@@ -98,9 +98,9 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
         }
         
         // Get the type of query - state or perfdata
-        if (jsonStatement.getString("query").equalsIgnoreCase("state")) {
+        if ("state".equalsIgnoreCase(jsonStatement.getString("query"))) {
             strbuf.append("Columns: state").append("\n");
-        } else if (jsonStatement.getString("query").equalsIgnoreCase("perfdata")){
+        } else if ("perfdata".equalsIgnoreCase(jsonStatement.getString("query"))){
             strbuf.append("Columns: perf_data").append("\n");
         } 
         
@@ -140,8 +140,8 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
 
 
     private boolean validateQuery(String ops) {
-        if (ops.equalsIgnoreCase("state") || 
-                (ops.equalsIgnoreCase("perfdata")) ) { 
+        if ("state".equalsIgnoreCase(ops) || 
+                ("perfdata".equalsIgnoreCase(ops)) ) { 
         	return true;
         }
         return false;

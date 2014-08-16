@@ -108,9 +108,9 @@ public class DocManager implements ConfigXMLInf {
         try {
         	if (line.hasOption("type")) {
         		String type = line.getOptionValue("type");
-        		if ( type.equalsIgnoreCase("html")) {
+        		if ( "html".equalsIgnoreCase(type)) {
         			dmgmt.genHtml();
-        		} else if (type.equalsIgnoreCase("text")) {
+        		} else if ("text".equalsIgnoreCase(type)) {
         			dmgmt.genText();
         		}
         	} else {
@@ -270,7 +270,7 @@ public class DocManager implements ConfigXMLInf {
     		(new StreamSource
     				(xslUrl.getFile()));
 
-    	if (type.equalsIgnoreCase("text"))
+    	if ("text".equalsIgnoreCase(type))
     		transformer.setOutputProperty(OutputKeys.METHOD, "text");
 
     	transformer.transform

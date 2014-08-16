@@ -385,7 +385,7 @@ public class DB2XMLConvert {
                     XMLPeriod period = new XMLPeriod();
                     
                     if (rsperiod.getString("type") != null) {
-                        if (rsperiod.getString("type").equalsIgnoreCase("M")) {
+                        if ("M".equalsIgnoreCase(rsperiod.getString("type"))) {
                             XMLMonths months = new XMLMonths();
                             if (rsperiod.getString("interval") != null) {
                                 months.setMonth(new Integer(rsperiod.getString("interval")));
@@ -397,7 +397,7 @@ public class DB2XMLConvert {
                           
                             period.getMonths().add(months);
                         
-                        } else if (rsperiod.getString("type").equalsIgnoreCase("W")) {
+                        } else if ("W".equalsIgnoreCase(rsperiod.getString("type"))) {
                             
                         	XMLWeeks weeks = new XMLWeeks();
                             

@@ -124,7 +124,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 
 
 	private void setProperties(Properties prop) {
-		isEnabled = prop.getProperty("cbEnable","false").equalsIgnoreCase("true");
+		isEnabled = "true".equalsIgnoreCase(prop.getProperty("cbEnable","false"));
 		exceptionThreshold = Integer.parseInt(prop.getProperty("cbAttempts","5"));
 		timeout = Long.parseLong(prop.getProperty("cbTimeout","60000"));
 	}

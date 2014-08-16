@@ -322,7 +322,7 @@ public class Aggregation {
 			Service service, ServiceItem serviceitem) {
 		String execStatement = null;	
 
-		if (agg.toString().equals("HOUR")) {
+		if ("HOUR".equals(agg.toString())) {
 			execStatement = aggregated.getMethod() + "(" + Util.fullQoutedName(service, serviceitem) + 
 					agg.execStatInclWeekend() +")";
 		} else {

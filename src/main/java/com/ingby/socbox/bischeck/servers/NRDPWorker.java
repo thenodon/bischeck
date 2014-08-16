@@ -209,7 +209,7 @@ public class NRDPWorker implements WorkerInf, Runnable {
                 
                 LOGGER.debug("NRDP return status is: {}", result);
                 
-                if (!result.equals("0")) {  
+                if (!"0".equals(result)) {  
                     String message = (String) ((Element) responselist.item(0)).getElementsByTagName("message").  
                         item(0).getChildNodes().item(0).getNodeValue().trim();  
                     LOGGER.error("{} - nrdp returned message \"{}\" for xml: {}", instanceName, message, xml);

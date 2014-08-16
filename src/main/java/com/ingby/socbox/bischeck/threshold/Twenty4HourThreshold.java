@@ -247,7 +247,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 		
 		BischeckDecimal threshold = new BischeckDecimal(getThresholdByHourAndMinute(hourThreshold, minuteThreshold));
 			
-		if (calcMethod.equalsIgnoreCase(">") || calcMethod.equalsIgnoreCase("<") ) {
+		if (">".equalsIgnoreCase(calcMethod) || "<".equalsIgnoreCase(calcMethod) ) {
 			if (threshold.getFloat() != null) {
 				BischeckDecimal warn = new BischeckDecimal(threshold.getFloat()*getWarning());
 				BischeckDecimal crit = new BischeckDecimal(threshold.getFloat()*getCritical());
@@ -260,7 +260,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 						" critical=" + null +"("+ getCritical() + ")");
 			
 			}
-		} else if (calcMethod.equalsIgnoreCase("=")) {
+		} else if ("=".equalsIgnoreCase(calcMethod)) {
 			if (threshold.getFloat() != null) {
 				BischeckDecimal critical =  new BischeckDecimal((getCritical()));
 				BischeckDecimal warning =  new BischeckDecimal((getWarning()));
@@ -340,7 +340,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             return null;
         }
         
-        if (calcMethod.equalsIgnoreCase("<")) {
+        if ("<".equalsIgnoreCase(calcMethod)) {
             return (1-this.warning)+1;
         } else {
             return this.warning;
@@ -354,7 +354,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             return null;
         }
         
-        if (calcMethod.equalsIgnoreCase("<")) {
+        if ("<".equalsIgnoreCase(calcMethod)) {
             return (1-this.critical)+1;
         } else {
             return this.critical;
@@ -425,19 +425,19 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             
         	LOGGER.debug("Hour threahold value: {}", calcthreshold);
 
-            if (calcMethod.equalsIgnoreCase(">")) {
+            if (">".equalsIgnoreCase(calcMethod)) {
                 if (measuredValue < this.getCritical()*calcthreshold) {
                     state=NAGIOSSTAT.CRITICAL;
                 } else if (measuredValue < this.getWarning()*calcthreshold) {
                     state=NAGIOSSTAT.WARNING;
                 }
-            } else if (calcMethod.equalsIgnoreCase("<")) {
+            } else if ("<".equalsIgnoreCase(calcMethod)) {
                 if (measuredValue > this.getCritical()*calcthreshold) {
                     state=NAGIOSSTAT.CRITICAL;
                 } else if (measuredValue > this.getWarning()*calcthreshold) {
                     state=NAGIOSSTAT.WARNING;
                 }
-            } else if (calcMethod.equalsIgnoreCase("=")) {
+            } else if ("=".equalsIgnoreCase(calcMethod)) {
 
                 float criticalBound =  (1-this.getCritical())*calcthreshold;
                 float warningBound =  (1-this.getWarning())*calcthreshold;
@@ -1116,7 +1116,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         
     
     private boolean isContentNull(String str) {
-        if (str.trim().equals("") || str.equalsIgnoreCase("null")) {
+        if (str.trim().isEmpty() || "null".equalsIgnoreCase(str)) {
             return true;
         }
         return false;

@@ -36,10 +36,10 @@ public class LastStatusNotification implements Serializable, Cloneable {
 	
 	private static final long serialVersionUID = 1L;
 
-	private Service service;
+	private final Service service;
 
 	
-	public LastStatusNotification(Service service) {
+	public LastStatusNotification(final Service service) {
 		this.service = service;	
 	}
 
@@ -66,9 +66,9 @@ public class LastStatusNotification implements Serializable, Cloneable {
 	 * @return the formatted json object
 	 */
 	public String getJson() {
-		JSONObject json = new JSONObject();
+		final JSONObject json = new JSONObject();
 		
-		long currentTime = System.currentTimeMillis();
+		final long currentTime = System.currentTimeMillis();
 		json.put("timestamp",currentTime);
 		json.put("date",new Date(currentTime).toString());
 		json.put("state",((ServiceStateInf) service).getServiceState().getState());
