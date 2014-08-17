@@ -31,7 +31,7 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 public class NagiosUtil {
     
     private boolean formatWarnCrit = false;
-	
+    
         
     public NagiosUtil() {
         
@@ -46,19 +46,19 @@ public class NagiosUtil {
     }
     
     public NagiosUtil(final boolean extended) {
-    	this.formatWarnCrit = Boolean.valueOf(extended);
+        this.formatWarnCrit = Boolean.valueOf(extended);
     }
     
     public void setExtended() {
-    	this.formatWarnCrit = true;
+        this.formatWarnCrit = true;
     }
     
     public boolean isExtended() {
-    	return this.formatWarnCrit;
+        return this.formatWarnCrit;
     }
 
     public String createNagiosMessage(final Service service) {
-    	return createNagiosMessage(service,true);
+        return createNagiosMessage(service,true);
     }
     
     /**
@@ -144,7 +144,7 @@ public class NagiosUtil {
 
             // Building the performance string 
             if (!currentMeasure.isNull()) {
-            	perfmessage.append(performanceMessage(serviceItem, warnValue, critValue,
+                perfmessage.append(performanceMessage(serviceItem, warnValue, critValue,
                     threshold, currentMeasure));
             }
             
@@ -153,7 +153,7 @@ public class NagiosUtil {
         }
         
         if (perfData) {
-        	message.append(" | ").append(perfmessage).append("avg-exec-time=").append(((totalexectime/count)+"ms"));
+            message.append(" | ").append(perfmessage).append("avg-exec-time=").append(((totalexectime/count)+"ms"));
         }
         
         return message.toString();
@@ -181,29 +181,29 @@ public class NagiosUtil {
         perfmessage.append(";0; threshold=");
         
         if (threshold == null) {
-        	//TODO this is compatibility, should be set to U  
-        	perfmessage.append("0");
+            //TODO this is compatibility, should be set to U  
+            perfmessage.append("0");
         } else {
-        	perfmessage.append(threshold.toString());
+            perfmessage.append(threshold.toString());
         }
         perfmessage.append(";0;0;0; ");
         
         if (isExtended()) {
-        	if (threshold != null) {
-        		perfmessage.append("warning=").
-        		append(warnValue.toString()).
-        		append(";0;0;0; ").
-        		append("critical=").
-        		append(critValue.toString()).
-        		append(";0;0;0; ");
-        	} else {
-        		perfmessage.append("warning=").
-        		append("0").
-        		append(";0;0;0; ").
-        		append("critical=").
-        		append("0").
-        		append(";0;0;0; ");
-        	}
+            if (threshold != null) {
+                perfmessage.append("warning=").
+                append(warnValue.toString()).
+                append(";0;0;0; ").
+                append("critical=").
+                append(critValue.toString()).
+                append(";0;0;0; ");
+            } else {
+                perfmessage.append("warning=").
+                append("0").
+                append(";0;0;0; ").
+                append("critical=").
+                append("0").
+                append(";0;0;0; ");
+            }
         }
         return perfmessage;
     }

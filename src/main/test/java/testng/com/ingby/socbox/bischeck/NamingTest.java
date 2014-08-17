@@ -28,37 +28,37 @@ import com.ingby.socbox.bischeck.Util;
 
 public class NamingTest {
 
-	@Test (groups = { "Naming" })
-	public void verifyHostName() {
-		Assert.assertEquals(
-			ObjectDefinitions.verifyHostName("bischeck.ingby.com"),
-			"bischeck.ingby.com");
-		Assert.assertEquals(
-				ObjectDefinitions.verifyHostName("bi_scheck.in\\\\-gby.com"),
-				"bi_scheck.in\\\\-gby.com");
-	}
-	
-	
-	@Test (groups = { "Naming" })
-	public void verifyHostServiceServiceItemName() {
-		Assert.assertEquals(
-			ObjectDefinitions.verifyHostServiceServiceItem("bischeck.ingby.com-@service0-_service1.2.3_99item[89]"),
-			"bischeck.ingby.com-@service0-_service1.2.3_99item[89]");
-	}
-	
-	
-	@Test( groups = { "Naming" }, expectedExceptions = java.lang.IllegalStateException.class)  
-	public void verifyNamingException() {
-		ObjectDefinitions.verifyHostName("_bischeck.ingby.com");
-	}
-	
+    @Test (groups = { "Naming" })
+    public void verifyHostName() {
+        Assert.assertEquals(
+            ObjectDefinitions.verifyHostName("bischeck.ingby.com"),
+            "bischeck.ingby.com");
+        Assert.assertEquals(
+                ObjectDefinitions.verifyHostName("bi_scheck.in\\\\-gby.com"),
+                "bi_scheck.in\\\\-gby.com");
+    }
+    
+    
+    @Test (groups = { "Naming" })
+    public void verifyHostServiceServiceItemName() {
+        Assert.assertEquals(
+            ObjectDefinitions.verifyHostServiceServiceItem("bischeck.ingby.com-@service0-_service1.2.3_99item[89]"),
+            "bischeck.ingby.com-@service0-_service1.2.3_99item[89]");
+    }
+    
+    
+    @Test( groups = { "Naming" }, expectedExceptions = java.lang.IllegalStateException.class)  
+    public void verifyNamingException() {
+        ObjectDefinitions.verifyHostName("_bischeck.ingby.com");
+    }
+    
 
-	@Test (groups = { "Naming" })
-	public void verifyQoutedname() {
-		Assert.assertEquals(Util.fullQoutedName("local-host", "service-1","serviceitem-1"),"local\\-host-service\\-1-serviceitem\\-1");
-	}
-	
-	@Test (groups = { "Naming" })
+    @Test (groups = { "Naming" })
+    public void verifyQoutedname() {
+        Assert.assertEquals(Util.fullQoutedName("local-host", "service-1","serviceitem-1"),"local\\-host-service\\-1-serviceitem\\-1");
+    }
+    
+    @Test (groups = { "Naming" })
     public void verifyAll() {
         Assert.assertEquals(Util.fullQoutedName("local-host", "serv/ic/e-1","service/it/em-1"),"local\\-host-serv/ic/e\\-1-service/it/em\\-1");
         Assert.assertEquals(Util.fullQoutedName("local-host", "serv/i c/e-1","serv ice/it/em-1"),"local\\-host-serv/i c/e\\-1-serv ice/it/em\\-1");

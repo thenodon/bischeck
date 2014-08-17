@@ -35,9 +35,9 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 
 public class UtilTest {
     ConfigurationManager confMgmr = null;
-	@BeforeTest
+    @BeforeTest
     public void beforeTest() throws Exception {
-	    try {
+        try {
             confMgmr = ConfigurationManager.getInstance();
         } catch (java.lang.IllegalStateException e) {
             System.setProperty("bishome", ".");
@@ -47,54 +47,54 @@ public class UtilTest {
             confMgmr = ConfigurationManager.getInstance();  
         }
 
-	}
-	
+    }
+    
     @Test (groups = { "Util" })
     public void getHourFromHourMinute() {
-    	Assert.assertEquals((int) Util.getHourFromHourMinute("2:0"), 2);
-    	Assert.assertEquals((int) Util.getHourFromHourMinute("02:00"), 2);
+        Assert.assertEquals((int) Util.getHourFromHourMinute("2:0"), 2);
+        Assert.assertEquals((int) Util.getHourFromHourMinute("02:00"), 2);
         Assert.assertEquals((int) Util.getHourFromHourMinute("12:00"), 12);
         Assert.assertEquals((int) Util.getHourFromHourMinute("00:00"), 00);
         Assert.assertEquals((int) Util.getHourFromHourMinute("23:00"), 23);
     }
     @Test (groups = { "Util" })
     public void fixExponetialFormat() {
-    	Assert.assertNull(Util.fixExponetialFormat(null));
-    	Assert.assertEquals(Util.fixExponetialFormat("1E-1"), "0.1");
-    	Assert.assertEquals(Util.fixExponetialFormat("32E-2"), "0.32");
+        Assert.assertNull(Util.fixExponetialFormat(null));
+        Assert.assertEquals(Util.fixExponetialFormat("1E-1"), "0.1");
+        Assert.assertEquals(Util.fixExponetialFormat("32E-2"), "0.32");
     }
 
     
     @Test (groups = { "Util" })
     public void fullNameServiceServiceItem() {
-    	Service service = new JDBCService("service", null);
-    	service.setHost(new Host("host"));
-    	ServiceItem serviceitem = new SQLServiceItem("serviceitem");
-    	Assert.assertEquals(Util.fullName(service, serviceitem),"host-service-serviceitem");
+        Service service = new JDBCService("service", null);
+        service.setHost(new Host("host"));
+        ServiceItem serviceitem = new SQLServiceItem("serviceitem");
+        Assert.assertEquals(Util.fullName(service, serviceitem),"host-service-serviceitem");
     }
 
     @Test (groups = { "Util" })
     public void fullNameStringStringString() {
-    	Assert.assertEquals(Util.fullName("ho\\-st","service", "serviceitem"),"ho\\-st-service-serviceitem");
+        Assert.assertEquals(Util.fullName("ho\\-st","service", "serviceitem"),"ho\\-st-service-serviceitem");
     }
 
     
     @Test (groups = { "Util" })
     public void hasStringNull() {
-    	Assert.assertEquals(Util.hasStringNull("12,null,32"),true);
-    	Assert.assertEquals(Util.hasStringNull("12,10,32"),false);
+        Assert.assertEquals(Util.hasStringNull("12,null,32"),true);
+        Assert.assertEquals(Util.hasStringNull("12,10,32"),false);
     }
 
 
     @Test (groups = { "Util" })
     public void obfuscatePassword() {
-    	Assert.assertEquals(Util.obfuscatePassword("fdsfspassword=ksfdlf;fds"),"fdsfspassword=xxxxx;fds");
+        Assert.assertEquals(Util.obfuscatePassword("fdsfspassword=ksfdlf;fds"),"fdsfspassword=xxxxx;fds");
     }
 
     
     @Test (groups = { "Util" })
     public void roundDecimals() {
-    	Assert.assertEquals(Util.roundDecimals(new Float("10.103000001")),new Float("10.103"));
-    	Assert.assertEquals(Util.roundDecimals(new Float("0.00000001")),new Float("1E-8"));
+        Assert.assertEquals(Util.roundDecimals(new Float("10.103000001")),new Float("10.103"));
+        Assert.assertEquals(Util.roundDecimals(new Float("0.00000001")),new Float("1E-8"));
     }
 }

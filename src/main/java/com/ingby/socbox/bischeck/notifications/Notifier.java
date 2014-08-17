@@ -43,15 +43,15 @@ public interface Notifier {
      * @param notificationData a key value hash
      * @throws NotifierException 
      */
-	void sendAlert(Map<String,String> notificationData) throws NotifierException;
-	
-	
-	/**
-	 * Send a resolve message to the server.
-	 * @param notificationData a key value hash
-	 * @throws NotifierException
-	 */
-	void sendResolve(Map<String,String> notificationData) throws NotifierException;
+    void sendAlert(Map<String,String> notificationData) throws NotifierException;
+    
+    
+    /**
+     * Send a resolve message to the server.
+     * @param notificationData a key value hash
+     * @throws NotifierException
+     */
+    void sendResolve(Map<String,String> notificationData) throws NotifierException;
     
     
     /**

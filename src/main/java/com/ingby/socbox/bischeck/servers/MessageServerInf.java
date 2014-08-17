@@ -28,11 +28,11 @@ import com.ingby.socbox.bischeck.service.Service;
  * 
  */
 public interface MessageServerInf extends Callback<Service>{
-	
-	
-	/**
-	 * The callback method used by any {@link Server} to receive messages with 
-	 * the {@link Service} data to processes 
-	 */
-	void onMessage(Service message);	
+    
+    
+    /**
+     * The callback method used by any {@link Server} to receive messages with 
+     * the {@link Service} data to processes 
+     */
+    void onMessage(Service message);    
 }

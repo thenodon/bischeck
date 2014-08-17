@@ -61,165 +61,165 @@ import com.ingby.socbox.bischeck.service.Service;
  * cbTimeout - the time in ms the circuit break will stay in the OPEN state 
  * before going to HALF-OPEN, default is 60000
  * </li>
- * </ul>		 
+ * </ul>         
  */
 public class ServerCircuitBreak implements ServerCircuitBreakMBean {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(ServerCircuitBreak.class);
-	public enum State { CLOSED, OPEN, HALF_OPEN };
-	
-	// The max number of times an exception can happen before a CLOSED goes to OPEN  
-	private volatile int exceptionThreshold = 5; 
-	
-	// The timeout when in OPEN state
-	private volatile long timeout = 20000L;
-	
-	// The state of the circuit break, initial state CLOSED
-	private volatile State state = State.CLOSED;
-	
-	// The number of times the execute method fails before going from CLOSED to OPEN
-	private final AtomicInteger exceptionCount = new AtomicInteger(); 
-	
-	// Total number of times the circuit break been set in OPEN state
-	private final AtomicLong openCount = new AtomicLong(); 
-	private volatile long attemptResetAfter = Long.MAX_VALUE;
-	private Server server;
-	
-	// An indicator that OPEN state is entered. Used for logging the first occurrence
-	private volatile boolean firstOpen;
-	
-	// Counting the total number of failed send operation due to exception in send and
-	// not send because in OPEN state
-	private final AtomicLong totalFailed = new AtomicLong();
-	
-	// The timestamp when the last state change happen 
-	private volatile long lastStateChange = 0L;
-	
-	private MBeanManager mbsMgr = null;
+    private final static Logger LOGGER = LoggerFactory.getLogger(ServerCircuitBreak.class);
+    public enum State { CLOSED, OPEN, HALF_OPEN };
     
-	private volatile boolean isEnabled = false;
-	
-	/**
-	 * Constructor for the circuit break
-	 * @param server the server object that the circuit break should be used for
-	 */
-	public ServerCircuitBreak(Server server) {
-		this(server,null);
-	}
-	
-	
-	public ServerCircuitBreak(Server server,
-			Properties prop) {
-		this.server = server;
-		lastStateChange = System.currentTimeMillis();
-		
-		if (prop != null) {
-			setProperties(prop);
-		}
-		
-		mbsMgr = new MBeanManager(this, "com.ingby.socbox.bischeck.servers:name=" + this.server.getInstanceName() + ",type=CircuitBreak");
-		mbsMgr.registerMBeanserver();
-			
-	}
+    // The max number of times an exception can happen before a CLOSED goes to OPEN  
+    private volatile int exceptionThreshold = 5; 
+    
+    // The timeout when in OPEN state
+    private volatile long timeout = 20000L;
+    
+    // The state of the circuit break, initial state CLOSED
+    private volatile State state = State.CLOSED;
+    
+    // The number of times the execute method fails before going from CLOSED to OPEN
+    private final AtomicInteger exceptionCount = new AtomicInteger(); 
+    
+    // Total number of times the circuit break been set in OPEN state
+    private final AtomicLong openCount = new AtomicLong(); 
+    private volatile long attemptResetAfter = Long.MAX_VALUE;
+    private Server server;
+    
+    // An indicator that OPEN state is entered. Used for logging the first occurrence
+    private volatile boolean firstOpen;
+    
+    // Counting the total number of failed send operation due to exception in send and
+    // not send because in OPEN state
+    private final AtomicLong totalFailed = new AtomicLong();
+    
+    // The timestamp when the last state change happen 
+    private volatile long lastStateChange = 0L;
+    
+    private MBeanManager mbsMgr = null;
+    
+    private volatile boolean isEnabled = false;
+    
+    /**
+     * Constructor for the circuit break
+     * @param server the server object that the circuit break should be used for
+     */
+    public ServerCircuitBreak(Server server) {
+        this(server,null);
+    }
+    
+    
+    public ServerCircuitBreak(Server server,
+            Properties prop) {
+        this.server = server;
+        lastStateChange = System.currentTimeMillis();
+        
+        if (prop != null) {
+            setProperties(prop);
+        }
+        
+        mbsMgr = new MBeanManager(this, "com.ingby.socbox.bischeck.servers:name=" + this.server.getInstanceName() + ",type=CircuitBreak");
+        mbsMgr.registerMBeanserver();
+            
+    }
 
 
-	private void setProperties(Properties prop) {
-		isEnabled = "true".equalsIgnoreCase(prop.getProperty("cbEnable","false"));
-		exceptionThreshold = Integer.parseInt(prop.getProperty("cbAttempts","5"));
-		timeout = Long.parseLong(prop.getProperty("cbTimeout","60000"));
-	}
+    private void setProperties(Properties prop) {
+        isEnabled = "true".equalsIgnoreCase(prop.getProperty("cbEnable","false"));
+        exceptionThreshold = Integer.parseInt(prop.getProperty("cbAttempts","5"));
+        timeout = Long.parseLong(prop.getProperty("cbTimeout","60000"));
+    }
 
 
-	/**
-	 * Get the current state of the circuit break
-	 * @return current state
-	 */
-	public State getState() {
-		if (!isEnabled) {
-			return State.CLOSED;
-		}
-		
-		if (state == State.OPEN) {
-			if (System.currentTimeMillis() >= attemptResetAfter) { 
-				state = State.HALF_OPEN;
-			}
-		} 
-		return state;
-	}
+    /**
+     * Get the current state of the circuit break
+     * @return current state
+     */
+    public State getState() {
+        if (!isEnabled) {
+            return State.CLOSED;
+        }
+        
+        if (state == State.OPEN) {
+            if (System.currentTimeMillis() >= attemptResetAfter) { 
+                state = State.HALF_OPEN;
+            }
+        } 
+        return state;
+    }
 
-	
-	/**
-	 * Reset the state to CLOSED
-	 */
-	public void reset() {
-		lastStateChange = System.currentTimeMillis();
-		state = State.CLOSED; 
-		exceptionCount.set(0);
-	}
+    
+    /**
+     * Reset the state to CLOSED
+     */
+    public void reset() {
+        lastStateChange = System.currentTimeMillis();
+        state = State.CLOSED; 
+        exceptionCount.set(0);
+    }
 
-	
-	/**
-	 * Set the state to OPEN and the time out time until test circuit break again
-	 */
-	synchronized public void trip() {
-		lastStateChange = System.currentTimeMillis();
-		
-		// Only update if the state was from CLOSED and not from HALF-OPEN
-		if (state == State.CLOSED) {
-			openCount.incrementAndGet();
-		}
-		state = State.OPEN; 
-		attemptResetAfter = System.currentTimeMillis() + timeout;
-	}
-	
-	
-	/**
-	 * Execute the {@link WorkerInfr#send(Service)} method through the circuit break.
-	 * @param worker the worker to execute {@link WorkerInf}
+    
+    /**
+     * Set the state to OPEN and the time out time until test circuit break again
+     */
+    synchronized public void trip() {
+        lastStateChange = System.currentTimeMillis();
+        
+        // Only update if the state was from CLOSED and not from HALF-OPEN
+        if (state == State.CLOSED) {
+            openCount.incrementAndGet();
+        }
+        state = State.OPEN; 
+        attemptResetAfter = System.currentTimeMillis() + timeout;
+    }
+    
+    
+    /**
+     * Execute the {@link WorkerInfr#send(Service)} method through the circuit break.
+     * @param worker the worker to execute {@link WorkerInf}
      * @param service the service object to be sent 
-	 */
-	public void execute(WorkerInf worker, Service service) {
+     */
+    public void execute(WorkerInf worker, Service service) {
 
-		final State currState = getState(); 
-		switch (currState) {
-		case CLOSED:
-			try {
-				worker.send(service); 
-				exceptionCount.set(0); 
-			} catch (ServerException e) {
-				if (isEnabled && exceptionCount.incrementAndGet() >= exceptionThreshold) { 
-					firstOpen = true;
-					trip(); 
-				} 
-			}
-			break;
-			
-		case OPEN: 
-			totalFailed.incrementAndGet();
-			if (firstOpen) {
-				firstOpen = false;
-				LOGGER.info("{} - Opened circut break", server.getInstanceName());
-			}
-			break;
-		
-		case HALF_OPEN:
-			LOGGER.info("{} - Half opened circut break", server.getInstanceName());
-			try {
-				worker.send(service); 
-				reset(); 
-			} catch (ServerException e) {
-				totalFailed.incrementAndGet();
-				firstOpen = true;
-				trip();
-			}
-			break;
-		
-		default: throw new IllegalStateException(server.getInstanceName() + " - Unknown state: " + currState);
-		}
-	}
-	
-	
-	/**
+        final State currState = getState(); 
+        switch (currState) {
+        case CLOSED:
+            try {
+                worker.send(service); 
+                exceptionCount.set(0); 
+            } catch (ServerException e) {
+                if (isEnabled && exceptionCount.incrementAndGet() >= exceptionThreshold) { 
+                    firstOpen = true;
+                    trip(); 
+                } 
+            }
+            break;
+            
+        case OPEN: 
+            totalFailed.incrementAndGet();
+            if (firstOpen) {
+                firstOpen = false;
+                LOGGER.info("{} - Opened circut break", server.getInstanceName());
+            }
+            break;
+        
+        case HALF_OPEN:
+            LOGGER.info("{} - Half opened circut break", server.getInstanceName());
+            try {
+                worker.send(service); 
+                reset(); 
+            } catch (ServerException e) {
+                totalFailed.incrementAndGet();
+                firstOpen = true;
+                trip();
+            }
+            break;
+        
+        default: throw new IllegalStateException(server.getInstanceName() + " - Unknown state: " + currState);
+        }
+    }
+    
+    
+    /**
      * Execute the {@link Server#send(Service)} method through the circuit break.
      * @param service the service object to be sent 
      */
@@ -262,7 +262,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
         default: throw new IllegalStateException("Unknown state: " + currState);
         }
     }
-	
+    
 
     /**
      * Remove all mbean stuff, used at reload
@@ -276,47 +276,47 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
     }
     
     
-	// JMX exposed methods
-	
-	@Override
-	public long getTotalFailed() {
-		return totalFailed.get();
-	}
+    // JMX exposed methods
+    
+    @Override
+    public long getTotalFailed() {
+        return totalFailed.get();
+    }
 
 
-	@Override
-	public String getCurrentState() {
-		return getState().toString();
-	}
+    @Override
+    public String getCurrentState() {
+        return getState().toString();
+    }
 
 
-	@Override
-	public String getLastStateChange() {
-		return new Date(lastStateChange).toString();
-	}
+    @Override
+    public String getLastStateChange() {
+        return new Date(lastStateChange).toString();
+    }
 
 
-	@Override
-	public long getTotalOpenCount() {
-		return openCount.get();
-	}
+    @Override
+    public long getTotalOpenCount() {
+        return openCount.get();
+    }
 
 
-	@Override
-	public boolean isEnabled() {
-		return isEnabled;
-	}
+    @Override
+    public boolean isEnabled() {
+        return isEnabled;
+    }
 
 
-	@Override
-	public void enable() {
-		isEnabled = true;
-	}
-	
-	@Override
-	public void disable() {
-		isEnabled = false;
-	}
+    @Override
+    public void enable() {
+        isEnabled = true;
+    }
+    
+    @Override
+    public void disable() {
+        isEnabled = false;
+    }
 
 
     @Override
@@ -346,5 +346,5 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
     public String getAttemptResetAfter() {
         return new Date(attemptResetAfter).toString();
     }
-	
+    
 }

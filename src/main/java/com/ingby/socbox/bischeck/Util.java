@@ -311,15 +311,15 @@ public abstract class Util {
      * @return the padded string
      */
     public static String integerToTimeString(Integer num) {
-    	if (num < 10) {
-    		return "0"+num;
-    	} else {
-    		return ""+num;
-    	}
+        if (num < 10) {
+            return "0"+num;
+        } else {
+            return ""+num;
+        }
     }
 
     public static void ShellExit(int exitCode) {
-    	System.exit(exitCode);
+        System.exit(exitCode);
     }
     
 }

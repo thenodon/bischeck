@@ -36,10 +36,10 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 public final class BisCalendar {
 
 
-	private BisCalendar() {
-		
-	}
-	
+    private BisCalendar() {
+        
+    }
+    
     /**
      * Get an Calendar instance of a ISO 8601. The calendar can be controlled
      * with two properties in property.xml:

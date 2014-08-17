@@ -24,67 +24,67 @@ package com.ingby.socbox.bischeck.servers;
  */
 public interface ServerCircuitBreakMBean {
 
-	/**
-	 * The total number of calls that has failed to be sent to the server due to
-	 * exception and circuit break being in OPEN state.
-	 * @return the total count of failed calls to the server
-	 */
-	long getTotalFailed();
-	
-	
-	/**
-	 * The current state of the circuit break
-	 * @return the circuit break current state
-	 */
-	String getCurrentState();
-	
-	
-	/**
-	 * Get the date and time for last state change
-	 * @return last state change
-	 */
-	String getLastStateChange();
-	
-	
-	/**
-	 * The total number of times the circuit break been open
-	 * @return the total number of times the circuit break been opened
-	 */
-	long getTotalOpenCount();
-
-	
-	/**
-	 * Check if circuit break is enabled
-	 * @return true if enabled and false if disabled
-	 */
-	boolean isEnabled();
-
-	
-	/**
-	 * Enable circuit break
-	 */
-	void enable();
-	
-	
-	/**
-	 * Disable circuit break
-	 */
-	void disable();
-	
-	
-	/**
-	 * Get the OPEN timeout time in milliseconds 
-	 */
-	long getOpenTimeout();
-   
-	
-	/**
-	 * Set the OPEN timeout time in milliseconds
-	 * @param timeout
-	 */
-	void setOpenTimeout(long timeout);
+    /**
+     * The total number of calls that has failed to be sent to the server due to
+     * exception and circuit break being in OPEN state.
+     * @return the total count of failed calls to the server
+     */
+    long getTotalFailed();
     
-	
+    
+    /**
+     * The current state of the circuit break
+     * @return the circuit break current state
+     */
+    String getCurrentState();
+    
+    
+    /**
+     * Get the date and time for last state change
+     * @return last state change
+     */
+    String getLastStateChange();
+    
+    
+    /**
+     * The total number of times the circuit break been open
+     * @return the total number of times the circuit break been opened
+     */
+    long getTotalOpenCount();
+
+    
+    /**
+     * Check if circuit break is enabled
+     * @return true if enabled and false if disabled
+     */
+    boolean isEnabled();
+
+    
+    /**
+     * Enable circuit break
+     */
+    void enable();
+    
+    
+    /**
+     * Disable circuit break
+     */
+    void disable();
+    
+    
+    /**
+     * Get the OPEN timeout time in milliseconds 
+     */
+    long getOpenTimeout();
+   
+    
+    /**
+     * Set the OPEN timeout time in milliseconds
+     * @param timeout
+     */
+    void setOpenTimeout(long timeout);
+    
+    
     /**
      * Get the CLOSE to OPEN count 
      */

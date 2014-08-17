@@ -30,76 +30,76 @@ import org.nfunk.jep.function.Add;
  *
  */
 public class Stddev extends org.nfunk.jep.function.Sum {
-	private Add addFun = new Add();
-	private boolean supportNull = false;
+    private Add addFun = new Add();
+    private boolean supportNull = false;
 
-	/**
-	 * Constructor.
-	 */
-	public Stddev() {
-		// Use a variable number of arguments
-		super();
-		this.supportNull = Util.getSupportNull();
-		
-	}
+    /**
+     * Constructor.
+     */
+    public Stddev() {
+        // Use a variable number of arguments
+        super();
+        this.supportNull = Util.getSupportNull();
+        
+    }
 
-	public Stddev(boolean supportNull) {
-		// Use a variable number of arguments
-		super();
-		this.supportNull  = supportNull;
-	}
+    public Stddev(boolean supportNull) {
+        // Use a variable number of arguments
+        super();
+        this.supportNull  = supportNull;
+    }
 
-	/**
-	 * Calculates the result of summing up all parameters, which are assumed to
-	 * be of the Double type.
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void run(Stack stack) throws ParseException {
-		
-		checkStack(stack);
-		if (curNumberOfParameters < 1) {
-			throw new ParseException("No arguments for Stddev");
-		}
-		
-		Object sum = (Object) new Double(0);
-		
-		Object param;
-		int paramCount = 0;
+    /**
+     * Calculates the result of summing up all parameters, which are assumed to
+     * be of the Double type.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void run(Stack stack) throws ParseException {
+        
+        checkStack(stack);
+        if (curNumberOfParameters < 1) {
+            throw new ParseException("No arguments for Stddev");
+        }
+        
+        Object sum = (Object) new Double(0);
+        
+        Object param;
+        int paramCount = 0;
         int numberNotNull = 0;
         
         Double[] square = new Double[curNumberOfParameters];
-        		
+                
         // repeat summation for each one of the current parameters
         while (paramCount < (curNumberOfParameters)) {
-        	// get the parameter from the stack
-        	param = stack.pop();
-        	if (!(supportNull && param instanceof Null)) {
-        		// add it to the sum (order is important for String arguments)
-        		square[numberNotNull] = (Double) param;
-        		sum = addFun.add(param, sum);	
+            // get the parameter from the stack
+            param = stack.pop();
+            if (!(supportNull && param instanceof Null)) {
+                // add it to the sum (order is important for String arguments)
+                square[numberNotNull] = (Double) param;
+                sum = addFun.add(param, sum);   
 
-        		numberNotNull++;
-        	}
-        	paramCount++;
+                numberNotNull++;
+            }
+            paramCount++;
         }
         
-		// Calculate the average and the standard deviation 
+        // Calculate the average and the standard deviation 
         if (numberNotNull != 0 ) {
-        	sum = (Double) sum / numberNotNull;
-        	// push the result on the inStack
-        	Double stdsum = new Double(0);
-        	for (int stdcount = 0; stdcount < numberNotNull; stdcount++) {
-        		stdsum += Math.pow((square[stdcount]-(Double) sum),2);  
-        	}
-        	
-        	Double stdev = Math.sqrt(stdsum/numberNotNull);
-        	
-        	stack.push(stdev);
+            sum = (Double) sum / numberNotNull;
+            // push the result on the inStack
+            Double stdsum = new Double(0);
+            for (int stdcount = 0; stdcount < numberNotNull; stdcount++) {
+                stdsum += Math.pow((square[stdcount]-(Double) sum),2);  
+            }
+            
+            Double stdev = Math.sqrt(stdsum/numberNotNull);
+            
+            stack.push(stdev);
         } else { 
-        	stack.push(new Null());
+            stack.push(new Null());
         }
-	}
+    }
 
-	
+    
 }

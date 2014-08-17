@@ -31,63 +31,63 @@ import org.nfunk.jep.function.PostfixMathCommand;
  */
 public class Average extends PostfixMathCommand {
 
-	private Add addFun = new Add();
-	private boolean supportNull = false;
+    private Add addFun = new Add();
+    private boolean supportNull = false;
 
-	/**
-	 * Constructor.
-	 */
-	public Average() {
-		// Use a variable number of arguments
-		numberOfParameters = -1;
-		this.supportNull = Util.getSupportNull();
-	}
+    /**
+     * Constructor.
+     */
+    public Average() {
+        // Use a variable number of arguments
+        numberOfParameters = -1;
+        this.supportNull = Util.getSupportNull();
+    }
 
-	public Average(boolean supportNull) {
-		// Use a variable number of arguments
-		numberOfParameters = -1;
-		this.supportNull  = supportNull;
-	}
+    public Average(boolean supportNull) {
+        // Use a variable number of arguments
+        numberOfParameters = -1;
+        this.supportNull  = supportNull;
+    }
 
-	/**
-	 * Calculates the average of all parameters, which are assumed to
-	 * be of the Double type.
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void run(Stack stack) throws ParseException {
-		checkStack(stack);// check the stack
-		
-		if (curNumberOfParameters < 1) {
-			throw new ParseException("No arguments for Avg");
-		}
+    /**
+     * Calculates the average of all parameters, which are assumed to
+     * be of the Double type.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void run(Stack stack) throws ParseException {
+        checkStack(stack);// check the stack
+        
+        if (curNumberOfParameters < 1) {
+            throw new ParseException("No arguments for Avg");
+        }
 
-		
-		// initialize the result to the first argument
-		Object sum = (Object) new Double(0);
-		
-		Object param;
-		int i = 0;
+        
+        // initialize the result to the first argument
+        Object sum = (Object) new Double(0);
+        
+        Object param;
+        int i = 0;
         int j = 0;
         // repeat summation for each one of the current parameters
         while (i < (curNumberOfParameters)) {
-        	// get the parameter from the stack
-        	param = stack.pop();
-        	if (!(supportNull && param instanceof Null)) {
-        		// add it to the sum (order is important for String arguments)
-        		sum = addFun.add(param, sum);	
+            // get the parameter from the stack
+            param = stack.pop();
+            if (!(supportNull && param instanceof Null)) {
+                // add it to the sum (order is important for String arguments)
+                sum = addFun.add(param, sum);   
 
-        		j++;
-        	}
-        	i++;
+                j++;
+            }
+            i++;
         }
-		// Calculate the average
+        // Calculate the average
         if (j != 0 ) {
-        	sum = (Double) sum / j;
-        	// push the result on the inStack
-        	stack.push(sum);
+            sum = (Double) sum / j;
+            // push the result on the inStack
+            stack.push(sum);
         } else { 
-        	stack.push(new Null());
+            stack.push(new Null());
         }
-	}
+    }
 }

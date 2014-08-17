@@ -32,29 +32,29 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.configuration.DocManager;
 
 public class DocManagerTest {
-	
-	ConfigurationManager confMgmr = null;
-	
-	@BeforeTest
-	public void beforeTest() throws Exception {
-		confMgmr = TestUtils.getConfigurationManager();
-	}	
-	
+    
+    ConfigurationManager confMgmr = null;
+    
+    @BeforeTest
+    public void beforeTest() throws Exception {
+        confMgmr = TestUtils.getConfigurationManager();
+    }   
+    
     @Test (groups = { "DocManager" })
     public void gen_doc_defaultdir() 
     throws TransformerFactoryConfigurationError, TransformerException, Exception {
-    	
-    	DocManager dmgmt = null;
-    	dmgmt = new DocManager();
-    	dmgmt.genHtml();
-    	dmgmt.genText();
+        
+        DocManager dmgmt = null;
+        dmgmt = new DocManager();
+        dmgmt.genHtml();
+        dmgmt.genText();
     }
 
     @Test (groups = { "DocManager" }, expectedExceptions = IOException.class)
     public void gen_doc_rootdir() 
     throws IOException {
-    	DocManager dmgmt = new DocManager("/WillFail");
-    	
+        DocManager dmgmt = new DocManager("/WillFail");
+        
     }
 
 }

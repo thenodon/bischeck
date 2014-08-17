@@ -90,12 +90,12 @@ public class ServiceFactory {
         }
          
         @SuppressWarnings("rawtypes")
-		Class[] param = (Class[]) Array.newInstance(Class.class, 2);
+        Class[] param = (Class[]) Array.newInstance(Class.class, 2);
         param[0] = String.class;
         param[1] = Properties.class;
         
         @SuppressWarnings("rawtypes")
-		Constructor cons = null;
+        Constructor cons = null;
         try {
             cons = clazz.getConstructor(param);
         } catch (Exception e) {

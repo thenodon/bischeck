@@ -192,8 +192,8 @@ public class NRDPWorker implements WorkerInf, Runnable {
                               
                 InputStream is = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
                 if (LOGGER.isDebugEnabled()) {
-                	LOGGER.debug("NRDP return string - {}", convertStreamToString(is));
-                	is.reset();
+                    LOGGER.debug("NRDP return string - {}", convertStreamToString(is));
+                    is.reset();
                 }
                 
                 Document doc = null;
@@ -283,7 +283,7 @@ public class NRDPWorker implements WorkerInf, Runnable {
         return utfenc;
     }
 
-    static String convertStreamToString(java.io.InputStream is) {	
+    static String convertStreamToString(java.io.InputStream is) {   
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }

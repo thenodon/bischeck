@@ -42,221 +42,221 @@ import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 
 public class PredictiveTest {
 
-	ConfigurationManager confMgmr = null;
-	
-	String hostname = "pre-hos@t";
-	String qhostname = "pre-host";
-	String servicename = "preservice";
-	String serviceitemname = "predict/H";
-	String cachekey = Util.fullName(qhostname, servicename, serviceitemname);
+    ConfigurationManager confMgmr = null;
+    
+    String hostname = "pre-hos@t";
+    String qhostname = "pre-host";
+    String servicename = "preservice";
+    String serviceitemname = "predict/H";
+    String cachekey = Util.fullName(qhostname, servicename, serviceitemname);
 
 
-	@BeforeClass
-	public void beforeTest() throws Exception {
-		TestUtils.getConfigurationManager();
-		CacheFactory.init();
-	}
+    @BeforeClass
+    public void beforeTest() throws Exception {
+        TestUtils.getConfigurationManager();
+        CacheFactory.init();
+    }
 
 
-	@AfterClass
-	public void afterTest() throws CacheException {
-		CacheFactory.destroy();
-	}
-	
-	@Test (groups = { "JEP" })
-	public void verifyPredictive() throws ParseException {
+    @AfterClass
+    public void afterTest() throws CacheException {
+        CacheFactory.destroy();
+    }
+    
+    @Test (groups = { "JEP" })
+    public void verifyPredictive() throws ParseException {
 
-		//30 days back in time
-		long current = System.currentTimeMillis();
-		current -= (30L*24L*60L*60L*1000L);
-		System.out.println("Now is " + System.currentTimeMillis() +" Start is " + current);
-		System.out.println("Now is " + (new Date(System.currentTimeMillis())).toString() +" Start is " + (new Date(current)).toString());
-	
-		CacheInf cache = CacheFactory.getInstance();
-		cache.clear();
-		
-		for (int i = 1; i < 59; i++) {
-			LastStatus ls = null;
-			if(i%2 == 0) {
-				int newval = i - (i/2);
-				ls = new LastStatus(""+newval, (float) i,  current + 12*60*60*1000);
-			
-			} else {
-				int newval = i + (i/2);
-				ls = new LastStatus(""+newval, (float) i,  current + 12*60*60*1000);
-			}
-			System.out.println(PredictiveTest.class.getName()+">"+(new Date(ls.getTimestamp())).toString() +"> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
-			cache.add(ls, Util.fullName( hostname, servicename, serviceitemname));
-			current += 12L*60L*60L*1000L;
-		}
-	
-		
-		ExecuteJEP parser = new ExecuteJEP();        // Create a new parser
-		String expr = "ols(" + 
-				"\""+ hostname +"\"," + 
-				"\""+ servicename+"\"," +
-				"\""+ serviceitemname+"\"," +
-				"\"AVG\",\"D\",\"30\",\"END\")";
-			
-		
-		Float value = (Float) parser.execute(expr);
-		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull(value);
-		
-		expr = "ols(" + 
-				"\""+ hostname +"\"," + 
-				"\""+ servicename+"\"," +
-				"\""+ serviceitemname+"\"," +
-				"\"MIN\",\"D\",\"30\",\"END\")";
-				
-		
-		value = (Float) parser.execute(expr);
-		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull(value);
-		
-		expr = "ols(" + 
-				"\""+ hostname +"\"," + 
-				"\""+ servicename+"\"," +
-				"\""+ serviceitemname+"\"," +
-				"\"MAX\",\"D\",\"30\",\"END\")";
-				
-		
-		value = (Float) parser.execute(expr);
-		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull(value);
-		
-		expr = "ols(" + 
-				"\""+ hostname +"\"," + 
-				"\""+ servicename+"\"," +
-				"\""+ serviceitemname+"\"," +
-				"\"AVG\",\"D\",\"30\",\"-28D\")";
-				
-		
-		value = (Float) parser.execute(expr);
-		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull(value);
-		
-		expr = "ols(" + 
-				"\""+ hostname +"\"," + 
-				"\""+ servicename+"\"," +
-				"\""+ serviceitemname+"\"," +
-				"\"AVG\",\"D\",\"30\",\"-30D\")";
-				
-		
-		value = (Float) parser.execute(expr);
-		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull(value);
-		
-		expr = "ols(" + 
-				"\"hostname1\"," + 
-				"\"servicename1\"," +
-				"\"serviceitemname1\"," +
-				"\"AVG\",\"D\",\"30\",\"-30D\")";
-				
-		
-		value = (Float) parser.execute(expr);
-		System.out.println(expr + " -> " + value);
-		Assert.assertNull(value);
-		
-		expr = "ols(" + 
-				"\""+ hostname +"\"," + 
-				"\""+ servicename+"\"," +
-				"\""+ serviceitemname+"\"," +
-				"\"AVG\",\"D\",\"30\",\"END\") * 2";
-				
-		
-		value = (Float) parser.execute(expr);
-		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull(value);
-		
-		expr = "ols(" + 
-				"\""+ hostname +"\"," + 
-				"\""+ servicename+"\"," +
-				"\""+ serviceitemname+"\"," +
-				"\"MIN\",\"D\",\"30\",\"END\") * 2";
-				
-		value = (Float) parser.execute(expr);
-		System.out.println(expr + " -> " + value);
-		Assert.assertNotNull(value);
-		
-		expr = "ols(" + 
-				"\""+ hostname +"\"," + 
-				"\""+ servicename+"\"," +
-				"\""+ serviceitemname+"\"," +
-				"\"MAX\",\"D\",\"30\",\"END\") * 2";
-				
-		
-		value = parser.execute(expr);
-		System.out.println(expr + " -> " + value);				
-		Assert.assertNotNull(value);
-		
-		expr = "olss(" + 
-				"\""+ hostname +"\"," + 
-				"\""+ servicename+"\"," +
-				"\""+ serviceitemname+"\"," +
-				"\"AVG\",\"D\",\"END\")";
-				
-		
-		value = (Float) parser.execute(expr);
-		System.out.println(expr + " -> " + value);
-	
-	}
+        //30 days back in time
+        long current = System.currentTimeMillis();
+        current -= (30L*24L*60L*60L*1000L);
+        System.out.println("Now is " + System.currentTimeMillis() +" Start is " + current);
+        System.out.println("Now is " + (new Date(System.currentTimeMillis())).toString() +" Start is " + (new Date(current)).toString());
+    
+        CacheInf cache = CacheFactory.getInstance();
+        cache.clear();
+        
+        for (int i = 1; i < 59; i++) {
+            LastStatus ls = null;
+            if(i%2 == 0) {
+                int newval = i - (i/2);
+                ls = new LastStatus(""+newval, (float) i,  current + 12*60*60*1000);
+            
+            } else {
+                int newval = i + (i/2);
+                ls = new LastStatus(""+newval, (float) i,  current + 12*60*60*1000);
+            }
+            System.out.println(PredictiveTest.class.getName()+">"+(new Date(ls.getTimestamp())).toString() +"> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
+            cache.add(ls, Util.fullName( hostname, servicename, serviceitemname));
+            current += 12L*60L*60L*1000L;
+        }
+    
+        
+        ExecuteJEP parser = new ExecuteJEP();        // Create a new parser
+        String expr = "ols(" + 
+                "\""+ hostname +"\"," + 
+                "\""+ servicename+"\"," +
+                "\""+ serviceitemname+"\"," +
+                "\"AVG\",\"D\",\"30\",\"END\")";
+            
+        
+        Float value = (Float) parser.execute(expr);
+        System.out.println(expr + " -> " + value);
+        Assert.assertNotNull(value);
+        
+        expr = "ols(" + 
+                "\""+ hostname +"\"," + 
+                "\""+ servicename+"\"," +
+                "\""+ serviceitemname+"\"," +
+                "\"MIN\",\"D\",\"30\",\"END\")";
+                
+        
+        value = (Float) parser.execute(expr);
+        System.out.println(expr + " -> " + value);
+        Assert.assertNotNull(value);
+        
+        expr = "ols(" + 
+                "\""+ hostname +"\"," + 
+                "\""+ servicename+"\"," +
+                "\""+ serviceitemname+"\"," +
+                "\"MAX\",\"D\",\"30\",\"END\")";
+                
+        
+        value = (Float) parser.execute(expr);
+        System.out.println(expr + " -> " + value);
+        Assert.assertNotNull(value);
+        
+        expr = "ols(" + 
+                "\""+ hostname +"\"," + 
+                "\""+ servicename+"\"," +
+                "\""+ serviceitemname+"\"," +
+                "\"AVG\",\"D\",\"30\",\"-28D\")";
+                
+        
+        value = (Float) parser.execute(expr);
+        System.out.println(expr + " -> " + value);
+        Assert.assertNotNull(value);
+        
+        expr = "ols(" + 
+                "\""+ hostname +"\"," + 
+                "\""+ servicename+"\"," +
+                "\""+ serviceitemname+"\"," +
+                "\"AVG\",\"D\",\"30\",\"-30D\")";
+                
+        
+        value = (Float) parser.execute(expr);
+        System.out.println(expr + " -> " + value);
+        Assert.assertNotNull(value);
+        
+        expr = "ols(" + 
+                "\"hostname1\"," + 
+                "\"servicename1\"," +
+                "\"serviceitemname1\"," +
+                "\"AVG\",\"D\",\"30\",\"-30D\")";
+                
+        
+        value = (Float) parser.execute(expr);
+        System.out.println(expr + " -> " + value);
+        Assert.assertNull(value);
+        
+        expr = "ols(" + 
+                "\""+ hostname +"\"," + 
+                "\""+ servicename+"\"," +
+                "\""+ serviceitemname+"\"," +
+                "\"AVG\",\"D\",\"30\",\"END\") * 2";
+                
+        
+        value = (Float) parser.execute(expr);
+        System.out.println(expr + " -> " + value);
+        Assert.assertNotNull(value);
+        
+        expr = "ols(" + 
+                "\""+ hostname +"\"," + 
+                "\""+ servicename+"\"," +
+                "\""+ serviceitemname+"\"," +
+                "\"MIN\",\"D\",\"30\",\"END\") * 2";
+                
+        value = (Float) parser.execute(expr);
+        System.out.println(expr + " -> " + value);
+        Assert.assertNotNull(value);
+        
+        expr = "ols(" + 
+                "\""+ hostname +"\"," + 
+                "\""+ servicename+"\"," +
+                "\""+ serviceitemname+"\"," +
+                "\"MAX\",\"D\",\"30\",\"END\") * 2";
+                
+        
+        value = parser.execute(expr);
+        System.out.println(expr + " -> " + value);              
+        Assert.assertNotNull(value);
+        
+        expr = "olss(" + 
+                "\""+ hostname +"\"," + 
+                "\""+ servicename+"\"," +
+                "\""+ serviceitemname+"\"," +
+                "\"AVG\",\"D\",\"END\")";
+                
+        
+        value = (Float) parser.execute(expr);
+        System.out.println(expr + " -> " + value);
+    
+    }
 
-	
-	@Test (groups = { "JEP" })
-	public void verifyPredictiveNull() throws ParseException {
-	ExecuteJEP parser = new ExecuteJEP();        // Create a new parser
-		
-		String expr = "ols(" + 
-				"\"hostname\"," + 
-				"\"servicename\"," +
-				"\"serviceitemname\"," +
-				"\"AVG\",\"D\",\"30\",\"END\")";
-				
-		
-		Float value = (Float) parser.execute(expr);
-		Assert.assertNull(value);
-	
-	}
-	
-	
-	@Test (groups = { "JEP" })
-	public void verifyPredictiveSingle() throws ParseException {
-	ExecuteJEP parser = new ExecuteJEP();        // Create a new parser
-		
-	LastStatus ls = new LastStatus("1000", (float) 0,  System.currentTimeMillis());
-	CacheFactory.getInstance().add(ls, Util.fullName( "hostname", "servicename", "serviceitemname"));
-	
-		String expr = "ols(" + 
-				"\"hostname\"," + 
-				"\"servicename\"," +
-				"\"serviceitemname\"," +
-				"\"AVG\",\"D\",\"30\",\"END\")";
-				
-		
-		Float value = (Float) parser.execute(expr);
-		Assert.assertNull((Float)value);
-	
-	}
-	
-	@Test (groups = { "JEP" })
-	public void verifyPredictiveExceptions() throws ParseException {
-	ExecuteJEP parser = new ExecuteJEP();        // Create a new parser
-		
-	LastStatus ls = new LastStatus("1000", (float) 0,  System.currentTimeMillis());
-	CacheFactory.getInstance().add(ls, Util.fullName( "hostname", "servicename", "serviceitemname"));
-	
-		String expr = "ols(" + 
-				"\"hostname\"," + 
-				"\"servicename\"," +
-				"\"serviceitemname\"," +
-				"\"AVG\",\"D\",\"-30\",\"END\")";
-				
-		
-		Float value = null;
-		value = (Float) parser.execute(expr);
-		Assert.assertNull(value);
-		
-	}
-	
+    
+    @Test (groups = { "JEP" })
+    public void verifyPredictiveNull() throws ParseException {
+    ExecuteJEP parser = new ExecuteJEP();        // Create a new parser
+        
+        String expr = "ols(" + 
+                "\"hostname\"," + 
+                "\"servicename\"," +
+                "\"serviceitemname\"," +
+                "\"AVG\",\"D\",\"30\",\"END\")";
+                
+        
+        Float value = (Float) parser.execute(expr);
+        Assert.assertNull(value);
+    
+    }
+    
+    
+    @Test (groups = { "JEP" })
+    public void verifyPredictiveSingle() throws ParseException {
+    ExecuteJEP parser = new ExecuteJEP();        // Create a new parser
+        
+    LastStatus ls = new LastStatus("1000", (float) 0,  System.currentTimeMillis());
+    CacheFactory.getInstance().add(ls, Util.fullName( "hostname", "servicename", "serviceitemname"));
+    
+        String expr = "ols(" + 
+                "\"hostname\"," + 
+                "\"servicename\"," +
+                "\"serviceitemname\"," +
+                "\"AVG\",\"D\",\"30\",\"END\")";
+                
+        
+        Float value = (Float) parser.execute(expr);
+        Assert.assertNull((Float)value);
+    
+    }
+    
+    @Test (groups = { "JEP" })
+    public void verifyPredictiveExceptions() throws ParseException {
+    ExecuteJEP parser = new ExecuteJEP();        // Create a new parser
+        
+    LastStatus ls = new LastStatus("1000", (float) 0,  System.currentTimeMillis());
+    CacheFactory.getInstance().add(ls, Util.fullName( "hostname", "servicename", "serviceitemname"));
+    
+        String expr = "ols(" + 
+                "\"hostname\"," + 
+                "\"servicename\"," +
+                "\"serviceitemname\"," +
+                "\"AVG\",\"D\",\"-30\",\"END\")";
+                
+        
+        Float value = null;
+        value = (Float) parser.execute(expr);
+        Assert.assertNull(value);
+        
+    }
+    
 }

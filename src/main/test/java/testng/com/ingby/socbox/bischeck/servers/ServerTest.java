@@ -26,74 +26,74 @@ import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 
 public class ServerTest {
 
-	private ConfigurationManager confMgmr;
-	private ServerMessageExecutor serverexecutor;
-	private Properties url2service;
-	
-	@BeforeClass
-	public void beforeTest() throws Exception {
-		confMgmr = TestUtils.getConfigurationManager();    
-		CacheFactory.init();
-		//CacheInf cache = CacheFactory.getInstance();
-		
-		url2service = confMgmr.getURL2Service();
-		serverexecutor = ServerMessageExecutor.getInstance();
-		
-	}
+    private ConfigurationManager confMgmr;
+    private ServerMessageExecutor serverexecutor;
+    private Properties url2service;
+    
+    @BeforeClass
+    public void beforeTest() throws Exception {
+        confMgmr = TestUtils.getConfigurationManager();    
+        CacheFactory.init();
+        //CacheInf cache = CacheFactory.getInstance();
+        
+        url2service = confMgmr.getURL2Service();
+        serverexecutor = ServerMessageExecutor.getInstance();
+        
+    }
 
-	@Test (groups = { "Server" } )
-	public void initServers()  {
+    @Test (groups = { "Server" } )
+    public void initServers()  {
 
-		Assert.assertNotEquals(serverexecutor, null);
-	}
-	
-	@Test (groups = { "Server" } )
-	public void execute() throws ServiceFactoryException, ServiceItemFactoryException, ThresholdException, ServiceException, ServiceItemException {
-		Service service = null;
-		
-		Assert.assertNotEquals(serverexecutor, null);
-		
-		
-		service = ServiceFactory.createService("myShell","shell://localhost",
-				url2service, new Properties());
-		
-		service.setConnectionUrl("shell://localhost");
-		Assert.assertEquals(service.getClass().getName(), "com.ingby.socbox.bischeck.service.ShellService");
-		
-		Assert.assertEquals(service.getServiceName(), "myShell");
-		
-		ServiceItem	serviceItem = ServiceItemFactory.createServiceItem("myShellItem", "CheckCommandServiceItem");
+        Assert.assertNotEquals(serverexecutor, null);
+    }
+    
+    @Test (groups = { "Server" } )
+    public void execute() throws ServiceFactoryException, ServiceItemFactoryException, ThresholdException, ServiceException, ServiceItemException {
+        Service service = null;
+        
+        Assert.assertNotEquals(serverexecutor, null);
+        
+        
+        service = ServiceFactory.createService("myShell","shell://localhost",
+                url2service, new Properties());
+        
+        service.setConnectionUrl("shell://localhost");
+        Assert.assertEquals(service.getClass().getName(), "com.ingby.socbox.bischeck.service.ShellService");
+        
+        Assert.assertEquals(service.getServiceName(), "myShell");
+        
+        ServiceItem serviceItem = ServiceItemFactory.createServiceItem("myShellItem", "CheckCommandServiceItem");
 
-		serviceItem.setService(service);
-		serviceItem.setExecution("{\"check\":\"echo Ok\\|time=10;;;;\",\"label\":\"time\"}");
-		
-		
-		Assert.assertEquals(service.getConnectionUrl(), "shell://localhost");
-		service.addServiceItem(serviceItem);
-		
-		Host host = new Host("myhost");
-		
-		host.addService(service);
-		service.setHost(host);
-
-
-		serviceItem.setThreshold(ThresholdFactory.getCurrent(service, serviceItem));
+        serviceItem.setService(service);
+        serviceItem.setExecution("{\"check\":\"echo Ok\\|time=10;;;;\",\"label\":\"time\"}");
+        
+        
+        Assert.assertEquals(service.getConnectionUrl(), "shell://localhost");
+        service.addServiceItem(serviceItem);
+        
+        Host host = new Host("myhost");
+        
+        host.addService(service);
+        service.setHost(host);
 
 
-		service.openConnection();
-		serviceItem.execute();
-		serviceItem.setExecutionTime(100L);
-		service.closeConnection();
+        serviceItem.setThreshold(ThresholdFactory.getCurrent(service, serviceItem));
 
-		serverexecutor.publishServer(service);
 
-		
-	}
-	
-	@AfterClass
-	public void unregisterServers()  {
+        service.openConnection();
+        serviceItem.execute();
+        serviceItem.setExecutionTime(100L);
+        service.closeConnection();
 
-		serverexecutor.unregisterAll();
-	}
-	
+        serverexecutor.publishServer(service);
+
+        
+    }
+    
+    @AfterClass
+    public void unregisterServers()  {
+
+        serverexecutor.unregisterAll();
+    }
+    
 }

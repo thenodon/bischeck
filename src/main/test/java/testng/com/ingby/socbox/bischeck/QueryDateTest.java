@@ -30,34 +30,34 @@ import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.QueryDate;
 
 public class QueryDateTest {
-	
-	
-	
-	@BeforeTest
+    
+    
+    
+    @BeforeTest
     public void beforeTest() throws Exception {
-		TestUtils.getConfigurationManager();    
+        TestUtils.getConfigurationManager();    
     }
     
     @Test (groups = { "QueryDate" })
     public void verifyQueryDate() {
-    	
-    	
-    	String parseit = "select val1 from where formdate='%%yyyy-MM-dd%[M-1]%%' and todate='%%yy.MM.dd%[D2]%%';";
-    	System.out.println(parseit);
-    	String parsed = QueryDate.parse(parseit);
-    	System.out.println(parsed);
-    	
-    	Calendar now = null;
-        now = BisCalendar.getInstance();	
-        	 
-    	now.add(Calendar.MONTH,-1);
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        
+        
+        String parseit = "select val1 from where formdate='%%yyyy-MM-dd%[M-1]%%' and todate='%%yy.MM.dd%[D2]%%';";
+        System.out.println(parseit);
+        String parsed = QueryDate.parse(parseit);
+        System.out.println(parsed);
+        
+        Calendar now = null;
+        now = BisCalendar.getInstance();    
+             
+        now.add(Calendar.MONTH,-1);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date1 = sdf.format(now.getTime());
         
-        now = BisCalendar.getInstance();	
+        now = BisCalendar.getInstance();    
         
         now.add(Calendar.DAY_OF_MONTH,2);
-    	sdf = new SimpleDateFormat("yy.MM.dd");
+        sdf = new SimpleDateFormat("yy.MM.dd");
         String date2 = sdf.format(now.getTime());
         
         Assert.assertEquals(parsed,"select val1 from where formdate='"+date1 +"' and todate='"+date2+"';");

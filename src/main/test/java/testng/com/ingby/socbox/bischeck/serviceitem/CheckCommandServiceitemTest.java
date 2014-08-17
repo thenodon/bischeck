@@ -41,57 +41,57 @@ public class CheckCommandServiceitemTest {
 
 
 
-	private CacheInf cache;
-	private Service shell;
-	@BeforeClass
-	public void beforeTest() throws Exception {
+    private CacheInf cache;
+    private Service shell;
+    @BeforeClass
+    public void beforeTest() throws Exception {
 
-		TestUtils.getConfigurationManager();
-		
-		shell = new ShellService("serviceName",null);
+        TestUtils.getConfigurationManager();
+        
+        shell = new ShellService("serviceName",null);
 
-		CacheFactory.init();
-		
-		cache = CacheFactory.getInstance();		
+        CacheFactory.init();
+        
+        cache = CacheFactory.getInstance();     
 
-		cache.clear();
-	}
+        cache.clear();
+    }
 
-	@AfterClass
-	public void afterTest() throws CacheException {
-		
-		CacheFactory.destroy();
-	}
+    @AfterClass
+    public void afterTest() throws CacheException {
+        
+        CacheFactory.destroy();
+    }
 
-	@Test (groups = { "ServiceItem" })
-	public void verifyService() throws ServiceException, ServiceItemException  {
-		ServiceItem checkcommand = new CheckCommandServiceItem("serviceItemName");
-		checkcommand.setService(shell);
-		
-		
-		
-		checkcommand.setExecution("{\"check\":"+
-				"\"echo Ok\\|rta=0.1;;;;\","+
-				"\"label\":"+ 
-		"\"rta\"}");
+    @Test (groups = { "ServiceItem" })
+    public void verifyService() throws ServiceException, ServiceItemException  {
+        ServiceItem checkcommand = new CheckCommandServiceItem("serviceItemName");
+        checkcommand.setService(shell);
+        
+        
+        
+        checkcommand.setExecution("{\"check\":"+
+                "\"echo Ok\\|rta=0.1;;;;\","+
+                "\"label\":"+ 
+        "\"rta\"}");
 
-		checkcommand.execute();
-		
-		System.out.println("Return value:" + checkcommand.getLatestExecuted());
-		Assert.assertNotNull(checkcommand.getLatestExecuted());
-		checkcommand.setExecution("{\"check\":"+
-				"\"echo Ok\\|time=0.1;;;;\","+
-				"\"label\":"+ 
-		"\"time\"}");
+        checkcommand.execute();
+        
+        System.out.println("Return value:" + checkcommand.getLatestExecuted());
+        Assert.assertNotNull(checkcommand.getLatestExecuted());
+        checkcommand.setExecution("{\"check\":"+
+                "\"echo Ok\\|time=0.1;;;;\","+
+                "\"label\":"+ 
+        "\"time\"}");
 
-		try {
-			checkcommand.execute();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Return value:" + checkcommand.getLatestExecuted());
-		Assert.assertNotNull(checkcommand.getLatestExecuted());
-	}
+        try {
+            checkcommand.execute();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        System.out.println("Return value:" + checkcommand.getLatestExecuted());
+        Assert.assertNotNull(checkcommand.getLatestExecuted());
+    }
 
 }

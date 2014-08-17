@@ -43,49 +43,49 @@ import com.ingby.socbox.bischeck.service.ServiceException;
 
 public class CheckCommandServiceItem extends ServiceItemAbstract implements ServiceItem {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(CheckCommandServiceItem.class);
-	
-	
-	public CheckCommandServiceItem(String name) {
-		this.serviceItemName = name;        
-	}
+    private final static Logger LOGGER = LoggerFactory.getLogger(CheckCommandServiceItem.class);
+    
+    
+    public CheckCommandServiceItem(String name) {
+        this.serviceItemName = name;        
+    }
 
 
-	@Override
-	public void execute() throws ServiceException, ServiceItemException {
-		/*
-		 * Check the operation type - status
-		 *  
-		 */
+    @Override
+    public void execute() throws ServiceException, ServiceItemException {
+        /*
+         * Check the operation type - status
+         *  
+         */
 
-		JSONObject jsonStatement = JSONObject.fromObject(this.getExecution());
-		if (!validateExecStatement(jsonStatement)) {
-			LOGGER.warn("Not a valid check operation {}", jsonStatement.toString());
-    		ServiceItemException si = new ServiceItemException(new IllegalArgumentException("Not a valid check operation " + jsonStatement.toString()));
-    		si.setServiceItemName(this.serviceItemName);
-    		throw si;
-		}
+        JSONObject jsonStatement = JSONObject.fromObject(this.getExecution());
+        if (!validateExecStatement(jsonStatement)) {
+            LOGGER.warn("Not a valid check operation {}", jsonStatement.toString());
+            ServiceItemException si = new ServiceItemException(new IllegalArgumentException("Not a valid check operation " + jsonStatement.toString()));
+            si.setServiceItemName(this.serviceItemName);
+            throw si;
+        }
 
-		String checkcommand = jsonStatement.getString("check");
+        String checkcommand = jsonStatement.getString("check");
 
-		// Execute the check_command
-		String checkres =  service.executeStmt(checkcommand);
+        // Execute the check_command
+        String checkres =  service.executeStmt(checkcommand);
 
-		String checkvalue = QueryNagiosPerfData.parseByLabel(jsonStatement.getString("label"), checkres);
-		setLatestExecuted(checkvalue);    
-	}
+        String checkvalue = QueryNagiosPerfData.parseByLabel(jsonStatement.getString("label"), checkres);
+        setLatestExecuted(checkvalue);    
+    }
 
-	private boolean validateExecStatement(final JSONObject jsonStatement) {
+    private boolean validateExecStatement(final JSONObject jsonStatement) {
 
-		if (!jsonStatement.containsKey("check")) {
-			return false;
-		}
+        if (!jsonStatement.containsKey("check")) {
+            return false;
+        }
 
-		if (!jsonStatement.containsKey("label")) {
-			return false; 
-		}
+        if (!jsonStatement.containsKey("label")) {
+            return false; 
+        }
 
-		return true;
-	}
+        return true;
+    }
 
 }

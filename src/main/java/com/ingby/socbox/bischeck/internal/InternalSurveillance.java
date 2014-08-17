@@ -57,169 +57,169 @@ import com.yammer.metrics.core.Timer;
  * 
  */
 public class InternalSurveillance implements Job {
-	private final static Logger  LOGGER = LoggerFactory.getLogger(InternalSurveillance.class);
-	private final OperatingSystemMXBean osMxBean = ManagementFactory.getOperatingSystemMXBean();
-	private final RuntimeMXBean rtMxBean = ManagementFactory.getRuntimeMXBean();
-	
-	private static String bischeckHostName;
+    private final static Logger  LOGGER = LoggerFactory.getLogger(InternalSurveillance.class);
+    private final OperatingSystemMXBean osMxBean = ManagementFactory.getOperatingSystemMXBean();
+    private final RuntimeMXBean rtMxBean = ManagementFactory.getRuntimeMXBean();
+    
+    private static String bischeckHostName;
 
-	/**
-	 * Initiate a quartz job to periodical send internal bischeck performance 
-	 * data to Nagios
-	 */
-	public static void init() throws SchedulerException, ParseException {
+    /**
+     * Initiate a quartz job to periodical send internal bischeck performance 
+     * data to Nagios
+     */
+    public static void init() throws SchedulerException, ParseException {
 
-		bischeckHostName = ConfigurationManager.getInstance().getProperties().getProperty("bischeckHostName","bischeck");
-		boolean sendInternal= Boolean.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("sendInternal","false"));
-		String sendInternalInterval= ConfigurationManager.getInstance().getProperties().getProperty("sendInternalInterval","0 */5 * * * ? *");
-		if (!CronExpression.isValidExpression(sendInternalInterval)) {
-			sendInternalInterval= "0 */5 * * * ? *";
-		}
-		
-		if (sendInternal) {
-			Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
-			if (!sched.isStarted()) {
-				sched.start();
-			}
-			
-			JobDetail job = newJob(InternalSurveillance.class).
-					withIdentity("Internal", "Internal").
-					withDescription("Internal").    
-					build();
-
-
-			// Every day at 10 sec past midnight
-			CronTrigger trigger = newTrigger()
-					.withIdentity("InternalTrigger", "Internal")
-					.withSchedule(cronSchedule(sendInternalInterval))
-					.forJob("Internal", "Internal")
-					.build();
-
-			// If job exists delete and add
-			if (sched.getJobDetail(job.getKey()) != null) {
-				sched.deleteJob(job.getKey());
-			}
-			
-			Date ft = sched.scheduleJob(job, trigger);
-
-			sched.addJob(job, true);
-
-			LOGGER.info("{} has been scheduled to run at: {} and repeat based on expression: {}",
-					job.getDescription(), ft, trigger.getCronExpression());
-		} else {
-			LOGGER.info("Internal bischeck monitoring disabled");
-		}
-	}
-
-	/**
-	 * Retrieve metrics timers and create a nagios performance data string
-	 * for execution timers mean value.
-	 * @return the performance data string
-	 */
-	public String executeTimers() {
-		
-		StringBuilder strbuf = new StringBuilder();
-
-		MetricPredicate predicate =MetricPredicate.ALL;
-		for (Entry<String, SortedMap<MetricName, Metric>> entry : getMetricsRegistry().getGroupedMetrics(
-				predicate ).entrySet()) {
-
-			for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
-				Timer timer = ((Timer) subEntry.getValue());
-
-				if (!entry.getKey().matches("com.ingby.socbox.bischeck.servers")) {
-					strbuf.append(trim(entry.getKey()));
-					strbuf.append("_");      
-					strbuf.append(subEntry.getKey().getName());
-					strbuf.append("=");    
-					strbuf.append(Util.roundDecimals((float)timer.getMean()));
-					strbuf.append("ms;;;; ");
-				}
-			}
-			strbuf.append(" ");
-		}
-		
-		LOGGER.debug("Timers: {}", strbuf.toString());
-		
-		return strbuf.toString();
-	}
+        bischeckHostName = ConfigurationManager.getInstance().getProperties().getProperty("bischeckHostName","bischeck");
+        boolean sendInternal= Boolean.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("sendInternal","false"));
+        String sendInternalInterval= ConfigurationManager.getInstance().getProperties().getProperty("sendInternalInterval","0 */5 * * * ? *");
+        if (!CronExpression.isValidExpression(sendInternalInterval)) {
+            sendInternalInterval= "0 */5 * * * ? *";
+        }
+        
+        if (sendInternal) {
+            Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
+            if (!sched.isStarted()) {
+                sched.start();
+            }
+            
+            JobDetail job = newJob(InternalSurveillance.class).
+                    withIdentity("Internal", "Internal").
+                    withDescription("Internal").    
+                    build();
 
 
-	/**
-	 * Retrieve metrics timers and create a nagios performance data string
-	 * for transaction rate
-	 * @return the performance data string
-	 */
-	public String tpsTimers() {
+            // Every day at 10 sec past midnight
+            CronTrigger trigger = newTrigger()
+                    .withIdentity("InternalTrigger", "Internal")
+                    .withSchedule(cronSchedule(sendInternalInterval))
+                    .forJob("Internal", "Internal")
+                    .build();
 
-		StringBuilder strbuf = new StringBuilder();
+            // If job exists delete and add
+            if (sched.getJobDetail(job.getKey()) != null) {
+                sched.deleteJob(job.getKey());
+            }
+            
+            Date ft = sched.scheduleJob(job, trigger);
 
+            sched.addJob(job, true);
 
-		MetricPredicate predicate =MetricPredicate.ALL;
-		for (Entry<String, SortedMap<MetricName, Metric>> entry : getMetricsRegistry().getGroupedMetrics(
-				predicate ).entrySet()) {
+            LOGGER.info("{} has been scheduled to run at: {} and repeat based on expression: {}",
+                    job.getDescription(), ft, trigger.getCronExpression());
+        } else {
+            LOGGER.info("Internal bischeck monitoring disabled");
+        }
+    }
 
+    /**
+     * Retrieve metrics timers and create a nagios performance data string
+     * for execution timers mean value.
+     * @return the performance data string
+     */
+    public String executeTimers() {
+        
+        StringBuilder strbuf = new StringBuilder();
 
-			for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
-				Timer timer = ((Timer) subEntry.getValue());
+        MetricPredicate predicate =MetricPredicate.ALL;
+        for (Entry<String, SortedMap<MetricName, Metric>> entry : getMetricsRegistry().getGroupedMetrics(
+                predicate ).entrySet()) {
 
-				if (!entry.getKey().matches("com.ingby.socbox.bischeck.servers")) {
-					strbuf.append(trim(entry.getKey()));
-					strbuf.append("_");      
-					strbuf.append(subEntry.getKey().getName());
-					strbuf.append("=");    
+            for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
+                Timer timer = ((Timer) subEntry.getValue());
 
-					strbuf.append(Util.roundDecimals((float) timer.getMeanRate()));
-					strbuf.append(";;;; ");
-				}
-			}
-			strbuf.append(" ");
-		}
-		
-		LOGGER.debug("TPS: {}", strbuf.toString());
-		
-		return strbuf.toString();
-	}
-
-	
-	public String jvm() {
-	
-		
-		double loadAvg = osMxBean.getSystemLoadAverage();
-		long uptime = rtMxBean == null ? 1 : rtMxBean.getUptime();
-		
-		StringBuilder strbuf = new StringBuilder();
-		strbuf.append("Uptime=");    
-		strbuf.append(uptime);
-		strbuf.append(";;;; ");
-		strbuf.append("LoadAvg=");    
-		strbuf.append(loadAvg);
-		strbuf.append(";;;;");
-
-		LOGGER.debug("JVM: {}", strbuf.toString());
-		
-		return strbuf.toString();
-	}
-	
-	
-	private String trim(String key) {
-		int lastdot = key.lastIndexOf('.');
-		String trimed = key.substring(lastdot+1);
-		return trimed;
-	}
+                if (!entry.getKey().matches("com.ingby.socbox.bischeck.servers")) {
+                    strbuf.append(trim(entry.getKey()));
+                    strbuf.append("_");      
+                    strbuf.append(subEntry.getKey().getName());
+                    strbuf.append("=");    
+                    strbuf.append(Util.roundDecimals((float)timer.getMean()));
+                    strbuf.append("ms;;;; ");
+                }
+            }
+            strbuf.append(" ");
+        }
+        
+        LOGGER.debug("Timers: {}", strbuf.toString());
+        
+        return strbuf.toString();
+    }
 
 
-	private MetricsRegistry getMetricsRegistry() {
-		MetricsRegistry metricsMap = Metrics.defaultRegistry();
-		
-		return metricsMap;
-	}
+    /**
+     * Retrieve metrics timers and create a nagios performance data string
+     * for transaction rate
+     * @return the performance data string
+     */
+    public String tpsTimers() {
 
-	@Override
-	public void execute(JobExecutionContext arg0) throws JobExecutionException {
-		ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-timers", NAGIOSSTAT.OK, this.executeTimers());
-		ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-tps", NAGIOSSTAT.OK, this.tpsTimers());
-		ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-jvm", NAGIOSSTAT.OK, this.jvm());
-	}
+        StringBuilder strbuf = new StringBuilder();
+
+
+        MetricPredicate predicate =MetricPredicate.ALL;
+        for (Entry<String, SortedMap<MetricName, Metric>> entry : getMetricsRegistry().getGroupedMetrics(
+                predicate ).entrySet()) {
+
+
+            for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
+                Timer timer = ((Timer) subEntry.getValue());
+
+                if (!entry.getKey().matches("com.ingby.socbox.bischeck.servers")) {
+                    strbuf.append(trim(entry.getKey()));
+                    strbuf.append("_");      
+                    strbuf.append(subEntry.getKey().getName());
+                    strbuf.append("=");    
+
+                    strbuf.append(Util.roundDecimals((float) timer.getMeanRate()));
+                    strbuf.append(";;;; ");
+                }
+            }
+            strbuf.append(" ");
+        }
+        
+        LOGGER.debug("TPS: {}", strbuf.toString());
+        
+        return strbuf.toString();
+    }
+
+    
+    public String jvm() {
+    
+        
+        double loadAvg = osMxBean.getSystemLoadAverage();
+        long uptime = rtMxBean == null ? 1 : rtMxBean.getUptime();
+        
+        StringBuilder strbuf = new StringBuilder();
+        strbuf.append("Uptime=");    
+        strbuf.append(uptime);
+        strbuf.append(";;;; ");
+        strbuf.append("LoadAvg=");    
+        strbuf.append(loadAvg);
+        strbuf.append(";;;;");
+
+        LOGGER.debug("JVM: {}", strbuf.toString());
+        
+        return strbuf.toString();
+    }
+    
+    
+    private String trim(String key) {
+        int lastdot = key.lastIndexOf('.');
+        String trimed = key.substring(lastdot+1);
+        return trimed;
+    }
+
+
+    private MetricsRegistry getMetricsRegistry() {
+        MetricsRegistry metricsMap = Metrics.defaultRegistry();
+        
+        return metricsMap;
+    }
+
+    @Override
+    public void execute(JobExecutionContext arg0) throws JobExecutionException {
+        ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-timers", NAGIOSSTAT.OK, this.executeTimers());
+        ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-tps", NAGIOSSTAT.OK, this.tpsTimers());
+        ServerMessageExecutor.getInstance().executeInternal(bischeckHostName,"bischeck-jvm", NAGIOSSTAT.OK, this.jvm());
+    }
 
 }

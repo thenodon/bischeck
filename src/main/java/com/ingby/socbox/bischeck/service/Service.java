@@ -223,7 +223,7 @@ public interface Service {
     String getAlias();
 
 
-	void setAlias(String alias);
+    void setAlias(String alias);
 
-	public Map<String, String> getNotificationData();
+    public Map<String, String> getNotificationData();
 }

@@ -53,8 +53,8 @@ import com.ingby.socbox.bischeck.service.Service;
 
 public final class NRDPServer implements Server, MessageServerInf {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(NRDPServer.class);
-	private final String instanceName;
+    private final static Logger LOGGER = LoggerFactory.getLogger(NRDPServer.class);
+    private final String instanceName;
     private final ServerCircuitBreak circuitBreak;
     
     private final int MAX_QUEUE = 10;
@@ -63,54 +63,54 @@ public final class NRDPServer implements Server, MessageServerInf {
     private ExecutorService execService;
 
     
-	private static Map<String,NRDPServer> servers = new HashMap<String, NRDPServer>();
+    private static Map<String,NRDPServer> servers = new HashMap<String, NRDPServer>();
 
-	private final String urlstr;
-	private final String cmd;
-	private final Integer connectionTimeout;
-	
-	private NRDPServer(String name) {
-		Properties defaultproperties = getServerProperties();
-		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
-		String hostAddress = prop.getProperty("hostAddress",
-				defaultproperties.getProperty("hostAddress"));
+    private final String urlstr;
+    private final String cmd;
+    private final Integer connectionTimeout;
+    
+    private NRDPServer(String name) {
+        Properties defaultproperties = getServerProperties();
+        Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+        String hostAddress = prop.getProperty("hostAddress",
+                defaultproperties.getProperty("hostAddress"));
 
-		Integer port = Integer.parseInt(prop.getProperty("port", 
-				defaultproperties.getProperty("port")));
+        Integer port = Integer.parseInt(prop.getProperty("port", 
+                defaultproperties.getProperty("port")));
 
-		String password = prop.getProperty("password",
-				defaultproperties.getProperty("password"));
+        String password = prop.getProperty("password",
+                defaultproperties.getProperty("password"));
 
-		String path = prop.getProperty("path",
-				defaultproperties.getProperty("path"));
+        String path = prop.getProperty("path",
+                defaultproperties.getProperty("path"));
 
-		Boolean ssl = Boolean.valueOf(prop.getProperty("ssl",
-				defaultproperties.getProperty("ssl")));
+        Boolean ssl = Boolean.valueOf(prop.getProperty("ssl",
+                defaultproperties.getProperty("ssl")));
 
-		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
-				defaultproperties.getProperty("connectionTimeout")));
-		
-		String protocol = "http://";
-		if (ssl) {
-			protocol = "https://";
-		}
-		
-		urlstr = protocol + hostAddress + ":" + port + "/" + path +"/";
-		cmd="token="+password+"&cmd=submitcheck&XMLDATA=";
-		
-		instanceName=name;
+        connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
+                defaultproperties.getProperty("connectionTimeout")));
+        
+        String protocol = "http://";
+        if (ssl) {
+            protocol = "https://";
+        }
+        
+        urlstr = protocol + hostAddress + ":" + port + "/" + path +"/";
+        cmd="token="+password+"&cmd=submitcheck&XMLDATA=";
+        
+        instanceName=name;
 
         subTaskQueue = new LinkedBlockingQueue<Service>();
         execService = Executors.newCachedThreadPool();
 
-		circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
-	    execService.execute(new NRDPWorker(instanceName, subTaskQueue, circuitBreak, urlstr, cmd, connectionTimeout));
+        circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
+        execService.execute(new NRDPWorker(instanceName, subTaskQueue, circuitBreak, urlstr, cmd, connectionTimeout));
 
-		        
-	}
+                
+    }
 
-	
-	/**
+    
+    /**
      * Retrieve the Server object. The method is invoked from class ServerExecutor
      * execute method. The created Server object is placed in the class internal 
      * Server object list.
@@ -118,21 +118,21 @@ public final class NRDPServer implements Server, MessageServerInf {
      * {@code &lt;server name="my"&gt;}
      * @return Server object
      */
-	synchronized public static Server getInstance(String name) {
-		
-		if (!servers.containsKey(name) ) {
-			servers.put(name,new NRDPServer(name));
-		}
-		return servers.get(name);
-	}
-
-	
-	@Override
-    public String getInstanceName() {
-    	return instanceName;
+    synchronized public static Server getInstance(String name) {
+        
+        if (!servers.containsKey(name) ) {
+            servers.put(name,new NRDPServer(name));
+        }
+        return servers.get(name);
     }
-	
-	/**
+
+    
+    @Override
+    public String getInstanceName() {
+        return instanceName;
+    }
+    
+    /**
      * Unregister the server and its configuration
      * @param name of the server instance
      */
@@ -166,14 +166,14 @@ public final class NRDPServer implements Server, MessageServerInf {
         // Todo check the behavior at reload
 //        circuitBreak = null;
     }
-	
     
-	@Override
-	public void send(Service service) {
-	    /*
-	     * Use the Worker send instead
-	     */
-	}
+    
+    @Override
+    public void send(Service service) {
+        /*
+         * Use the Worker send instead
+         */
+    }
 
 
     public static Properties getServerProperties() {
@@ -189,17 +189,17 @@ public final class NRDPServer implements Server, MessageServerInf {
         return defaultproperties;
     }
 
-	@Override
-	public void onMessage(Service message) {
-	    subTaskQueue.offer(message);
+    @Override
+    public void onMessage(Service message) {
+        subTaskQueue.offer(message);
 
-	    LOGGER.debug("{} - Worker pool size {} and queue size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize(),subTaskQueue.size());
+        LOGGER.debug("{} - Worker pool size {} and queue size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize(),subTaskQueue.size());
 
-	    /* If the queue is larger then 10 start new workers */
-	    if (subTaskQueue.size() > MAX_QUEUE) {
-	        execService.execute(new NRDPWorker(instanceName, subTaskQueue, circuitBreak, urlstr, cmd, connectionTimeout));
-	        LOGGER.info("{} - Increase worker pool size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize());
-	    }
-	}
-		
+        /* If the queue is larger then 10 start new workers */
+        if (subTaskQueue.size() > MAX_QUEUE) {
+            execService.execute(new NRDPWorker(instanceName, subTaskQueue, circuitBreak, urlstr, cmd, connectionTimeout));
+            LOGGER.info("{} - Increase worker pool size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize());
+        }
+    }
+        
 }

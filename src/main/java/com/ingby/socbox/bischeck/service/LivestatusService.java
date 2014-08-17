@@ -49,54 +49,54 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
         this.serviceName = serviceName;
         
         if (bischeckProperties != null) {
-        	try {
-        		querytimeout = Integer.parseInt(bischeckProperties.getProperty("LiveStatusService.querytimeout","10000"));
-        	} catch (NumberFormatException ne) {
-        		LOGGER.error("Property LiveStatusService.querytimeout is not set correct to an integer: {}",
-        				bischeckProperties.getProperty("LiveStatusService.querytimeout"));
-        	}
+            try {
+                querytimeout = Integer.parseInt(bischeckProperties.getProperty("LiveStatusService.querytimeout","10000"));
+            } catch (NumberFormatException ne) {
+                LOGGER.error("Property LiveStatusService.querytimeout is not set correct to an integer: {}",
+                        bischeckProperties.getProperty("LiveStatusService.querytimeout"));
+            }
         }
     }
 
     
     @Override
     public void openConnection() throws ServiceException {
-    	super.openConnection();
-    	
-    	URI uri = null;
-    	try {   
-    		uri = new URI(this.getConnectionUrl());
-    		clientSocket = new Socket(uri.getHost(), uri.getPort());
-    		clientSocket.setSoTimeout(querytimeout);
-    	} catch (IOException ioe) {
-    		setConnectionEstablished(false);
-    		LOGGER.warn("Open connection failed ", ioe);
-    		
-    		try {
-    			if (clientSocket != null) {
-    				clientSocket.close();
-    			}
-    		} catch (IOException ignore) {}
-    		
-    		ServiceException se = new ServiceException(ioe);
-    		se.setServiceName(this.serviceName);
-    		throw se;
-    	} catch (URISyntaxException use) {
-    		LOGGER.warn("Uri syntax is faulty",use);
-    		ServiceException se = new ServiceException(use);
-    		se.setServiceName(this.serviceName);
-    		throw se;
-    	}
-    	setConnectionEstablished(true);
-    	LOGGER.debug("Connected to {}", uri.toString());
+        super.openConnection();
+        
+        URI uri = null;
+        try {   
+            uri = new URI(this.getConnectionUrl());
+            clientSocket = new Socket(uri.getHost(), uri.getPort());
+            clientSocket.setSoTimeout(querytimeout);
+        } catch (IOException ioe) {
+            setConnectionEstablished(false);
+            LOGGER.warn("Open connection failed ", ioe);
+            
+            try {
+                if (clientSocket != null) {
+                    clientSocket.close();
+                }
+            } catch (IOException ignore) {}
+            
+            ServiceException se = new ServiceException(ioe);
+            se.setServiceName(this.serviceName);
+            throw se;
+        } catch (URISyntaxException use) {
+            LOGGER.warn("Uri syntax is faulty",use);
+            ServiceException se = new ServiceException(use);
+            se.setServiceName(this.serviceName);
+            throw se;
+        }
+        setConnectionEstablished(true);
+        LOGGER.debug("Connected to {}", uri.toString());
     }
     
     @Override
     public void closeConnection() throws ServiceException{
         try {
-        	if (clientSocket != null) {
-        		clientSocket.close();
-        	}
+            if (clientSocket != null) {
+                clientSocket.close();
+            }
         } catch (IOException ignore) {}
     }
 
@@ -118,33 +118,33 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
         
         try {
 
-        	dataOut = new DataOutputStream(clientSocket.getOutputStream());
-        	dataOut.writeBytes(message);
-        	dataOut.flush();
+            dataOut = new DataOutputStream(clientSocket.getOutputStream());
+            dataOut.writeBytes(message);
+            dataOut.flush();
 
-        	bufIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            bufIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-        	String responseLine = null;
+            String responseLine = null;
             while ((responseLine = bufIn.readLine()) != null) {  
                 responseBuffer.append(responseLine);    
             }  
         } catch (IOException ioe) {
             LOGGER.error("Connection failed", ioe);
             ServiceException se = new ServiceException(ioe);
-    		se.setServiceName(this.serviceName);
-    		throw se;
+            se.setServiceName(this.serviceName);
+            throw se;
         } finally {    
             try {
-            	if (dataOut != null) {
-            		dataOut.close();
-            	}
+                if (dataOut != null) {
+                    dataOut.close();
+                }
             } catch (IOException ignore) {}  
             dataOut = null;  
 
             try {
-            	if (bufIn != null) {
-            		bufIn.close();
-            	}
+                if (bufIn != null) {
+                    bufIn.close();
+                }
             } catch (IOException ignore) {}  
             bufIn = null; 
         }

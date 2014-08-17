@@ -34,7 +34,7 @@ public interface Server {
      * @throws ServerException if any communication exception occur. 
      * If {@ ServerCircuitBreak} is used it will be triggered by the exception.
      */
-	void send(Service service) throws ServerException;
+    void send(Service service) throws ServerException;
     
     
     /**

@@ -41,15 +41,15 @@ public class Host {
      * Create a Host object with name hostname
      * @param hostname name of the host
      */
-	public Host (String hostname) {
+    public Host (String hostname) {
         this.hostname = hostname;
     }
 
     
-	/**
-	 * Add {@link Service} to the Host object
-	 * @param service the service to add
-	 */
+    /**
+     * Add {@link Service} to the Host object
+     * @param service the service to add
+     */
     public void addService(Service service) {
         services.put(service.getServiceName(), service);
     }
@@ -112,8 +112,8 @@ public class Host {
      * @return
      */
     public String getAlias() {
-		return alias;
-	}
+        return alias;
+    }
 
     
     /**
@@ -121,6 +121,6 @@ public class Host {
      * @param alias
      */
     public void setAlias(String alias) {
-		this.alias = alias;
-	}
+        this.alias = alias;
+    }
 }

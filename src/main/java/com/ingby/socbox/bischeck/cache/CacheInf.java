@@ -35,62 +35,62 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
  */
 public interface CacheInf {
 
-	String ENDMARK = "END";
-	String JEPLISTSEP = ",";
+    String ENDMARK = "END";
+    String JEPLISTSEP = ",";
 
-	/*
-	 ***********************************************
-	 * Add methods
-	 ***********************************************
-	 */
-	
-	/**
-	 * Add value from the service and its serviceitem at index 0.
-	 * @param service
-	 * @param serviceitem
-	 */
-	void add(Service service, ServiceItem serviceitem);
-
-
-	/**
-	 * Add value from a LastStatus object. The value is added as index 0.
-	 * @param ls
-	 * @param hostName
-	 * @param serviceName
-	 * @param serviceItemName
-	 */
-	void add(LastStatus ls, 
-			String hostName, 
-			String serviceName, 
-			String serviceItemName);
-
-	
-	/**
-	 * Add a LastStatus object to the cache at index 0.  
-	 * @param ls
-	 * @param key the key should be created by method {@link Util.fullName} to get correct quoting on the names
-	 */
-	void add(LastStatus ls, String key);
-	
-	
     /*
      ***********************************************
-	 * Get data methods - LastStatus
-	 ***********************************************
-	 */
-	/**
-	 * Get a the LastStatus object closest to the time defined byt the timestamp
-	 * @param hostName
-	 * @param serviceName
-	 * @param serviceItemName
-	 * @param timestamp
-	 * @return LastStatus object closest to the timestamp or null if the 
-	 * timestamp are outside the range of existing data
-	 */
+     * Add methods
+     ***********************************************
+     */
+    
+    /**
+     * Add value from the service and its serviceitem at index 0.
+     * @param service
+     * @param serviceitem
+     */
+    void add(Service service, ServiceItem serviceitem);
+
+
+    /**
+     * Add value from a LastStatus object. The value is added as index 0.
+     * @param ls
+     * @param hostName
+     * @param serviceName
+     * @param serviceItemName
+     */
+    void add(LastStatus ls, 
+            String hostName, 
+            String serviceName, 
+            String serviceItemName);
+
+    
+    /**
+     * Add a LastStatus object to the cache at index 0.  
+     * @param ls
+     * @param key the key should be created by method {@link Util.fullName} to get correct quoting on the names
+     */
+    void add(LastStatus ls, String key);
+    
+    
+    /*
+     ***********************************************
+     * Get data methods - LastStatus
+     ***********************************************
+     */
+    /**
+     * Get a the LastStatus object closest to the time defined byt the timestamp
+     * @param hostName
+     * @param serviceName
+     * @param serviceItemName
+     * @param timestamp
+     * @return LastStatus object closest to the timestamp or null if the 
+     * timestamp are outside the range of existing data
+     */
     LastStatus getLastStatusByTime(String hostName, 
-    		String serviceName, 
-    		String serviceItemName,
-			long timestamp);
+            String serviceName, 
+            String serviceItemName,
+            long timestamp);
     
     /**
      * Get a the LastStatus object at the index. 
@@ -102,9 +102,9 @@ public interface CacheInf {
      * returned
      */
     LastStatus getLastStatusByIndex(String hostName, 
-    		String serviceName, 
-    		String serviceItemName,
-    		long index);
+            String serviceName, 
+            String serviceItemName,
+            long index);
 
     /**
      * Get a List of LastStatus objects from the from timestamp to the to 
@@ -119,9 +119,9 @@ public interface CacheInf {
      * range null will be returned 
      */
     List<LastStatus> getLastStatusListByTime(String hostName, 
-			String serviceName, 
-			String serviceItemName, 
-			long from, long to);
+            String serviceName, 
+            String serviceItemName, 
+            long from, long to);
     
     
     /**
@@ -135,9 +135,9 @@ public interface CacheInf {
      * @return
      */
     List<LastStatus> getLastStatusListByIndex(String hostName, 
-			String serviceName, 
-			String serviceitemName, 
-			long fromIndex, long toIndex);
+            String serviceName, 
+            String serviceitemName, 
+            long fromIndex, long toIndex);
     
 
     /**
@@ -147,87 +147,87 @@ public interface CacheInf {
      * @param serviceitemName
      * @return
      */
-	List<LastStatus> getLastStatusListAll(String hostName,
-			String serviceName, 
-			String serviceItemName);
+    List<LastStatus> getLastStatusListAll(String hostName,
+            String serviceName, 
+            String serviceItemName);
 
 
     /*
      ***********************************************
-	 * Get data methods - String
-	 ***********************************************
-	 */
-	
-	/**
-	 * Get the value in the cache for the host, service and service item at 
-	 * cache location according to index, where index 0 is the last inserted. 
-	 * @param hostName
-	 * @param serviceName
-	 * @param serviceItemName
-	 * @param index
-	 * @return the cache value at index. If the index is out of range null is 
-	 * returned
-	 */
-	String getByIndex(String hostName, 
-			String serviceName, 
-			String serviceItemName,
-			long index);
+     * Get data methods - String
+     ***********************************************
+     */
+    
+    /**
+     * Get the value in the cache for the host, service and service item at 
+     * cache location according to index, where index 0 is the last inserted. 
+     * @param hostName
+     * @param serviceName
+     * @param serviceItemName
+     * @param index
+     * @return the cache value at index. If the index is out of range null is 
+     * returned
+     */
+    String getByIndex(String hostName, 
+            String serviceName, 
+            String serviceItemName,
+            long index);
 
-	/**
-	 * Return the cache values separated with the separator string.
-	 * @param hostName
-	 * @param serviceName
-	 * @param serviceItemName
-	 * @param fromIndex
-	 * @param toIndex
-	 * @param separator
-	 * @return the values in a String separated by the separator string. If both 
-	 * from and to index are out of range null is returned. If only to index is 
-	 * out of range to index will be the same as the current size of cached 
-	 * elements.
-	 */
-	String getByIndex(String hostName, 
-			String serviceName, 
-			String serviceItemName,
-			long fromIndex, long toIndex, 
-			String separator);
+    /**
+     * Return the cache values separated with the separator string.
+     * @param hostName
+     * @param serviceName
+     * @param serviceItemName
+     * @param fromIndex
+     * @param toIndex
+     * @param separator
+     * @return the values in a String separated by the separator string. If both 
+     * from and to index are out of range null is returned. If only to index is 
+     * out of range to index will be the same as the current size of cached 
+     * elements.
+     */
+    String getByIndex(String hostName, 
+            String serviceName, 
+            String serviceItemName,
+            long fromIndex, long toIndex, 
+            String separator);
 
-	
-	/**
+    
+    /**
      * Get the value in the cache for the host, service and service item that  
      * is closed in time to a cache data. 
      * The method do the search by a number splitting and then search.
      * @param hostName
-	 * @param serviceName
-	 * @param serviceItemName
-	 * @param timestamp
-	 * @return
-	 */
-	String getByTime(String hostName, 
-			String serviceName, 
-			String serviceItemName,
-			long timestamp);
+     * @param serviceName
+     * @param serviceItemName
+     * @param timestamp
+     * @return
+     */
+    String getByTime(String hostName, 
+            String serviceName, 
+            String serviceItemName,
+            long timestamp);
 
 
-	String getByTime(String hostName, 
-			String serviceName, 
-			String serviceItemName,
-			long from, long to, 
-			String separator);
+    String getByTime(String hostName, 
+            String serviceName, 
+            String serviceItemName,
+            long from, long to, 
+            String separator);
     
 
-	String getAll(String hostName,
-			String serviceName, 
-			String serviceItemName,
-			String separator);
+    String getAll(String hostName,
+            String serviceName, 
+            String serviceItemName,
+            String separator);
 
     /*
      ***********************************************
-	 * Position and size methods
-	 ***********************************************
-	 */
-	 
-	/**
+     * Position and size methods
+     ***********************************************
+     */
+     
+    /**
      * The size for the specific host, service, service item entry.
      * @param hostname
      * @param serviceName
@@ -235,44 +235,44 @@ public interface CacheInf {
      * @return size of cached values for a specific host-service-serviceitem
      */
     Long size(String hostname, String serviceName,
-			String serviceItemName);
+            String serviceItemName);
 
-	/**
-	 * Get cache index for element closest to the timestamp, where timestamp is the time
-	 * in milliseconds "back" in time.
-	 * @param hostName
+    /**
+     * Get cache index for element closest to the timestamp, where timestamp is the time
+     * in milliseconds "back" in time.
+     * @param hostName
      * @param serviceName
      * @param serviceItemName
      * @param timestamp
      * @return
      */
-	Long getIndexByTime(String hostName, 
-			String serviceName,
-			String serviceItemName, 
-			long timestamp);
+    Long getIndexByTime(String hostName, 
+            String serviceName,
+            String serviceItemName, 
+            long timestamp);
 
-	/**
-	 * Get the last index in the cache for the host, service and serviceitem 
-	 * @param hostName
-	 * @param serviceName
-	 * @param serviceItemName
-	 * @return
-	 */
-	long getLastIndex(String hostName, 
-			String serviceName, 
-			String serviceItemName);
+    /**
+     * Get the last index in the cache for the host, service and serviceitem 
+     * @param hostName
+     * @param serviceName
+     * @param serviceItemName
+     * @return
+     */
+    long getLastIndex(String hostName, 
+            String serviceName, 
+            String serviceItemName);
 
-	long getLastTime(String hostName, 
-			String serviceName, 
-			String serviceItemName);
+    long getLastTime(String hostName, 
+            String serviceName, 
+            String serviceItemName);
 
-	/*
+    /*
      ***********************************************
-	 * Clear methods
-	 ***********************************************
-	 */
+     * Clear methods
+     ***********************************************
+     */
 
-	/**
+    /**
      * Clear everything in the cache
      * @return
      */
@@ -285,8 +285,8 @@ public interface CacheInf {
      * @param serviceItemName
      */
     void clear(String hostName, 
-    		String serviceName, 
-    		String serviceItemName);
+            String serviceName, 
+            String serviceItemName);
 
     
 

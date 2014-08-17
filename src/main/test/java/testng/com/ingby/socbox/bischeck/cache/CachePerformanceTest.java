@@ -39,99 +39,99 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
 public class CachePerformanceTest {
 
-	CacheInf cache = null;
-	ConfigurationManager confMgmr = null;
-	
-	String hostname = "test-server.ingby.com";
-	String qhostname = "test\\-server.ingby.com";
-	String servicename = "service@first";
-	String serviceitemname = "_service.item_123";
-	String cachekey = Util.fullName(qhostname, servicename, serviceitemname);
-	private int fastcacheSize;
-	
-	@BeforeClass
+    CacheInf cache = null;
+    ConfigurationManager confMgmr = null;
+    
+    String hostname = "test-server.ingby.com";
+    String qhostname = "test\\-server.ingby.com";
+    String servicename = "service@first";
+    String serviceitemname = "_service.item_123";
+    String cachekey = Util.fullName(qhostname, servicename, serviceitemname);
+    private int fastcacheSize;
+    
+    @BeforeClass
     public void beforeTest() throws Exception {
-		confMgmr = TestUtils.getConfigurationManager();    
-    		
-		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
-		cache = CacheFactory.getInstance();
-		cache.clear();
-		fastcacheSize = Integer.parseInt(ConfigurationManager.getInstance().getProperties().getProperty("lastStatusCacheSize","500"));
-	
-	}
+        confMgmr = TestUtils.getConfigurationManager();    
+            
+        CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
+        cache = CacheFactory.getInstance();
+        cache.clear();
+        fastcacheSize = Integer.parseInt(ConfigurationManager.getInstance().getProperties().getProperty("lastStatusCacheSize","500"));
+    
+    }
 
-	@AfterClass
-	public void afterTest() throws CacheException {
-		CacheFactory.destroy();
-	}
+    @AfterClass
+    public void afterTest() throws CacheException {
+        CacheFactory.destroy();
+    }
 
 
 
-	@Test (groups = { "Cache" })
-	public void superAdd() {
-		
-		int count = 10001;
-		long current = System.currentTimeMillis() - count*300*1000;
+    @Test (groups = { "Cache" })
+    public void superAdd() {
+        
+        int count = 10001;
+        long current = System.currentTimeMillis() - count*300*1000;
 
-		long start = System.currentTimeMillis();
-		for (int i = 1; i < count; i++) {
-			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
-			//System.out.println(">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
-			cache.add(ls, hostname, servicename, serviceitemname);
-		}
-		long exec = System.currentTimeMillis() - start;
-		System.out.println("Insert " + count + " " + (exec*1000/count) + " us Total time " + (exec) + " msec");
-		Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0]"),"10000");
-		Assert.assertEquals(CacheEvaluator.parse(cachekey + "[9999]"),"1");
+        long start = System.currentTimeMillis();
+        for (int i = 1; i < count; i++) {
+            LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
+            //System.out.println(">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
+            cache.add(ls, hostname, servicename, serviceitemname);
+        }
+        long exec = System.currentTimeMillis() - start;
+        System.out.println("Insert " + count + " " + (exec*1000/count) + " us Total time " + (exec) + " msec");
+        Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0]"),"10000");
+        Assert.assertEquals(CacheEvaluator.parse(cachekey + "[9999]"),"1");
 
-		count = 10001;
-		current = System.currentTimeMillis() - count*300*1000;
-		start = System.currentTimeMillis();
+        count = 10001;
+        current = System.currentTimeMillis() - count*300*1000;
+        start = System.currentTimeMillis();
 
-		for (int i = 1; i < count; i++) {
-			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
-			//System.out.println(">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
-			cache.add(ls, hostname+"1", servicename, serviceitemname);
-		}
-		exec = System.currentTimeMillis() - start;
-		System.out.println("Insert " + count + " " + (exec*1000/count) + " us Total time " + (exec) + " msec");
+        for (int i = 1; i < count; i++) {
+            LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
+            //System.out.println(">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
+            cache.add(ls, hostname+"1", servicename, serviceitemname);
+        }
+        exec = System.currentTimeMillis() - start;
+        System.out.println("Insert " + count + " " + (exec*1000/count) + " us Total time " + (exec) + " msec");
 
-		count = 10001;
-		current = System.currentTimeMillis() - count*300*1000;
+        count = 10001;
+        current = System.currentTimeMillis() - count*300*1000;
 
-		start = System.currentTimeMillis();
-		for (int i = 1; i < count; i++) {
-			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
-			//System.out.println(">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
-			cache.add(ls, hostname, servicename, serviceitemname);
-		}
-		exec = System.currentTimeMillis() - start;
-		System.out.println("Insert " + count + " " + (exec*1000/count) + " us Total time " + (exec) + " msec");
+        start = System.currentTimeMillis();
+        for (int i = 1; i < count; i++) {
+            LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
+            //System.out.println(">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
+            cache.add(ls, hostname, servicename, serviceitemname);
+        }
+        exec = System.currentTimeMillis() - start;
+        System.out.println("Insert " + count + " " + (exec*1000/count) + " us Total time " + (exec) + " msec");
 
-		start = System.currentTimeMillis();
-		CacheEvaluator.parse(cachekey + "[0:"+(fastcacheSize-1)+"]");
-		exec = System.currentTimeMillis() - start;
-		System.out.println("Get fast "+ (exec) + " msec");
+        start = System.currentTimeMillis();
+        CacheEvaluator.parse(cachekey + "[0:"+(fastcacheSize-1)+"]");
+        exec = System.currentTimeMillis() - start;
+        System.out.println("Get fast "+ (exec) + " msec");
 
-		start = System.currentTimeMillis();
-		int getfromslow = 10000+fastcacheSize-1;
-		CacheEvaluator.parse(cachekey + "[10000:"+getfromslow+"]");
-		exec = System.currentTimeMillis() - start;
-		System.out.println("Get slow "+ (exec) + " msec");
+        start = System.currentTimeMillis();
+        int getfromslow = 10000+fastcacheSize-1;
+        CacheEvaluator.parse(cachekey + "[10000:"+getfromslow+"]");
+        exec = System.currentTimeMillis() - start;
+        System.out.println("Get slow "+ (exec) + " msec");
 
-		count = 10001;
-		current = System.currentTimeMillis() - count*300*1000;
-		start = System.currentTimeMillis();
+        count = 10001;
+        current = System.currentTimeMillis() - count*300*1000;
+        start = System.currentTimeMillis();
 
-		for (int i = 1; i < count; i++) {
-			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
-			//System.out.println(">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
-			cache.add(ls, hostname+"1", servicename, serviceitemname);
-		}
-		exec = System.currentTimeMillis() - start;
-		System.out.println("Insert " + count + " " + (exec*1000/count) + " us Total time " + (exec) + " msec");
+        for (int i = 1; i < count; i++) {
+            LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
+            //System.out.println(">> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
+            cache.add(ls, hostname+"1", servicename, serviceitemname);
+        }
+        exec = System.currentTimeMillis() - start;
+        System.out.println("Insert " + count + " " + (exec*1000/count) + " us Total time " + (exec) + " msec");
 
-	}
+    }
 
-	
+    
 }

@@ -54,12 +54,12 @@ public class ServiceItemFactory {
             clazz = (Class<ServiceItem>) ClassCache.getClassByName("com.ingby.socbox.bischeck.serviceitem." +clazzname);
         } catch (ClassNotFoundException e) {
             try {
-            	clazz = (Class<ServiceItem>) ClassCache.getClassByName(clazzname);
+                clazz = (Class<ServiceItem>) ClassCache.getClassByName(clazzname);
             }catch (ClassNotFoundException ee) {
                 LOGGER.error("ServiceItem class {} not found for serviceitem {}", clazzname, name, ee);
                 ServiceItemFactoryException sfe = new ServiceItemFactoryException(ee);
-    			sfe.setServiceItemName(name);
-    			throw sfe;
+                sfe.setServiceItemName(name);
+                throw sfe;
             }
         }
 
@@ -68,23 +68,23 @@ public class ServiceItemFactory {
 
         Constructor cons = null;
         try {
-			cons = clazz.getConstructor(param);
-		} catch (Exception e) {
-			LOGGER.error("Could find correct constructor for class {} for serviceitem {}", clazzname, name, e);
-			ServiceItemFactoryException sfe = new ServiceItemFactoryException(e);
-			sfe.setServiceItemName(name);
-			throw sfe;
-		}
+            cons = clazz.getConstructor(param);
+        } catch (Exception e) {
+            LOGGER.error("Could find correct constructor for class {} for serviceitem {}", clazzname, name, e);
+            ServiceItemFactoryException sfe = new ServiceItemFactoryException(e);
+            sfe.setServiceItemName(name);
+            throw sfe;
+        }
 
         ServiceItem serviceItem = null;
         try {
-			serviceItem = (ServiceItem) cons.newInstance(name);
-		} catch (Exception e) {
-			LOGGER.error("Could not instaniate object for class {} for serviceitem {}", clazzname, name, e);
-			ServiceItemFactoryException sfe = new ServiceItemFactoryException(e);
-			sfe.setServiceItemName(name);
-			throw sfe;
-		}
+            serviceItem = (ServiceItem) cons.newInstance(name);
+        } catch (Exception e) {
+            LOGGER.error("Could not instaniate object for class {} for serviceitem {}", clazzname, name, e);
+            ServiceItemFactoryException sfe = new ServiceItemFactoryException(e);
+            sfe.setServiceItemName(name);
+            throw sfe;
+        }
         return serviceItem;
     }
 }

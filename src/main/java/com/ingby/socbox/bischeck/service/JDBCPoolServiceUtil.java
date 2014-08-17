@@ -37,21 +37,21 @@ public class JDBCPoolServiceUtil {
     private static ConcurrentHashMap<String,ManagedBasicDataSource> poolmap = new ConcurrentHashMap<String,ManagedBasicDataSource>();
     
     static public Connection getConnection(String connectionurl) throws SQLException {
-    	
-    	Connection jdbccon = null;
-    	
-    	synchronized (connectionurl) {
-    		if (poolmap.containsKey(connectionurl)) {
-    			ManagedBasicDataSource bds = poolmap.get(connectionurl);
-    			jdbccon = bds.getConnection();
-    		} else {
-    			ManagedBasicDataSource bds = new ManagedBasicDataSource();
-    			bds.setUrl(connectionurl);
-    			poolmap.putIfAbsent(connectionurl, bds);
-    			jdbccon = bds.getConnection();		
-    		}
-    	}
-    	return jdbccon;
+        
+        Connection jdbccon = null;
+        
+        synchronized (connectionurl) {
+            if (poolmap.containsKey(connectionurl)) {
+                ManagedBasicDataSource bds = poolmap.get(connectionurl);
+                jdbccon = bds.getConnection();
+            } else {
+                ManagedBasicDataSource bds = new ManagedBasicDataSource();
+                bds.setUrl(connectionurl);
+                poolmap.putIfAbsent(connectionurl, bds);
+                jdbccon = bds.getConnection();      
+            }
+        }
+        return jdbccon;
     }
     
 }

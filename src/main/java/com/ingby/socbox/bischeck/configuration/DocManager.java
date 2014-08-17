@@ -50,8 +50,8 @@ import com.ingby.socbox.bischeck.Util;
  *
  */
 public class DocManager implements ConfigXMLInf {
-	
-	private static final int OKAY = 0;
+    
+    private static final int OKAY = 0;
     private static final int FAILED = 1;
     
     private static final String CSSFILE = "bischeck.css";
@@ -106,30 +106,30 @@ public class DocManager implements ConfigXMLInf {
         }
         
         try {
-        	if (line.hasOption("type")) {
-        		String type = line.getOptionValue("type");
-        		if ( "html".equalsIgnoreCase(type)) {
-        			dmgmt.genHtml();
-        		} else if ("text".equalsIgnoreCase(type)) {
-        			dmgmt.genText();
-        		}
-        	} else {
-        		dmgmt.genHtml();
-        	}
+            if (line.hasOption("type")) {
+                String type = line.getOptionValue("type");
+                if ( "html".equalsIgnoreCase(type)) {
+                    dmgmt.genHtml();
+                } else if ("text".equalsIgnoreCase(type)) {
+                    dmgmt.genText();
+                }
+            } else {
+                dmgmt.genHtml();
+            }
         } catch (Exception e) {
-        	System.out.println(e.getMessage());
-        	Util.ShellExit(FAILED);
+            System.out.println(e.getMessage());
+            Util.ShellExit(FAILED);
         }
     }
 
     
     public DocManager() throws IOException {
-    	this(DEFAULTDIR);
+        this(DEFAULTDIR);
     }
     
     
     public DocManager(String dirname) throws IOException {
-    	outputdir = checkDir(dirname);
+        outputdir = checkDir(dirname);
     }
     
     /**
@@ -142,7 +142,7 @@ public class DocManager implements ConfigXMLInf {
     public void genHtml() 
     throws TransformerFactoryConfigurationError, TransformerException, Exception {
         
-    	URL cssfile = DocManager.class.getClassLoader().getResource(CSSFILE);
+        URL cssfile = DocManager.class.getClassLoader().getResource(CSSFILE);
         System.out.println(cssfile.toString());
         System.out.println(outputdir.getAbsolutePath()+File.separator+CSSFILE);
         copy(cssfile.getPath(), outputdir.getAbsolutePath()+File.separator+CSSFILE);
@@ -236,7 +236,7 @@ public class DocManager implements ConfigXMLInf {
 
                 
         BufferedWriter out = new BufferedWriter(
-        		new FileWriter(new File(outputdir, "index.html")));
+                new FileWriter(new File(outputdir, "index.html")));
         out.write(indexbuf.toString());
         out.close();
 
@@ -258,26 +258,26 @@ public class DocManager implements ConfigXMLInf {
     private void genFile(XMLCONFIG xmlconf, File outputdir, String type)
     throws TransformerFactoryConfigurationError, TransformerException, IOException, Exception {
 
-    	URL xslUrl = DocManager.class.getClassLoader().getResource(xmlconf.nametag()+"2"+type+".xsl");
-    	if (xslUrl == null) {
-    		throw new IOException("File " + xmlconf.nametag()+"2"+type+".xsl does not exists");
-    	}
+        URL xslUrl = DocManager.class.getClassLoader().getResource(xmlconf.nametag()+"2"+type+".xsl");
+        if (xslUrl == null) {
+            throw new IOException("File " + xmlconf.nametag()+"2"+type+".xsl does not exists");
+        }
 
-    	TransformerFactory tFactory = TransformerFactory.newInstance();
+        TransformerFactory tFactory = TransformerFactory.newInstance();
 
-    	Transformer transformer =
-    		tFactory.newTransformer
-    		(new StreamSource
-    				(xslUrl.getFile()));
+        Transformer transformer =
+            tFactory.newTransformer
+            (new StreamSource
+                    (xslUrl.getFile()));
 
-    	if ("text".equalsIgnoreCase(type))
-    		transformer.setOutputProperty(OutputKeys.METHOD, "text");
+        if ("text".equalsIgnoreCase(type))
+            transformer.setOutputProperty(OutputKeys.METHOD, "text");
 
-    	transformer.transform
-    	(new StreamSource
-    			(new File(ConfigFileManager.initConfigDir(),xmlconf.xml())),
-    			new javax.xml.transform.stream.StreamResult
-    			( new FileOutputStream(outputdir+File.separator+xmlconf.nametag()+"."+type)));
+        transformer.transform
+        (new StreamSource
+                (new File(ConfigFileManager.initConfigDir(),xmlconf.xml())),
+                new javax.xml.transform.stream.StreamResult
+                ( new FileOutputStream(outputdir+File.separator+xmlconf.nametag()+"."+type)));
     }
 
 
@@ -347,8 +347,8 @@ public class DocManager implements ConfigXMLInf {
         }
         
         try (FileInputStream from = new FileInputStream(fromFile);
-        	FileOutputStream to =  new FileOutputStream(toFile);
-        	){
+            FileOutputStream to =  new FileOutputStream(toFile);
+            ){
             byte[] buffer = new byte[4096];
             int bytesRead;
 

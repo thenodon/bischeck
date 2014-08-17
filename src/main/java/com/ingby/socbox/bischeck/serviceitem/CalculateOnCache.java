@@ -43,8 +43,8 @@ import com.ingby.socbox.bischeck.service.ServiceException;
  */
 public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem {
     
-	private final static Logger LOGGER = LoggerFactory.getLogger(CalculateOnCache.class);
-	
+    private final static Logger LOGGER = LoggerFactory.getLogger(CalculateOnCache.class);
+    
     public CalculateOnCache(String name) {
         this.serviceItemName = name;    
     }
@@ -55,34 +55,34 @@ public class CalculateOnCache extends ServiceItemAbstract implements ServiceItem
      */
     @Override
     public void execute() throws ServiceException, ServiceItemException {                
-            	
-    	String cacheparsedstr = service.executeStmt(getExecution());
-    	
-    	if (cacheparsedstr == null) {
-    		setLatestExecuted(null);
-    	}
-    	else {
-    		
-    		Float value = null;
-    		ExecuteJEP jep = ExecuteJEPPool.getInstance().checkOut();
-    		try {
-    			value = jep.execute(cacheparsedstr);
-    		} catch (ParseException pe) {
-    			LOGGER.warn("Parse exception of {}", cacheparsedstr);
-        		ServiceItemException si = new ServiceItemException(pe);
-        		si.setServiceItemName(this.serviceItemName);
-        		throw si;
-    		} finally {
-    			ExecuteJEPPool.getInstance().checkIn(jep);
-    			jep = null;
-    		}
-    		
-    		if (value == null) {
-    			setLatestExecuted(null);
-    		} else {
-    			setLatestExecuted(Float.toString(value));
-    		}
-    	}
+                
+        String cacheparsedstr = service.executeStmt(getExecution());
+        
+        if (cacheparsedstr == null) {
+            setLatestExecuted(null);
+        }
+        else {
+            
+            Float value = null;
+            ExecuteJEP jep = ExecuteJEPPool.getInstance().checkOut();
+            try {
+                value = jep.execute(cacheparsedstr);
+            } catch (ParseException pe) {
+                LOGGER.warn("Parse exception of {}", cacheparsedstr);
+                ServiceItemException si = new ServiceItemException(pe);
+                si.setServiceItemName(this.serviceItemName);
+                throw si;
+            } finally {
+                ExecuteJEPPool.getInstance().checkIn(jep);
+                jep = null;
+            }
+            
+            if (value == null) {
+                setLatestExecuted(null);
+            } else {
+                setLatestExecuted(Float.toString(value));
+            }
+        }
     }
 }
 

@@ -182,11 +182,11 @@ public interface ServiceItem {
      * Get the serviceitem alias
      * @param alias
      */
-	void setAlias(String alias);
+    void setAlias(String alias);
 
-	/////////////////////
-	
-	NAGIOSSTAT evaluateThreshold();
-	
-	NAGIOSSTAT getEvaluatedThreshold();
+    /////////////////////
+    
+    NAGIOSSTAT evaluateThreshold();
+    
+    NAGIOSSTAT getEvaluatedThreshold();
 }

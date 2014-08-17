@@ -41,39 +41,39 @@ public class NagiosUtilTest {
     
     @BeforeTest
     public void beforeTest() throws Exception {
-    	confMgmr = TestUtils.getConfigurationManager();            
+        confMgmr = TestUtils.getConfigurationManager();            
     }   
     
-	@Test (groups = { "NagiosUtil" })
-	public void verifyPerfData() {
-	    
-	    NagiosUtil nagutil = new NagiosUtil();
-	    ServiceItem serviceItem = new CheckCommandServiceItem("SERVICEITEM");
-	    Service service = new ShellService("SERVICE",null);
-	    service.addServiceItem(serviceItem);
-	    Host host = new Host("HOST");
-	    host.addService(service);
+    @Test (groups = { "NagiosUtil" })
+    public void verifyPerfData() {
+        
+        NagiosUtil nagutil = new NagiosUtil();
+        ServiceItem serviceItem = new CheckCommandServiceItem("SERVICEITEM");
+        Service service = new ShellService("SERVICE",null);
+        service.addServiceItem(serviceItem);
+        Host host = new Host("HOST");
+        host.addService(service);
         service.setHost(host);
-		
+        
        Threshold threshold = new TestThreshold("HOST","SERVICE","SERVICEITEM");
         
         //threshold.
         
         serviceItem.setExecutionTime(10L);
-		serviceItem.setLatestExecuted("1.79029728E8");
-		
-		serviceItem.setThreshold(threshold);
-		
-		
-		((TestThreshold) threshold).setWarning(1.0F);
-		((TestThreshold) threshold).setCritical(0.8F);
-		((TestThreshold) threshold).setThreshold(5.928746E7F);
-		Assert.assertEquals((float)threshold.getThreshold(),(float) new Float("59287460.0"),0);
-		((TestThreshold) threshold).setCalcMethod(">");
-		System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
-		Assert.assertEquals(nagutil.createNagiosMessage(service)," SERVICEITEM = 179029728 (59287460 > 59287460 >  W > 47429968 >  C > )  |  SERVICEITEM=179029728;59287460;47429968;0; threshold=59287460;0;0;0; avg-exec-time=10ms");
-		((TestThreshold) threshold).setCalcMethod("<");
-		System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
+        serviceItem.setLatestExecuted("1.79029728E8");
+        
+        serviceItem.setThreshold(threshold);
+        
+        
+        ((TestThreshold) threshold).setWarning(1.0F);
+        ((TestThreshold) threshold).setCritical(0.8F);
+        ((TestThreshold) threshold).setThreshold(5.928746E7F);
+        Assert.assertEquals((float)threshold.getThreshold(),(float) new Float("59287460.0"),0);
+        ((TestThreshold) threshold).setCalcMethod(">");
+        System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
+        Assert.assertEquals(nagutil.createNagiosMessage(service)," SERVICEITEM = 179029728 (59287460 > 59287460 >  W > 47429968 >  C > )  |  SERVICEITEM=179029728;59287460;47429968;0; threshold=59287460;0;0;0; avg-exec-time=10ms");
+        ((TestThreshold) threshold).setCalcMethod("<");
+        System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
         Assert.assertEquals(nagutil.createNagiosMessage(service)," SERVICEITEM = 179029728 (59287460 < 59287460 <  W < 71144952 <  C < )  |  SERVICEITEM=179029728;59287460;71144952;0; threshold=59287460;0;0;0; avg-exec-time=10ms");
         ((TestThreshold) threshold).setCalcMethod("=");
         System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
@@ -146,82 +146,82 @@ public class NagiosUtilTest {
         System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
         Assert.assertEquals(nagutil.createNagiosMessage(service)," SERVICEITEM = 0.09728 (12.23 = 1.22 =  +-W = 1.93 =  +-C = )  |  SERVICEITEM=0.09728;1.22;1.93;0; threshold=12.23;0;0;0; avg-exec-time=10ms");
 
-	}
+    }
 
 
-	@Test (groups = { "NagiosUtil" })
-	public void verifyPerfDataExt() {
-	    
-	    NagiosUtil nagutil = new NagiosUtil(true);
-	    ServiceItem serviceItem = new CheckCommandServiceItem("SERVICEITEM");
-	    Service service = new ShellService("SERVICE",null);
-	    service.addServiceItem(serviceItem);
-	    Host host = new Host("HOST");
-	    host.addService(service);
+    @Test (groups = { "NagiosUtil" })
+    public void verifyPerfDataExt() {
+        
+        NagiosUtil nagutil = new NagiosUtil(true);
+        ServiceItem serviceItem = new CheckCommandServiceItem("SERVICEITEM");
+        Service service = new ShellService("SERVICE",null);
+        service.addServiceItem(serviceItem);
+        Host host = new Host("HOST");
+        host.addService(service);
         service.setHost(host);
-		
+        
         Threshold threshold = new TestThreshold("HOST","SERVICE","SERVICEITEM");
         
                 
         serviceItem.setExecutionTime(10L);
-		serviceItem.setLatestExecuted("1.79029728E8");
-		
-		serviceItem.setThreshold(threshold);
-		
-		
-		((TestThreshold) threshold).setWarning(1.0F);
-		((TestThreshold) threshold).setCritical(0.8F);
-		((TestThreshold) threshold).setThreshold(5.928746E7F);
-		Assert.assertEquals((float)threshold.getThreshold(),(float) new Float("59287460.0"),0);
-		((TestThreshold) threshold).setCalcMethod(">");
-		System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
-		Assert.assertEquals(nagutil.createNagiosMessage(service)," SERVICEITEM = 179029728 (59287460 > 59287460 >  W > 47429968 >  C > )  |  SERVICEITEM=179029728;59287460;47429968;0; threshold=59287460;0;0;0; warning=59287460;0;0;0; critical=47429968;0;0;0; avg-exec-time=10ms");
-	}
+        serviceItem.setLatestExecuted("1.79029728E8");
+        
+        serviceItem.setThreshold(threshold);
+        
+        
+        ((TestThreshold) threshold).setWarning(1.0F);
+        ((TestThreshold) threshold).setCritical(0.8F);
+        ((TestThreshold) threshold).setThreshold(5.928746E7F);
+        Assert.assertEquals((float)threshold.getThreshold(),(float) new Float("59287460.0"),0);
+        ((TestThreshold) threshold).setCalcMethod(">");
+        System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
+        Assert.assertEquals(nagutil.createNagiosMessage(service)," SERVICEITEM = 179029728 (59287460 > 59287460 >  W > 47429968 >  C > )  |  SERVICEITEM=179029728;59287460;47429968;0; threshold=59287460;0;0;0; warning=59287460;0;0;0; critical=47429968;0;0;0; avg-exec-time=10ms");
+    }
 
-	@Test (groups = { "NagiosUtil" })
-	public void verifyPerfDataNoThreshold() {
-	    
-	    NagiosUtil nagutil = new NagiosUtil();
-	    ServiceItem serviceItem = new CheckCommandServiceItem("SERVICEITEM");
-	    Service service = new ShellService("SERVICE",null);
-	    service.addServiceItem(serviceItem);
-	    Host host = new Host("HOST");
-	    host.addService(service);
+    @Test (groups = { "NagiosUtil" })
+    public void verifyPerfDataNoThreshold() {
+        
+        NagiosUtil nagutil = new NagiosUtil();
+        ServiceItem serviceItem = new CheckCommandServiceItem("SERVICEITEM");
+        Service service = new ShellService("SERVICE",null);
+        service.addServiceItem(serviceItem);
+        Host host = new Host("HOST");
+        host.addService(service);
         service.setHost(host);
-		
+        
         Threshold threshold = new DummyThreshold("HOST","SERVICE","SERVICEITEM");
         
         serviceItem.setExecutionTime(10L);
-		serviceItem.setLatestExecuted("1.79029728E8");
-		
-		serviceItem.setThreshold(threshold);
-		
-		
-		System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
-		Assert.assertEquals(nagutil.createNagiosMessage(service)," SERVICEITEM = 179029728 (NA)  |  SERVICEITEM=179029728;;;0; threshold=0;0;0;0; avg-exec-time=10ms");
-	}
+        serviceItem.setLatestExecuted("1.79029728E8");
+        
+        serviceItem.setThreshold(threshold);
+        
+        
+        System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
+        Assert.assertEquals(nagutil.createNagiosMessage(service)," SERVICEITEM = 179029728 (NA)  |  SERVICEITEM=179029728;;;0; threshold=0;0;0;0; avg-exec-time=10ms");
+    }
 
-	@Test (groups = { "NagiosUtil" })
-	public void verifyPerfDataNoThresholdExt() {
-	    
-	    NagiosUtil nagutil = new NagiosUtil(true);
-	    ServiceItem serviceItem = new CheckCommandServiceItem("SERVICEITEM");
-	    Service service = new ShellService("SERVICE",null);
-	    service.addServiceItem(serviceItem);
-	    Host host = new Host("HOST");
-	    host.addService(service);
+    @Test (groups = { "NagiosUtil" })
+    public void verifyPerfDataNoThresholdExt() {
+        
+        NagiosUtil nagutil = new NagiosUtil(true);
+        ServiceItem serviceItem = new CheckCommandServiceItem("SERVICEITEM");
+        Service service = new ShellService("SERVICE",null);
+        service.addServiceItem(serviceItem);
+        Host host = new Host("HOST");
+        host.addService(service);
         service.setHost(host);
-		
+        
         Threshold threshold = new DummyThreshold("HOST","SERVICE","SERVICEITEM");
         
         serviceItem.setExecutionTime(10L);
-		serviceItem.setLatestExecuted("1.79029728E8");
-		
-		serviceItem.setThreshold(threshold);
-		
-		
-		System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
-		Assert.assertEquals(nagutil.createNagiosMessage(service)," SERVICEITEM = 179029728 (NA)  |  SERVICEITEM=179029728;;;0; threshold=0;0;0;0; warning=0;0;0;0; critical=0;0;0;0; avg-exec-time=10ms");
-	}
+        serviceItem.setLatestExecuted("1.79029728E8");
+        
+        serviceItem.setThreshold(threshold);
+        
+        
+        System.out.println("\""+nagutil.createNagiosMessage(service)+"\"");
+        Assert.assertEquals(nagutil.createNagiosMessage(service)," SERVICEITEM = 179029728 (NA)  |  SERVICEITEM=179029728;;;0; threshold=0;0;0;0; warning=0;0;0;0; critical=0;0;0;0; avg-exec-time=10ms");
+    }
 
 }

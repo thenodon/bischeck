@@ -80,11 +80,11 @@ public class CachePurgeJob implements Job {
      * @throws ParseException
      */
     public static void init(Properties prop) throws SchedulerException {
-    	
-    	
-    	sched = StdSchedulerFactory.getDefaultScheduler();
+        
+        
+        sched = StdSchedulerFactory.getDefaultScheduler();
         if (!sched.isStarted()) {
-        	sched.start();
+            sched.start();
         }
         
         
@@ -102,7 +102,7 @@ public class CachePurgeJob implements Job {
         
         // If job exists delete and add
         if (sched.getJobDetail(job.getKey()) != null) {
-        	sched.deleteJob(job.getKey());
+            sched.deleteJob(job.getKey());
         }
         
         Date ft = sched.scheduleJob(job, trigger);
@@ -114,39 +114,39 @@ public class CachePurgeJob implements Job {
     }
     
 
-	@Override
+    @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         final Timer timer = Metrics.newTimer(CachePurgeJob.class, 
-				"purgeTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-		final TimerContext context = timer.time();
-		
-		try {
-			Map<String, String> purgeMap = ConfigurationManager.getInstance().getPurgeMap();
-			LOGGER.info("CachePurge purging {}", purgeMap.size());
-			CacheInf cache = CacheFactory.getInstance();
-			
-			for (String key : purgeMap.keySet()) {
-				if (cache instanceof CachePurgeInf) {
-					LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
-					
-					if (CacheUtil.isByTime(purgeMap.get(key))) {
-						// find the index of the time
-						ServiceDef servicedef = new ServiceDef(key);
-						Long index = cache.getIndexByTime( 
-								servicedef.getHostName(),
-								servicedef.getServiceName(), 
-								servicedef.getServiceItemName(),
-								System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(purgeMap.get(key)))*1000);
-						((CachePurgeInf) cache).trim(key, index);
-					} else {
-						((CachePurgeInf) cache).trim(key, Long.valueOf(purgeMap.get(key)));
-					}
-				}
-			}
-		} finally {
-			long duration = context.stop()/1000000;
-			LOGGER.info("CachePurge executed in {} ms", duration);
-		}
+                "purgeTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final TimerContext context = timer.time();
+        
+        try {
+            Map<String, String> purgeMap = ConfigurationManager.getInstance().getPurgeMap();
+            LOGGER.info("CachePurge purging {}", purgeMap.size());
+            CacheInf cache = CacheFactory.getInstance();
+            
+            for (String key : purgeMap.keySet()) {
+                if (cache instanceof CachePurgeInf) {
+                    LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
+                    
+                    if (CacheUtil.isByTime(purgeMap.get(key))) {
+                        // find the index of the time
+                        ServiceDef servicedef = new ServiceDef(key);
+                        Long index = cache.getIndexByTime( 
+                                servicedef.getHostName(),
+                                servicedef.getServiceName(), 
+                                servicedef.getServiceItemName(),
+                                System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(purgeMap.get(key)))*1000);
+                        ((CachePurgeInf) cache).trim(key, index);
+                    } else {
+                        ((CachePurgeInf) cache).trim(key, Long.valueOf(purgeMap.get(key)));
+                    }
+                }
+            }
+        } finally {
+            long duration = context.stop()/1000000;
+            LOGGER.info("CachePurge executed in {} ms", duration);
+        }
     }
 
 }

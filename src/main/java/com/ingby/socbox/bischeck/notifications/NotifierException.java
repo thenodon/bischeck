@@ -20,21 +20,21 @@ package com.ingby.socbox.bischeck.notifications;
 
 public class NotifierException extends Exception {
 
-	private static final long serialVersionUID = 941565193879100650L;
+    private static final long serialVersionUID = 941565193879100650L;
 
-	public NotifierException() {
-		super();
-	}
+    public NotifierException() {
+        super();
+    }
 
-	public NotifierException(String message) {
-		super(message);
-	}
+    public NotifierException(String message) {
+        super(message);
+    }
 
-	public NotifierException(String message,Throwable cause) {
-		super(message, cause);
-	}
+    public NotifierException(String message,Throwable cause) {
+        super(message, cause);
+    }
 
-	public NotifierException(Throwable cause) {
-		super(cause);
-	}
+    public NotifierException(Throwable cause) {
+        super(cause);
+    }
 }

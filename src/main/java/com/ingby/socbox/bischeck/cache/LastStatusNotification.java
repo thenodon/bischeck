@@ -33,22 +33,22 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  */
 public class LastStatusNotification implements Serializable, Cloneable {
 
-	
-	private static final long serialVersionUID = 1L;
+    
+    private static final long serialVersionUID = 1L;
 
-	private final Service service;
+    private final Service service;
 
-	
-	public LastStatusNotification(final Service service) {
-		this.service = service;	
-	}
+    
+    public LastStatusNotification(final Service service) {
+        this.service = service; 
+    }
 
-	
-	/**
-	 * The method create a json object of the state change. 
-	 * The following example show the format:<br
-	 * <code>
-	 * {"state":"WARNING",<br>
+    
+    /**
+     * The method create a json object of the state change. 
+     * The following example show the format:<br
+     * <code>
+     * {"state":"WARNING",<br>
      * {"type":"HARD",<br>
      * &nbsp;&nbsp;"SSHport":{ <br>
      * &nbsp;&nbsp;&nbsp;&nbsp;"timestamp":1393626063324,"value":"0.000094","threshold":1.059E-4,"calcmethod":"<","state":"OK"
@@ -63,25 +63,25 @@ public class LastStatusNotification implements Serializable, Cloneable {
      * if the state was a hard vs soft state change according to the Nagios
      * specification. This is followed with a one to many of the individual
      * state of the serviceitems that are part of the service. 
-	 * @return the formatted json object
-	 */
-	public String getJson() {
-		final JSONObject json = new JSONObject();
-		
-		final long currentTime = System.currentTimeMillis();
-		json.put("timestamp",currentTime);
-		json.put("date",new Date(currentTime).toString());
-		json.put("state",((ServiceStateInf) service).getServiceState().getState());
-		if (((ServiceStateInf) service).getServiceState().isResolved()) {
-			json.put("notification","resolved");
-		} else {
-			json.put("notification","alert");
-		}
-		
-		json.put("incident_key",((ServiceStateInf) service).getServiceState().getCurrentIncidentId());
-				
-		
-		return json.toString();
-	}
+     * @return the formatted json object
+     */
+    public String getJson() {
+        final JSONObject json = new JSONObject();
+        
+        final long currentTime = System.currentTimeMillis();
+        json.put("timestamp",currentTime);
+        json.put("date",new Date(currentTime).toString());
+        json.put("state",((ServiceStateInf) service).getServiceState().getState());
+        if (((ServiceStateInf) service).getServiceState().isResolved()) {
+            json.put("notification","resolved");
+        } else {
+            json.put("notification","alert");
+        }
+        
+        json.put("incident_key",((ServiceStateInf) service).getServiceState().getCurrentIncidentId());
+                
+        
+        return json.toString();
+    }
 
 }

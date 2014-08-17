@@ -27,7 +27,7 @@ package com.ingby.socbox.bischeck.threshold;
  */
 public class TestThreshold implements Threshold {
     
-	private String hostName;
+    private String hostName;
     private String serviceName;
     private String serviceItemName;
     private NAGIOSSTAT state;
@@ -39,10 +39,10 @@ public class TestThreshold implements Threshold {
     
     public TestThreshold(String hostName, String serviceName, String serviceItemName) {
         
-    	this.hostName = hostName;
-    	this.serviceName = serviceName;
-    	this.serviceItemName = serviceItemName;
-    	
+        this.hostName = hostName;
+        this.serviceName = serviceName;
+        this.serviceItemName = serviceItemName;
+        
         this.state = NAGIOSSTAT.OK;
     }
 

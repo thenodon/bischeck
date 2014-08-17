@@ -45,78 +45,78 @@ public class SQLServiceitemTest {
 
 
 
-	private CacheInf cache;
-	private Host host;
-	private JDBCService jdbc;
-	private SQLServiceItem sql;
+    private CacheInf cache;
+    private Host host;
+    private JDBCService jdbc;
+    private SQLServiceItem sql;
 
-	@BeforeClass
-	public void beforeTest() throws Exception {
+    @BeforeClass
+    public void beforeTest() throws Exception {
 
-		TestUtils.getConfigurationManager();    
-		CacheFactory.init();
-		
-		host = new Host("host");
-		jdbc = new JDBCService("test",null);
-		jdbc.setConnectionUrl("jdbc:derby:memory:myDBxyz;create=true");
-		jdbc.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-		sql = new SQLServiceItem("serviceItemName");
-		sql.setService(jdbc);
-		host.addService(jdbc);
-		jdbc.setHost(host);
+        TestUtils.getConfigurationManager();    
+        CacheFactory.init();
+        
+        host = new Host("host");
+        jdbc = new JDBCService("test",null);
+        jdbc.setConnectionUrl("jdbc:derby:memory:myDBxyz;create=true");
+        jdbc.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+        sql = new SQLServiceItem("serviceItemName");
+        sql.setService(jdbc);
+        host.addService(jdbc);
+        jdbc.setHost(host);
 
-		// Create table
-		//Creating a database table
-		Connection con = DriverManager.getConnection("jdbc:derby:memory:myDBxyz;create=true");
-		Statement stat = con.createStatement();
+        // Create table
+        //Creating a database table
+        Connection con = DriverManager.getConnection("jdbc:derby:memory:myDBxyz;create=true");
+        Statement stat = con.createStatement();
 
-		stat.execute("create table test (id INT, value INT, createdate date)");
-		stat.execute("insert into test (id, value, createdate) values (1,1000,CURRENT_DATE)");
-		stat.execute("insert into test (id, value, createdate) values (2,1000,CURRENT_DATE)");
-		stat.execute("insert into test (id, value, createdate) values (3,2000,CURRENT_DATE)");
-		stat.execute("insert into test (id, value, createdate) values (4,3000,'2010-12-31')");
-		con.commit();
+        stat.execute("create table test (id INT, value INT, createdate date)");
+        stat.execute("insert into test (id, value, createdate) values (1,1000,CURRENT_DATE)");
+        stat.execute("insert into test (id, value, createdate) values (2,1000,CURRENT_DATE)");
+        stat.execute("insert into test (id, value, createdate) values (3,2000,CURRENT_DATE)");
+        stat.execute("insert into test (id, value, createdate) values (4,3000,'2010-12-31')");
+        con.commit();
 
-		CacheFactory.init();
-		
-		cache = CacheFactory.getInstance();		
+        CacheFactory.init();
+        
+        cache = CacheFactory.getInstance();     
 
-		cache.clear();
-	}
+        cache.clear();
+    }
 
-	@AfterClass
-	public void afterTest() throws CacheException {
-		CacheFactory.destroy();
-	}
+    @AfterClass
+    public void afterTest() throws CacheException {
+        CacheFactory.destroy();
+    }
 
-	@Test (groups = { "ServiceItem" })
-	public void verifyService() throws Exception {
+    @Test (groups = { "ServiceItem" })
+    public void verifyService() throws Exception {
 
-			LastStatus ls = new LastStatus("1", (float) 1.0);
-			cache.add(ls, Util.fullName("host1", "web", "state"));
-			ls = new LastStatus("2", (float) 1.0);
-			cache.add(ls, Util.fullName("host2", "web", "state"));
-			ls = new LastStatus("3", (float) 1.0);
-			cache.add(ls, Util.fullName("host3", "web", "state"));
+            LastStatus ls = new LastStatus("1", (float) 1.0);
+            cache.add(ls, Util.fullName("host1", "web", "state"));
+            ls = new LastStatus("2", (float) 1.0);
+            cache.add(ls, Util.fullName("host2", "web", "state"));
+            ls = new LastStatus("3", (float) 1.0);
+            cache.add(ls, Util.fullName("host3", "web", "state"));
 
-			
-			
-			jdbc.openConnection();
+            
+            
+            jdbc.openConnection();
 
-			sql.setExecution("select sum(value) from test");
-			sql.execute();
-			Assert.assertEquals(sql.getLatestExecuted(),"7000");
+            sql.setExecution("select sum(value) from test");
+            sql.execute();
+            Assert.assertEquals(sql.getLatestExecuted(),"7000");
 
-			sql.setExecution("select sum(value) from test where createdate = '%%yyyy-MM-dd%%'");
-			sql.execute();
-			Assert.assertEquals(sql.getLatestExecuted(),"4000");
+            sql.setExecution("select sum(value) from test where createdate = '%%yyyy-MM-dd%%'");
+            sql.execute();
+            Assert.assertEquals(sql.getLatestExecuted(),"4000");
 
-			sql.setExecution("select sum(value) from test where (id = host1-web-state[0] or id = host2-web-state[0]) and createdate = '%%yyyy-MM-dd%%'");
-			sql.execute();
-			Assert.assertEquals(sql.getLatestExecuted(),"2000");
+            sql.setExecution("select sum(value) from test where (id = host1-web-state[0] or id = host2-web-state[0]) and createdate = '%%yyyy-MM-dd%%'");
+            sql.execute();
+            Assert.assertEquals(sql.getLatestExecuted(),"2000");
 
-			jdbc.closeConnection();
+            jdbc.closeConnection();
 
-	}
+    }
 
 }

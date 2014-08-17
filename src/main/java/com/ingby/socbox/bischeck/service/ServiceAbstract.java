@@ -94,10 +94,10 @@ public abstract class ServiceAbstract {
 
     
     void openConnection() throws ServiceException{
-    	// Create the service state object at first open
-    	if (fsm == null) {
-    		fsm = ServiceState.ServiceStateFactory((Service) this);
-    	}
+        // Create the service state object at first open
+        if (fsm == null) {
+            fsm = ServiceState.ServiceStateFactory((Service) this);
+        }
     }
     
     
@@ -172,52 +172,52 @@ public abstract class ServiceAbstract {
 
 
     public String getAlias() {
-		return alias;
-	}
+        return alias;
+    }
 
 
-	public void setAlias(String alias) {
-		this.alias = alias;
-	}
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 
-	// ServiceStateInf
+    // ServiceStateInf
     public ServiceState getServiceState() {
-		return fsm;
-	}
+        return fsm;
+    }
 
 
-	public void setServiceState() {
-		fsm.setState(getLevel());
-	}
-	
-	public Map<String, String> getNotificationData() {
-		Map<String,String> notification = new HashMap<String, String>();
-		notification.put("host", getHost().getHostname());
-		notification.put("service", getServiceName());
-		notification.put("state", getLevel().toString());
-		notification.put("incident_key", getServiceState().getCurrentIncidentId());
-		notification.put("resolved", getServiceState().isResolved().toString());
-		
-		NagiosUtil nagutil = new NagiosUtil();
-		
-		notification.put("description", new StringBuilder().
-				append(getHost().getHostname()).
-				append("-").
-				append(getServiceName()). 
-				append(" : ").
-				append(getLevel()). 
-				append(" : "). 
-				append(nagutil.createNagiosMessage((Service) this)).toString());
-		
-		notification.put("description_minimal", new StringBuilder().
-				append(getHost().getHostname()).
-				append("-").
-				append(getServiceName()). 
-				append(" : ").
-				append(getLevel()). 
-				append(" : "). 
-				append(nagutil.createNagiosMessage((Service) this, false)).toString());
+    public void setServiceState() {
+        fsm.setState(getLevel());
+    }
+    
+    public Map<String, String> getNotificationData() {
+        Map<String,String> notification = new HashMap<String, String>();
+        notification.put("host", getHost().getHostname());
+        notification.put("service", getServiceName());
+        notification.put("state", getLevel().toString());
+        notification.put("incident_key", getServiceState().getCurrentIncidentId());
+        notification.put("resolved", getServiceState().isResolved().toString());
+        
+        NagiosUtil nagutil = new NagiosUtil();
+        
+        notification.put("description", new StringBuilder().
+                append(getHost().getHostname()).
+                append("-").
+                append(getServiceName()). 
+                append(" : ").
+                append(getLevel()). 
+                append(" : "). 
+                append(nagutil.createNagiosMessage((Service) this)).toString());
+        
+        notification.put("description_minimal", new StringBuilder().
+                append(getHost().getHostname()).
+                append("-").
+                append(getServiceName()). 
+                append(" : ").
+                append(getLevel()). 
+                append(" : "). 
+                append(nagutil.createNagiosMessage((Service) this, false)).toString());
 
-		return notification;
-	}
+        return notification;
+    }
 }

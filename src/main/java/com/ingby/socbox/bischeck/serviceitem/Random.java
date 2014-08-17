@@ -32,8 +32,8 @@ import com.ingby.socbox.bischeck.service.ServiceException;
  */
 public class Random extends ServiceItemAbstract implements ServiceItem {
     
-	private final static Logger LOGGER = LoggerFactory.getLogger(Random.class);
-	
+    private final static Logger LOGGER = LoggerFactory.getLogger(Random.class);
+    
     public Random(String name) {
         this.serviceItemName = name;    
     }
@@ -45,9 +45,9 @@ public class Random extends ServiceItemAbstract implements ServiceItem {
     @Override
     public void execute() throws ServiceException, ServiceItemException {                
 
-    	Float rand = (float) Math.random() * Float.parseFloat(getExecution());
-    	setLatestExecuted(Float.toString(rand));
-    	
+        Float rand = (float) Math.random() * Float.parseFloat(getExecution());
+        setLatestExecuted(Float.toString(rand));
+        
     }
 }
 

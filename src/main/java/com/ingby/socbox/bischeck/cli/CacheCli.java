@@ -60,255 +60,255 @@ import jline.console.history.FileHistory;
  */
 public class CacheCli {
 
-	final static String HISTORYFILE = ".jline_history";
-	private static boolean showtime = true;
-	private static boolean showparse = true;
+    final static String HISTORYFILE = ".jline_history";
+    private static boolean showtime = true;
+    private static boolean showparse = true;
 
-	public static void main(String[] args) throws ConfigurationException, CacheException, IOException, ParseException {
-		CommandLineParser cmdParser = new GnuParser();
-		CommandLine line = null;
-		// create the Options
-		Options options = new Options();
-		options.addOption( "u", "usage", false, "show usage" );
-		options.addOption( "p", "pipemode", false, "read from stdin" );
-		options.addOption( "T", "notime", false, "do not show execution time" );
-		options.addOption( "P", "noparse", false, "do not show parsed expression" );
+    public static void main(String[] args) throws ConfigurationException, CacheException, IOException, ParseException {
+        CommandLineParser cmdParser = new GnuParser();
+        CommandLine line = null;
+        // create the Options
+        Options options = new Options();
+        options.addOption( "u", "usage", false, "show usage" );
+        options.addOption( "p", "pipemode", false, "read from stdin" );
+        options.addOption( "T", "notime", false, "do not show execution time" );
+        options.addOption( "P", "noparse", false, "do not show parsed expression" );
 
-		try {
-			line = cmdParser.parse( options, args );
+        try {
+            line = cmdParser.parse( options, args );
 
-		} catch (org.apache.commons.cli.ParseException e) {
-			System.out.println( "Command parse error:" + e.getMessage() );
-			Util.ShellExit(1);
-		}
+        } catch (org.apache.commons.cli.ParseException e) {
+            System.out.println( "Command parse error:" + e.getMessage() );
+            Util.ShellExit(1);
+        }
 
-		if (line.hasOption("usage")) {
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp( "CacheCli", options );
-			Util.ShellExit(0);
-		}
-
-
-
-		try {
-			ConfigurationManager.getInstance();
-		} catch (java.lang.IllegalStateException e) {
-			ConfigurationManager.init();
-			ConfigurationManager.getInstance();  
-		}    
-
-		Boolean supportNull = false;
-		if ("true".equalsIgnoreCase(ConfigurationManager.getInstance().getProperties().
-				getProperty("notFullListParse","false"))) {
-			supportNull = true;
-		}
-
-		CacheFactory.init();
-
-		if (line.hasOption("notime")) {
-			showtime  = false;
-		}
-
-		if (line.hasOption("noparse")) {
-			showparse = false;
-		}
-
-		if (line.hasOption("pipemode")) {
-			pipe(supportNull);
-		} else {
-			cli(supportNull);
-
-		}
-	}
+        if (line.hasOption("usage")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp( "CacheCli", options );
+            Util.ShellExit(0);
+        }
 
 
-	private static void pipe(Boolean supportNull) throws IOException, ParseException {
-		BufferedReader in = null;
 
-		ExecuteJEP parser = new ExecuteJEP();        // Create a new parser	
+        try {
+            ConfigurationManager.getInstance();
+        } catch (java.lang.IllegalStateException e) {
+            ConfigurationManager.init();
+            ConfigurationManager.getInstance();  
+        }    
 
-		try {
-			in = new BufferedReader(new InputStreamReader(System.in));
-			String line;
-			boolean first = true;
-			while ((line = in.readLine()) != null) {
-				if (first) {
-					execute(parser, line);
-					System.out.println(execute(parser, line));
-					first = false;
-				} else {
-					System.out.println(execute(parser, line));
-				}
-			}
-		}
-		finally {
-			if (in != null) {
-				in.close();
-			}
-		}
-	}
+        Boolean supportNull = false;
+        if ("true".equalsIgnoreCase(ConfigurationManager.getInstance().getProperties().
+                getProperty("notFullListParse","false"))) {
+            supportNull = true;
+        }
 
+        CacheFactory.init();
 
-	private static void cli(Boolean supportNull) throws IOException,
-	ConfigurationException {
+        if (line.hasOption("notime")) {
+            showtime  = false;
+        }
 
-		ExecuteJEP parser = new ExecuteJEP();        // Create a new parser	
+        if (line.hasOption("noparse")) {
+            showparse = false;
+        }
 
-		ConsoleReader console = null;
-		FileHistory history = null;
+        if (line.hasOption("pipemode")) {
+            pipe(supportNull);
+        } else {
+            cli(supportNull);
 
-		String historyFile = System.getProperty("user.home") + File.separator  + HISTORYFILE;
-
-		try {
-
-			console = new ConsoleReader();
-			history = new FileHistory(new File(historyFile));
-
-			console.print("Using bischeck configuration: ");
-			console.println(ConfigFileManager.initConfigDir().getAbsolutePath());
+        }
+    }
 
 
-			console.print("Cmd history: ");
-			console.println(history.getFile().getAbsolutePath());
-			console.print("Null support in arrays: ");
-			console.println(supportNull.toString());
+    private static void pipe(Boolean supportNull) throws IOException, ParseException {
+        BufferedReader in = null;
 
-			console.setHistory(history);
-			console.println("Execution time is divided in parse/calculate/total time (ms)");
-			console.setPrompt("cachecli> ");
+        ExecuteJEP parser = new ExecuteJEP();        // Create a new parser 
 
-
-			// Main loop reading cli commands
-			boolean first = true;
-			while (true) {
-				String line = null;
-
-				try {
-					line = console.readLine();
-				} catch (IllegalArgumentException ie) {
-					console.println(ie.getMessage());
-					continue;
-				}
-
-				if (line == null || "quit".equalsIgnoreCase(line) || "exit".equalsIgnoreCase(line) ) {
-					break;
-				}
-
-				if (line.matches("^list.*")) {
-					String[] patternArray = line.split("^list");
-					String pattern = "*";
-					if (patternArray.length == 2 && !patternArray[1].trim().isEmpty()) {
-						pattern = patternArray[1];
-					}
-					
-					Map<String, Long> lists = listKeys(pattern.trim());
-					if (!lists.isEmpty()) {
-						for (String key : lists.keySet()) {
-							console.print(key);
-							console.print(" : ");
-							console.println(lists.get(key).toString());
-						} 
-					} else {
-						console.println("Not found");
-					}
-					
-					continue;
-				}
-
-				if ("help".equalsIgnoreCase(line)) {
-					showhelp(console);
-					continue;
-				}
-
-				try {
-					if (first) {
-						execute(parser, line);
-						console.println(execute(parser, line));
-						first = false;
-					} else {
-						console.println(execute(parser, line));
-					}
-				} catch (ParseException e) {
-					console.println (e.getMessage());
-				}
-			}
-		} finally {
-			try {
-				TerminalFactory.get().restore();
-			} catch (Exception e) {
-				console.println ("Could not restore " + e.getMessage());
-			}
-			if (history != null) {
-				history.flush();
-			}
-		}
-	}
+        try {
+            in = new BufferedReader(new InputStreamReader(System.in));
+            String line;
+            boolean first = true;
+            while ((line = in.readLine()) != null) {
+                if (first) {
+                    execute(parser, line);
+                    System.out.println(execute(parser, line));
+                    first = false;
+                } else {
+                    System.out.println(execute(parser, line));
+                }
+            }
+        }
+        finally {
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
 
 
-	private static Map<String, Long> listKeys(String pattern) {
-		CacheInf cache = CacheFactory.getInstance();
-		Map<String, Long> lists = null;
-		if (cache instanceof LastStatusCache) {
-			lists = ((LastStatusCache) cache).getKeys(pattern);
-		} 
-		return lists;
-	}
+    private static void cli(Boolean supportNull) throws IOException,
+    ConfigurationException {
+
+        ExecuteJEP parser = new ExecuteJEP();        // Create a new parser 
+
+        ConsoleReader console = null;
+        FileHistory history = null;
+
+        String historyFile = System.getProperty("user.home") + File.separator  + HISTORYFILE;
+
+        try {
+
+            console = new ConsoleReader();
+            history = new FileHistory(new File(historyFile));
+
+            console.print("Using bischeck configuration: ");
+            console.println(ConfigFileManager.initConfigDir().getAbsolutePath());
 
 
-	private static String execute(ExecuteJEP parser, String line) throws ParseException {
-		Long startTime = System.currentTimeMillis();
-		//Parse the input line expression
-		String parsedExpression = CacheEvaluator.parse(line);
-		Long stopParseTime = System.currentTimeMillis() - startTime;
+            console.print("Cmd history: ");
+            console.println(history.getFile().getAbsolutePath());
+            console.print("Null support in arrays: ");
+            console.println(supportNull.toString());
 
-		Float resultValue = null;	
-
-		Long startExecuteTime =  System.currentTimeMillis();
-
-		// Calculate the parsed expression
-		resultValue = parser.execute(parsedExpression);
-		Long stopExecuteTime =  System.currentTimeMillis() - startExecuteTime;
-
-		Long endTime = System.currentTimeMillis()-startTime;
-
-		// Write the execution time
-		StringBuilder strbu = new StringBuilder();
-
-		if (showtime) {
-			strbu.append("["+stopParseTime.toString()+"/"+stopExecuteTime.toString()+"/"+endTime.toString()+" ms] ");
-		}
-
-		// Write the parsed expression
-		if (showparse) {
-			strbu.append(parsedExpression);
-			strbu.append(" = ");
-		}
-		// Write the calculated result
-
-		if (resultValue != null) {
-			strbu.append(new BischeckDecimal(resultValue).toString());
-		} else {
-			strbu.append("null");
-		}
-		return strbu.toString();
-	}
+            console.setHistory(history);
+            console.println("Execution time is divided in parse/calculate/total time (ms)");
+            console.setPrompt("cachecli> ");
 
 
-	private static void showhelp(ConsoleReader console) throws IOException {
-		console.println("Help");
-		console.println("====");
-		console.println("On the command line any expression can be entered that bischeck ");
-		console.println("supportd to retrive and calculate on cached data.");
-		console.println();
-		console.println("Examples:");
-		console.println("host-service-item[0] * 10");
-		console.println("avg(host0-service-item[10:20]) / avg(host1-service-item[10:20]) ");
-		console.println();
-		console.println("Commands");
-		console.println("========");
-		console.println("list      - list [keys*]");
-		console.println("quit/exit - exit CacheCli");
-		console.println("help      - show this help");
-	}
+            // Main loop reading cli commands
+            boolean first = true;
+            while (true) {
+                String line = null;
+
+                try {
+                    line = console.readLine();
+                } catch (IllegalArgumentException ie) {
+                    console.println(ie.getMessage());
+                    continue;
+                }
+
+                if (line == null || "quit".equalsIgnoreCase(line) || "exit".equalsIgnoreCase(line) ) {
+                    break;
+                }
+
+                if (line.matches("^list.*")) {
+                    String[] patternArray = line.split("^list");
+                    String pattern = "*";
+                    if (patternArray.length == 2 && !patternArray[1].trim().isEmpty()) {
+                        pattern = patternArray[1];
+                    }
+                    
+                    Map<String, Long> lists = listKeys(pattern.trim());
+                    if (!lists.isEmpty()) {
+                        for (String key : lists.keySet()) {
+                            console.print(key);
+                            console.print(" : ");
+                            console.println(lists.get(key).toString());
+                        } 
+                    } else {
+                        console.println("Not found");
+                    }
+                    
+                    continue;
+                }
+
+                if ("help".equalsIgnoreCase(line)) {
+                    showhelp(console);
+                    continue;
+                }
+
+                try {
+                    if (first) {
+                        execute(parser, line);
+                        console.println(execute(parser, line));
+                        first = false;
+                    } else {
+                        console.println(execute(parser, line));
+                    }
+                } catch (ParseException e) {
+                    console.println (e.getMessage());
+                }
+            }
+        } finally {
+            try {
+                TerminalFactory.get().restore();
+            } catch (Exception e) {
+                console.println ("Could not restore " + e.getMessage());
+            }
+            if (history != null) {
+                history.flush();
+            }
+        }
+    }
+
+
+    private static Map<String, Long> listKeys(String pattern) {
+        CacheInf cache = CacheFactory.getInstance();
+        Map<String, Long> lists = null;
+        if (cache instanceof LastStatusCache) {
+            lists = ((LastStatusCache) cache).getKeys(pattern);
+        } 
+        return lists;
+    }
+
+
+    private static String execute(ExecuteJEP parser, String line) throws ParseException {
+        Long startTime = System.currentTimeMillis();
+        //Parse the input line expression
+        String parsedExpression = CacheEvaluator.parse(line);
+        Long stopParseTime = System.currentTimeMillis() - startTime;
+
+        Float resultValue = null;   
+
+        Long startExecuteTime =  System.currentTimeMillis();
+
+        // Calculate the parsed expression
+        resultValue = parser.execute(parsedExpression);
+        Long stopExecuteTime =  System.currentTimeMillis() - startExecuteTime;
+
+        Long endTime = System.currentTimeMillis()-startTime;
+
+        // Write the execution time
+        StringBuilder strbu = new StringBuilder();
+
+        if (showtime) {
+            strbu.append("["+stopParseTime.toString()+"/"+stopExecuteTime.toString()+"/"+endTime.toString()+" ms] ");
+        }
+
+        // Write the parsed expression
+        if (showparse) {
+            strbu.append(parsedExpression);
+            strbu.append(" = ");
+        }
+        // Write the calculated result
+
+        if (resultValue != null) {
+            strbu.append(new BischeckDecimal(resultValue).toString());
+        } else {
+            strbu.append("null");
+        }
+        return strbu.toString();
+    }
+
+
+    private static void showhelp(ConsoleReader console) throws IOException {
+        console.println("Help");
+        console.println("====");
+        console.println("On the command line any expression can be entered that bischeck ");
+        console.println("supportd to retrive and calculate on cached data.");
+        console.println();
+        console.println("Examples:");
+        console.println("host-service-item[0] * 10");
+        console.println("avg(host0-service-item[10:20]) / avg(host1-service-item[10:20]) ");
+        console.println();
+        console.println("Commands");
+        console.println("========");
+        console.println("list      - list [keys*]");
+        console.println("quit/exit - exit CacheCli");
+        console.println("help      - show this help");
+    }
 }
 

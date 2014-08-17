@@ -26,6 +26,6 @@ package com.ingby.socbox.bischeck.service;
  */
 public interface ServiceStateInf {
 
-	ServiceState getServiceState();
-	void setServiceState();
+    ServiceState getServiceState();
+    void setServiceState();
 }

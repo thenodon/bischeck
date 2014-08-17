@@ -59,9 +59,9 @@ import com.ingby.socbox.bischeck.service.ServiceException;
  */
 public class LivestatusServiceItem extends ServiceItemAbstract implements ServiceItem {
     
-	private final static Logger LOGGER = LoggerFactory.getLogger(LivestatusServiceItem.class);
-	
-	
+    private final static Logger LOGGER = LoggerFactory.getLogger(LivestatusServiceItem.class);
+    
+    
     public LivestatusServiceItem(String name) {
         this.serviceItemName = name;        
     }
@@ -76,10 +76,10 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
         JSONObject jsonStatement = JSONObject.fromObject(this.getExecution());
         StringBuilder strbuf = new StringBuilder();
         if (!validateExecStatement(jsonStatement)) {
-        	LOGGER.warn("Not a valid livestatus operation {}", jsonStatement.toString());
-    		ServiceItemException si = new ServiceItemException(new IllegalArgumentException("Not a valid livestatus operation " + jsonStatement.toString()));
-    		si.setServiceItemName(this.serviceItemName);
-    		throw si;
+            LOGGER.warn("Not a valid livestatus operation {}", jsonStatement.toString());
+            ServiceItemException si = new ServiceItemException(new IllegalArgumentException("Not a valid livestatus operation " + jsonStatement.toString()));
+            si.setServiceItemName(this.serviceItemName);
+            throw si;
         }
 
         // Check if a host or service request
@@ -109,10 +109,10 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
         
         JSONArray jsonReplyArray =  (JSONArray) JSONSerializer.toJSON(service.executeStmt(strbuf.toString()));
         if (jsonReplyArray.size() != 1) {
-        	LOGGER.warn("Request to livestatus returned no data - check the configuration for {}", Util.fullQoutedName( service, this));
-        	ServiceItemException si = new ServiceItemException("Request to livestatus returned no data - check the configuration for " + Util.fullQoutedName( service, this));
-    		si.setServiceItemName(this.serviceItemName);
-    		throw si;  	
+            LOGGER.warn("Request to livestatus returned no data - check the configuration for {}", Util.fullQoutedName( service, this));
+            ServiceItemException si = new ServiceItemException("Request to livestatus returned no data - check the configuration for " + Util.fullQoutedName( service, this));
+            si.setServiceItemName(this.serviceItemName);
+            throw si;   
         }
         
         String firstValue = ((JSONArray) JSONSerializer.toJSON(jsonReplyArray.getString(0))).getString(0);
@@ -126,13 +126,13 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
 
     private boolean validateExecStatement(JSONObject jsonStatement) {
         if (!jsonStatement.containsKey("host"))  {
-        	return false;
+            return false;
         }
         
         if (!jsonStatement.containsKey("query")) {
-        	return false; 
+            return false; 
         } else if (!validateQuery(jsonStatement.getString("query"))) {
-        	return false;    
+            return false;    
         }
         
         return true;
@@ -142,7 +142,7 @@ public class LivestatusServiceItem extends ServiceItemAbstract implements Servic
     private boolean validateQuery(String ops) {
         if ("state".equalsIgnoreCase(ops) || 
                 ("perfdata".equalsIgnoreCase(ops)) ) { 
-        	return true;
+            return true;
         }
         return false;
     }

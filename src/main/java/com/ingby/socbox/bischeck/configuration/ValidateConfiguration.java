@@ -25,14 +25,14 @@ import org.slf4j.LoggerFactory;
 
 public abstract class ValidateConfiguration {
 
-	private final static Logger  LOOGER = LoggerFactory.getLogger(ValidateConfiguration.class);
+    private final static Logger  LOOGER = LoggerFactory.getLogger(ValidateConfiguration.class);
 
-	
-	public static int verify() {
-		ConfigFileManager xmlfilemgr = new ConfigFileManager();
+    
+    public static int verify() {
+        ConfigFileManager xmlfilemgr = new ConfigFileManager();
         for (ConfigXMLInf.XMLCONFIG xmlconf :ConfigXMLInf.XMLCONFIG.values()) {
             try {
-              	xmlfilemgr.getXMLConfiguration(xmlconf);
+                xmlfilemgr.getXMLConfiguration(xmlconf);
             } catch (Exception e) {
                 LOOGER.error("Errors was found validating the configuration file {}", 
                         xmlconf.xml(),e);
@@ -42,16 +42,16 @@ public abstract class ValidateConfiguration {
         return 0;
     }
 
-	public static void verifyByDirectory(String dir) throws Exception {
-		ConfigFileManager xmlfilemgr = new ConfigFileManager();
-		for (ConfigXMLInf.XMLCONFIG xmlconf :ConfigXMLInf.XMLCONFIG.values()) {
-			try {
-				xmlfilemgr.getXMLConfiguration(xmlconf,dir);
-			} catch (Exception e) {
-				LOOGER.error("Errors was found validating the configuration file {} in directory ", 
+    public static void verifyByDirectory(String dir) throws Exception {
+        ConfigFileManager xmlfilemgr = new ConfigFileManager();
+        for (ConfigXMLInf.XMLCONFIG xmlconf :ConfigXMLInf.XMLCONFIG.values()) {
+            try {
+                xmlfilemgr.getXMLConfiguration(xmlconf,dir);
+            } catch (Exception e) {
+                LOOGER.error("Errors was found validating the configuration file {} in directory ", 
                         xmlconf.xml(), dir ,e);
-				throw new Exception(xmlconf.xml(), e);
-			}
-		}    
-	}
+                throw new Exception(xmlconf.xml(), e);
+            }
+        }    
+    }
 }

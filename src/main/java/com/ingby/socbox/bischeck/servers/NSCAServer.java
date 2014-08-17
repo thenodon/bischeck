@@ -61,8 +61,8 @@ public final class NSCAServer implements Server, MessageServerInf {
     private NagiosSettings settings;
     
     
-	
-	/**
+    
+    /**
      * Retrieve the Server object. The method is invoked from class ServerExecutor
      * execute method. The created Server object is placed in the class internal 
      * Server object list.
@@ -98,9 +98,9 @@ public final class NSCAServer implements Server, MessageServerInf {
         execService.shutdownNow();
         
         try {
-			execService.awaitTermination(5000, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e1) {}
-			
+            execService.awaitTermination(5000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e1) {}
+            
         
         LOGGER.info("{} - Shutdown is done", instanceName);
         
@@ -132,19 +132,19 @@ public final class NSCAServer implements Server, MessageServerInf {
     
     
     private NagiosSettings getNSCAConnection(String name)  {
-    	Properties defaultproperties = getServerProperties();
-    	Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+        Properties defaultproperties = getServerProperties();
+        Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
         return new NagiosSettingsBuilder()
         .withNagiosHost(prop.getProperty("hostAddress",
-        		defaultproperties.getProperty("hostAddress")))
+                defaultproperties.getProperty("hostAddress")))
         .withPort(Integer.parseInt(prop.getProperty("port", 
-        		defaultproperties.getProperty("port"))))
+                defaultproperties.getProperty("port"))))
         .withEncryption(Encryption.valueOf(prop.getProperty("encryptionMode", 
-        		defaultproperties.getProperty("encryptionMode"))))
+                defaultproperties.getProperty("encryptionMode"))))
         .withPassword(prop.getProperty("password",
-        		defaultproperties.getProperty("password")))
+                defaultproperties.getProperty("password")))
         .withConnectionTimeout(Integer.parseInt(prop.getProperty("connectionTimeout",
-        		defaultproperties.getProperty("connectionTimeout"))))
+                defaultproperties.getProperty("connectionTimeout"))))
         .create();
     }
     
@@ -152,7 +152,7 @@ public final class NSCAServer implements Server, MessageServerInf {
     
     @Override
     public String getInstanceName() {
-    	return instanceName;
+        return instanceName;
     }
     
     @Override
@@ -166,30 +166,30 @@ public final class NSCAServer implements Server, MessageServerInf {
      * Get the default properties
      * @return default properties
      */
-	public static Properties getServerProperties() {
-		Properties defaultproperties = new Properties();
-	    
-		defaultproperties.setProperty("hostAddress","localhost");
-    	defaultproperties.setProperty("port","5667");
-    	defaultproperties.setProperty("encryptionMode","XOR");
-    	defaultproperties.setProperty("password","");
-    	defaultproperties.setProperty("connectionTimeout","5000");
-		
-		return defaultproperties;
-	}
+    public static Properties getServerProperties() {
+        Properties defaultproperties = new Properties();
+        
+        defaultproperties.setProperty("hostAddress","localhost");
+        defaultproperties.setProperty("port","5667");
+        defaultproperties.setProperty("encryptionMode","XOR");
+        defaultproperties.setProperty("password","");
+        defaultproperties.setProperty("connectionTimeout","5000");
+        
+        return defaultproperties;
+    }
 
 
-	@Override
-	public void onMessage(Service message) {
-		subTaskQueue.offer(message);
-		
-		LOGGER.debug("{} - Worker pool size {} and queue size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize(),subTaskQueue.size());
-		
-		/* If the queue is larger then 10 start new workers */
-		if (subTaskQueue.size() > MAX_QUEUE) {
-		    execService.execute(new NSCAWorker(instanceName, subTaskQueue, circuitBreak, settings));
-		    LOGGER.info("{} - Increase worker pool size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize());
-		}
-	}
+    @Override
+    public void onMessage(Service message) {
+        subTaskQueue.offer(message);
+        
+        LOGGER.debug("{} - Worker pool size {} and queue size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize(),subTaskQueue.size());
+        
+        /* If the queue is larger then 10 start new workers */
+        if (subTaskQueue.size() > MAX_QUEUE) {
+            execService.execute(new NSCAWorker(instanceName, subTaskQueue, circuitBreak, settings));
+            LOGGER.info("{} - Increase worker pool size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize());
+        }
+    }
 }
 

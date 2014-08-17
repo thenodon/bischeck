@@ -97,13 +97,13 @@ import com.yammer.metrics.core.TimerContext;
  */
 
 public final class ConfigurationManager  implements ConfigurationManagerMBean {
-	
-	private static final int OKAY = 0;
+    
+    private static final int OKAY = 0;
     private static final int FAILED = 1;
     
     private static final String DEFAULT_TRESHOLD = "DummyThreshold";
 
-	public static final String INTERVALSCHEDULEPATTERN = "^[0-9]+ *[HMS]{1} *$";
+    public static final String INTERVALSCHEDULEPATTERN = "^[0-9]+ *[HMS]{1} *$";
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
 
@@ -121,7 +121,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     private ConfigFileManager xmlFileMgr = null;
     
     private Map<RunAfter,List<Service>> runafter = null;
-	
+    
     private Map<String,XMLServicetemplate> serviceTemplateMap = null;
     private Map<String,XMLServiceitemtemplate> serviceItemTemplateMap = null;
     private Map<String,XMLCachetemplate> cacheTemplateMap = null;
@@ -186,18 +186,18 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      * Allocate all configuration data structures
      */
     private void allocateDataStructs() {
-    	xmlFileMgr  = new ConfigFileManager();
-    	bischeckProperties = new Properties();    
-    	url2service = new Properties();
-    	hostsMap = new HashMap<String,Host>();
-    	scheduleJobs = new ArrayList<ServiceJobConfig>();
-    	serversMap = new HashMap<String,Properties>();
-    	serversClasses = new HashMap<String,Class<?>>();
-    	runafter = new HashMap<RunAfter,List<Service>>();
-    	serviceTemplateMap = new HashMap<String, XMLServicetemplate>();
-    	serviceItemTemplateMap = new HashMap<String, XMLServiceitemtemplate>();
-    	cacheTemplateMap = new HashMap<String, XMLCachetemplate>();
-    	purgeMap = new HashMap<String, String>();
+        xmlFileMgr  = new ConfigFileManager();
+        bischeckProperties = new Properties();    
+        url2service = new Properties();
+        hostsMap = new HashMap<String,Host>();
+        scheduleJobs = new ArrayList<ServiceJobConfig>();
+        serversMap = new HashMap<String,Properties>();
+        serversClasses = new HashMap<String,Class<?>>();
+        runafter = new HashMap<RunAfter,List<Service>>();
+        serviceTemplateMap = new HashMap<String, XMLServicetemplate>();
+        serviceItemTemplateMap = new HashMap<String, XMLServiceitemtemplate>();
+        cacheTemplateMap = new HashMap<String, XMLCachetemplate>();
+        purgeMap = new HashMap<String, String>();
     }
 
     
@@ -226,7 +226,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      * @throws ConfigurationException if the configuration is faulty
      */
     synchronized public static void initonce() throws  ConfigurationException {
-    	initConfiguration(true);
+        initConfiguration(true);
     }
     
     
@@ -237,36 +237,36 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      * @throws ConfigurationException if the configuration is faulty
      */
     synchronized public static void init() throws ConfigurationException {
-    	initConfiguration(false);
+        initConfiguration(false);
     }
     
 
     synchronized private static void initConfiguration(boolean runOnce) throws ConfigurationException {
-    	if (configMgr == null ) 
+        if (configMgr == null ) 
             configMgr = new ConfigurationManager();
 
-    	final Timer timer = Metrics.newTimer(ConfigurationManager.class, 
-				"initializationTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-		final TimerContext context = timer.time();
+        final Timer timer = Metrics.newTimer(ConfigurationManager.class, 
+                "initializationTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final TimerContext context = timer.time();
 
         configMgr.allocateDataStructs();
         
         try {
-        	// Read all configuration data structures. 
-        	configMgr.initProperties();
-        	configMgr.initURL2Service();
-        	configMgr.initServers();
-        	configMgr.initBischeckServices(runOnce);
-        	
-        	ThresholdFactory.clearCache();
-        	        	
+            // Read all configuration data structures. 
+            configMgr.initProperties();
+            configMgr.initURL2Service();
+            configMgr.initServers();
+            configMgr.initBischeckServices(runOnce);
+            
+            ThresholdFactory.clearCache();
+                        
         } catch (ConfigurationException e) {
-        	LOGGER.error("Configuration Manager initzialization failed with {}", e.getMessage(),e);
-        	throw e;
+            LOGGER.error("Configuration Manager initzialization failed with {}", e.getMessage(),e);
+            throw e;
         }
         finally {
-        	long duration = context.stop()/1000000;
-			LOGGER.info("Configuration init time: {} ms", duration);
+            long duration = context.stop()/1000000;
+            LOGGER.info("Configuration init time: {} ms", duration);
         }
         
         // Make all configuration data structures unmodifiable before usage
@@ -319,18 +319,18 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
 
     
     private void initBischeckServices(boolean once) 
-    		throws ConfigurationException {
+            throws ConfigurationException {
         XMLBischeck bischeckconfig  =
                 (XMLBischeck) xmlFileMgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.BISCHECK);
 
         // Init Service templates 
         for (XMLServicetemplate serviceTemplate: bischeckconfig.getServicetemplate()) {
-        	serviceTemplateMap.put(serviceTemplate.getTemplatename(),serviceTemplate);
+            serviceTemplateMap.put(serviceTemplate.getTemplatename(),serviceTemplate);
         }
         
         // Init Serviceitem templates
         for (XMLServiceitemtemplate serviceItemTemplate: bischeckconfig.getServiceitemtemplate()) {
-        	serviceItemTemplateMap.put(serviceItemTemplate.getTemplatename(),serviceItemTemplate);
+            serviceItemTemplateMap.put(serviceItemTemplate.getTemplatename(),serviceItemTemplate);
         }
         
         // Init cache templates
@@ -340,12 +340,12 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         
         // Conduct the Host, Service and ServiceItem configuration 
         try {
-			setupHost(bischeckconfig);
-		} catch (ServiceFactoryException e) {
-			throw new ConfigurationException(e);
-		} catch (ServiceItemFactoryException e) {
-			throw new ConfigurationException(e);
-		}
+            setupHost(bischeckconfig);
+        } catch (ServiceFactoryException e) {
+            throw new ConfigurationException(e);
+        } catch (ServiceItemFactoryException e) {
+            throw new ConfigurationException(e);
+        }
         
         // Create the quartz schedule triggers and store in a List
         setServiceTriggers(once);
@@ -382,7 +382,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
 
 
     private void setupHost(XMLBischeck bischeckconfig) 
-    		throws ServiceFactoryException, ConfigurationException, ServiceItemFactoryException {
+            throws ServiceFactoryException, ConfigurationException, ServiceItemFactoryException {
         Iterator<XMLHost> iterhost = bischeckconfig.getHost().iterator();
         
         while (iterhost.hasNext() ) {
@@ -414,15 +414,15 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
             // Set the macro values
             ConfigMacroUtil.replaceMacros(host);
             if (LOGGER.isDebugEnabled()) {
-            	StringBuilder strbuf = ConfigMacroUtil.dump(host);
-            	LOGGER.debug(strbuf.toString());
+                StringBuilder strbuf = ConfigMacroUtil.dump(host);
+                LOGGER.debug(strbuf.toString());
             }
         }
     }
 
 
     private void setupService(XMLHost hostconfig, Host host) 
-    		throws ServiceFactoryException, ConfigurationException, ServiceItemFactoryException {
+            throws ServiceFactoryException, ConfigurationException, ServiceItemFactoryException {
         Iterator<XMLService> iterservice = hostconfig.getService().iterator();
         
         while (iterservice.hasNext()) {
@@ -433,19 +433,19 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
                      
             // If a template is detected
             if (serviceconfig.getTemplate() != null) {
-            	if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) {
-            		if (serviceconfig.getServiceoverride() != null && serviceconfig.getServiceoverride().isInactive() != null ){
-            			if (serviceconfig.getServiceoverride().isInactive()) {
-            				LOGGER.debug("Service {} for host {} is set to inactive - break", 
-            						serviceconfig.getName(), host.getHostname());
-            				continue;
-            			}
-            		}
-            		service = createServiceByTemplate(host, serviceconfig);
-            	} else {
-            		LOGGER.error("The serviceitem template {} is not in the configuration", serviceconfig.getTemplate());
-        			throw new ServiceItemFactoryException("The serviceitem template " + serviceconfig.getTemplate() +" is not in the configuration");
-            	}
+                if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) {
+                    if (serviceconfig.getServiceoverride() != null && serviceconfig.getServiceoverride().isInactive() != null ){
+                        if (serviceconfig.getServiceoverride().isInactive()) {
+                            LOGGER.debug("Service {} for host {} is set to inactive - break", 
+                                    serviceconfig.getName(), host.getHostname());
+                            continue;
+                        }
+                    }
+                    service = createServiceByTemplate(host, serviceconfig);
+                } else {
+                    LOGGER.error("The serviceitem template {} is not in the configuration", serviceconfig.getTemplate());
+                    throw new ServiceItemFactoryException("The serviceitem template " + serviceconfig.getTemplate() +" is not in the configuration");
+                }
             } else {
                 // If a normal service configuration is detected
                 if (serviceconfig.isInactive() != null ){
@@ -455,7 +455,7 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
                         continue;
                     }
                 }
-            	service = createServiceByClassic(host, serviceconfig);
+                service = createServiceByClassic(host, serviceconfig);
 
             }
             
@@ -471,25 +471,25 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     private void setServiceDriver(Service service)
             throws ConfigurationException {
         if (service.getDriverClassName() != null) {
-        	if (service.getDriverClassName().trim().length() != 0) {
-        		LOGGER.debug("Driver name: {}", service.getDriverClassName().trim());
-        		try {
-        			Class.forName(service.getDriverClassName().trim()).newInstance();
-        			
-        		} catch (ClassNotFoundException e) {
-        			LOGGER.error("Could not find the driver class {} for service {} ", 
-        					service.getServiceName(), service.getDriverClassName(), e);
-        			throw new ConfigurationException(e);
-        		} catch (InstantiationException e) {
-        			LOGGER.error("Could not instantiate the driver class {} for service {}", 
-        					service.getServiceName(), service.getDriverClassName(), e);
-        			throw new ConfigurationException(e);
-        		} catch (IllegalAccessException e) {
-        			LOGGER.error("Could not acces the driver class {} for service {}", 
-        					service.getServiceName(), service.getDriverClassName(), e);
-        			throw new ConfigurationException(e);
-        		}
-        	}
+            if (service.getDriverClassName().trim().length() != 0) {
+                LOGGER.debug("Driver name: {}", service.getDriverClassName().trim());
+                try {
+                    Class.forName(service.getDriverClassName().trim()).newInstance();
+                    
+                } catch (ClassNotFoundException e) {
+                    LOGGER.error("Could not find the driver class {} for service {} ", 
+                            service.getServiceName(), service.getDriverClassName(), e);
+                    throw new ConfigurationException(e);
+                } catch (InstantiationException e) {
+                    LOGGER.error("Could not instantiate the driver class {} for service {}", 
+                            service.getServiceName(), service.getDriverClassName(), e);
+                    throw new ConfigurationException(e);
+                } catch (IllegalAccessException e) {
+                    LOGGER.error("Could not acces the driver class {} for service {}", 
+                            service.getServiceName(), service.getDriverClassName(), e);
+                    throw new ConfigurationException(e);
+                }
+            }
         }
     }
 
@@ -504,9 +504,9 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
             throws ServiceFactoryException {
         Service service;
         service = ServiceFactory.createService(
-        		serviceconfig.getName(),
-        		serviceconfig.getUrl().trim(),
-        		url2service, bischeckProperties);
+                serviceconfig.getName(),
+                serviceconfig.getUrl().trim(),
+                url2service, bischeckProperties);
 
         //Check for null - not supported logger.error
         service.setHost(host);
@@ -516,9 +516,9 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         service.setConnectionUrl(serviceconfig.getUrl().trim());
         service.setDriverClassName(serviceconfig.getDriver());
         if (serviceconfig.isSendserver() != null) {
-        	service.setSendServiceData(serviceconfig.isSendserver());
+            service.setSendServiceData(serviceconfig.isSendserver());
         } else {
-        	service.setSendServiceData(true);
+            service.setSendServiceData(true);
         }
         return service;
     }
@@ -564,9 +564,9 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         service.setConnectionUrl(template.getUrl().trim());
         service.setDriverClassName(template.getDriver());
         if (template.isSendserver() != null) {
-        	service.setSendServiceData(template.isSendserver());
+            service.setSendServiceData(template.isSendserver());
         } else {
-        	service.setSendServiceData(true);
+            service.setSendServiceData(true);
         }
         // Override with template properties
         if (serviceconfig.getServiceoverride() != null) {
@@ -602,38 +602,38 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     private void setupServiceItem(XMLService serviceconfig, Service service)
             throws ServiceItemFactoryException, ServiceFactoryException {
         
-    	Iterator<XMLServiceitem> iterserviceitem = null; 
-    	
+        Iterator<XMLServiceitem> iterserviceitem = null; 
+        
         // If the service was a template - search in the template
         if (serviceTemplateMap.containsKey(serviceconfig.getTemplate())) { 
-        	XMLServicetemplate template = serviceTemplateMap.get(serviceconfig.getTemplate());
-        	iterserviceitem = template.getServiceitem().iterator();
+            XMLServicetemplate template = serviceTemplateMap.get(serviceconfig.getTemplate());
+            iterserviceitem = template.getServiceitem().iterator();
         }
         else {
-        	iterserviceitem = serviceconfig.getServiceitem().iterator();
+            iterserviceitem = serviceconfig.getServiceitem().iterator();
         }
         
         while (iterserviceitem.hasNext()) {
-        	ServiceItem serviceitem = null;
-        	
-        	// If a normal service configuration is detected
-        	XMLServiceitem serviceitemconfig = iterserviceitem.next();
-        	
-        	if (serviceitemconfig.getTemplate() != null ) {
-        		
-        		if (serviceItemTemplateMap.containsKey(serviceitemconfig.getTemplate())){
-        			serviceitem = createServiceItemByTemplate(service,
-        					serviceitemconfig);
-        		} else {
-        			LOGGER.error("The serviceitem template {} is not in the configuration", serviceitemconfig.getTemplate());
-        			throw new ServiceItemFactoryException("The serviceitem template " + serviceitemconfig.getTemplate() +" is not in the configuration");
-        		}
+            ServiceItem serviceitem = null;
+            
+            // If a normal service configuration is detected
+            XMLServiceitem serviceitemconfig = iterserviceitem.next();
+            
+            if (serviceitemconfig.getTemplate() != null ) {
+                
+                if (serviceItemTemplateMap.containsKey(serviceitemconfig.getTemplate())){
+                    serviceitem = createServiceItemByTemplate(service,
+                            serviceitemconfig);
+                } else {
+                    LOGGER.error("The serviceitem template {} is not in the configuration", serviceitemconfig.getTemplate());
+                    throw new ServiceItemFactoryException("The serviceitem template " + serviceitemconfig.getTemplate() +" is not in the configuration");
+                }
             } else {
-            	serviceitem = ceateServiceitemByClassic(service,
+                serviceitem = ceateServiceitemByClassic(service,
                         serviceitemconfig);
             }
-        	
-        	service.addServiceItem(serviceitem);
+            
+            service.addServiceItem(serviceitem);
 
         }
     }
@@ -645,8 +645,8 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         ServiceItem serviceitem;
         Aggregation aggregation;
         serviceitem = ServiceItemFactory.createServiceItem(
-        		serviceitemconfig.getName(),
-        		serviceitemconfig.getServiceitemclass().trim());
+                serviceitemconfig.getName(),
+                serviceitemconfig.getServiceitemclass().trim());
 
         serviceitem.setService(service);
         serviceitem.setClassName(serviceitemconfig.getServiceitemclass().trim());
@@ -658,10 +658,10 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
          * Set default threshold class if not set in bischeck.xml
          */
         if (serviceitemconfig.getThresholdclass() == null || 
-        		serviceitemconfig.getThresholdclass().trim().length() == 0 ) {
-        	serviceitem.setThresholdClassName(DEFAULT_TRESHOLD);
+                serviceitemconfig.getThresholdclass().trim().length() == 0 ) {
+            serviceitem.setThresholdClassName(DEFAULT_TRESHOLD);
         } else {
-        	serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
+            serviceitem.setThresholdClassName(serviceitemconfig.getThresholdclass().trim());
         }
         
         /*
@@ -675,20 +675,20 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
                 aggregation = new Aggregation(serviceitemconfig.getCache(),service,serviceitem);
             } else {
                 // Template based
-            	if (cacheTemplateMap.containsKey(serviceitemconfig.getCache().getTemplate())) {
-            		xmlPurge = cacheTemplateMap.get(serviceitemconfig.getCache().getTemplate()).getPurge();
+                if (cacheTemplateMap.containsKey(serviceitemconfig.getCache().getTemplate())) {
+                    xmlPurge = cacheTemplateMap.get(serviceitemconfig.getCache().getTemplate()).getPurge();
                     aggregation = new Aggregation(cacheTemplateMap.get(serviceitemconfig.getCache().getTemplate()),service,serviceitem);
-            	} else {
-            		LOGGER.error("The cache template {} is not in the configuration", serviceitemconfig.getCache().getTemplate());
-        			throw new ServiceItemFactoryException("The cache template " + serviceitemconfig.getCache().getTemplate() +" is not in the configuration");		
-            	}   
+                } else {
+                    LOGGER.error("The cache template {} is not in the configuration", serviceitemconfig.getCache().getTemplate());
+                    throw new ServiceItemFactoryException("The cache template " + serviceitemconfig.getCache().getTemplate() +" is not in the configuration");      
+                }   
             }
             
             aggregation.setAggregate(url2service);
             setPurgeMap(aggregation.getRetentionMap());
             setPurge(xmlPurge,service,serviceitem);
         } else {
-        	setPurge(null,service,serviceitem);
+            setPurge(null,service,serviceitem);
         }
         return serviceitem;
     }
@@ -728,10 +728,10 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
          * Set default threshold class if not set in bischeck.xml
          */
         if (template.getThresholdclass() == null || 
-        		template.getThresholdclass().trim().length() == 0 ) {
-        	serviceitem.setThresholdClassName(DEFAULT_TRESHOLD);
+                template.getThresholdclass().trim().length() == 0 ) {
+            serviceitem.setThresholdClassName(DEFAULT_TRESHOLD);
         } else {
-        	serviceitem.setThresholdClassName(template.getThresholdclass().trim());
+            serviceitem.setThresholdClassName(template.getThresholdclass().trim());
         }
         
         if (serviceitemconfig.getServiceitemoverride() != null) {
@@ -766,19 +766,19 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
                 aggregation = new Aggregation(xmlCache,service,serviceitem);
             } else {
                 // Template based
-            	if (cacheTemplateMap.containsKey(template.getCache().getTemplate())) {
-            		xmlPurge = cacheTemplateMap.get(template.getCache().getTemplate()).getPurge();
-            		aggregation = new Aggregation(cacheTemplateMap.get(template.getCache().getTemplate()),service,serviceitem);
-            	} else {
-            		LOGGER.error("The cache template {} is not in the configuration", template.getCache().getTemplate());
-        			throw new ServiceItemFactoryException("The cache template " + template.getCache().getTemplate() +" is not in the configuration");		
-            	}
+                if (cacheTemplateMap.containsKey(template.getCache().getTemplate())) {
+                    xmlPurge = cacheTemplateMap.get(template.getCache().getTemplate()).getPurge();
+                    aggregation = new Aggregation(cacheTemplateMap.get(template.getCache().getTemplate()),service,serviceitem);
+                } else {
+                    LOGGER.error("The cache template {} is not in the configuration", template.getCache().getTemplate());
+                    throw new ServiceItemFactoryException("The cache template " + template.getCache().getTemplate() +" is not in the configuration");       
+                }
             }    
             aggregation.setAggregate(url2service);
             setPurgeMap(aggregation.getRetentionMap());
             setPurge(xmlPurge,service,serviceitem);
         } else {
-        	setPurge(null,service,serviceitem);
+            setPurge(null,service,serviceitem);
         }
         
         return serviceitem;
@@ -791,11 +791,11 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      * @param retentionMap
      */
     private void setPurgeMap(Map<String, String> retentionMap) {
-    	purgeMap.putAll(retentionMap);
-	}
+        purgeMap.putAll(retentionMap);
+    }
 
 
-	/**
+    /**
      * For serviceitem that has <purge> defined the purging will be set up. If 
      * a serviceitem do not have cache with purge then it will be set to property
      * <code>lastStatusCacheSize</code> and default is 500.
@@ -803,25 +803,25 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      * @param service
      * @param serviceitem
      */
-	private void setPurge(XMLPurge xmlPurge, Service service, ServiceItem serviceitem) {
-		String key = Util.fullName(service, serviceitem);
-		if (xmlPurge == null) {
-			// Set default 
-			try {
-				purgeMap.put(key, String.valueOf(bischeckProperties.getProperty("lastStatusCacheSize","500")));
-			} catch (NumberFormatException ne) {
-				purgeMap.put(key, String.valueOf("500"));
-			}
+    private void setPurge(XMLPurge xmlPurge, Service service, ServiceItem serviceitem) {
+        String key = Util.fullName(service, serviceitem);
+        if (xmlPurge == null) {
+            // Set default 
+            try {
+                purgeMap.put(key, String.valueOf(bischeckProperties.getProperty("lastStatusCacheSize","500")));
+            } catch (NumberFormatException ne) {
+                purgeMap.put(key, String.valueOf("500"));
+            }
         } else {
-        	if(xmlPurge.getMaxcount() != null) {
-        		purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
-        	} else if (xmlPurge.getOffset() != null && xmlPurge.getPeriod() != null) {
-        		purgeMap.put(key, "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
-        	}
+            if(xmlPurge.getMaxcount() != null) {
+                purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
+            } else if (xmlPurge.getOffset() != null && xmlPurge.getPeriod() != null) {
+                purgeMap.put(key, "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
+            }
         }
     }
     
-	private void initServers() throws ConfigurationException {
+    private void initServers() throws ConfigurationException {
         XMLServers serversconfig = (XMLServers) xmlFileMgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.SERVERS);
 
         Iterator<XMLServer> iter = serversconfig.getServer().iterator();
@@ -829,11 +829,11 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         while (iter.hasNext()) {
             XMLServer serverconfig = iter.next(); 
             try {
-				setServers(serverconfig);
-			} catch (ClassNotFoundException e) {
-				LOGGER.error("The class {} for server {} was not found", serverconfig.getClazz(), serverconfig.getName(), e);
-				throw new ConfigurationException(e);
-			}        
+                setServers(serverconfig);
+            } catch (ClassNotFoundException e) {
+                LOGGER.error("The class {} for server {} was not found", serverconfig.getClazz(), serverconfig.getName(), e);
+                throw new ConfigurationException(e);
+            }        
         }
     }
 
@@ -853,19 +853,19 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     @SuppressWarnings("unchecked")
     private Class<?> getServerClass(String clazzname) throws ClassNotFoundException { 
 
-    	Class<?> clazz = null;
+        Class<?> clazz = null;
 
-    	if (isClass("com.ingby.socbox.bischeck.servers." +clazzname)) {
-    		clazz=(Class<Server>) Class.forName("com.ingby.socbox.bischeck.servers." + clazzname);
-    	} else if (isClass("com.ingby.socbox.bischeck.notifications." + clazzname)){
-    		clazz=(Class<Notifier>) Class.forName("com.ingby.socbox.bischeck.notifications." + clazzname);	
-    	} else if (isClass(clazzname)){
-    		clazz=(Class<Server>) Class.forName(clazzname);
-    	} else {
-    		throw new ClassNotFoundException(clazzname);
-    	}
+        if (isClass("com.ingby.socbox.bischeck.servers." +clazzname)) {
+            clazz=(Class<Server>) Class.forName("com.ingby.socbox.bischeck.servers." + clazzname);
+        } else if (isClass("com.ingby.socbox.bischeck.notifications." + clazzname)){
+            clazz=(Class<Notifier>) Class.forName("com.ingby.socbox.bischeck.notifications." + clazzname);  
+        } else if (isClass(clazzname)){
+            clazz=(Class<Server>) Class.forName(clazzname);
+        } else {
+            throw new ClassNotFoundException(clazzname);
+        }
 
-    	return clazz;
+        return clazz;
     }
 
     private boolean isClass(String className) {
@@ -910,38 +910,38 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
                 trigger = newTrigger()
                 .withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
                 .withSchedule(
-                		cronSchedule(schedule).withMisfireHandlingInstructionDoNothing())
+                        cronSchedule(schedule).withMisfireHandlingInstructionDoNothing())
                 .build();
             
             
         } else if (isIntervalTrigger(schedule)){
-        	// Simple schedule
-        	trigger = newTrigger()
-        	.withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
-        	.startAt(randomStartTime(calculateInterval(schedule)))
-        	.withSchedule(
-        			//simpleSchedule().
-        			SimpleScheduleBuilder.
-        			repeatSecondlyForever(calculateInterval(schedule)).
-        			withMisfireHandlingInstructionNextWithRemainingCount())
-        			.build();
-        	
+            // Simple schedule
+            trigger = newTrigger()
+            .withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
+            .startAt(randomStartTime(calculateInterval(schedule)))
+            .withSchedule(
+                    //simpleSchedule().
+                    SimpleScheduleBuilder.
+                    repeatSecondlyForever(calculateInterval(schedule)).
+                    withMisfireHandlingInstructionNextWithRemainingCount())
+                    .build();
+            
         } else if (isRunAfterTrigger(schedule)) {
-        	int index = schedule.indexOf("-");
-        	String hostname = schedule.substring(0, index);
-        	String servicename = schedule.substring(index+1, schedule.length());
-        	LOGGER.debug("Check for services that will run after host {} and service {}", hostname, servicename);
-        	RunAfter runafterkey = new RunAfter(hostname, servicename);
+            int index = schedule.indexOf("-");
+            String hostname = schedule.substring(0, index);
+            String servicename = schedule.substring(index+1, schedule.length());
+            LOGGER.debug("Check for services that will run after host {} and service {}", hostname, servicename);
+            RunAfter runafterkey = new RunAfter(hostname, servicename);
 
-        	if (!runafter.containsKey(runafterkey)) {
-        		LOGGER.debug("Add service {}-{} to run after host {} and service {} ", 
-        				service.getHost().getHostname(),service.getServiceName(), hostname, servicename);
-        		runafter.put(runafterkey, new ArrayList<Service>());		
-        	}
-        	
-        	runafter.get(runafterkey).add(service);
+            if (!runafter.containsKey(runafterkey)) {
+                LOGGER.debug("Add service {}-{} to run after host {} and service {} ", 
+                        service.getHost().getHostname(),service.getServiceName(), hostname, servicename);
+                runafter.put(runafterkey, new ArrayList<Service>());        
+            }
+            
+            runafter.get(runafterkey).add(service);
         }
-        	
+            
         return trigger;
     }
 
@@ -954,9 +954,9 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      * @return a Date that is current-time + current-time + random(0,intervalinsec) 
      */
     private Date randomStartTime(int intervalinsec) {
-    	long randomininterval = ((long) (Math.random()*intervalinsec*1000));
-    	long starttime = System.currentTimeMillis()+randomininterval;
-    	return new Date(starttime);
+        long randomininterval = ((long) (Math.random()*intervalinsec*1000));
+        long starttime = System.currentTimeMillis()+randomininterval;
+        return new Date(starttime);
     }
     
     
@@ -969,16 +969,16 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      */
     private Trigger triggerFactoryOnce(String schedule, Service service, int triggerid) {
 
-    	Trigger trigger = null;
+        Trigger trigger = null;
 
-    	trigger = newTrigger()
-    			.withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
-    			.withSchedule(simpleSchedule().
-    					withRepeatCount(0))
-    					.startNow()
-    					.build();
-    	LOGGER.debug("Tigger for host {} and service {} for schedule {}", 
-    			service.getHost().getHostname(), service.getServiceName(), schedule);
+        trigger = newTrigger()
+                .withIdentity(service.getServiceName()+"Trigger-"+(triggerid), service.getHost().getHostname()+"TriggerGroup")
+                .withSchedule(simpleSchedule().
+                        withRepeatCount(0))
+                        .startNow()
+                        .build();
+        LOGGER.debug("Tigger for host {} and service {} for schedule {}", 
+                service.getHost().getHostname(), service.getServiceName(), schedule);
 
         return trigger;
     }
@@ -1020,59 +1020,59 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     
     
     private boolean isIntervalTrigger(String schedule) {
-    	Pattern pattern = Pattern.compile(INTERVALSCHEDULEPATTERN);
+        Pattern pattern = Pattern.compile(INTERVALSCHEDULEPATTERN);
         Matcher matcher = pattern.matcher(schedule);
         
         if (matcher.matches()) {
-        	return true;
+            return true;
         }
-    	
+        
         return false;
     }
     
     
     private  boolean isRunAfterTrigger(String schedule) {
-    	int index = schedule.indexOf("-");
-    	if (index == -1) {
-    		return false;
-    	}
-    	
-    	String hostname = schedule.substring(0, index);
-    	String servicename = schedule.substring(index+1, schedule.length());
-    	
-    	Host hostafter = hostsMap.get(hostname);
-    	
-    	if (hostafter != null) {
-    		
-    		Service serviceafter = hostafter.getServiceByName(servicename);
-        	
-    		if (serviceafter != null) {
-    		
-    			if (!(hostname.equals(hostafter.getHostname()) && 
-    				servicename.equals(serviceafter.getServiceName()))) { 
-    				LOGGER.warn("RunAfter host and/or service do not exists for host " + 
-    						hostname + 
-    						"-" +
-    						servicename);
-    				return false;
-    			}
-    		} else {
-    			LOGGER.warn("RunAfter service do not exists for " + 
-    					hostname + 
-    					"-" +
-    					servicename);
-    			return false;
-    		}
-    			
-    	} else {
-    		LOGGER.warn("RunAfter host do not exists for " + 
-					hostname + 
-					"-" +
-					servicename);
-			return false;
-    	}
-    	
-    	return true;
+        int index = schedule.indexOf("-");
+        if (index == -1) {
+            return false;
+        }
+        
+        String hostname = schedule.substring(0, index);
+        String servicename = schedule.substring(index+1, schedule.length());
+        
+        Host hostafter = hostsMap.get(hostname);
+        
+        if (hostafter != null) {
+            
+            Service serviceafter = hostafter.getServiceByName(servicename);
+            
+            if (serviceafter != null) {
+            
+                if (!(hostname.equals(hostafter.getHostname()) && 
+                    servicename.equals(serviceafter.getServiceName()))) { 
+                    LOGGER.warn("RunAfter host and/or service do not exists for host " + 
+                            hostname + 
+                            "-" +
+                            servicename);
+                    return false;
+                }
+            } else {
+                LOGGER.warn("RunAfter service do not exists for " + 
+                        hostname + 
+                        "-" +
+                        servicename);
+                return false;
+            }
+                
+        } else {
+            LOGGER.warn("RunAfter host do not exists for " + 
+                    hostname + 
+                    "-" +
+                    servicename);
+            return false;
+        }
+        
+        return true;
     }
     
         
@@ -1193,10 +1193,10 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
      */
     public Properties getServerProperiesByName(String name) {
         if (initDone.get()) {
-        	// Check if null then send an empty Properties
-        	if (serversMap.get(name) == null) {
-        		return new Properties();
-        	}
+            // Check if null then send an empty Properties
+            if (serversMap.get(name) == null) {
+                return new Properties();
+            }
             return serversMap.get(name);
         } else { 
             LOGGER.error("Configuration manager not initilized (getServerProperiesByName)");
@@ -1247,8 +1247,8 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     
     @Override
     public String getPurgeConfigurations() {
-    	final String separator = System.getProperty("line.separator");
-    	
+        final String separator = System.getProperty("line.separator");
+        
         StringBuilder strbuf = new StringBuilder();
         TreeMap<String, String> treeMap = new TreeMap<String,String>();
         
@@ -1262,30 +1262,30 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     
     @Override
     public String getServiceDefinitions() {
-    	final String separator = System.getProperty("line.separator");
-    	
+        final String separator = System.getProperty("line.separator");
+        
         StringBuilder strbuf = new StringBuilder();
         TreeSet<String> set = new TreeSet<String>();
         
         Map<String,Host> hosts = getHostConfig();
         for (String hostName: hosts.keySet()) {
-        	
-        	Map<String, Service> services = hosts.get(hostName).getServices();
-        	
-        	for(String serviceName: services.keySet() ) {
-        		if (serviceName.indexOf(Aggregation.AGGREGATION_SEPARATOR) == -1) {	
-        			Map<String, ServiceItem> serviceitems = services.get(serviceName).getServicesItems();
+            
+            Map<String, Service> services = hosts.get(hostName).getServices();
+            
+            for(String serviceName: services.keySet() ) {
+                if (serviceName.indexOf(Aggregation.AGGREGATION_SEPARATOR) == -1) { 
+                    Map<String, ServiceItem> serviceitems = services.get(serviceName).getServicesItems();
 
-        			for (String servicItemName: serviceitems.keySet() ) {
+                    for (String servicItemName: serviceitems.keySet() ) {
 
-        				set.add(Util.fullName(hostName, serviceName, servicItemName));
-        			}
-        		}
-        	}	
+                        set.add(Util.fullName(hostName, serviceName, servicItemName));
+                    }
+                }
+            }   
         }
         
         for (String str:set) {
-        	strbuf.append(str).append(separator);
+            strbuf.append(str).append(separator);
         }
         
         return strbuf.toString();

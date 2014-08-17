@@ -29,58 +29,58 @@ import org.nfunk.jep.function.PostfixMathCommand;
  */
 public class Max extends PostfixMathCommand {
 
-	private boolean supportNull = false;
+    private boolean supportNull = false;
 
-	/**
-	 * Constructor.
-	 */
-	public Max() {
-		// Use a variable number of arguments
-		numberOfParameters = -1;
-		this.supportNull = Util.getSupportNull();
-	}
+    /**
+     * Constructor.
+     */
+    public Max() {
+        // Use a variable number of arguments
+        numberOfParameters = -1;
+        this.supportNull = Util.getSupportNull();
+    }
 
-	public Max(boolean supportNull) {
-		// Use a variable number of arguments
-		numberOfParameters = -1;
-		this.supportNull  = supportNull;
-	}
+    public Max(boolean supportNull) {
+        // Use a variable number of arguments
+        numberOfParameters = -1;
+        this.supportNull  = supportNull;
+    }
 
-	/**
-	 * Calculate the max, which are assumed to
-	 * be of the Double type.
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void run(Stack stack) throws ParseException {
-		checkStack(stack);// check the stack
+    /**
+     * Calculate the max, which are assumed to
+     * be of the Double type.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void run(Stack stack) throws ParseException {
+        checkStack(stack);// check the stack
 
-		if (curNumberOfParameters < 1) {
-			throw new ParseException("No arguments for Max");
-		}
-	
+        if (curNumberOfParameters < 1) {
+            throw new ParseException("No arguments for Max");
+        }
+    
 
-		Object max = (Object) new Double(0);;
-		Object param;
-		int i = 0;
+        Object max = (Object) new Double(0);;
+        Object param;
+        int i = 0;
         int j = 0;
         // repeat summation for each one of the current parameters
         while (i < (curNumberOfParameters)) {
-        	// get the parameter from the stack
-        	param = stack.pop();
-        	if (!(supportNull && param instanceof Null)) {
-        		if ((Double) max <= (Double) param) {
-    				max = param;
-    			}
-        		j++;
-        	}
-        	i++;
+            // get the parameter from the stack
+            param = stack.pop();
+            if (!(supportNull && param instanceof Null)) {
+                if ((Double) max <= (Double) param) {
+                    max = param;
+                }
+                j++;
+            }
+            i++;
         }
-		
+        
         if (j != 0 ) {
-        	stack.push(max);
+            stack.push(max);
         } else { 
-        	stack.push(new Null());
+            stack.push(new Null());
         }
-	}
+    }
 }

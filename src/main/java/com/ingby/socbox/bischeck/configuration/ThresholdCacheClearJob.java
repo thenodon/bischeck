@@ -50,11 +50,11 @@ public class ThresholdCacheClearJob implements Job {
     private static Scheduler sched;
 
     public static void init(Properties prop) throws SchedulerException {
-    	
-    	
-    	sched = StdSchedulerFactory.getDefaultScheduler();
+        
+        
+        sched = StdSchedulerFactory.getDefaultScheduler();
         if (!sched.isStarted()) {
-        	sched.start();
+            sched.start();
         }
         
         JobDetail job = newJob(ThresholdCacheClearJob.class).
@@ -72,7 +72,7 @@ public class ThresholdCacheClearJob implements Job {
         
         // If job exists delete and add
         if (sched.getJobDetail(job.getKey()) != null) {
-        	sched.deleteJob(job.getKey());
+            sched.deleteJob(job.getKey());
         }
         
         Date ft = sched.scheduleJob(job, trigger);

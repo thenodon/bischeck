@@ -30,73 +30,73 @@ import org.nfunk.jep.function.Add;
  *
  */
 public class Median extends org.nfunk.jep.function.Sum {
-	private Add addFun = new Add();
-	private boolean supportNull = false;
+    private Add addFun = new Add();
+    private boolean supportNull = false;
 
-	/**
-	 * Constructor.
-	 */
-	public Median() {
-		// Use a variable number of arguments
-		super();
-		this.supportNull = Util.getSupportNull();
-		
-	}
+    /**
+     * Constructor.
+     */
+    public Median() {
+        // Use a variable number of arguments
+        super();
+        this.supportNull = Util.getSupportNull();
+        
+    }
 
-	public Median(boolean supportNull) {
-		// Use a variable number of arguments
-		super();
-		this.supportNull  = supportNull;
-	}
+    public Median(boolean supportNull) {
+        // Use a variable number of arguments
+        super();
+        this.supportNull  = supportNull;
+    }
 
-	/**
-	 * Calculate the median value and push on the stack. If the number 
-	 * of parameters are even the mean will be calculate for the 2 
-	 * parameters in the "center" of the array of sorted numbers. 
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void run(Stack stack) throws ParseException {
-		
-		checkStack(stack);
-		if (curNumberOfParameters < 1) {
-			throw new ParseException("No arguments for Median");
-		}
-		
-		
-		Object param;
-		int paramCount = 0;
+    /**
+     * Calculate the median value and push on the stack. If the number 
+     * of parameters are even the mean will be calculate for the 2 
+     * parameters in the "center" of the array of sorted numbers. 
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void run(Stack stack) throws ParseException {
+        
+        checkStack(stack);
+        if (curNumberOfParameters < 1) {
+            throw new ParseException("No arguments for Median");
+        }
+        
+        
+        Object param;
+        int paramCount = 0;
         int numberNotNull = 0;
         
         Double[] median = new Double[curNumberOfParameters];
-        	
+            
         // get all parameters into and array
         while (paramCount < (curNumberOfParameters)) {
         
-        	param = stack.pop();
-        	if (!(supportNull && param instanceof Null)) {
-        		
-        		median[numberNotNull] = (Double) param;
-        		numberNotNull++;
-        	}
-        	paramCount++;
+            param = stack.pop();
+            if (!(supportNull && param instanceof Null)) {
+                
+                median[numberNotNull] = (Double) param;
+                numberNotNull++;
+            }
+            paramCount++;
         }
         
-		// Calculate the median 
+        // Calculate the median 
         if (numberNotNull != 0 ) {
-        	// get the numbers into a sorted order
-        	Arrays.sort(median);
-        	
-        	if ( (median.length & 1) == 0 ) { 
-        		//even number of parameters
-        		stack.push((median[median.length/2-1] + median[median.length/2])/2);
-        	} else { 
-        		//odd number of parameters
-        		stack.push(median[median.length/2]);
-        	}
+            // get the numbers into a sorted order
+            Arrays.sort(median);
+            
+            if ( (median.length & 1) == 0 ) { 
+                //even number of parameters
+                stack.push((median[median.length/2-1] + median[median.length/2])/2);
+            } else { 
+                //odd number of parameters
+                stack.push(median[median.length/2]);
+            }
         } else { 
-        	stack.push(new Null());
+            stack.push(new Null());
         }
-	}
+    }
 
 }

@@ -55,8 +55,8 @@ public abstract class ServiceItemAbstract {
     protected String latestValue = null;
     protected Long exectime;
     protected Threshold threshold;
-	private String classname;
-	private NAGIOSSTAT curstate;
+    private String classname;
+    private NAGIOSSTAT curstate;
     
     public void setService(Service service) {
         this.service = service;
@@ -139,29 +139,29 @@ public abstract class ServiceItemAbstract {
     }
 
     public void setClassName(String classname){
-    	this.classname = classname;
+        this.classname = classname;
     }
 
     public String getClassName() {
-    	return this.classname;
+        return this.classname;
     }
 
 
     public String getAlias() {
-		return alias;
-	}
+        return alias;
+    }
 
 
-	public void setAlias(String alias) {
-		this.alias = alias;
-	}
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 
-	public NAGIOSSTAT evaluateThreshold() {
-		curstate = getThreshold().getState(getLatestExecuted());
-		return curstate;
-	}
-	
-	public NAGIOSSTAT getEvaluatedThreshold() {
-		return curstate;
-	}
+    public NAGIOSSTAT evaluateThreshold() {
+        curstate = getThreshold().getState(getLatestExecuted());
+        return curstate;
+    }
+    
+    public NAGIOSSTAT getEvaluatedThreshold() {
+        return curstate;
+    }
 }

@@ -27,16 +27,16 @@ public interface LastStatusCacheMBean {
 
     String BEANNAME = "com.ingby.socbox.bischeck.cache.provider.redis:name=stats,type=LastStatusCache";
     
-	/**
-	 * Get the number of unique keys managed by the cache
-	 * @return
-	 */
-	int getCacheKeyCount();
-	
-	/**
-	 * Get all the keys in the cache
-	 * @return
-	 */
+    /**
+     * Get the number of unique keys managed by the cache
+     * @return
+     */
+    int getCacheKeyCount();
+    
+    /**
+     * Get all the keys in the cache
+     * @return
+     */
     String[] getCacheKeys();
     
     /**

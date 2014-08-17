@@ -29,56 +29,56 @@ import org.nfunk.jep.function.PostfixMathCommand;
  */
 public class Min extends PostfixMathCommand {
 
-	private boolean supportNull = false;
-	/**
-	 * Constructor.
-	 */
-	public Min() {
-		// Use a variable number of arguments
-		numberOfParameters = -1;
-		this.supportNull = Util.getSupportNull();
-	}
+    private boolean supportNull = false;
+    /**
+     * Constructor.
+     */
+    public Min() {
+        // Use a variable number of arguments
+        numberOfParameters = -1;
+        this.supportNull = Util.getSupportNull();
+    }
 
-	public Min(boolean supportNull) {
-		// Use a variable number of arguments
-		numberOfParameters = -1;
-		this.supportNull  = supportNull;
-	}
+    public Min(boolean supportNull) {
+        // Use a variable number of arguments
+        numberOfParameters = -1;
+        this.supportNull  = supportNull;
+    }
 
-	/**
-	 * Calculate the min, which are assumed to
-	 * be of the Double type.
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void run(Stack stack) throws ParseException {
-		checkStack(stack);// check the stack
-	
-		if (curNumberOfParameters < 1) {
-			throw new ParseException("No arguments for Min");
-		}
+    /**
+     * Calculate the min, which are assumed to
+     * be of the Double type.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void run(Stack stack) throws ParseException {
+        checkStack(stack);// check the stack
+    
+        if (curNumberOfParameters < 1) {
+            throw new ParseException("No arguments for Min");
+        }
 
-		Object min = (Object) new Double(Double.MAX_VALUE);;
-		Object param;
-		int i = 0;
+        Object min = (Object) new Double(Double.MAX_VALUE);;
+        Object param;
+        int i = 0;
         int j = 0;
         // repeat summation for each one of the current parameters
         while (i < (curNumberOfParameters)) {
-        	// get the parameter from the stack
-        	param = stack.pop();
-        	if (!(supportNull && param instanceof Null)) {
-        		if ((Double) min >= (Double) param) {
-    				min = param;
-    			}
-        		j++;
-        	}
-        	i++;
+            // get the parameter from the stack
+            param = stack.pop();
+            if (!(supportNull && param instanceof Null)) {
+                if ((Double) min >= (Double) param) {
+                    min = param;
+                }
+                j++;
+            }
+            i++;
         }
-		
+        
         if (j != 0 ) {
-        	stack.push(min);
+            stack.push(min);
         } else { 
-        	stack.push(new Null());
+            stack.push(new Null());
         }
-	}
+    }
 }

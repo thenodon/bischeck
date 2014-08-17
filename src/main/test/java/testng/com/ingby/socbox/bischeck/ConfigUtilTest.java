@@ -36,53 +36,53 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
 
 public class ConfigUtilTest {
-	
+    
     ConfigurationManager confMgmr = null; 
-	@BeforeTest
+    @BeforeTest
     public void beforeTest() throws Exception {
-		confMgmr = TestUtils.getConfigurationManager();
-	}
+        confMgmr = TestUtils.getConfigurationManager();
+    }
     
     @Test (groups = { "ConfigUtil" })
     public void replaceMacros() throws Exception {
-    	
-    	ServiceItem serviceItem = ServiceItemFactory.createServiceItem("serviceitemNAME", "CalculateOnCache");
-    	serviceItem.setDecscription("Host $$HOSTNAME$$ for service $$SERVICENAME$$, alias $$SERVICEALIAS$$ and $$SERVICEITEMNAME$$");
-    	serviceItem.setExecution("{\"check\":\"/usr/lib/nagios/plugins/check_tcp -H $$HOSTNAME$$ -p 22\",\"$$SERVICEITEMNAME$$\":\"time\"}");
-    		
-    	Service service = ServiceFactory.createService("serviceNAME", "bischeck://cache/$$HOSTNAME$$",ConfigurationManager.getInstance().getURL2Service(), null);
-    	service.setAlias("serviceALIAS");
-    	service.setDecscription("Host $$HOSTNAME$$ for service $$SERVICENAME$$");
-    	service.addServiceItem(serviceItem);
-    	service.setConnectionUrl("bischeck://cache/$$HOSTNAME$$/$$HOSTNAME$$");
-    	
-    	List<String> schedulelist = new ArrayList<String>();
-    	schedulelist.add("5M");
-    	schedulelist.add("$$HOSTNAME$$-$$SERVICENAME$$");
-    	service.setSchedules(schedulelist);
-    	
-    	Host host = new Host("hostNAME");
-    	host.setAlias("hostALIAS");
-    	host.setDecscription("This is host $$HOSTNAME$$ with alias $$HOSTALIAS$$");
-    	service.setHost(host);
-    	host.addService(service);
-    	
-    	StringBuilder strbuf = ConfigMacroUtil.dump(host);
-    	System.out.println(strbuf.toString());
-    	
-    	ConfigMacroUtil.replaceMacros(host);
-    	
-    	strbuf = ConfigMacroUtil.dump(host);
-    	System.out.println(strbuf.toString());
-    	
-    	Assert.assertEquals(host.getHostname(),"hostNAME");  	
-    	Assert.assertEquals(host.getDecscription(),"This is host hostNAME with alias hostALIAS");
-    	
-    	Assert.assertEquals(host.getServiceByName("serviceNAME").getServiceName(),"serviceNAME");
-    	Assert.assertEquals(host.getServiceByName("serviceNAME").getDecscription(),"Host hostNAME for service serviceNAME");
-    	Assert.assertEquals(host.getServiceByName("serviceNAME").getConnectionUrl(),"bischeck://cache/hostNAME/hostNAME");
-    	Assert.assertEquals(host.getServiceByName("serviceNAME").getServiceItemByName("serviceitemNAME").getDecscription(),"Host hostNAME for service serviceNAME, alias serviceALIAS and serviceitemNAME");
-    	Assert.assertEquals(host.getServiceByName("serviceNAME").getServiceItemByName("serviceitemNAME").getExecution(),"{\"check\":\"/usr/lib/nagios/plugins/check_tcp -H hostNAME -p 22\",\"serviceitemNAME\":\"time\"}");
-    	
+        
+        ServiceItem serviceItem = ServiceItemFactory.createServiceItem("serviceitemNAME", "CalculateOnCache");
+        serviceItem.setDecscription("Host $$HOSTNAME$$ for service $$SERVICENAME$$, alias $$SERVICEALIAS$$ and $$SERVICEITEMNAME$$");
+        serviceItem.setExecution("{\"check\":\"/usr/lib/nagios/plugins/check_tcp -H $$HOSTNAME$$ -p 22\",\"$$SERVICEITEMNAME$$\":\"time\"}");
+            
+        Service service = ServiceFactory.createService("serviceNAME", "bischeck://cache/$$HOSTNAME$$",ConfigurationManager.getInstance().getURL2Service(), null);
+        service.setAlias("serviceALIAS");
+        service.setDecscription("Host $$HOSTNAME$$ for service $$SERVICENAME$$");
+        service.addServiceItem(serviceItem);
+        service.setConnectionUrl("bischeck://cache/$$HOSTNAME$$/$$HOSTNAME$$");
+        
+        List<String> schedulelist = new ArrayList<String>();
+        schedulelist.add("5M");
+        schedulelist.add("$$HOSTNAME$$-$$SERVICENAME$$");
+        service.setSchedules(schedulelist);
+        
+        Host host = new Host("hostNAME");
+        host.setAlias("hostALIAS");
+        host.setDecscription("This is host $$HOSTNAME$$ with alias $$HOSTALIAS$$");
+        service.setHost(host);
+        host.addService(service);
+        
+        StringBuilder strbuf = ConfigMacroUtil.dump(host);
+        System.out.println(strbuf.toString());
+        
+        ConfigMacroUtil.replaceMacros(host);
+        
+        strbuf = ConfigMacroUtil.dump(host);
+        System.out.println(strbuf.toString());
+        
+        Assert.assertEquals(host.getHostname(),"hostNAME");     
+        Assert.assertEquals(host.getDecscription(),"This is host hostNAME with alias hostALIAS");
+        
+        Assert.assertEquals(host.getServiceByName("serviceNAME").getServiceName(),"serviceNAME");
+        Assert.assertEquals(host.getServiceByName("serviceNAME").getDecscription(),"Host hostNAME for service serviceNAME");
+        Assert.assertEquals(host.getServiceByName("serviceNAME").getConnectionUrl(),"bischeck://cache/hostNAME/hostNAME");
+        Assert.assertEquals(host.getServiceByName("serviceNAME").getServiceItemByName("serviceitemNAME").getDecscription(),"Host hostNAME for service serviceNAME, alias serviceALIAS and serviceitemNAME");
+        Assert.assertEquals(host.getServiceByName("serviceNAME").getServiceItemByName("serviceitemNAME").getExecution(),"{\"check\":\"/usr/lib/nagios/plugins/check_tcp -H hostNAME -p 22\",\"serviceitemNAME\":\"time\"}");
+        
     }
 }

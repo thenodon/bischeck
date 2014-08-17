@@ -59,7 +59,7 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
     
     private NagiosPassiveCheckSender sender = null;
     private String instanceName;
-	private NagiosUtil nagutil = new NagiosUtil();
+    private NagiosUtil nagutil = new NagiosUtil();
 
     
     /**
@@ -85,7 +85,7 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
      * @param name of the server instance
      */
     synchronized public static void unregister(String name) {
-    	servers.remove(name);
+        servers.remove(name);
     }
     
     
@@ -104,40 +104,40 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
     }
     
     private NagiosSettings getNSCAConnection(String name)  {
-    	Properties defaultproperties = getServerProperties();
-    	Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+        Properties defaultproperties = getServerProperties();
+        Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
         return new NagiosSettingsBuilder()
         .withNagiosHost(prop.getProperty("hostAddress",
-        		defaultproperties.getProperty("hostAddress")))
+                defaultproperties.getProperty("hostAddress")))
         .withPort(Integer.parseInt(prop.getProperty("port", 
-        		defaultproperties.getProperty("port"))))
+                defaultproperties.getProperty("port"))))
         .withEncryption(Encryption.valueOf(prop.getProperty("encryptionMode", 
-        		defaultproperties.getProperty("encryptionMode"))))
+                defaultproperties.getProperty("encryptionMode"))))
         .withPassword(prop.getProperty("password",
-        		defaultproperties.getProperty("password")))
+                defaultproperties.getProperty("password")))
         .withConnectionTimeout(Integer.parseInt(prop.getProperty("connectionTimeout",
-        		defaultproperties.getProperty("connectionTimeout"))))
+                defaultproperties.getProperty("connectionTimeout"))))
         .create();
     }
     
     
     @Override
     synchronized public void sendInternal(String host, String service, NAGIOSSTAT level, String message) {
-    	MessagePayload payload = new MessagePayloadBuilder()
+        MessagePayload payload = new MessagePayloadBuilder()
         .withHostname(host)
         .withServiceName(service)
         .create();
-    	 payload.setMessage(level +"|"+ message);
-    	 payload.setLevel(level.toString());
+         payload.setMessage(level +"|"+ message);
+         payload.setLevel(level.toString());
     }
         
     
-	@Override
+    @Override
     public String getInstanceName() {
-    	return instanceName;
+        return instanceName;
     }
-	
-	
+    
+    
     @Override
     synchronized public void send(Service service) {
         NAGIOSSTAT level;
@@ -168,42 +168,42 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
         payload.setLevel(level.toString());
         
         if (LOGGER.isInfoEnabled()) {
-        	LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
+            LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
         }
         
         final String timerName = instanceName+"_send";
 
-    	final Timer timer = Metrics.newTimer(NSCAServerNoSend.class, 
-    			timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-    	final TimerContext context = timer.time();
+        final Timer timer = Metrics.newTimer(NSCAServerNoSend.class, 
+                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final TimerContext context = timer.time();
 
         try {
-        	// Do nothing 
+            // Do nothing 
         } finally { 
-        	long duration = context.stop()/1000000;
-        	LOGGER.debug("Nsca send execute: {} ms", duration);
+            long duration = context.stop()/1000000;
+            LOGGER.debug("Nsca send execute: {} ms", duration);
         }
     }
     
     
-	public static Properties getServerProperties() {
-		Properties defaultproperties = new Properties();
-	    
-		defaultproperties.setProperty("hostAddress","localhost");
-    	defaultproperties.setProperty("port","5667");
-    	defaultproperties.setProperty("encryptionMode","XOR");
-    	defaultproperties.setProperty("password","");
-    	defaultproperties.setProperty("connectionTimeout","5000");
-		
-		return defaultproperties;
-	}
+    public static Properties getServerProperties() {
+        Properties defaultproperties = new Properties();
+        
+        defaultproperties.setProperty("hostAddress","localhost");
+        defaultproperties.setProperty("port","5667");
+        defaultproperties.setProperty("encryptionMode","XOR");
+        defaultproperties.setProperty("password","");
+        defaultproperties.setProperty("connectionTimeout","5000");
+        
+        return defaultproperties;
+    }
 
 
-	@Override
-	public void onMessage(Service message) {
-		send(message);
-	}
-	@Override
+    @Override
+    public void onMessage(Service message) {
+        send(message);
+    }
+    @Override
     synchronized public void unregister() {
     }
 }

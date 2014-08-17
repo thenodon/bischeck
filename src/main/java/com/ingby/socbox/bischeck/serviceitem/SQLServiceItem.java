@@ -37,15 +37,15 @@ public class SQLServiceItem extends ServiceItemAbstract implements ServiceItem {
     
     @Override
     public void execute() throws ServiceException {
-    	
-    	String cacheparsedstr = CacheEvaluator.parse(getExecution());
-    	
-    	if (cacheparsedstr == null) {
-    		setLatestExecuted(null);
-    	}
-    	else {
-    		String res = service.executeStmt(cacheparsedstr);
-    		setLatestExecuted(res);
-    	}
+        
+        String cacheparsedstr = CacheEvaluator.parse(getExecution());
+        
+        if (cacheparsedstr == null) {
+            setLatestExecuted(null);
+        }
+        else {
+            String res = service.executeStmt(cacheparsedstr);
+            setLatestExecuted(res);
+        }
     }
 }

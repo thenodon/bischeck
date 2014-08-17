@@ -39,9 +39,9 @@ public class LastCacheService extends ServiceAbstract implements Service, Servic
     
     @Override
     public void openConnection() throws ServiceException {
-    	super.openConnection();
-    	// The use of LastStatusCache do not need a connection
-    	setConnectionEstablished(true);	
+        super.openConnection();
+        // The use of LastStatusCache do not need a connection
+        setConnectionEstablished(true); 
     }
 
 
@@ -66,6 +66,6 @@ public class LastCacheService extends ServiceAbstract implements Service, Servic
      * return is the value of each separated by ,
      */
     public String executeStmt(String exec) throws ServiceException {
-    	return CacheEvaluator.parse(exec);
+        return CacheEvaluator.parse(exec);
     }
 }

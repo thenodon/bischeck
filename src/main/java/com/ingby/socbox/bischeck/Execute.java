@@ -82,7 +82,7 @@ public final class Execute implements ExecuteMBean {
     private static Execute exec = new Execute();
 
     private MBeanManager mbsMgr = null;
-	private Scheduler sched = null;
+    private Scheduler sched = null;
     
     private static final int RESTART = 1000;
     private static final int OKAY = 0;
@@ -116,8 +116,8 @@ public final class Execute implements ExecuteMBean {
             line = parser.parse(options, args);
 
         } catch (org.apache.commons.cli.ParseException e) {
-        	System.out.println("Command parse error:" + e.getMessage());
-        	HelpFormatter formatter = new HelpFormatter();
+            System.out.println("Command parse error:" + e.getMessage());
+            HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("Bischeck", options);
             Util.ShellExit(FAILED);
         }
@@ -207,7 +207,7 @@ public final class Execute implements ExecuteMBean {
 
         
         if (!start()) {
-        	return FAILED;
+            return FAILED;
         }
         
         /*
@@ -239,16 +239,16 @@ public final class Execute implements ExecuteMBean {
 
         Boolean disableCertificateValidation = Boolean.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("disableCertificateValidation","false"));
         if (disableCertificateValidation) {
-        	
-        	try {
-				SSLTrustManager.disableCertificateValidation();
-			} catch (KeyManagementException e) {
-				LOGGER.error("Disable SSL X.509 certification validation failed", e);
-				throw new Exception(e);
-			} catch (NoSuchAlgorithmException e) {
-				LOGGER.error("Disable SSL X.509 certification validation failed", e);
-				throw new Exception(e);
-			}
+            
+            try {
+                SSLTrustManager.disableCertificateValidation();
+            } catch (KeyManagementException e) {
+                LOGGER.error("Disable SSL X.509 certification validation failed", e);
+                throw new Exception(e);
+            } catch (NoSuchAlgorithmException e) {
+                LOGGER.error("Disable SSL X.509 certification validation failed", e);
+                throw new Exception(e);
+            }
         }
         
         
@@ -259,7 +259,7 @@ public final class Execute implements ExecuteMBean {
         try {
             System.in.close();
         } catch (IOException ignore) {
-        	LOGGER.info("Could not close stdin");
+            LOGGER.info("Could not close stdin");
         }
 
         System.out.close();
@@ -305,7 +305,7 @@ public final class Execute implements ExecuteMBean {
                     syncObj.wait(looptimeout);
                 }
             } catch (InterruptedException ignore) {
-            	LOGGER.info("Interrupted while loop timeout", ignore);
+                LOGGER.info("Interrupted while loop timeout", ignore);
             }
 
             // If no remaining triggers - shutdown
@@ -434,7 +434,7 @@ public final class Execute implements ExecuteMBean {
                 try {
                     dumpthread.join();
                 } catch (InterruptedException ignore) {
-                	LOGGER.info("Interrupted while waiting on dumpthread thread to complete", ignore);
+                    LOGGER.info("Interrupted while waiting on dumpthread thread to complete", ignore);
                 }
             }
         });
@@ -447,7 +447,7 @@ public final class Execute implements ExecuteMBean {
 
     @Override
     public boolean start() {
-    	try {
+        try {
             sched  = initScheduler();
             initTriggers(sched);
             ConfigurationJobs.initScheduler();
@@ -455,19 +455,19 @@ public final class Execute implements ExecuteMBean {
             LOGGER.error("Scheduler init failed", e);
             return false;
         }
-    	return true;
+        return true;
     }
     
     @Override
     public boolean stop() {
-    	try {
+        try {
             sched.shutdown(true);
             LOGGER.info("Scheduler shutdown");
         } catch (SchedulerException e) {
             LOGGER.warn("Stopping Quartz scheduler failed", e);
             return false;
         }
-    	return true;
+        return true;
     }
 
     @Override
@@ -614,10 +614,10 @@ public final class Execute implements ExecuteMBean {
         }
 
         try (FileInputStream fstream = new FileInputStream(path + File.separator + "version.txt");
-        	DataInputStream in = new DataInputStream(fstream);
-        	BufferedReader br = new BufferedReader(new InputStreamReader(in))
-        	){
-        	version = br.readLine();
+            DataInputStream in = new DataInputStream(fstream);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in))
+            ){
+            version = br.readLine();
             LOGGER.info("Bisheck version is {}", version);
         } catch (Exception ioe) {
             version = "N/A";

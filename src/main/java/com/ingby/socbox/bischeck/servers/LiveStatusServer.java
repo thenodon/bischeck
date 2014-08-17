@@ -46,35 +46,35 @@ import com.yammer.metrics.core.TimerContext;
  */
 public final class LiveStatusServer implements Server, MessageServerInf {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(LiveStatusServer.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(LiveStatusServer.class);
 
-	private static Map<String,LiveStatusServer> servers = new HashMap<String,LiveStatusServer>();
+    private static Map<String,LiveStatusServer> servers = new HashMap<String,LiveStatusServer>();
 
-	private final String instanceName;
+    private final String instanceName;
 
-	private final String  hostAddress;
-	private final Integer port;
-	private final Integer connectionTimeout;
+    private final String  hostAddress;
+    private final Integer port;
+    private final Integer connectionTimeout;
 
-	private final NagiosUtil nagutil = new NagiosUtil();
-	
-	private LiveStatusServer(String name) {
-		instanceName=name;
-		Properties defaultproperties = getServerProperties();
-		Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
-		hostAddress = prop.getProperty("hostAddress",
-				defaultproperties.getProperty("hostAddress"));
+    private final NagiosUtil nagutil = new NagiosUtil();
+    
+    private LiveStatusServer(String name) {
+        instanceName=name;
+        Properties defaultproperties = getServerProperties();
+        Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+        hostAddress = prop.getProperty("hostAddress",
+                defaultproperties.getProperty("hostAddress"));
 
-		port = Integer.parseInt(prop.getProperty("port", 
-				defaultproperties.getProperty("port")));
+        port = Integer.parseInt(prop.getProperty("port", 
+                defaultproperties.getProperty("port")));
 
-		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
-				defaultproperties.getProperty("connectionTimeout")));
+        connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
+                defaultproperties.getProperty("connectionTimeout")));
 
-	}
+    }
 
-	
-	/**
+    
+    /**
      * Retrieve the Server object. The method is invoked from class ServerExecutor
      * execute method. The created Server object is placed in the class internal 
      * Server object list.
@@ -82,140 +82,140 @@ public final class LiveStatusServer implements Server, MessageServerInf {
      * {@code &lt;server name="my"&gt;}
      * @return Server object
      */
-	synchronized public static Server getInstance(String name) {
-		
-		if (!servers.containsKey(name) ) {
-			servers.put(name,new LiveStatusServer(name));
-		}
-		return servers.get(name);
-	}
+    synchronized public static Server getInstance(String name) {
+        
+        if (!servers.containsKey(name) ) {
+            servers.put(name,new LiveStatusServer(name));
+        }
+        return servers.get(name);
+    }
 
     
-	/**
+    /**
      * Unregister the server and its configuration
      * @param name of the server instance
      */
     synchronized public static void unregister(String name) {
-    	servers.remove(name);
+        servers.remove(name);
     }
     
-	
-	@Override
+    
+    @Override
     public String getInstanceName() {
-    	return instanceName;
+        return instanceName;
     }
-	
-	
-	/**
-	 * COMMAND [timestamp] PROCESS_SERVICE_CHECK_RESULT;hostname;servicename;status;description
-	 * timestamp in seconds 
-	 */
+    
+    
+    /**
+     * COMMAND [timestamp] PROCESS_SERVICE_CHECK_RESULT;hostname;servicename;status;description
+     * timestamp in seconds 
+     */
 
-	@Override
-	public void send(Service service) {
+    @Override
+    public void send(Service service) {
 
-		NAGIOSSTAT level;
+        NAGIOSSTAT level;
 
-		/*
-		 * Check the last connection status for the Service
-		 */
-		String xml = null;
-		if ( service.isConnectionEstablished() ) {
-			try {
-				level = service.getLevel();
-				xml = format(level, 
-						service.getHost().getHostname(),
-						service.getServiceName(),
-						nagutil.createNagiosMessage(service));
-			} catch (Exception e) {
-				level=NAGIOSSTAT.CRITICAL;
-				xml = format(level, 
-						service.getHost().getHostname(),
-						service.getServiceName(),
-						e.getMessage());
-			}
-		} else {
-			// If no connection is established still write a value 
-			// of null 
-			level=NAGIOSSTAT.CRITICAL;
-			xml = format(level, 
-					service.getHost().getHostname(),
-					service.getServiceName(),
-					Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
-		}
+        /*
+         * Check the last connection status for the Service
+         */
+        String xml = null;
+        if ( service.isConnectionEstablished() ) {
+            try {
+                level = service.getLevel();
+                xml = format(level, 
+                        service.getHost().getHostname(),
+                        service.getServiceName(),
+                        nagutil.createNagiosMessage(service));
+            } catch (Exception e) {
+                level=NAGIOSSTAT.CRITICAL;
+                xml = format(level, 
+                        service.getHost().getHostname(),
+                        service.getServiceName(),
+                        e.getMessage());
+            }
+        } else {
+            // If no connection is established still write a value 
+            // of null 
+            level=NAGIOSSTAT.CRITICAL;
+            xml = format(level, 
+                    service.getHost().getHostname(),
+                    service.getServiceName(),
+                    Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
+        }
 
-		 if (LOGGER.isInfoEnabled()) {
-	        	LOGGER.info(ServerUtil.logFormat(instanceName, service, xml));
-		 }
-		 
-		connectAndSend(xml);
-	}
+         if (LOGGER.isInfoEnabled()) {
+                LOGGER.info(ServerUtil.logFormat(instanceName, service, xml));
+         }
+         
+        connectAndSend(xml);
+    }
 
 
-	private void connectAndSend(String xml) {
-		
-		final String timerName = instanceName+"_sendTimer";
+    private void connectAndSend(String xml) {
         
-		final Timer timer = Metrics.newTimer(LiveStatusServer.class, 
-				timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-		final TimerContext context = timer.time();
+        final String timerName = instanceName+"_sendTimer";
+        
+        final Timer timer = Metrics.newTimer(LiveStatusServer.class, 
+                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final TimerContext context = timer.time();
 
-		try (Socket clientSocket = new Socket(hostAddress, port);
-			 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-			){
-			
-			clientSocket.setSoTimeout(connectionTimeout);
-			
-			out.println(xml);
+        try (Socket clientSocket = new Socket(hostAddress, port);
+             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            ){
+            
+            clientSocket.setSoTimeout(connectionTimeout);
+            
+            out.println(xml);
             out.flush();
 
-		} catch (UnknownHostException e) {
-			LOGGER.error("Network error - don't know about host: {}", hostAddress,e);
-		} catch (IOException e) {
-			LOGGER.error("Network error - check livestatus server and that service is started", e);
-		} finally { 
+        } catch (UnknownHostException e) {
+            LOGGER.error("Network error - don't know about host: {}", hostAddress,e);
+        } catch (IOException e) {
+            LOGGER.error("Network error - check livestatus server and that service is started", e);
+        } finally { 
 
-			long duration = context.stop()/1000000;
-			LOGGER.debug("Livestatus send execute: {} ms", duration);
-		}
-	}
+            long duration = context.stop()/1000000;
+            LOGGER.debug("Livestatus send execute: {} ms", duration);
+        }
+    }
 
-	
-	private String format(NAGIOSSTAT level, String hostname,
-			String servicename, String output) {
-		StringBuilder strbuf = new StringBuilder();
+    
+    private String format(NAGIOSSTAT level, String hostname,
+            String servicename, String output) {
+        StringBuilder strbuf = new StringBuilder();
 
-		long timeinsec = System.currentTimeMillis()/1000;
-		strbuf.append("COMMAND ");
-		strbuf.append("[").append(timeinsec).append("]");
-		strbuf.append(" PROCESS_SERVICE_CHECK_RESULT;");
-		strbuf.append(hostname).append(";");
-		strbuf.append(servicename).append(";");
-		strbuf.append(level.val()).append(";");
-		strbuf.append(level.toString());
-		strbuf.append(output);
-		
-		return strbuf.toString();
-	}
+        long timeinsec = System.currentTimeMillis()/1000;
+        strbuf.append("COMMAND ");
+        strbuf.append("[").append(timeinsec).append("]");
+        strbuf.append(" PROCESS_SERVICE_CHECK_RESULT;");
+        strbuf.append(hostname).append(";");
+        strbuf.append(servicename).append(";");
+        strbuf.append(level.val()).append(";");
+        strbuf.append(level.toString());
+        strbuf.append(output);
+        
+        return strbuf.toString();
+    }
 
-	
+    
 
-	public static Properties getServerProperties() {
-		Properties defaultproperties = new Properties();
+    public static Properties getServerProperties() {
+        Properties defaultproperties = new Properties();
 
-		defaultproperties.setProperty("hostAddress","localhost");
-		defaultproperties.setProperty("port","6557");
-		defaultproperties.setProperty("connectionTimeout","5000");
+        defaultproperties.setProperty("hostAddress","localhost");
+        defaultproperties.setProperty("port","6557");
+        defaultproperties.setProperty("connectionTimeout","5000");
 
-		return defaultproperties;
-	}
+        return defaultproperties;
+    }
 
-	@Override
-	public void onMessage(Service message) {
-		send(message);
-	}
-	
-	@Override
-	synchronized public void unregister() {
+    @Override
+    public void onMessage(Service message) {
+        send(message);
+    }
+    
+    @Override
+    synchronized public void unregister() {
     }
 }

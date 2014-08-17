@@ -33,38 +33,38 @@ import com.ingby.socbox.bischeck.service.ServiceState;
  */
 public interface CacheStateInf {
 
-	/**
-	 * Write state for the service to the cache.
-	 * @param service
-	 * @return the score of the state written to the cache
-	 */
-	Long addState(Service service);
+    /**
+     * Write state for the service to the cache.
+     * @param service
+     * @return the score of the state written to the cache
+     */
+    Long addState(Service service);
 
-	/**
-	 * Get the current {@link ServiceState} object from the current status in the 
-	 * cache. <br>
-	 * This is primarily used at statup to get the last state from the cache
-	 * @param service
-	 * @return the state from the cache
-	 */
-	ServiceState getState(Service service);
-	
-	/**
-	 * Write notification status to the cache. 
-	 * @param service
-	 * @return the score of the state written to the cache
-	 */
-	Long addNotification(Service service);
-	
+    /**
+     * Get the current {@link ServiceState} object from the current status in the 
+     * cache. <br>
+     * This is primarily used at statup to get the last state from the cache
+     * @param service
+     * @return the state from the cache
+     */
+    ServiceState getState(Service service);
+    
+    /**
+     * Write notification status to the cache. 
+     * @param service
+     * @return the score of the state written to the cache
+     */
+    Long addNotification(Service service);
+    
 
-	/**
-	 * Write notification status to the cache but using a specified score.<br>
-	 * The specified score should be the score returned by {@link CacheStateInf#addState(Service)} 
-	 * to make the notification related to the state the notification was triggered by. 
-	 * @param service
-	 * @return the score of the state written to the cache. Same as the input score
-	 */
-	Long addNotification(Service service, Long score);
-	
+    /**
+     * Write notification status to the cache but using a specified score.<br>
+     * The specified score should be the score returned by {@link CacheStateInf#addState(Service)} 
+     * to make the notification related to the state the notification was triggered by. 
+     * @param service
+     * @return the score of the state written to the cache. Same as the input score
+     */
+    Long addNotification(Service service, Long score);
+    
 
 }

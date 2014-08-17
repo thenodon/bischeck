@@ -59,28 +59,28 @@ public final class GraphiteServer implements Server, MessageServerInf {
     private final int port;
     private final String hostAddress;
     private final int connectionTimeout;
-	private final String doNotSendRegex;
-	private final String doNotSendRegexDelim;
-	private final MatchServiceToSend msts;
+    private final String doNotSendRegex;
+    private final String doNotSendRegexDelim;
+    private final MatchServiceToSend msts;
     
     private GraphiteServer (String name) {
     
-    	Properties defaultproperties = getServerProperties();
+        Properties defaultproperties = getServerProperties();
         Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
     
         hostAddress = prop.getProperty("hostAddress",
-        		defaultproperties.getProperty("hostAddress"));
+                defaultproperties.getProperty("hostAddress"));
         port = Integer.parseInt(prop.getProperty("port",
-        		defaultproperties.getProperty("port")));
+                defaultproperties.getProperty("port")));
         connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
-        		defaultproperties.getProperty("connectionTimeout")));
+                defaultproperties.getProperty("connectionTimeout")));
         doNotSendRegex = prop.getProperty("doNotSendRegex",
-        		defaultproperties.getProperty("doNotSendRegex"));
+                defaultproperties.getProperty("doNotSendRegex"));
         doNotSendRegexDelim = prop.getProperty("doNotSendRegexDelim",
-        		defaultproperties.getProperty("doNotSendRegexDelim"));
+                defaultproperties.getProperty("doNotSendRegexDelim"));
         instanceName = name;
         
-		msts = new MatchServiceToSend(MatchServiceToSend.convertString2List(doNotSendRegex,doNotSendRegexDelim));
+        msts = new MatchServiceToSend(MatchServiceToSend.convertString2List(doNotSendRegex,doNotSendRegexDelim));
 
     }
     
@@ -94,7 +94,7 @@ public final class GraphiteServer implements Server, MessageServerInf {
      * @return Server object
      */
     synchronized public static Server getInstance(String name) {
-    	
+        
         if (!servers.containsKey(name) ) {
             servers.put(name,new GraphiteServer(name));
         }
@@ -107,13 +107,13 @@ public final class GraphiteServer implements Server, MessageServerInf {
      * @param name of the server instance
      */
     synchronized public static void unregister(String name) {
-    	servers.remove(name);
+        servers.remove(name);
     }
     
     
     @Override
     public String getInstanceName() {
-    	return instanceName;
+        return instanceName;
     }
     
     
@@ -125,9 +125,9 @@ public final class GraphiteServer implements Server, MessageServerInf {
          * Check if the message should be sent
          */        
         if(!doNotSendRegex.isEmpty()) {
-        	if (msts.doNotSend(service)) {
-        		return;
-        	}
+            if (msts.doNotSend(service)) {
+                return;
+            }
         }
         
         if ( service.isConnectionEstablished()) {
@@ -138,25 +138,25 @@ public final class GraphiteServer implements Server, MessageServerInf {
 
         
         if (LOGGER.isInfoEnabled()) {
-        	LOGGER.info(ServerUtil.logFormat(instanceName, service, message));
+            LOGGER.info(ServerUtil.logFormat(instanceName, service, message));
         }
         
         connectAndSend(message);
     }
 
 
-	private void connectAndSend(String message) {
+    private void connectAndSend(String message) {
         
         final String timerName = instanceName+"_sendTimer";
         final Timer timer = Metrics.newTimer(GraphiteServer.class, 
-        		timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
         final TimerContext context = timer.time();
         
         try (Socket  graphiteSocket = new Socket();
-        	 PrintWriter	out = new PrintWriter(graphiteSocket.getOutputStream(), true)
-        	){
+             PrintWriter    out = new PrintWriter(graphiteSocket.getOutputStream(), true)
+            ){
 
-        	InetAddress addr = InetAddress.getByName(hostAddress);
+            InetAddress addr = InetAddress.getByName(hostAddress);
             SocketAddress sockaddr = new InetSocketAddress(addr, port);
     
             graphiteSocket.connect(sockaddr,connectionTimeout);
@@ -169,12 +169,12 @@ public final class GraphiteServer implements Server, MessageServerInf {
         } catch (IOException e) {
             LOGGER.error("Network error - check Graphite server and that service is started", e);
         } finally {
-        	
-        	long duration = context.stop()/1000000;
-        	LOGGER.debug("Graphite send execute: {} ms", duration);
+            
+            long duration = context.stop()/1000000;
+            LOGGER.debug("Graphite send execute: {} ms", duration);
         
         }
-	}
+    }
 
     
     private String getMessage(Service service) {
@@ -278,21 +278,21 @@ public final class GraphiteServer implements Server, MessageServerInf {
     
     
     public static Properties getServerProperties() {
-		Properties defaultproperties = new Properties();
-	    
-		defaultproperties.setProperty("hostAddress","localhost");
-    	defaultproperties.setProperty("port","2003");
-    	defaultproperties.setProperty("connectionTimeout","5000");
-    	defaultproperties.setProperty("doNotSendRegex","");
-    	defaultproperties.setProperty("doNotSendRegexDelim","%");
-		return defaultproperties;
-	}
+        Properties defaultproperties = new Properties();
+        
+        defaultproperties.setProperty("hostAddress","localhost");
+        defaultproperties.setProperty("port","2003");
+        defaultproperties.setProperty("connectionTimeout","5000");
+        defaultproperties.setProperty("doNotSendRegex","");
+        defaultproperties.setProperty("doNotSendRegexDelim","%");
+        return defaultproperties;
+    }
 
     
     @Override
-	public void onMessage(Service message) {
-		send(message);
-	}
+    public void onMessage(Service message) {
+        send(message);
+    }
     
     @Override
     synchronized public void unregister() {

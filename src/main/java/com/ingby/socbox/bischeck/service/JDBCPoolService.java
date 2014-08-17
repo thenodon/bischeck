@@ -45,64 +45,64 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
         this.serviceName = serviceName;
     
         if (bischeckProperties != null) {
-        	try {
-        		querytimeout = Integer.parseInt(bischeckProperties.getProperty("JDBCService.querytimeout","10"));
-        	} catch (NumberFormatException ne) {
-        		LOGGER.error("Property JDBCSerivce.querytimeout is not set correct to an integer: {}", 
-        				bischeckProperties.getProperty("JDBCSerivce.querytimeout"));
-        	}
+            try {
+                querytimeout = Integer.parseInt(bischeckProperties.getProperty("JDBCService.querytimeout","10"));
+            } catch (NumberFormatException ne) {
+                LOGGER.error("Property JDBCSerivce.querytimeout is not set correct to an integer: {}", 
+                        bischeckProperties.getProperty("JDBCSerivce.querytimeout"));
+            }
         }
     }
 
     
     @Override
     public void openConnection() throws ServiceException {   
-    	try {
-    		this.connection = JDBCPoolServiceUtil.getConnection(this.getConnectionUrl());
-    	} catch (SQLException sqle) {
-    		setConnectionEstablished(false);
-    		LOGGER.warn("Open connection failed",sqle);
-    		ServiceException se = new ServiceException(sqle);
-    		se.setServiceName(this.serviceName);
-    		throw se;
-    	}
-    	setConnectionEstablished(true);
+        try {
+            this.connection = JDBCPoolServiceUtil.getConnection(this.getConnectionUrl());
+        } catch (SQLException sqle) {
+            setConnectionEstablished(false);
+            LOGGER.warn("Open connection failed",sqle);
+            ServiceException se = new ServiceException(sqle);
+            se.setServiceName(this.serviceName);
+            throw se;
+        }
+        setConnectionEstablished(true);
     }
     
     @Override
     public void closeConnection() throws ServiceException {
-    	try {
-    		this.connection.close();
-    	} catch (SQLException sqle) {
-        	LOGGER.warn("Closing connection failed",sqle);
-    		ServiceException se = new ServiceException(sqle);
-    		se.setServiceName(this.serviceName);
-    		throw se;
+        try {
+            this.connection.close();
+        } catch (SQLException sqle) {
+            LOGGER.warn("Closing connection failed",sqle);
+            ServiceException se = new ServiceException(sqle);
+            se.setServiceName(this.serviceName);
+            throw se;
         }
     }
 
     
     @Override 
     public String executeStmt(String exec) throws ServiceException {
-    	
-    	
-    	try (Statement statement = this.connection.createStatement();
-    		 ResultSet res = statement.executeQuery(exec);
-    		){
-    		
-    		statement.setQueryTimeout(querytimeout);
+        
+        
+        try (Statement statement = this.connection.createStatement();
+             ResultSet res = statement.executeQuery(exec);
+            ){
+            
+            statement.setQueryTimeout(querytimeout);
 
-    		if (res.next()) { //Changed from first - not working with as400 jdbc driver
-    			return (res.getString(1));
-    		}
-    	} catch (SQLException sqle) {
-    		LOGGER.warn("Executing {} statement failed",exec, sqle);
-    		ServiceException se = new ServiceException(sqle);
-    		se.setServiceName(this.serviceName);
-    		throw se;
-    	} 
+            if (res.next()) { //Changed from first - not working with as400 jdbc driver
+                return (res.getString(1));
+            }
+        } catch (SQLException sqle) {
+            LOGGER.warn("Executing {} statement failed",exec, sqle);
+            ServiceException se = new ServiceException(sqle);
+            se.setServiceName(this.serviceName);
+            throw se;
+        } 
 
-    	return null;
+        return null;
     }    
 
 }

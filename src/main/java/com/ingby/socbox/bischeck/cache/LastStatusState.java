@@ -39,28 +39,28 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  */
 public class LastStatusState implements Serializable, Cloneable {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusState.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusState.class);
 
-	
-	private static final long serialVersionUID = 1L;
+    
+    private static final long serialVersionUID = 1L;
 
-	private static final String HARD = "HARD";
-	private static final String SOFT = "SOFT";
-	private static final String NA = "N/A";
+    private static final String HARD = "HARD";
+    private static final String SOFT = "SOFT";
+    private static final String NA = "N/A";
 
-	private Service service;
+    private Service service;
 
-	
-	public LastStatusState(Service service) {
-		this.service = service;	
-	}
+    
+    public LastStatusState(Service service) {
+        this.service = service; 
+    }
 
-	
-	/**
-	 * The method create a json object of the state change. 
-	 * The following example show the format:<br
-	 * <code>
-	 * {"state":"WARNING",<br>
+    
+    /**
+     * The method create a json object of the state change. 
+     * The following example show the format:<br
+     * <code>
+     * {"state":"WARNING",<br>
      * {"type":"HARD",<br>
      * &nbsp;&nbsp;"SSHport":{ <br>
      * &nbsp;&nbsp;&nbsp;&nbsp;"timestamp":1393626063324,"value":"0.000094","threshold":1.059E-4,"calcmethod":"<","state":"OK"
@@ -75,35 +75,35 @@ public class LastStatusState implements Serializable, Cloneable {
      * if the state was a hard vs soft state change according to the Nagios
      * specification. This is followed with a one to many of the individual
      * state of the serviceitems that are part of the service. 
-	 * @return the formatted json object
-	 */
-	public String getJson() {
-		JSONObject json = new JSONObject();
-		
-		long currentTime = System.currentTimeMillis();
-		json.put("timestamp",currentTime);
-		json.put("date",new Date(currentTime).toString());
-		json.put("state",((ServiceStateInf) service).getServiceState().getState());
-		json.put("previousState",((ServiceStateInf) service).getServiceState().getPreviousState());
-		if (service instanceof ServiceStateInf) {
-			if (((ServiceStateInf) service).getServiceState().isHardState()) {
-				json.put("type",HARD);
-			} else {
-				json.put("type",SOFT);
-			}
-		} else {
-			json.put("type",NA);
-		}
+     * @return the formatted json object
+     */
+    public String getJson() {
+        JSONObject json = new JSONObject();
+        
+        long currentTime = System.currentTimeMillis();
+        json.put("timestamp",currentTime);
+        json.put("date",new Date(currentTime).toString());
+        json.put("state",((ServiceStateInf) service).getServiceState().getState());
+        json.put("previousState",((ServiceStateInf) service).getServiceState().getPreviousState());
+        if (service instanceof ServiceStateInf) {
+            if (((ServiceStateInf) service).getServiceState().isHardState()) {
+                json.put("type",HARD);
+            } else {
+                json.put("type",SOFT);
+            }
+        } else {
+            json.put("type",NA);
+        }
 
-		json.put("softCount", ((ServiceStateInf) service).getServiceState().getSoftCount());
+        json.put("softCount", ((ServiceStateInf) service).getServiceState().getSoftCount());
 
-		json.put("connectionStatus", service.isConnectionEstablished());
-		
-		for (ServiceItem item : service.getServicesItems().values()) {
-			json.put(item.getServiceItemName(),(new LastStatus(item)).getJson());
-		}
-		
-		return json.toString();
-	}
+        json.put("connectionStatus", service.isConnectionEstablished());
+        
+        for (ServiceItem item : service.getServicesItems().values()) {
+            json.put(item.getServiceItemName(),(new LastStatus(item)).getJson());
+        }
+        
+        return json.toString();
+    }
 
 }

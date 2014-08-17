@@ -58,14 +58,14 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     private final int connectionTimeout;
     
     private OpenTSDBServer (String name) {
-    	Properties defaultproperties = getServerProperties();
+        Properties defaultproperties = getServerProperties();
         Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
         hostAddress = prop.getProperty("hostAddress",
-        		defaultproperties.getProperty("hostAddress"));
+                defaultproperties.getProperty("hostAddress"));
         port = Integer.parseInt(prop.getProperty("port",
-        		defaultproperties.getProperty("port")));
+                defaultproperties.getProperty("port")));
         connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
-        		defaultproperties.getProperty("connectionTimeout")));
+                defaultproperties.getProperty("connectionTimeout")));
         instanceName = name;
     }
     
@@ -80,7 +80,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
      */
     synchronized public static Server getInstance(String name) {
     
-    	if (!servers.containsKey(name) ) {
+        if (!servers.containsKey(name) ) {
             servers.put(name,new OpenTSDBServer(name));
         }
         return servers.get(name);
@@ -92,15 +92,15 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
      * @param name of the server instance
      */
     synchronized public static void unregister(String name) {
-    	servers.remove(name);
+        servers.remove(name);
     }
     
     
-	@Override
+    @Override
     public String getInstanceName() {
-    	return instanceName;
+        return instanceName;
     }
-	
+    
     
     @Override
     synchronized public void send(Service service) {
@@ -113,7 +113,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
         }
 
         if (LOGGER.isInfoEnabled()) {
-        	LOGGER.info(ServerUtil.logFormat(instanceName, service, message));
+            LOGGER.info(ServerUtil.logFormat(instanceName, service, message));
         }
         
         connectAndSend(message);
@@ -121,18 +121,18 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     }
 
 
-	private void connectAndSend(String message) {
-		Socket opentsdbSocket = null;
+    private void connectAndSend(String message) {
+        Socket opentsdbSocket = null;
         PrintWriter out = null;
         
         final String timerName = instanceName+"_sendTimer";
 
-    	final Timer timer = Metrics.newTimer(OpenTSDBServer.class, 
-    			timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-    	final TimerContext context = timer.time();
+        final Timer timer = Metrics.newTimer(OpenTSDBServer.class, 
+                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final TimerContext context = timer.time();
 
         try {
-        	
+            
             InetAddress addr = InetAddress.getByName(hostAddress);
             SocketAddress sockaddr = new InetSocketAddress(addr, port);
 
@@ -154,16 +154,16 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
                 out.close();
             }
             try {
-            	if (opentsdbSocket != null) {
-            		opentsdbSocket.close();
-            	}
+                if (opentsdbSocket != null) {
+                    opentsdbSocket.close();
+                }
             } catch (IOException ignore) {}    
             
             long duration = context.stop()/1000000;
-			LOGGER.debug("OpenTSDB send execute: {} ms", duration);
+            LOGGER.debug("OpenTSDB send execute: {} ms", duration);
             
         }
-	}
+    }
 
     private String getMessage(Service service) {
 
@@ -269,19 +269,19 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     
     
     public static Properties getServerProperties() {
-		Properties defaultproperties = new Properties();
-	    
-		defaultproperties.setProperty("hostAddress","localhost");
-    	defaultproperties.setProperty("port","5667");
-    	defaultproperties.setProperty("connectionTimeout","5000");
-	
-		return defaultproperties;
-	}
+        Properties defaultproperties = new Properties();
+        
+        defaultproperties.setProperty("hostAddress","localhost");
+        defaultproperties.setProperty("port","5667");
+        defaultproperties.setProperty("connectionTimeout","5000");
+    
+        return defaultproperties;
+    }
     
     @Override
-	public void onMessage(Service message) {
-		send(message);
-	}
+    public void onMessage(Service message) {
+        send(message);
+    }
     @Override
     synchronized public void unregister() {
     }

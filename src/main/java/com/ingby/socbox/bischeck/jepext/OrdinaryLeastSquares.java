@@ -33,46 +33,46 @@ import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLSException;
  */
 public class OrdinaryLeastSquares extends PostfixMathCommand
 {
-	public OrdinaryLeastSquares()
-	{       
-    	numberOfParameters = 7;
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public void run(@SuppressWarnings("rawtypes") Stack inStack)
-		throws ParseException 
-	{
-		checkStack(inStack); // check the stack
-		Object timeOffset = inStack.pop();
-		Object forecast = inStack.pop();
-		Object resolution =  inStack.pop();
-		Object resolutionMethod =  inStack.pop();
-		Object serviceItemName = inStack.pop();
-		Object serviceName =  inStack.pop();
-		Object hostName =  inStack.pop();
-	    
-		String str = (String) forecast;
-		Integer forecastInt = Integer.valueOf(str);
-		
-		CalculateOLS ols = null;
-		try {
-			ols = new CalculateOLS((String) hostName, 
-				(String) serviceName, 
-				(String) serviceItemName, 
-				(String) resolutionMethod, 
-				(String) resolution, 
-				forecastInt,
-				(String) timeOffset);
-		} 
-		catch (CalculateOLSException ce) {
-			throw new ParseException(ce.getMessage());
-		}
-		
-		Double forecastValue = ols.getPredictiveValue();
-		
-		inStack.push(forecastValue); 
-		return;
-	}
-	
+    public OrdinaryLeastSquares()
+    {       
+        numberOfParameters = 7;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public void run(@SuppressWarnings("rawtypes") Stack inStack)
+        throws ParseException 
+    {
+        checkStack(inStack); // check the stack
+        Object timeOffset = inStack.pop();
+        Object forecast = inStack.pop();
+        Object resolution =  inStack.pop();
+        Object resolutionMethod =  inStack.pop();
+        Object serviceItemName = inStack.pop();
+        Object serviceName =  inStack.pop();
+        Object hostName =  inStack.pop();
+        
+        String str = (String) forecast;
+        Integer forecastInt = Integer.valueOf(str);
+        
+        CalculateOLS ols = null;
+        try {
+            ols = new CalculateOLS((String) hostName, 
+                (String) serviceName, 
+                (String) serviceItemName, 
+                (String) resolutionMethod, 
+                (String) resolution, 
+                forecastInt,
+                (String) timeOffset);
+        } 
+        catch (CalculateOLSException ce) {
+            throw new ParseException(ce.getMessage());
+        }
+        
+        Double forecastValue = ols.getPredictiveValue();
+        
+        inStack.push(forecastValue); 
+        return;
+    }
+    
 }

@@ -46,12 +46,12 @@ public class JDBCService extends ServiceAbstract implements Service, ServiceStat
         this.serviceName = serviceName;
         
         if (bischeckProperties != null) {
-        	try {
-        		querytimeout = Integer.parseInt(bischeckProperties.getProperty("JDBCService.querytimeout","10"));
-        	} catch (NumberFormatException ne) {
-        		LOGGER.error("Property JDBCSerivce.querytimeout is not set correct to an integer: {}", 
-        				bischeckProperties.getProperty("JDBCSerivce.querytimeout"));
-        	}
+            try {
+                querytimeout = Integer.parseInt(bischeckProperties.getProperty("JDBCService.querytimeout","10"));
+            } catch (NumberFormatException ne) {
+                LOGGER.error("Property JDBCSerivce.querytimeout is not set correct to an integer: {}", 
+                        bischeckProperties.getProperty("JDBCSerivce.querytimeout"));
+            }
         }
         
     }
@@ -59,16 +59,16 @@ public class JDBCService extends ServiceAbstract implements Service, ServiceStat
     
     @Override
     public void openConnection() throws ServiceException {
-    	super.openConnection();
-    	
-    	try {
-    		this.connection = DriverManager.getConnection(this.getConnectionUrl());
-    	} catch (SQLException sqle) {
-    		setConnectionEstablished(false);
-        	LOGGER.warn("Open connection failed",sqle);
-    		ServiceException se = new ServiceException(sqle);
-    		se.setServiceName(this.serviceName);
-    		throw se;
+        super.openConnection();
+        
+        try {
+            this.connection = DriverManager.getConnection(this.getConnectionUrl());
+        } catch (SQLException sqle) {
+            setConnectionEstablished(false);
+            LOGGER.warn("Open connection failed",sqle);
+            ServiceException se = new ServiceException(sqle);
+            se.setServiceName(this.serviceName);
+            throw se;
         }
         setConnectionEstablished(true);
     }
@@ -77,12 +77,12 @@ public class JDBCService extends ServiceAbstract implements Service, ServiceStat
     @Override
     public void closeConnection() throws ServiceException {
         try {
-        	this.connection.close();
+            this.connection.close();
         } catch (SQLException sqle) {
-        	LOGGER.warn("Closing connection failed",sqle);
-    		ServiceException se = new ServiceException(sqle);
-    		se.setServiceName(this.serviceName);
-    		throw se;
+            LOGGER.warn("Closing connection failed",sqle);
+            ServiceException se = new ServiceException(sqle);
+            se.setServiceName(this.serviceName);
+            throw se;
         }
     }
 
@@ -90,22 +90,22 @@ public class JDBCService extends ServiceAbstract implements Service, ServiceStat
     @Override 
     public String executeStmt(String exec) throws ServiceException {
         
-    	try (Statement statement = this.connection.createStatement();
-       		 ResultSet res = statement.executeQuery(exec);
-       		){
-       	
-        	statement.setQueryTimeout(querytimeout);
+        try (Statement statement = this.connection.createStatement();
+             ResultSet res = statement.executeQuery(exec);
+            ){
+        
+            statement.setQueryTimeout(querytimeout);
             
             if (res.next()) {//Changed from first - not working with as400 jdbc driver
                 return (res.getString(1));
             }
         } catch (SQLException sqle) {
-        	LOGGER.warn("Executing {} statement failed",exec, sqle);
-    		ServiceException se = new ServiceException(sqle);
-    		se.setServiceName(this.serviceName);
-    		throw se;
+            LOGGER.warn("Executing {} statement failed",exec, sqle);
+            ServiceException se = new ServiceException(sqle);
+            se.setServiceName(this.serviceName);
+            throw se;
         }
-    	
+        
         return null;
     }    
 

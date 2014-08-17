@@ -49,173 +49,173 @@ import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLLaststatuscache;
 
 public class MoveCache2Redis {
 
-	
-	private static boolean verbose = false;
-	private static boolean check = false;
+    
+    private static boolean verbose = false;
+    private static boolean check = false;
 
-	public static void main(String[] args) throws Exception {
-		CommandLineParser parser = new GnuParser();
-		CommandLine line = null;
-		// create the Options
-		Options options = new Options();
-		options.addOption( "u", "usage", false, "show usage." );
-		options.addOption( "v", "verbose", false, "verbose output" );
-		options.addOption( "c", "check", false, "check - do not write to files" );
-		options.addOption( "f", "cachefile", true, "The name of the cache file" );
+    public static void main(String[] args) throws Exception {
+        CommandLineParser parser = new GnuParser();
+        CommandLine line = null;
+        // create the Options
+        Options options = new Options();
+        options.addOption( "u", "usage", false, "show usage." );
+        options.addOption( "v", "verbose", false, "verbose output" );
+        options.addOption( "c", "check", false, "check - do not write to files" );
+        options.addOption( "f", "cachefile", true, "The name of the cache file" );
 
 
-		try {
+        try {
             ConfigurationManager.getInstance();
         } catch (java.lang.IllegalStateException e) {
             ConfigurationManager.init();
             ConfigurationManager.getInstance();  
         }    
-		CacheFactory.init();
-		
-		try {
-			// parse the command line arguments
-			line = parser.parse( options, args );
+        CacheFactory.init();
+        
+        try {
+            // parse the command line arguments
+            line = parser.parse( options, args );
 
-		} catch (org.apache.commons.cli.ParseException e) {
-			System.out.println( "Command parse error:" + e.getMessage() );
-			Util.ShellExit(1);
-		}
+        } catch (org.apache.commons.cli.ParseException e) {
+            System.out.println( "Command parse error:" + e.getMessage() );
+            Util.ShellExit(1);
+        }
 
-		if (line.hasOption("usage")) {
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp( "MoveCache2Redis", options );
-			Util.ShellExit(0);
-		}
-		
-		if (line.hasOption("verbose")) {
-			verbose = true;
-		}
+        if (line.hasOption("usage")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp( "MoveCache2Redis", options );
+            Util.ShellExit(0);
+        }
+        
+        if (line.hasOption("verbose")) {
+            verbose = true;
+        }
 
-		if (line.hasOption("check")) {
-			check = true;
-		}
+        if (line.hasOption("check")) {
+            check = true;
+        }
 
-		String cacheFile = null;
-		if (!line.hasOption("cachefile")) {
-			cacheFile = ConfigurationManager.getInstance().getProperties().getProperty("lastStatusCacheDumpDir", "/var/tmp");
-			cacheFile = cacheFile+File.separatorChar + "lastStatusCacheDump";
-		} else {
-			cacheFile = line.getOptionValue("cachefile");
-		}
+        String cacheFile = null;
+        if (!line.hasOption("cachefile")) {
+            cacheFile = ConfigurationManager.getInstance().getProperties().getProperty("lastStatusCacheDumpDir", "/var/tmp");
+            cacheFile = cacheFile+File.separatorChar + "lastStatusCacheDump";
+        } else {
+            cacheFile = line.getOptionValue("cachefile");
+        }
 
-		loaddump(cacheFile);
+        loaddump(cacheFile);
 
-		CacheFactory.destroy();
-		StdSchedulerFactory.getDefaultScheduler().shutdown();
-	}
+        CacheFactory.destroy();
+        StdSchedulerFactory.getDefaultScheduler().shutdown();
+    }
 
 
-	public static void loaddump(String cachefile) throws Exception{
-		Object xmlobj = null;
+    public static void loaddump(String cachefile) throws Exception{
+        Object xmlobj = null;
 
-		File dumpfile = new File(cachefile);
+        File dumpfile = new File(cachefile);
 
-		if (dumpfile.isDirectory()) {
-			System.out.println("Dump cache file " + dumpfile.getAbsolutePath() + " is  a directory");
-			throw new Exception();
-		}
+        if (dumpfile.isDirectory()) {
+            System.out.println("Dump cache file " + dumpfile.getAbsolutePath() + " is  a directory");
+            throw new Exception();
+        }
 
-		if (!dumpfile.canRead()) {
-			System.out.println("No permission to read cache file " + dumpfile.getAbsolutePath());
-			throw new Exception();
-		}
+        if (!dumpfile.canRead()) {
+            System.out.println("No permission to read cache file " + dumpfile.getAbsolutePath());
+            throw new Exception();
+        }
 
-		if (dumpfile.exists()) {
-			JAXBContext jc = null;
+        if (dumpfile.exists()) {
+            JAXBContext jc = null;
 
-			long countEntries = 0;
-			long countKeys = 0;
+            long countEntries = 0;
+            long countKeys = 0;
 
-			long start = System.currentTimeMillis();
+            long start = System.currentTimeMillis();
 
-			xmlobj = getXMLFromBackend(xmlobj, dumpfile, jc);
+            xmlobj = getXMLFromBackend(xmlobj, dumpfile, jc);
 
-			CacheInf lsc = CacheFactory.getInstance();
-			
-			XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
-			long totalCountEntries = 0;
-			for (XMLKey key:cache.getKey()) {
-				countKeys++;
-				
-				LinkedList<LastStatus> list = new LinkedList<LastStatus>();
-				
-				countEntries = 0;
-				for (XMLEntry entry:key.getEntry()) {
-					LastStatus ls = new LastStatus(entry);
-					list.addFirst(ls);
-					
-					countEntries++;
-				}   
-				
-				totalCountEntries += countEntries;
-				
-				if (verbose) {
-					System.out.println("Loading : " + key.getId());
-				}
-				
-				for (LastStatus ls: list) {
-					if (verbose) {
-						System.out.println(ls.getJson());
-					}
-					if (!check) {
-						lsc.add(ls, key.getId());	
-					}
-				}
-				System.out.println("Loaded " + key.getId() +  ": Number of entries " + countEntries);
-			}
+            CacheInf lsc = CacheFactory.getInstance();
+            
+            XMLLaststatuscache cache = (XMLLaststatuscache) xmlobj;
+            long totalCountEntries = 0;
+            for (XMLKey key:cache.getKey()) {
+                countKeys++;
+                
+                LinkedList<LastStatus> list = new LinkedList<LastStatus>();
+                
+                countEntries = 0;
+                for (XMLEntry entry:key.getEntry()) {
+                    LastStatus ls = new LastStatus(entry);
+                    list.addFirst(ls);
+                    
+                    countEntries++;
+                }   
+                
+                totalCountEntries += countEntries;
+                
+                if (verbose) {
+                    System.out.println("Loading : " + key.getId());
+                }
+                
+                for (LastStatus ls: list) {
+                    if (verbose) {
+                        System.out.println(ls.getJson());
+                    }
+                    if (!check) {
+                        lsc.add(ls, key.getId());   
+                    }
+                }
+                System.out.println("Loaded " + key.getId() +  ": Number of entries " + countEntries);
+            }
 
-			long end = System.currentTimeMillis();
-			System.out.println("Loaded totally " + countKeys + " keys and " +
-					totalCountEntries + " entries in " + (end-start) + " ms");
-		} else {
-			System.out.println("Cache file do not exists - will be created on next shutdown");
-			throw new Exception("Cache file do not exists - will be created on next shutdown");
-		}
-	}
+            long end = System.currentTimeMillis();
+            System.out.println("Loaded totally " + countKeys + " keys and " +
+                    totalCountEntries + " entries in " + (end-start) + " ms");
+        } else {
+            System.out.println("Cache file do not exists - will be created on next shutdown");
+            throw new Exception("Cache file do not exists - will be created on next shutdown");
+        }
+    }
 
-	
-	public static Object getXMLFromBackend(Object xmlobj, File configfile, JAXBContext jc)
-			throws Exception {
-		try {
-			jc = JAXBContext.newInstance("com.ingby.socbox.bischeck.xsd.laststatuscache");
-		} catch (JAXBException e) {
-			throw new Exception(e);
-		}
-		SchemaFactory sf = SchemaFactory.newInstance(
-				javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		Schema schema = null;
+    
+    public static Object getXMLFromBackend(Object xmlobj, File configfile, JAXBContext jc)
+            throws Exception {
+        try {
+            jc = JAXBContext.newInstance("com.ingby.socbox.bischeck.xsd.laststatuscache");
+        } catch (JAXBException e) {
+            throw new Exception(e);
+        }
+        SchemaFactory sf = SchemaFactory.newInstance(
+                javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = null;
 
-		URL xsdUrl = ConfigurationManager.class.getClassLoader().getResource("laststatuscache.xsd");
-		if (xsdUrl == null) {
-			throw new Exception("Could not find xsd file " +
-					"laststatuscache.xsd" + " in classpath");
-		}
+        URL xsdUrl = ConfigurationManager.class.getClassLoader().getResource("laststatuscache.xsd");
+        if (xsdUrl == null) {
+            throw new Exception("Could not find xsd file " +
+                    "laststatuscache.xsd" + " in classpath");
+        }
 
-		try {
-			schema = sf.newSchema(new File(xsdUrl.getFile()));
-		} catch (Exception e) {
-			throw new Exception(e);
-		} 
+        try {
+            schema = sf.newSchema(new File(xsdUrl.getFile()));
+        } catch (Exception e) {
+            throw new Exception(e);
+        } 
 
-		Unmarshaller u = null;
-		try {
-			u = jc.createUnmarshaller();
-		} catch (JAXBException e) {
-			throw new Exception(e);
-		}
-		u.setSchema(schema);
+        Unmarshaller u = null;
+        try {
+            u = jc.createUnmarshaller();
+        } catch (JAXBException e) {
+            throw new Exception(e);
+        }
+        u.setSchema(schema);
 
-		try {
-			xmlobj =  u.unmarshal(configfile);
-		} catch (JAXBException e) {
-			throw new Exception(e);
-		}
-		return xmlobj;
-	}
+        try {
+            xmlobj =  u.unmarshal(configfile);
+        } catch (JAXBException e) {
+            throw new Exception(e);
+        }
+        return xmlobj;
+    }
 
 }

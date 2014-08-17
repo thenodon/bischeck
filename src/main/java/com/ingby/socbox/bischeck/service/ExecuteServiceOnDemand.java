@@ -63,154 +63,154 @@ import com.ingby.socbox.bischeck.service.ServiceJobConfig;
  */
 public class ExecuteServiceOnDemand implements DynamicMBean {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteServiceOnDemand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteServiceOnDemand.class);
 
-	String BEANNAME = "com.ingby.socbox.bischeck.service:type=ExecuteServiceOnDemand";
-	
-	private MBeanManager mbsMgr = null;
+    String BEANNAME = "com.ingby.socbox.bischeck.service:type=ExecuteServiceOnDemand";
     
-	public  ExecuteServiceOnDemand() {
-		
+    private MBeanManager mbsMgr = null;
+    
+    public  ExecuteServiceOnDemand() {
+        
         mbsMgr = new MBeanManager(this,BEANNAME);
         mbsMgr.registerMBeanserver();
     }
 
-	
-	@Override
-	public Object getAttribute(String attribute)
-			throws AttributeNotFoundException, MBeanException,
-			ReflectionException {
-		// No attributes
-		return null;
-	}
+    
+    @Override
+    public Object getAttribute(String attribute)
+            throws AttributeNotFoundException, MBeanException,
+            ReflectionException {
+        // No attributes
+        return null;
+    }
 
-	
-	@Override
-	public AttributeList getAttributes(String[] attributes) {
-		// No attributes
-		return null;
-	}
+    
+    @Override
+    public AttributeList getAttributes(String[] attributes) {
+        // No attributes
+        return null;
+    }
 
-	
-	@Override
-	public MBeanInfo getMBeanInfo() {
-		MBeanParameterInfo[] params = {new MBeanParameterInfo("host", String.class.getName(),"Name of host"),new MBeanParameterInfo("service", String.class.getName(),"Name of service")};
-		
-		MBeanOperationInfo[] opers = {
-	            new MBeanOperationInfo(
-	                    "execute",
-	                    "Execute service on demand",
-	                    params ,   // no parameters
-	                    "boolean",
-	                    MBeanOperationInfo.ACTION)
-	        };
-	        return new MBeanInfo(
-	                this.getClass().getName(),
-	                "Property Manager MBean",
-	                null,  // attributes
-	                null,  // constructors
-	                opers,
-	                null); // notifications
-	
-	}
+    
+    @Override
+    public MBeanInfo getMBeanInfo() {
+        MBeanParameterInfo[] params = {new MBeanParameterInfo("host", String.class.getName(),"Name of host"),new MBeanParameterInfo("service", String.class.getName(),"Name of service")};
+        
+        MBeanOperationInfo[] opers = {
+                new MBeanOperationInfo(
+                        "execute",
+                        "Execute service on demand",
+                        params ,   // no parameters
+                        "boolean",
+                        MBeanOperationInfo.ACTION)
+            };
+            return new MBeanInfo(
+                    this.getClass().getName(),
+                    "Property Manager MBean",
+                    null,  // attributes
+                    null,  // constructors
+                    opers,
+                    null); // notifications
+    
+    }
 
-	
-	@Override
-	public Object invoke(String actionName, Object[] params, String[] signature)
-			throws MBeanException, ReflectionException {
-		if ("execute".equals(actionName) &&
+    
+    @Override
+    public Object invoke(String actionName, Object[] params, String[] signature)
+            throws MBeanException, ReflectionException {
+        if ("execute".equals(actionName) &&
                 (params != null && params.length == 2) &&
                 (signature != null && signature.length == 2)) {
          
-			    return executeServiceDef((String) params[0],(String) params[1]);
+                return executeServiceDef((String) params[0],(String) params[1]);
         } else {
-        	throw new ReflectionException(new NoSuchMethodException(actionName));
+            throw new ReflectionException(new NoSuchMethodException(actionName));
         }
-	}
+    }
 
-	
-	@Override
-	public void setAttribute(Attribute attribute)
-			throws AttributeNotFoundException, InvalidAttributeValueException,
-			MBeanException, ReflectionException {
-	}
+    
+    @Override
+    public void setAttribute(Attribute attribute)
+            throws AttributeNotFoundException, InvalidAttributeValueException,
+            MBeanException, ReflectionException {
+    }
 
-	
-	@Override
-	public AttributeList setAttributes(AttributeList attributes) {
-		return null;
-	}
-
-
-	private boolean executeServiceDef(String hostName, String serviceName) {
-		LOGGER.info("On demand call for host {} and service {}", hostName, serviceName);
-		
-		Map<String, Host> hostMap = ConfigurationManager.getInstance().getHostConfig();
+    
+    @Override
+    public AttributeList setAttributes(AttributeList attributes) {
+        return null;
+    }
 
 
-		// Find host
-		Host host = null;
-		for (String hostfromMap : hostMap.keySet()) {
-			if (hostName.equals(hostfromMap)) {
-				host = hostMap.get(hostfromMap);
-				break;
-			}
-		}
-
-		if (host == null) {
-			LOGGER.debug("Host not found");
-			return false;
-		}
-
-		// Find service
-		Service service = host.getServiceByName(serviceName);
-		if (service == null) {
-			LOGGER.debug("Service not found");
-			return false;
-		}
-
-		// Execute immediately 
-
-		boolean state = executeSeriveImmediate(hostName, serviceName, service);
-		LOGGER.debug("Scheduling returned {}", state);
-		
-		return state;
-		
-	}
+    private boolean executeServiceDef(String hostName, String serviceName) {
+        LOGGER.info("On demand call for host {} and service {}", hostName, serviceName);
+        
+        Map<String, Host> hostMap = ConfigurationManager.getInstance().getHostConfig();
 
 
-	private boolean executeSeriveImmediate(String hostName, String serviceName, Service service) {
-		Scheduler sched = null;
-		try {
+        // Find host
+        Host host = null;
+        for (String hostfromMap : hostMap.keySet()) {
+            if (hostName.equals(hostfromMap)) {
+                host = hostMap.get(hostfromMap);
+                break;
+            }
+        }
 
-			sched = StdSchedulerFactory.getDefaultScheduler();
+        if (host == null) {
+            LOGGER.debug("Host not found");
+            return false;
+        }
 
-			Trigger trigger = newTrigger()
-					.withIdentity(service.getServiceName()+"Trigger-OnDemand", hostName+"TriggerGroupOnDemand")
-					.withSchedule(simpleSchedule().
-							withRepeatCount(0))
-							.startNow()
-							.build();
+        // Find service
+        Service service = host.getServiceByName(serviceName);
+        if (service == null) {
+            LOGGER.debug("Service not found");
+            return false;
+        }
 
-			ServiceJobConfig jobentry = new ServiceJobConfig(service);
+        // Execute immediately 
 
-			jobentry.addSchedule(trigger);
+        boolean state = executeSeriveImmediate(hostName, serviceName, service);
+        LOGGER.debug("Scheduling returned {}", state);
+        
+        return state;
+        
+    }
 
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("service", jobentry.getService());
 
-			JobDataMap jobmap = new JobDataMap(map);
-			JobDetail job = newJob(ServiceJob.class)
-					.withIdentity(serviceName,hostName)
-					.withDescription(hostName + "-"+ serviceName + "-OnDemand")
-					.usingJobData(jobmap).build();
+    private boolean executeSeriveImmediate(String hostName, String serviceName, Service service) {
+        Scheduler sched = null;
+        try {
 
-			sched.scheduleJob(job, trigger);
-			return true;
-		} catch (SchedulerException e) {
-			LOGGER.error("On demand scheduling failed for host {} and service {}",hostName, serviceName, e);
-			return false;
-		}
-	}
+            sched = StdSchedulerFactory.getDefaultScheduler();
+
+            Trigger trigger = newTrigger()
+                    .withIdentity(service.getServiceName()+"Trigger-OnDemand", hostName+"TriggerGroupOnDemand")
+                    .withSchedule(simpleSchedule().
+                            withRepeatCount(0))
+                            .startNow()
+                            .build();
+
+            ServiceJobConfig jobentry = new ServiceJobConfig(service);
+
+            jobentry.addSchedule(trigger);
+
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("service", jobentry.getService());
+
+            JobDataMap jobmap = new JobDataMap(map);
+            JobDetail job = newJob(ServiceJob.class)
+                    .withIdentity(serviceName,hostName)
+                    .withDescription(hostName + "-"+ serviceName + "-OnDemand")
+                    .usingJobData(jobmap).build();
+
+            sched.scheduleJob(job, trigger);
+            return true;
+        } catch (SchedulerException e) {
+            LOGGER.error("On demand scheduling failed for host {} and service {}",hostName, serviceName, e);
+            return false;
+        }
+    }
 
 }

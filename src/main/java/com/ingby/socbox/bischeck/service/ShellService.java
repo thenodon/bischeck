@@ -35,18 +35,18 @@ import org.slf4j.LoggerFactory;
  */
 public class ShellService extends ServiceAbstract implements Service, ServiceStateInf {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(ShellService.class);
-	
-	
-	public ShellService (String serviceName, Properties notUsed) {
+    private final static Logger LOGGER = LoggerFactory.getLogger(ShellService.class);
+    
+    
+    public ShellService (String serviceName, Properties notUsed) {
         this.serviceName = serviceName;
     }
 
     
     @Override
     public void openConnection() throws ServiceException { 
-    	super.openConnection();
-    	setConnectionEstablished(true);
+        super.openConnection();
+        setConnectionEstablished(true);
     }
 
     
@@ -56,51 +56,51 @@ public class ShellService extends ServiceAbstract implements Service, ServiceSta
     
     @Override 
     public String executeStmt(String exec) throws ServiceException  {
-    	
-    	Runtime run = null;
-    	Process pr = null;
-    	BufferedReader buf = null;
-    	String ret = null;
-    	
-    	try {
-    		run = Runtime.getRuntime();
-        	pr = run.exec(exec);
-        	pr.waitFor();
-        	buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-    		ret = buf.readLine();
-    	} catch (IOException ioe) {
-    		LOGGER.warn("Executing {} failed",exec, ioe);
-    		ServiceException se = new ServiceException(ioe);
-    		se.setServiceName(this.serviceName);
-    		throw se;
-    	} catch (InterruptedException ie) {
-    		LOGGER.warn("Executing {} failed with execption",exec, ie);
-    		ServiceException se = new ServiceException(ie);
-    		se.setServiceName(this.serviceName);
-    		throw se;
-    	} finally {
-    		try {
-    			buf.close();
-    		}catch (Exception ignore){}
-    	
-    		try {
-    			pr.getErrorStream().close();
-    		}catch (Exception ignore){}
-    		
-    		try {
-    			pr.getInputStream().close();
-    		}catch (Exception ignore){}
-    		
-    		try {
-    			pr.getOutputStream().close();
-    		}catch (Exception ignore){}
-    		
-    		try {
-    			pr.destroy();
-    		}catch (Exception ignore){}
-    	}
-    	
-    	return ret;    	
+        
+        Runtime run = null;
+        Process pr = null;
+        BufferedReader buf = null;
+        String ret = null;
+        
+        try {
+            run = Runtime.getRuntime();
+            pr = run.exec(exec);
+            pr.waitFor();
+            buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+            ret = buf.readLine();
+        } catch (IOException ioe) {
+            LOGGER.warn("Executing {} failed",exec, ioe);
+            ServiceException se = new ServiceException(ioe);
+            se.setServiceName(this.serviceName);
+            throw se;
+        } catch (InterruptedException ie) {
+            LOGGER.warn("Executing {} failed with execption",exec, ie);
+            ServiceException se = new ServiceException(ie);
+            se.setServiceName(this.serviceName);
+            throw se;
+        } finally {
+            try {
+                buf.close();
+            }catch (Exception ignore){}
+        
+            try {
+                pr.getErrorStream().close();
+            }catch (Exception ignore){}
+            
+            try {
+                pr.getInputStream().close();
+            }catch (Exception ignore){}
+            
+            try {
+                pr.getOutputStream().close();
+            }catch (Exception ignore){}
+            
+            try {
+                pr.destroy();
+            }catch (Exception ignore){}
+        }
+        
+        return ret;     
     }
 
 }

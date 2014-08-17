@@ -25,66 +25,66 @@ package com.ingby.socbox.bischeck.threshold;
  *
  */
 public class ThresholdContainer {
-	private Float floatThreshold = null;
-	private String expThreshold = null;
-	private boolean expInd = false;
+    private Float floatThreshold = null;
+    private String expThreshold = null;
+    private boolean expInd = false;
 
-	private Float warning;
-	private Float critical;
-
-
-
-	public Float getFloatThreshold() {
-		return floatThreshold;
-	}
+    private Float warning;
+    private Float critical;
 
 
-	public void setFloatThreshold(Float floatThreshold) {
-		this.floatThreshold = floatThreshold;
-		this.expInd = false;
-	}
+
+    public Float getFloatThreshold() {
+        return floatThreshold;
+    }
 
 
-	public String getExpThreshold() {
-		return expThreshold;
-	}
+    public void setFloatThreshold(Float floatThreshold) {
+        this.floatThreshold = floatThreshold;
+        this.expInd = false;
+    }
 
 
-	public void setExpThreshold(String expThreshold) {
-		this.expThreshold = expThreshold;
-		this.expInd = true;
-	}
+    public String getExpThreshold() {
+        return expThreshold;
+    }
 
 
-	public boolean isExpInd() {
-		return expInd;
-	}
-
-	public Float getWarning() {
-		if (this.warning == null) {
-			return null;
-		}
-
-		return this.warning;
-	}
+    public void setExpThreshold(String expThreshold) {
+        this.expThreshold = expThreshold;
+        this.expInd = true;
+    }
 
 
-	public void setWarning(Float warning) {
-		this.warning = warning;
-	}
+    public boolean isExpInd() {
+        return expInd;
+    }
+
+    public Float getWarning() {
+        if (this.warning == null) {
+            return null;
+        }
+
+        return this.warning;
+    }
 
 
-	public Float getCritical() {
-		if (this.critical == null) {
-			return null;
-		}
-
-		return this.critical;
-	}
+    public void setWarning(Float warning) {
+        this.warning = warning;
+    }
 
 
-	public void setCritical(Float critical) {
-		this.critical = critical;
-	}
+    public Float getCritical() {
+        if (this.critical == null) {
+            return null;
+        }
+
+        return this.critical;
+    }
+
+
+    public void setCritical(Float critical) {
+        this.critical = critical;
+    }
 
 }

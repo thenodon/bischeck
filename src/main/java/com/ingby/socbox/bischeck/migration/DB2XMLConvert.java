@@ -102,7 +102,7 @@ public class DB2XMLConvert {
                 converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.PROPERTIES.xml(),xmlstr);
             } else { 
                 System.out.println("############## " + 
-                		ConfigXMLInf.XMLCONFIG.PROPERTIES.xml() + 
+                        ConfigXMLInf.XMLCONFIG.PROPERTIES.xml() + 
                         " ##############");
                 System.out.println(xmlstr);
             }
@@ -112,7 +112,7 @@ public class DB2XMLConvert {
                 converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.URL2SERVICES.xml(),xmlstr);
             } else {
                 System.out.println("############## " + 
-                		ConfigXMLInf.XMLCONFIG.URL2SERVICES.xml() + 
+                        ConfigXMLInf.XMLCONFIG.URL2SERVICES.xml() + 
                         " ##############");
                 System.out.println(xmlstr);
             }
@@ -131,7 +131,7 @@ public class DB2XMLConvert {
                 converter.writeToFile(destdir,ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml(),xmlstr);
             } else { 
                 System.out.println("############## " +
-                		ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml() +
+                        ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD.xml() +
                         " ##############");
                 System.out.println(xmlstr);
             }
@@ -399,7 +399,7 @@ public class DB2XMLConvert {
                         
                         } else if ("W".equalsIgnoreCase(rsperiod.getString("type"))) {
                             
-                        	XMLWeeks weeks = new XMLWeeks();
+                            XMLWeeks weeks = new XMLWeeks();
                             
                             if (rsperiod.getString("interval") != null) {
                                 weeks.setWeek(new Integer(rsperiod.getString("interval")));
@@ -489,13 +489,13 @@ public class DB2XMLConvert {
             //Start writing to the output stream
             bufferedWriter.write(xmlstr.toString());
         } finally {
-        	if (bufferedWriter != null) {
-        		bufferedWriter.flush();
-        	}
+            if (bufferedWriter != null) {
+                bufferedWriter.flush();
+            }
             try {
-            	if (bufferedWriter != null) {
-            		bufferedWriter.close();
-            	}
+                if (bufferedWriter != null) {
+                    bufferedWriter.close();
+                }
             } catch (IOException ignore) {}
         }
     }

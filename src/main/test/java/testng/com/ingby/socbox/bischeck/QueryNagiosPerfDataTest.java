@@ -28,21 +28,21 @@ import com.ingby.socbox.bischeck.QueryNagiosPerfData;
 public class QueryNagiosPerfDataTest {
 
 
-	@Test (groups = { "Util" })
-	public void verifyPerfData() {
-		Assert.assertEquals(QueryNagiosPerfData.parse("load5","load1=0.160;15.000;30.000;0; load5=0.090;10.000;25.000;0; load15=0.020;5.000;20.000;0;"),"0.090");
-		Assert.assertEquals(QueryNagiosPerfData.parse("rta","'rta'=0.251ms;100.000;500.000;0; 'pl'=0%;20;60;;"),"0.251");
-		Assert.assertEquals(QueryNagiosPerfData.parse("size","time=0.009737s;;;0.000000 size=481B;;;0"),"481");
-		Assert.assertEquals(QueryNagiosPerfData.parse("dns","'dns'=10ms 'pl'=0%;20;60;;"),"10");
-		
-		Assert.assertEquals(QueryNagiosPerfData.parseByLabel("load5","load1=0.160;15.000;30.000;0; load5=0.090;10.000;25.000;0; load15=0.020;5.000;20.000;0;"),"0.090");
-		Assert.assertEquals(QueryNagiosPerfData.parseByLabel("rta","'rta'=0.251ms;100.000;500.000;0; 'pl'=0%;20;60;;"),"0.251");
-		Assert.assertEquals(QueryNagiosPerfData.parseByLabel("size","time=0.009737s;;;0.000000 size=481B;;;0"),"481");
-		Assert.assertEquals(QueryNagiosPerfData.parseByLabel("dns","'dns'=10ms 'pl'=0%;20;60;;"),"10");
-		
-		Assert.assertEquals(QueryNagiosPerfData.parseByLabel("load5","Status OKAY|load1=0.160;15.000;30.000;0; load5=0.090;10.000;25.000;0; load15=0.020;5.000;20.000;0;"),"0.090");
-		Assert.assertEquals(QueryNagiosPerfData.parseByLabel("rta"," Status OKAY  | 'rta'=0.251ms;100.000;500.000;0;   'pl'=0%;20;60;;"),"0.251");
-		
-	}
-	
+    @Test (groups = { "Util" })
+    public void verifyPerfData() {
+        Assert.assertEquals(QueryNagiosPerfData.parse("load5","load1=0.160;15.000;30.000;0; load5=0.090;10.000;25.000;0; load15=0.020;5.000;20.000;0;"),"0.090");
+        Assert.assertEquals(QueryNagiosPerfData.parse("rta","'rta'=0.251ms;100.000;500.000;0; 'pl'=0%;20;60;;"),"0.251");
+        Assert.assertEquals(QueryNagiosPerfData.parse("size","time=0.009737s;;;0.000000 size=481B;;;0"),"481");
+        Assert.assertEquals(QueryNagiosPerfData.parse("dns","'dns'=10ms 'pl'=0%;20;60;;"),"10");
+        
+        Assert.assertEquals(QueryNagiosPerfData.parseByLabel("load5","load1=0.160;15.000;30.000;0; load5=0.090;10.000;25.000;0; load15=0.020;5.000;20.000;0;"),"0.090");
+        Assert.assertEquals(QueryNagiosPerfData.parseByLabel("rta","'rta'=0.251ms;100.000;500.000;0; 'pl'=0%;20;60;;"),"0.251");
+        Assert.assertEquals(QueryNagiosPerfData.parseByLabel("size","time=0.009737s;;;0.000000 size=481B;;;0"),"481");
+        Assert.assertEquals(QueryNagiosPerfData.parseByLabel("dns","'dns'=10ms 'pl'=0%;20;60;;"),"10");
+        
+        Assert.assertEquals(QueryNagiosPerfData.parseByLabel("load5","Status OKAY|load1=0.160;15.000;30.000;0; load5=0.090;10.000;25.000;0; load15=0.020;5.000;20.000;0;"),"0.090");
+        Assert.assertEquals(QueryNagiosPerfData.parseByLabel("rta"," Status OKAY  | 'rta'=0.251ms;100.000;500.000;0;   'pl'=0%;20;60;;"),"0.251");
+        
+    }
+    
 }

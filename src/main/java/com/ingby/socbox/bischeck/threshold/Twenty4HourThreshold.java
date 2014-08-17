@@ -75,9 +75,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Twenty4HourThreshold.class);
 
-	private static final int HOURS_PER_DAY = 24;
+    private static final int HOURS_PER_DAY = 24;
 
-	private static XMLTwenty4Threshold twenty4hourconfig;
+    private static XMLTwenty4Threshold twenty4hourconfig;
 
     private String serviceName;
     private String serviceItemName;
@@ -92,23 +92,23 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     private Integer currenthour = null;
     private Integer currentminute = null;
 
-	private NAGIOSSTAT stateOnNull = NAGIOSSTAT.UNKNOWN;
+    private NAGIOSSTAT stateOnNull = NAGIOSSTAT.UNKNOWN;
 
-	private boolean isHoliday = false;
+    private boolean isHoliday = false;
 
-	private boolean notExist = false;
-	
-	private String currentRule = null;
-	
+    private boolean notExist = false;
+    
+    private String currentRule = null;
+    
     public boolean notExist() {
-		return notExist;
-	}
+        return notExist;
+    }
 
     public String getCurrentRule() {
-    	return currentRule;
+        return currentRule;
     }
     
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
         CommandLine line = null;
        
@@ -145,9 +145,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 line.hasOption("item")) {
 
             Twenty4HourThreshold current = new Twenty4HourThreshold(
-            		line.getOptionValue("host"),
-            		line.getOptionValue("service"),
-            		line.getOptionValue("item"));
+                    line.getOptionValue("host"),
+                    line.getOptionValue("service"),
+                    line.getOptionValue("item"));
             
             if (line.hasOption("date")) {
                 Calendar testdate = BisCalendar.getInstance();
@@ -161,11 +161,11 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 current.init();
             }
             if (current.notExist()) {
-            	System.out.println("No threshold configuration exists for " + 
-            			line.getOptionValue("host") + "-" +
-            			line.getOptionValue("service")  + "-" +
-            			line.getOptionValue("item"));
-            	Util.ShellExit(0);
+                System.out.println("No threshold configuration exists for " + 
+                        line.getOptionValue("host") + "-" +
+                        line.getOptionValue("service")  + "-" +
+                        line.getOptionValue("item"));
+                Util.ShellExit(0);
             }
             
             Calendar c = BisCalendar.getInstance();
@@ -174,22 +174,22 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             Float metric = null;
             
             if (line.hasOption("hour")) {
-            	hourThreshold = Integer.parseInt(line.getOptionValue("hour"));
+                hourThreshold = Integer.parseInt(line.getOptionValue("hour"));
             }
             
             if (line.hasOption("minute")) {
-            	minuteThreshold = Integer.parseInt(line.getOptionValue("minute"));
+                minuteThreshold = Integer.parseInt(line.getOptionValue("minute"));
             }    
             
             if (line.hasOption("metric")) {
-            	metric = Float.parseFloat(line.getOptionValue("metric"));
+                metric = Float.parseFloat(line.getOptionValue("metric"));
             }
 
             int verbose = 0;
 
             if (line.hasOption("verbose")) {
-            	verbose = Integer.parseInt(line.getOptionValue("verbose"));
-            	
+                verbose = Integer.parseInt(line.getOptionValue("verbose"));
+                
             }
             
             System.out.println(current.show(hourThreshold, minuteThreshold, metric, verbose));
@@ -201,135 +201,135 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     
     public String show(int hourThreshold,int minuteThreshold, Float metric, int verbose) {
-    	String lineSep = System.getProperty("line.separator");
-    	StringBuilder showConfig = new StringBuilder();
-    	if (isHoliday) {
-    		showConfig.append("Is holiday");
-    		return showConfig.toString();
-    	}
-    	
-    	if (verbose > 0) {
-    		showConfig.append(getCurrentRule()).append(lineSep);
-    	}
-    	
-    	if (verbose > 1) {
-			for (int i=0;i < HOURS_PER_DAY;i++) {
-    			if (thresholdByPeriod[i] == null) {
-    				showConfig.append("Hour " + Util.integerToTimeString(i) + " threshold=null");
-    				
-    			} else if (thresholdByPeriod[i].isExpInd()) {
-    				showConfig.append("Hour " + Util.integerToTimeString(i) + " threshold=" + thresholdByPeriod[i].getExpThreshold()).
-    				append(" warning=").append(thresholdByPeriod[i].getWarning()). 
-    				append(" critical=").append(thresholdByPeriod[i].getCritical());
-    				
-    			} else {
-    				showConfig.append("Hour " + Util.integerToTimeString(i) + " threshold=" + this.thresholdByPeriod[i].getFloatThreshold()).
-    				append(" warning=").append(thresholdByPeriod[i].getWarning()). 
-    				append(" critical=").append(thresholdByPeriod[i].getCritical());
-    			}
-    			showConfig.append(lineSep);
-    		}
-    	
-		}
-		
-		BischeckDecimal value = null;
-		if (metric != null) {
-			value = new BischeckDecimal(metric);
-			showConfig.append(value);
-		}
-		showConfig.append("@" + Util.integerToTimeString(hourThreshold) +":"+ Util.integerToTimeString(minuteThreshold));
+        String lineSep = System.getProperty("line.separator");
+        StringBuilder showConfig = new StringBuilder();
+        if (isHoliday) {
+            showConfig.append("Is holiday");
+            return showConfig.toString();
+        }
+        
+        if (verbose > 0) {
+            showConfig.append(getCurrentRule()).append(lineSep);
+        }
+        
+        if (verbose > 1) {
+            for (int i=0;i < HOURS_PER_DAY;i++) {
+                if (thresholdByPeriod[i] == null) {
+                    showConfig.append("Hour " + Util.integerToTimeString(i) + " threshold=null");
+                    
+                } else if (thresholdByPeriod[i].isExpInd()) {
+                    showConfig.append("Hour " + Util.integerToTimeString(i) + " threshold=" + thresholdByPeriod[i].getExpThreshold()).
+                    append(" warning=").append(thresholdByPeriod[i].getWarning()). 
+                    append(" critical=").append(thresholdByPeriod[i].getCritical());
+                    
+                } else {
+                    showConfig.append("Hour " + Util.integerToTimeString(i) + " threshold=" + this.thresholdByPeriod[i].getFloatThreshold()).
+                    append(" warning=").append(thresholdByPeriod[i].getWarning()). 
+                    append(" critical=").append(thresholdByPeriod[i].getCritical());
+                }
+                showConfig.append(lineSep);
+            }
+        
+        }
+        
+        BischeckDecimal value = null;
+        if (metric != null) {
+            value = new BischeckDecimal(metric);
+            showConfig.append(value);
+        }
+        showConfig.append("@" + Util.integerToTimeString(hourThreshold) +":"+ Util.integerToTimeString(minuteThreshold));
 
-		
-		if (metric != null) {
-			NAGIOSSTAT state = resolveState(metric, hourThreshold, minuteThreshold);
-			showConfig.append(" State=" + state);
-		}
-		
-		BischeckDecimal threshold = new BischeckDecimal(getThresholdByHourAndMinute(hourThreshold, minuteThreshold));
-			
-		if (">".equalsIgnoreCase(calcMethod) || "<".equalsIgnoreCase(calcMethod) ) {
-			if (threshold.getFloat() != null) {
-				BischeckDecimal warn = new BischeckDecimal(threshold.getFloat()*getWarning());
-				BischeckDecimal crit = new BischeckDecimal(threshold.getFloat()*getCritical());
-				showConfig.append(" Threshold=" + threshold + " ("+getCalcMethod()+")" + 
-						" warning=" + warn +"("+getWarning()+ ")" + 
-						" critical=" + crit+"("+ getCritical() + ")");
-			} else {
-				showConfig.append(" Threshold=" + null + " ("+getCalcMethod()+")" + 
-						" warning=" + null +"("+getWarning()+ ")" +
-						" critical=" + null +"("+ getCritical() + ")");
-			
-			}
-		} else if ("=".equalsIgnoreCase(calcMethod)) {
-			if (threshold.getFloat() != null) {
-				BischeckDecimal critical =  new BischeckDecimal((getCritical()));
-				BischeckDecimal warning =  new BischeckDecimal((getWarning()));
-				
-				BischeckDecimal criticalPercentage =  new BischeckDecimal((1-getCritical()));
-				BischeckDecimal criticalBound     =  new BischeckDecimal((1-getCritical())*threshold.getFloat());
-				BischeckDecimal criticalUpBound   =  new BischeckDecimal(threshold.getFloat() + criticalBound.getFloat());
-				BischeckDecimal criticalDownBound =  new BischeckDecimal(threshold.getFloat() - criticalBound.getFloat());
-				BischeckDecimal warningPercentage =  new BischeckDecimal((1-getWarning()));
-				BischeckDecimal warningBound      =  new BischeckDecimal((1-getWarning())*threshold.getFloat());
-				BischeckDecimal warningUpBound    =  new BischeckDecimal(threshold.getFloat() + warningBound.getFloat());
-				BischeckDecimal warningDownBound  =  new BischeckDecimal(threshold.getFloat() - warningBound.getFloat());
-				
-				showConfig.append(" Threshold=" + threshold.scaleBy(value) + " ("+getCalcMethod()+")" + 
-						" warning=" + warningUpBound + "/" + warningDownBound + 
-						"(+-"+warningPercentage.scaleBy(warning) + ")" + 
-						" critical=" + criticalUpBound + "/" + criticalDownBound + 
-						"(+-"+criticalPercentage.scaleBy(critical) + ")");
-			} else {
-				BischeckDecimal critical =  new BischeckDecimal((getCritical()));
-				BischeckDecimal warning =  new BischeckDecimal((getWarning()));
-				
-				BischeckDecimal criticalPercentage =  new BischeckDecimal((1-getCritical()));
-				BischeckDecimal warningPercentage =  new BischeckDecimal((1-getWarning()));
-				showConfig.append(" Threshold=" + null + " ("+getCalcMethod()+")" + 
-						" warning=" + null + "/" + null + 
-						"(+-"+ warningPercentage.scaleBy(warning) + ")" +
-						" critical=" + null + "/" + null + 
-						"(+-" + criticalPercentage.scaleBy(critical) + ")");
-			}
-		}
-		return showConfig.toString();
+        
+        if (metric != null) {
+            NAGIOSSTAT state = resolveState(metric, hourThreshold, minuteThreshold);
+            showConfig.append(" State=" + state);
+        }
+        
+        BischeckDecimal threshold = new BischeckDecimal(getThresholdByHourAndMinute(hourThreshold, minuteThreshold));
+            
+        if (">".equalsIgnoreCase(calcMethod) || "<".equalsIgnoreCase(calcMethod) ) {
+            if (threshold.getFloat() != null) {
+                BischeckDecimal warn = new BischeckDecimal(threshold.getFloat()*getWarning());
+                BischeckDecimal crit = new BischeckDecimal(threshold.getFloat()*getCritical());
+                showConfig.append(" Threshold=" + threshold + " ("+getCalcMethod()+")" + 
+                        " warning=" + warn +"("+getWarning()+ ")" + 
+                        " critical=" + crit+"("+ getCritical() + ")");
+            } else {
+                showConfig.append(" Threshold=" + null + " ("+getCalcMethod()+")" + 
+                        " warning=" + null +"("+getWarning()+ ")" +
+                        " critical=" + null +"("+ getCritical() + ")");
+            
+            }
+        } else if ("=".equalsIgnoreCase(calcMethod)) {
+            if (threshold.getFloat() != null) {
+                BischeckDecimal critical =  new BischeckDecimal((getCritical()));
+                BischeckDecimal warning =  new BischeckDecimal((getWarning()));
+                
+                BischeckDecimal criticalPercentage =  new BischeckDecimal((1-getCritical()));
+                BischeckDecimal criticalBound     =  new BischeckDecimal((1-getCritical())*threshold.getFloat());
+                BischeckDecimal criticalUpBound   =  new BischeckDecimal(threshold.getFloat() + criticalBound.getFloat());
+                BischeckDecimal criticalDownBound =  new BischeckDecimal(threshold.getFloat() - criticalBound.getFloat());
+                BischeckDecimal warningPercentage =  new BischeckDecimal((1-getWarning()));
+                BischeckDecimal warningBound      =  new BischeckDecimal((1-getWarning())*threshold.getFloat());
+                BischeckDecimal warningUpBound    =  new BischeckDecimal(threshold.getFloat() + warningBound.getFloat());
+                BischeckDecimal warningDownBound  =  new BischeckDecimal(threshold.getFloat() - warningBound.getFloat());
+                
+                showConfig.append(" Threshold=" + threshold.scaleBy(value) + " ("+getCalcMethod()+")" + 
+                        " warning=" + warningUpBound + "/" + warningDownBound + 
+                        "(+-"+warningPercentage.scaleBy(warning) + ")" + 
+                        " critical=" + criticalUpBound + "/" + criticalDownBound + 
+                        "(+-"+criticalPercentage.scaleBy(critical) + ")");
+            } else {
+                BischeckDecimal critical =  new BischeckDecimal((getCritical()));
+                BischeckDecimal warning =  new BischeckDecimal((getWarning()));
+                
+                BischeckDecimal criticalPercentage =  new BischeckDecimal((1-getCritical()));
+                BischeckDecimal warningPercentage =  new BischeckDecimal((1-getWarning()));
+                showConfig.append(" Threshold=" + null + " ("+getCalcMethod()+")" + 
+                        " warning=" + null + "/" + null + 
+                        "(+-"+ warningPercentage.scaleBy(warning) + ")" +
+                        " critical=" + null + "/" + null + 
+                        "(+-" + criticalPercentage.scaleBy(critical) + ")");
+            }
+        }
+        return showConfig.toString();
     }
 
 
-	public Twenty4HourThreshold(String hostName, String serviceName, String serviceItemName) {
+    public Twenty4HourThreshold(String hostName, String serviceName, String serviceItemName) {
         
-    	this.hostName = hostName;
-    	this.serviceName = serviceName;
-    	this.serviceItemName = serviceItemName;
-    	
+        this.hostName = hostName;
+        this.serviceName = serviceName;
+        this.serviceItemName = serviceItemName;
+        
         Integer stateAsInt = null;
         String stateAsString = null;
         
         try {
-        	stateAsInt = Integer.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("stateOnNull","UNKNOWN"));
-        	switch (stateAsInt) {
-        	case 0: stateOnNull = NAGIOSSTAT.OK;
-        		break;
-        	case 1: stateOnNull = NAGIOSSTAT.WARNING;
-        		break;
-        	case 2: stateOnNull = NAGIOSSTAT.CRITICAL;
-        		break;
-        	case 3: stateOnNull = NAGIOSSTAT.UNKNOWN;
-        		break;
-        	default: stateOnNull = NAGIOSSTAT.UNKNOWN;
-        		break;
-        	}
+            stateAsInt = Integer.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("stateOnNull","UNKNOWN"));
+            switch (stateAsInt) {
+            case 0: stateOnNull = NAGIOSSTAT.OK;
+                break;
+            case 1: stateOnNull = NAGIOSSTAT.WARNING;
+                break;
+            case 2: stateOnNull = NAGIOSSTAT.CRITICAL;
+                break;
+            case 3: stateOnNull = NAGIOSSTAT.UNKNOWN;
+                break;
+            default: stateOnNull = NAGIOSSTAT.UNKNOWN;
+                break;
+            }
         } catch (NumberFormatException ne) {
-        	stateAsString = ConfigurationManager.getInstance().getProperties().getProperty("stateOnNull","UNKNOWN");
-        	if (stateAsString.equalsIgnoreCase(NAGIOSSTAT.OK.toString())) {
-        		stateOnNull = NAGIOSSTAT.OK;
-        	} else if (stateAsString.equalsIgnoreCase(NAGIOSSTAT.CRITICAL.toString())) {
-        		stateOnNull = NAGIOSSTAT.CRITICAL;
-        	} else if (stateAsString.equalsIgnoreCase(NAGIOSSTAT.WARNING.toString())) {
-        		stateOnNull = NAGIOSSTAT.WARNING;
-        	} else {
-        		stateOnNull = NAGIOSSTAT.UNKNOWN;
-        	}
+            stateAsString = ConfigurationManager.getInstance().getProperties().getProperty("stateOnNull","UNKNOWN");
+            if (stateAsString.equalsIgnoreCase(NAGIOSSTAT.OK.toString())) {
+                stateOnNull = NAGIOSSTAT.OK;
+            } else if (stateAsString.equalsIgnoreCase(NAGIOSSTAT.CRITICAL.toString())) {
+                stateOnNull = NAGIOSSTAT.CRITICAL;
+            } else if (stateAsString.equalsIgnoreCase(NAGIOSSTAT.WARNING.toString())) {
+                stateOnNull = NAGIOSSTAT.WARNING;
+            } else {
+                stateOnNull = NAGIOSSTAT.UNKNOWN;
+            }
         }
     }
 
@@ -371,7 +371,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     @Override
     public NAGIOSSTAT getState(String value) {
 
-    	
+        
         Float measuredValue = null;
 
         if (value != null) {
@@ -386,17 +386,17 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         NAGIOSSTAT state = NAGIOSSTAT.OK;
         
         if (isHoliday) {
-        	state = NAGIOSSTAT.OK;
+            state = NAGIOSSTAT.OK;
         } else {
-        	Calendar c = BisCalendar.getInstance();
+            Calendar c = BisCalendar.getInstance();
             int hourThreshold = c.get(Calendar.HOUR_OF_DAY);
             int minuteThreshold = c.get(Calendar.MINUTE);
 
-        	state = resolveState(measuredValue, hourThreshold, minuteThreshold);
+            state = resolveState(measuredValue, hourThreshold, minuteThreshold);
         }
         
         if (LOGGER.isDebugEnabled()) {
-        	LOGGER.debug("Measured: {} critical level: {} warning level: {} hour: {}",
+            LOGGER.debug("Measured: {} critical level: {} warning level: {} hour: {}",
                 measuredValue,
                 this.getCritical(),
                 this.getWarning(),
@@ -407,23 +407,23 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     }
 
 
-	private NAGIOSSTAT resolveState(Float measuredValue, int hourThreshold, int minuteThreshold) {
-		NAGIOSSTAT state = NAGIOSSTAT.OK;
-		
-		Float calcthreshold = this.getThresholdByHourAndMinute(hourThreshold, minuteThreshold);
-		
-		/* Only check if this is a hour period that not null  and that the measured value is null
+    private NAGIOSSTAT resolveState(Float measuredValue, int hourThreshold, int minuteThreshold) {
+        NAGIOSSTAT state = NAGIOSSTAT.OK;
+        
+        Float calcthreshold = this.getThresholdByHourAndMinute(hourThreshold, minuteThreshold);
+        
+        /* Only check if this is a hour period that not null  and that the measured value is null
          * Maybe measured value should result in an error - but I think it should be a separate service control 
          */
         
         if (measuredValue == null) {
-        	
-        	LOGGER.debug("Measured value is null so state is set to {}", stateOnNull.toString());
-        	
-        	state=stateOnNull;
+            
+            LOGGER.debug("Measured value is null so state is set to {}", stateOnNull.toString());
+            
+            state=stateOnNull;
         } else if (calcthreshold != null && measuredValue != null) {
             
-        	LOGGER.debug("Hour threahold value: {}", calcthreshold);
+            LOGGER.debug("Hour threahold value: {}", calcthreshold);
 
             if (">".equalsIgnoreCase(calcMethod)) {
                 if (measuredValue < this.getCritical()*calcthreshold) {
@@ -454,7 +454,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             }
         }
         return state;
-	}
+    }
 
     
     @Override
@@ -486,8 +486,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     
     @Override
     public Float getThreshold() {
-    	
-    	Calendar c = BisCalendar.getInstance();
+        
+        Calendar c = BisCalendar.getInstance();
         int hourThreshold = c.get(Calendar.HOUR_OF_DAY);
         int minuteThreshold = c.get(Calendar.MINUTE);
 
@@ -495,46 +495,46 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     }
 
 
-	private Float getThresholdByHourAndMinute(int hourThreshold, int minuteThreshold) {
-		
-		if (currenthour != null && currentminute != null) {
-        	if (currenthour == hourThreshold && currentminute == minuteThreshold) {
-        		LOGGER.debug("Threshold cache hit for {}-{}-{}", hostName, serviceName, serviceItemName);
-        		return currentthreshold;
-        	}
+    private Float getThresholdByHourAndMinute(int hourThreshold, int minuteThreshold) {
+        
+        if (currenthour != null && currentminute != null) {
+            if (currenthour == hourThreshold && currentminute == minuteThreshold) {
+                LOGGER.debug("Threshold cache hit for {}-{}-{}", hostName, serviceName, serviceItemName);
+                return currentthreshold;
+            }
         }
 
-		LOGGER.debug("Threshold cache miss for {}-{}-{}", hostName, serviceName, serviceItemName);
+        LOGGER.debug("Threshold cache miss for {}-{}-{}", hostName, serviceName, serviceItemName);
 
         final Timer timer = Metrics.newTimer(Twenty4HourThreshold.class, 
-				"recalculateTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-		final TimerContext ctxthreshold = timer.time();
+                "recalculateTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final TimerContext ctxthreshold = timer.time();
         
-		if (thresholdByPeriod[hourThreshold] == null || 
-        		thresholdByPeriod[(hourThreshold+1) % HOURS_PER_DAY] == null) {
+        if (thresholdByPeriod[hourThreshold] == null || 
+                thresholdByPeriod[(hourThreshold+1) % HOURS_PER_DAY] == null) {
             currentthreshold = null;
         } else {
 
-        	Float calculatedfirst = calculateForInterval(thresholdByPeriod[hourThreshold]);
-        	Float calculatednext = calculateForInterval(thresholdByPeriod[(hourThreshold+1) % HOURS_PER_DAY]);
+            Float calculatedfirst = calculateForInterval(thresholdByPeriod[hourThreshold]);
+            Float calculatednext = calculateForInterval(thresholdByPeriod[(hourThreshold+1) % HOURS_PER_DAY]);
 
-        	if (calculatedfirst == null || calculatednext == null) {
-        		currentthreshold = null;
-        	} else {
-        		currentthreshold = minuteThreshold*(calculatednext - calculatedfirst)/60 + calculatedfirst;
-        		
-        		// New stuff to manage hours set on interval
-        		this.warning = thresholdByPeriod[hourThreshold].getWarning();
-        		this.critical = thresholdByPeriod[hourThreshold].getCritical();
-        	}      	
+            if (calculatedfirst == null || calculatednext == null) {
+                currentthreshold = null;
+            } else {
+                currentthreshold = minuteThreshold*(calculatednext - calculatedfirst)/60 + calculatedfirst;
+                
+                // New stuff to manage hours set on interval
+                this.warning = thresholdByPeriod[hourThreshold].getWarning();
+                this.critical = thresholdByPeriod[hourThreshold].getCritical();
+            }       
         }
         
         currenthour = hourThreshold;
         currentminute = minuteThreshold;
         ctxthreshold.stop();
-	
+    
         return currentthreshold;
-	}
+    }
     
     
     private boolean isHoliday(XMLTwenty4Threshold config, int year, int month, int dayofmonth) {
@@ -572,7 +572,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 servicedef.getServicename().equals(this.serviceName) &&
                 servicedef.getServiceitemname().equals(this.serviceItemName)) {
                 
-            	periodList = servicedef.getPeriod();
+                periodList = servicedef.getPeriod();
                 break;
             }
         }
@@ -584,26 +584,26 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     private List<XMLPeriod> findServicedefByTemplate(XMLTwenty4Threshold config) {
 
-    	List<XMLPeriod> periodList = null;
+        List<XMLPeriod> periodList = null;
 
-    	for (XMLServicedefgroup servicedefGroup: config.getServicedefgroup()) {
-    		for (XMLMember member: servicedefGroup.getMember()) {
-    			
-    			if (member.getHostname().equals(this.hostName) &&
-    					member.getServicename().equals(this.serviceName) &&
-    					member.getServiceitemname().equals(this.serviceItemName)) {
-    				String templatename = servicedefGroup.getTemplate();
-    				
-    				for (XMLServicedeftemplate template: config.getServicedeftemplate()) {
-    					if (template.getTemplatename().equalsIgnoreCase(templatename)) {		
-    						periodList = template.getPeriod();
-    						return periodList;
-    					}
-    				}
-    			}
-    		}
-    	}
-    	return null;
+        for (XMLServicedefgroup servicedefGroup: config.getServicedefgroup()) {
+            for (XMLMember member: servicedefGroup.getMember()) {
+                
+                if (member.getHostname().equals(this.hostName) &&
+                        member.getServicename().equals(this.serviceName) &&
+                        member.getServiceitemname().equals(this.serviceItemName)) {
+                    String templatename = servicedefGroup.getTemplate();
+                    
+                    for (XMLServicedeftemplate template: config.getServicedeftemplate()) {
+                        if (template.getTemplatename().equalsIgnoreCase(templatename)) {        
+                            periodList = template.getPeriod();
+                            return periodList;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }    
     
     
@@ -620,28 +620,28 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
      * @return
      */
     private XMLPeriod findPeriod(List<XMLPeriod> listPeriod, Calendar date){
-    	
-    	if (LOGGER.isDebugEnabled()) {
-
-    		Integer month=date.get(Calendar.MONTH) + 1;
-    		Integer dayofmonth=date.get(Calendar.DAY_OF_MONTH);
-
-    		Integer week=date.get(Calendar.WEEK_OF_YEAR);
-    		Integer dayofweek=date.get(Calendar.DAY_OF_WEEK);
-
-    		LOGGER.debug("The current date is: month=" + month +
-    				" dayofmonth="+ dayofmonth +
-    				" week="+ week +
-    				" dayofweek="+ dayofweek);
-    	}
         
-    	XMLPeriod period = null;
+        if (LOGGER.isDebugEnabled()) {
+
+            Integer month=date.get(Calendar.MONTH) + 1;
+            Integer dayofmonth=date.get(Calendar.DAY_OF_MONTH);
+
+            Integer week=date.get(Calendar.WEEK_OF_YEAR);
+            Integer dayofweek=date.get(Calendar.DAY_OF_WEEK);
+
+            LOGGER.debug("The current date is: month=" + month +
+                    " dayofmonth="+ dayofmonth +
+                    " week="+ week +
+                    " dayofweek="+ dayofweek);
+        }
+        
+        XMLPeriod period = null;
         /**
          * 1 - Check for a complete month and day in month
          */
         period = checkDayAndMonth(listPeriod,date);
         if (period != null) { 
-        	return period; 
+            return period; 
         }
         
         
@@ -650,7 +650,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
          */
         period = checkDayAndWeek(listPeriod,date);
         if (period != null) { 
-        	return period; 
+            return period; 
         }
         
         
@@ -659,7 +659,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
          */
         period = checkDayOfMonth(listPeriod, date);
         if (period != null) { 
-        	return period; 
+            return period; 
         }
         
     
@@ -668,7 +668,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
          */
         period = checkDayOfWeek(listPeriod, date);
         if (period != null) { 
-        	return period; 
+            return period; 
         }
         
     
@@ -677,7 +677,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
          */
         period = checkMonth(listPeriod, date);
         if (period != null) { 
-        	return period; 
+            return period; 
         }
         
         
@@ -686,7 +686,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
          */
         period = checkWeek(listPeriod, date);
         if (period != null) { 
-        	return period; 
+            return period; 
         }
         
         /**
@@ -696,32 +696,32 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     }
 
 
-	private XMLPeriod checkDefault(List<XMLPeriod> listPeriod) {
-		
-		Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+    private XMLPeriod checkDefault(List<XMLPeriod> listPeriod) {
         
-		while (periodIter.hasNext()) {
+        Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+        
+        while (periodIter.hasNext()) {
             XMLPeriod period = periodIter.next();
             if (period.getMonths().isEmpty() && 
-            		period.getWeeks().isEmpty() ) {
-            	
-            	currentRule = String.format("Rule 7 - default - hourid: %s", period.getHoursIDREF());
-            	LOGGER.debug(currentRule);
-            	
-            	assignPeriod(period);
+                    period.getWeeks().isEmpty() ) {
+                
+                currentRule = String.format("Rule 7 - default - hourid: %s", period.getHoursIDREF());
+                LOGGER.debug(currentRule);
+                
+                assignPeriod(period);
                 return period;
             }
         }
         return null;
-	}
+    }
 
 
-	private XMLPeriod checkWeek(List<XMLPeriod> listPeriod, Calendar date) {
+    private XMLPeriod checkWeek(List<XMLPeriod> listPeriod, Calendar date) {
 
-		Integer week = date.get(Calendar.WEEK_OF_YEAR);
-		
-		Iterator<XMLPeriod> periodIter = listPeriod.iterator();
-		
+        Integer week = date.get(Calendar.WEEK_OF_YEAR);
+        
+        Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+        
         while (periodIter.hasNext()) {
             XMLPeriod period = periodIter.next();
 
@@ -731,29 +731,29 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 XMLWeeks weeks = weeksIter.next();
                 
                 if (!isContentNull(weeks.getWeek()) && 
-                	weeks.getWeek().equals(week) && 
-                	isContentNull(weeks.getDayofweek())) {
-                	
-                	currentRule = String.format("Rule 6 - week is %s - hourid: %s", week, period.getHoursIDREF());
-                	LOGGER.debug(currentRule);
+                    weeks.getWeek().equals(week) && 
+                    isContentNull(weeks.getDayofweek())) {
+                    
+                    currentRule = String.format("Rule 6 - week is %s - hourid: %s", week, period.getHoursIDREF());
+                    LOGGER.debug(currentRule);
                 
-                	assignPeriod(period);
-                	return period;
+                    assignPeriod(period);
+                    return period;
                 }
 
             }
         }
         return null;
-	}
+    }
 
 
-	private XMLPeriod checkMonth(List<XMLPeriod> listPeriod, Calendar date) {
-		
-		Integer month = date.get(Calendar.MONTH) + 1;
-		
-		Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+    private XMLPeriod checkMonth(List<XMLPeriod> listPeriod, Calendar date) {
         
-		while (periodIter.hasNext()) {
+        Integer month = date.get(Calendar.MONTH) + 1;
+        
+        Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+        
+        while (periodIter.hasNext()) {
             XMLPeriod period = periodIter.next();
 
             Iterator<XMLMonths> monthsIter = period.getMonths().iterator();
@@ -762,28 +762,28 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 XMLMonths months = monthsIter.next();
 
                 if (!isContentNull(months.getMonth()) &&
-                	months.getMonth().equals(month) &&
-                	isContentNull(months.getDayofmonth())) {
+                    months.getMonth().equals(month) &&
+                    isContentNull(months.getDayofmonth())) {
 
-                	currentRule = String.format("Rule 5 - month is %s - hourid: %s", month, period.getHoursIDREF());
-                	LOGGER.debug(currentRule);
-                	
-                	assignPeriod(period);
-                	return period;
+                    currentRule = String.format("Rule 5 - month is %s - hourid: %s", month, period.getHoursIDREF());
+                    LOGGER.debug(currentRule);
+                    
+                    assignPeriod(period);
+                    return period;
                 }
 
             }
         }
-		return null;
-	}
+        return null;
+    }
 
 
-	private XMLPeriod checkDayOfWeek(List<XMLPeriod> listPeriod, Calendar date) {
-		
-		Integer dayofweek = date.get(Calendar.DAY_OF_WEEK);
-		
-		Iterator<XMLPeriod> periodIter = listPeriod.iterator();
-		
+    private XMLPeriod checkDayOfWeek(List<XMLPeriod> listPeriod, Calendar date) {
+        
+        Integer dayofweek = date.get(Calendar.DAY_OF_WEEK);
+        
+        Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+        
         while (periodIter.hasNext()) {
             XMLPeriod period = periodIter.next();
 
@@ -794,25 +794,25 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
                 if (isContentNull(weeks.getWeek()) &&
                     weeks.getDayofweek().equals(dayofweek)) {
-                	
-                	currentRule = String.format("Rule 4 - day of week is %s - hourid: %s", dayofweek, period.getHoursIDREF());
-                	LOGGER.debug(currentRule);
-                	
-                	assignPeriod(period);
+                    
+                    currentRule = String.format("Rule 4 - day of week is %s - hourid: %s", dayofweek, period.getHoursIDREF());
+                    LOGGER.debug(currentRule);
+                    
+                    assignPeriod(period);
                     return period;
                 }
             }
         }
         return null;
-	}
+    }
 
 
-	private XMLPeriod checkDayOfMonth(List<XMLPeriod> listPeriod, Calendar date) {
-		
-		Integer dayofmonth = date.get(Calendar.DAY_OF_MONTH);
-		
-		Iterator<XMLPeriod> periodIter = listPeriod.iterator();
-		
+    private XMLPeriod checkDayOfMonth(List<XMLPeriod> listPeriod, Calendar date) {
+        
+        Integer dayofmonth = date.get(Calendar.DAY_OF_MONTH);
+        
+        Iterator<XMLPeriod> periodIter = listPeriod.iterator();
+        
         while (periodIter.hasNext()) {
             XMLPeriod period = periodIter.next();
 
@@ -824,21 +824,21 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 if (isContentNull(months.getMonth()) &&
                     months.getDayofmonth().equals(dayofmonth)) {
 
-                	currentRule = String.format("Rule 3 - day of month is %s - hourid: %s", dayofmonth, period.getHoursIDREF());
-                	LOGGER.debug(currentRule);
-                	
-                	assignPeriod(period);
+                    currentRule = String.format("Rule 3 - day of month is %s - hourid: %s", dayofmonth, period.getHoursIDREF());
+                    LOGGER.debug(currentRule);
+                    
+                    assignPeriod(period);
                     return period;
                 }
             }
         }
         return null;
-	}
+    }
 
 
-	private XMLPeriod checkDayAndWeek(List<XMLPeriod> listPeriod, Calendar date) {
-		
-		Integer week = date.get(Calendar.WEEK_OF_YEAR);
+    private XMLPeriod checkDayAndWeek(List<XMLPeriod> listPeriod, Calendar date) {
+        
+        Integer week = date.get(Calendar.WEEK_OF_YEAR);
         Integer dayofweek = date.get(Calendar.DAY_OF_WEEK);
         
         Iterator<XMLPeriod> periodIter = listPeriod.iterator();
@@ -852,26 +852,26 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 XMLWeeks weeks = weeksIter.next();
 
                 if (!isContentNull(weeks.getWeek()) && 
-                	!isContentNull(weeks.getDayofweek()) &&
-                	weeks.getWeek().equals(week) &&
-                	weeks.getDayofweek().equals(dayofweek)) {
-                	
-                	currentRule = String.format("Rule 2 - week is %s and day is %s - hourid: %s", week, dayofweek, period.getHoursIDREF());
-                	LOGGER.debug(currentRule);
-                	
-                	assignPeriod(period);
-                	return period;
+                    !isContentNull(weeks.getDayofweek()) &&
+                    weeks.getWeek().equals(week) &&
+                    weeks.getDayofweek().equals(dayofweek)) {
+                    
+                    currentRule = String.format("Rule 2 - week is %s and day is %s - hourid: %s", week, dayofweek, period.getHoursIDREF());
+                    LOGGER.debug(currentRule);
+                    
+                    assignPeriod(period);
+                    return period;
                 }
 
             }
         }
         return null;
-	}
+    }
 
-	
-	private XMLPeriod checkDayAndMonth(List<XMLPeriod> listPeriod, Calendar date) {
-		
-		Integer month = date.get(Calendar.MONTH) + 1;
+    
+    private XMLPeriod checkDayAndMonth(List<XMLPeriod> listPeriod, Calendar date) {
+        
+        Integer month = date.get(Calendar.MONTH) + 1;
         Integer dayofmonth = date.get(Calendar.DAY_OF_MONTH);
         
         Iterator<XMLPeriod> periodIter = listPeriod.iterator();
@@ -885,43 +885,43 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 XMLMonths months = monthsIter.next();
 
                 if (!isContentNull(months.getMonth()) && 
-                	!isContentNull(months.getDayofmonth()) &&
-                	months.getMonth().equals(month) &&
-                	months.getDayofmonth().equals(dayofmonth)) {
+                    !isContentNull(months.getDayofmonth()) &&
+                    months.getMonth().equals(month) &&
+                    months.getDayofmonth().equals(dayofmonth)) {
 
-                	currentRule = String.format("Rule 1 - month is %s and day is %s - hourid: %s", month, dayofmonth, period.getHoursIDREF());
-                	LOGGER.debug(currentRule);
-                	
-                	assignPeriod(period);
-                	return period;
+                    currentRule = String.format("Rule 1 - month is %s and day is %s - hourid: %s", month, dayofmonth, period.getHoursIDREF());
+                    LOGGER.debug(currentRule);
+                    
+                    assignPeriod(period);
+                    return period;
                 }
                 
             }
         }
         return null;
-	}
+    }
 
-	
-	private void assignPeriod(XMLPeriod foundperiod) {
+    
+    private void assignPeriod(XMLPeriod foundperiod) {
 
-		this.calcMethod = foundperiod.getCalcmethod();
-		this.warning = 1-new Float(foundperiod.getWarning())/100;
-		this.critical = 1-new Float(foundperiod.getCritical())/100;
-	
-	}
+        this.calcMethod = foundperiod.getCalcmethod();
+        this.warning = 1-new Float(foundperiod.getWarning())/100;
+        this.critical = 1-new Float(foundperiod.getCritical())/100;
+    
+    }
 
 
-	private void setHourTreshold(XMLTwenty4Threshold config,XMLPeriod period) {
+    private void setHourTreshold(XMLTwenty4Threshold config,XMLPeriod period) {
         Iterator<XMLHours> hourIter = config.getHours().iterator();
         
         while (hourIter.hasNext()) {
             XMLHours hours = hourIter.next();
             if (hours.getHoursID() == period.getHoursIDREF()) {
-            	LOGGER.debug("Got the hour id to populate hourid: {}", period.getHoursIDREF());
+                LOGGER.debug("Got the hour id to populate hourid: {}", period.getHoursIDREF());
                 if (!hours.getHour().isEmpty()) {
-                	populateOneHour(hours, period);
+                    populateOneHour(hours, period);
                 } else {
-                	populateIntervalHour(hours, period);
+                    populateIntervalHour(hours, period);
                 }
                 
                 break;
@@ -929,8 +929,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         }
     }
 
-	
-	/**
+    
+    /**
      * Set the threshold value based on intervals. 
      * The thresholdByPeriod 24 array are first initialized to null.
      * The iterate over the list of XMLHourinterval configurations.
@@ -938,142 +938,142 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
      * @param hours
      */
     private void populateIntervalHour(XMLHours hours, XMLPeriod period) {
-    	List<XMLHourinterval> hourIntList = hours.getHourinterval();
+        List<XMLHourinterval> hourIntList = hours.getHourinterval();
 
-    	/*
-    	 * Init 
-    	 */
-    	for (int i=0;i < HOURS_PER_DAY;i++) {
-    		this.thresholdByPeriod[i] = null;
-    	}
+        /*
+         * Init 
+         */
+        for (int i=0;i < HOURS_PER_DAY;i++) {
+            this.thresholdByPeriod[i] = null;
+        }
 
-    	for (XMLHourinterval hour: hourIntList) { 
+        for (XMLHourinterval hour: hourIntList) { 
 
-    		ThresholdContainer tc = new ThresholdContainer();
-    		String curhour = hour.getThreshold();
-    		int from = Util.getHourFromHourMinute(hour.getFrom());
-    		int to = Util.getHourFromHourMinute(hour.getTo());;
-    				
-    		for(int i = from; i < to + 1; i++) {
+            ThresholdContainer tc = new ThresholdContainer();
+            String curhour = hour.getThreshold();
+            int from = Util.getHourFromHourMinute(hour.getFrom());
+            int to = Util.getHourFromHourMinute(hour.getTo());;
+                    
+            for(int i = from; i < to + 1; i++) {
 
-    			if (isContentNull(curhour)) { 
-    				this.thresholdByPeriod[i] = null;
-    			} else {
-    				// Override if exists in the interval
-    				
-    				if (hour.getWarning() != null) {
-    					tc.setWarning(1-new Float(hour.getWarning())/100);
-    				} else {
-    					tc.setWarning(1-new Float(period.getWarning())/100);
-    				}
-    				
-    				if (hour.getCritical() != null) {
-    					tc.setCritical(1-new Float(hour.getCritical())/100);
-    				} else {
-    					tc.setCritical(1-new Float(period.getCritical())/100);
-    				}
-    				
-    				try { 
-    					tc.setFloatThreshold(Float.parseFloat(curhour));
-    				} catch (NumberFormatException ne) {
-    					curhour = ConfigMacroUtil.replaceMacros(curhour, hostName, serviceName, serviceItemName);
-    					tc.setExpThreshold(curhour);
-    				}
-    				
-    				this.thresholdByPeriod[i] = tc;
-    			}
-    		}
-    	}
-    	
-    	if (LOGGER.isDebugEnabled()) {
-    		for (int i=0;i < HOURS_PER_DAY;i++) {
-    			if (thresholdByPeriod[i] == null) {
-    				LOGGER.debug("Hour {} threshold=null", Util.integerToTimeString(i));
-    				
-    			} else if (thresholdByPeriod[i].isExpInd()) {
-    				LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), thresholdByPeriod[i].getExpThreshold());
-    				    				
-    			} else {
-    				LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), this.thresholdByPeriod[i].getFloatThreshold());
+                if (isContentNull(curhour)) { 
+                    this.thresholdByPeriod[i] = null;
+                } else {
+                    // Override if exists in the interval
+                    
+                    if (hour.getWarning() != null) {
+                        tc.setWarning(1-new Float(hour.getWarning())/100);
+                    } else {
+                        tc.setWarning(1-new Float(period.getWarning())/100);
+                    }
+                    
+                    if (hour.getCritical() != null) {
+                        tc.setCritical(1-new Float(hour.getCritical())/100);
+                    } else {
+                        tc.setCritical(1-new Float(period.getCritical())/100);
+                    }
+                    
+                    try { 
+                        tc.setFloatThreshold(Float.parseFloat(curhour));
+                    } catch (NumberFormatException ne) {
+                        curhour = ConfigMacroUtil.replaceMacros(curhour, hostName, serviceName, serviceItemName);
+                        tc.setExpThreshold(curhour);
+                    }
+                    
+                    this.thresholdByPeriod[i] = tc;
+                }
+            }
+        }
+        
+        if (LOGGER.isDebugEnabled()) {
+            for (int i=0;i < HOURS_PER_DAY;i++) {
+                if (thresholdByPeriod[i] == null) {
+                    LOGGER.debug("Hour {} threshold=null", Util.integerToTimeString(i));
+                    
+                } else if (thresholdByPeriod[i].isExpInd()) {
+                    LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), thresholdByPeriod[i].getExpThreshold());
+                                        
+                } else {
+                    LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), this.thresholdByPeriod[i].getFloatThreshold());
 
-    			}
-    		}
-    	}
+                }
+            }
+        }
     }
 
 
-	private void populateOneHour(XMLHours hours, XMLPeriod period) {
-		List<String> hourList = hours.getHour();
-		
-		LOGGER.debug("Size of hour list {}", hourList.size());
-		
-		for (int i=0;i < HOURS_PER_DAY ;i++) { 
-		    
-		    ThresholdContainer tc = new ThresholdContainer();
-		    String curhour = null;
-		    
-		    curhour = hourList.get(i);
-		
-		    if (isContentNull(curhour)) { 
-		        this.thresholdByPeriod[i] = null;
-		    } else {
-		    	tc.setWarning(1-new Float(period.getWarning())/100);
-		    	tc.setCritical(1-new Float(period.getCritical())/100);
+    private void populateOneHour(XMLHours hours, XMLPeriod period) {
+        List<String> hourList = hours.getHour();
+        
+        LOGGER.debug("Size of hour list {}", hourList.size());
+        
+        for (int i=0;i < HOURS_PER_DAY ;i++) { 
+            
+            ThresholdContainer tc = new ThresholdContainer();
+            String curhour = null;
+            
+            curhour = hourList.get(i);
+        
+            if (isContentNull(curhour)) { 
+                this.thresholdByPeriod[i] = null;
+            } else {
+                tc.setWarning(1-new Float(period.getWarning())/100);
+                tc.setCritical(1-new Float(period.getCritical())/100);
 
-		        try { 
-		            tc.setFloatThreshold(Float.parseFloat(curhour));
-		        } catch (NumberFormatException ne) {
-		        	// Replace macros 
-		        	curhour = ConfigMacroUtil.replaceMacros(curhour, hostName, serviceName, serviceItemName);
-		        	tc.setExpThreshold(curhour);
-		        }
-		        this.thresholdByPeriod[i] = tc;
-		    }
-		}
-		
-		if (LOGGER.isDebugEnabled()) {
-    		for (int i=0;i < HOURS_PER_DAY;i++) {
-    			if (thresholdByPeriod[i] == null) {
-    				LOGGER.debug("Hour {} threshold=null", Util.integerToTimeString(i));
-    				
-    			} else if (thresholdByPeriod[i].isExpInd()) {
-    				LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), thresholdByPeriod[i].getExpThreshold());
-    				
-    			} else {
-    				LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), this.thresholdByPeriod[i].getFloatThreshold());
+                try { 
+                    tc.setFloatThreshold(Float.parseFloat(curhour));
+                } catch (NumberFormatException ne) {
+                    // Replace macros 
+                    curhour = ConfigMacroUtil.replaceMacros(curhour, hostName, serviceName, serviceItemName);
+                    tc.setExpThreshold(curhour);
+                }
+                this.thresholdByPeriod[i] = tc;
+            }
+        }
+        
+        if (LOGGER.isDebugEnabled()) {
+            for (int i=0;i < HOURS_PER_DAY;i++) {
+                if (thresholdByPeriod[i] == null) {
+                    LOGGER.debug("Hour {} threshold=null", Util.integerToTimeString(i));
+                    
+                } else if (thresholdByPeriod[i].isExpInd()) {
+                    LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), thresholdByPeriod[i].getExpThreshold());
+                    
+                } else {
+                    LOGGER.debug("Hour {} threshold={}", Util.integerToTimeString(i), this.thresholdByPeriod[i].getFloatThreshold());
 
-    			}
-    		}
-    	}
-	}
+                }
+            }
+        }
+    }
 
-	
+    
     synchronized public static void unregister() {
-    	twenty4hourconfig = null;
+        twenty4hourconfig = null;
     }
     
     
     private synchronized static XMLTwenty4Threshold configInit() throws Exception {
-    	if (twenty4hourconfig == null) {
-    		ConfigFileManager xmlfilemgr = new ConfigFileManager();
-    		twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD);
-    	}
-    	return twenty4hourconfig;
+        if (twenty4hourconfig == null) {
+            ConfigFileManager xmlfilemgr = new ConfigFileManager();
+            twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD);
+        }
+        return twenty4hourconfig;
     }
     
     
     public void init(Calendar now) throws ThresholdException  {
         
-    	XMLTwenty4Threshold twenty4hourconfig;
-		try {
-			twenty4hourconfig = configInit();
-		} catch (Exception e) {
-			LOGGER.error("Configuration file missing or corrupted", e);
-			ThresholdException te = new ThresholdException(e);
-			te.setThresholdName(this.getClass().getName());
-			throw te;
-		}
-    	
+        XMLTwenty4Threshold twenty4hourconfig;
+        try {
+            twenty4hourconfig = configInit();
+        } catch (Exception e) {
+            LOGGER.error("Configuration file missing or corrupted", e);
+            ThresholdException te = new ThresholdException(e);
+            te.setThresholdName(this.getClass().getName());
+            throw te;
+        }
+        
         int year=now.get(Calendar.YEAR);
         int month=now.get(Calendar.MONTH) + 1;
         int dayofmonth=now.get(Calendar.DAY_OF_MONTH);
@@ -1092,24 +1092,24 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
             
             List<XMLPeriod> listPeriod = findServicedef(twenty4hourconfig);
             if (listPeriod == null) {
-            	listPeriod = findServicedefByTemplate(twenty4hourconfig);
+                listPeriod = findServicedefByTemplate(twenty4hourconfig);
             }
             
             
             if (listPeriod != null) {
-            	LOGGER.debug("Number of period for service def are {}", listPeriod.size());
+                LOGGER.debug("Number of period for service def are {}", listPeriod.size());
                 XMLPeriod period = findPeriod(listPeriod, now);
                 
                 if (period != null) {
-                	LOGGER.debug("Found period has hourid: {}", period.getHoursIDREF());
-                	setHourTreshold(twenty4hourconfig, period);
+                    LOGGER.debug("Found period has hourid: {}", period.getHoursIDREF());
+                    setHourTreshold(twenty4hourconfig, period);
                 } else {
-                	notExist  = true;
-                	LOGGER.debug("No period found for {} {} {} " + hostName, serviceName, serviceItemName);
+                    notExist  = true;
+                    LOGGER.debug("No period found for {} {} {} " + hostName, serviceName, serviceItemName);
                 }
             } else {
-            	notExist  = true;
-            	LOGGER.debug("No configuration found for {} {} {} " + hostName, serviceName, serviceItemName);
+                notExist  = true;
+                LOGGER.debug("No configuration found for {} {} {} " + hostName, serviceName, serviceItemName);
             }                       
         }
     }
@@ -1142,9 +1142,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         }
         
         if (dayofmonth <10) {
-        	monthandday.append("0").append(dayofmonth);
+            monthandday.append("0").append(dayofmonth);
         } else {
-        	monthandday.append(dayofmonth);
+            monthandday.append(dayofmonth);
         }
         
         return monthandday.toString();
@@ -1154,37 +1154,37 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     
     
     private Float calculateForInterval(ThresholdContainer tcont) {
-		
-		if (tcont.isExpInd()) {
-	    	
-			String parsedstr = CacheEvaluator.parse(tcont.getExpThreshold());
+        
+        if (tcont.isExpInd()) {
+            
+            String parsedstr = CacheEvaluator.parse(tcont.getExpThreshold());
 
-			if (parsedstr == null) {
-				return null;
-			} else {
-				Float value = null;
-	    		ExecuteJEP jep = ExecuteJEPPool.getInstance().checkOut();
-	    		try {
-	    			value = jep.execute(parsedstr);
-	    		} catch (ParseException e) { 
-					return null;
-				} finally {
-	    			ExecuteJEPPool.getInstance().checkIn(jep);
-	    			jep = null;
-	    		}
-		
-	    		LOGGER.debug("Calculated value {} ", value);
-	    		
-	    		if (value == null) {
-	    			return null;
-	    		}
-	    		
-	    		return value;
-	    		
-			}
-		} else {
-			return tcont.getFloatThreshold();
-		}
+            if (parsedstr == null) {
+                return null;
+            } else {
+                Float value = null;
+                ExecuteJEP jep = ExecuteJEPPool.getInstance().checkOut();
+                try {
+                    value = jep.execute(parsedstr);
+                } catch (ParseException e) { 
+                    return null;
+                } finally {
+                    ExecuteJEPPool.getInstance().checkIn(jep);
+                    jep = null;
+                }
+        
+                LOGGER.debug("Calculated value {} ", value);
+                
+                if (value == null) {
+                    return null;
+                }
+                
+                return value;
+                
+            }
+        } else {
+            return tcont.getFloatThreshold();
+        }
     }
     
 }
