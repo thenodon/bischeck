@@ -66,5 +66,12 @@ public class TestServiceKeyRouter {
 		skr = new ServiceKeyRouter("{\".*database\":\"123456\",\".*web\":\"654321\"}");
 		
 		Assert.assertNull(skr.getServiceKey(hostName, serviceName));
+		
+		
+		hostName = "host1";
+		serviceName = "database";
+		skr = new ServiceKeyRouter("", "DEFAULT");
+		Assert.assertEquals(skr.getServiceKey(hostName, serviceName),"DEFAULT");
+
 	}
 }
