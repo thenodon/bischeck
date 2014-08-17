@@ -83,7 +83,7 @@ public final class BigPanda implements Notifier, MessageServerInf {
 		
 		defaultServiceKey = prop.getProperty("default_app_key");
 		
-		skr = new ServiceKeyRouter(serviceKey,defaultServiceKey);
+		skr = new ServiceKeyRouter(serviceKey, defaultServiceKey);
 
 		connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
 				defaultproperties.getProperty("connectionTimeout")));
@@ -102,7 +102,7 @@ public final class BigPanda implements Notifier, MessageServerInf {
 		Properties defaultproperties = new Properties();
 
 		defaultproperties.setProperty("url","https://api.bigpanda.io/data/v2/alerts");
-		defaultproperties.setProperty("app_key","Sign up to get your own");
+		defaultproperties.setProperty("app_key","");
 		defaultproperties.setProperty("default_app_key","");
 		defaultproperties.setProperty("connectionTimeout","5000");
 		defaultproperties.setProperty("send","true");
@@ -119,6 +119,7 @@ public final class BigPanda implements Notifier, MessageServerInf {
     	notificator.remove(name);
     }
 
+    @Override
 	public void sendAlert(Map<String, String> notificationData) {
 		try {
 			String message = send(notificationData);
@@ -132,17 +133,19 @@ public final class BigPanda implements Notifier, MessageServerInf {
 		}
 	}
 
+	@Override
 	public void sendResolve(Map<String, String> notificationData) {
-		try {
-			String message = send(notificationData);
-			LOGGER.info("Resolve message to {} : {}", instanceName, message.toString());
-		} catch (IOException e) {
-			LOGGER.error("Sedning resolve message to {} failed.", instanceName, e);
-		} catch (IllegalArgumentException e) {
-			LOGGER.error("Service for {} do not have a service key defined. Will not be sent by instance {}.", 
-					Util.fullQouteHostServiceName(notificationData.get("host"),notificationData.get("service")),
-					instanceName);
-		}
+		return;
+//		try {
+//			String message = send(notificationData);
+//			LOGGER.info("Resolve message to {} : {}", instanceName, message.toString());
+//		} catch (IOException e) {
+//			LOGGER.error("Sedning resolve message to {} failed.", instanceName, e);
+//		} catch (IllegalArgumentException e) {
+//			LOGGER.error("Service for {} do not have a service key defined. Will not be sent by instance {}.", 
+//					Util.fullQouteHostServiceName(notificationData.get("host"),notificationData.get("service")),
+//					instanceName);
+//		}
 	}
 
 	private String send(Map<String, String> notificationData) 
@@ -154,21 +157,27 @@ public final class BigPanda implements Notifier, MessageServerInf {
 		if (key == null) {
 			throw new IllegalArgumentException();
 		}
+
+		Long bptimestamp = unixEpoch(System.currentTimeMillis());
 		
 		new JSONBuilder(message)
 		.object()
 		.key("app_key")
 		.value(key)
 		.key("status")
-		.value(notificationData.get("state"))
+		.value(notificationData.get("state").toLowerCase())
 		.key("service")
 		.value(notificationData.get("host") + "-" + notificationData.get("service"))
 		.key("timestamp")
-		.value(System.currentTimeMillis()) //Need this in notificationData
+		.value(bptimestamp) //Need this in notificationData
 		.key("description")
-		.value(notificationData.get("description"))
+		.value(notificationData.get("description_minimal"))
+		.key("check")
+		.value("bischeck")
 		.key("cluster")
 		.value(notificationData.get("host"))
+		.key("incident_key")
+		.value(notificationData.get("incident_key"))
 		.endObject();
 		
 		if (sendMessage) {
@@ -179,8 +188,14 @@ public final class BigPanda implements Notifier, MessageServerInf {
 	}
 
 
+	private Long unixEpoch(long currentTimeMillis) {
+		return currentTimeMillis / 1000L;
+	}
+
+
 	private JSONObject sendMessage(final Writer message) throws IOException {
 		String payload = message.toString();
+		LOGGER.debug("Message is : {}", payload);
 		HttpURLConnection conn = null;
 
 		final String timerName = instanceName+"_sendTimer";
@@ -199,11 +214,11 @@ public final class BigPanda implements Notifier, MessageServerInf {
 			return null;
 		}
 
-		//json = responseHTTP(conn);		
+		json = responseHTTP(conn);		
 
 		} finally {
 			long duration = context.stop()/1000000;
-			LOGGER.debug("PagerDuty for {} send execute: {} ms", instanceName, duration);
+			LOGGER.debug("BigPanda for {} send execute: {} ms", instanceName, duration);
 		}
 
 		return json;
@@ -224,15 +239,17 @@ public final class BigPanda implements Notifier, MessageServerInf {
 			} 
 		}
 		
+		LOGGER.debug("HTTPS repsonse : {}", sb);
+		
 		JSONObject json = null;
 		if (sb.toString().isEmpty()) {
 			LOGGER.error("HTTPS response for instance {} returned no data", instanceName);
 		} else {
 			json = (JSONObject) JSONSerializer.toJSON(sb.toString());
 			if (json == null ) {
-				LOGGER.error("PagerDuty returned null json object for message {} for instance {}", sb.toString(), instanceName);
-			} else if (json.size() != 3 || !json.has("status") || !json.has("incident_key")) {
-				LOGGER.error("PagerDuty returned faulty json message for {} for instance {}", sb.toString(), instanceName);
+				LOGGER.error("BigPanda returned null json object for message {} for instance {}", sb.toString(), instanceName);
+			} else if (!json.has("response")) {
+				LOGGER.error("BigPanda returned faulty json message for {} for instance {}", sb.toString(), instanceName);
 			}
 		}
 		
@@ -249,16 +266,16 @@ public final class BigPanda implements Notifier, MessageServerInf {
 			int returnStatus = conn.getResponseCode();
 			if (returnStatus != HttpURLConnection.HTTP_OK) {
 				if (returnStatus == HttpURLConnection.HTTP_BAD_REQUEST) {
-					LOGGER.error("PagerDuty responded with {} for instance {}, check Bischeck configuration", 
-							instanceName, returnStatus);
+					LOGGER.error("BigPanda responded with {} for instance {}, check Bischeck configuration", 
+							returnStatus, instanceName);
 					return false;
 				} else if (returnStatus == HttpURLConnection.HTTP_FORBIDDEN) {
-					LOGGER.error("PagerDuty responded with {} for instance {}, probably making to many API calls to PagerDuty", 
-							instanceName, returnStatus);
+					LOGGER.error("BigPanda responded with {} for instance {}, probably making to many API calls to BigPanda", 
+							returnStatus, instanceName);
 					return false;
 				} else if (returnStatus >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
-					LOGGER.error("PagerDuty responded with {} for instance {}, check PagerDuty server status and vaildate your account settings", 
-							instanceName, returnStatus);
+					LOGGER.error("BigPanda responded with {} for instance {}, check BigPanda server status and vaildate your account settings", 
+							returnStatus, instanceName);
 					return false;
 				}
 			}
