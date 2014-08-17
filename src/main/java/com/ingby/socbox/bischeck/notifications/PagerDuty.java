@@ -141,7 +141,7 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 		Properties defaultproperties = new Properties();
 
 		defaultproperties.setProperty("url","https://events.pagerduty.com/generic/2010-04-15/create_event.json");
-		defaultproperties.setProperty("service_key","Sign up to get your own");
+		defaultproperties.setProperty("service_key","");
 		defaultproperties.setProperty("default_service_key","");
 		defaultproperties.setProperty("connectionTimeout","5000");
 		defaultproperties.setProperty("send","true");
@@ -158,6 +158,7 @@ public final class PagerDuty implements Notifier, MessageServerInf {
     	notificator.remove(name);
     }
 
+    @Override
 	public void sendAlert(Map<String, String> notificationData) {
 		Writer message = new StringWriter();
 
@@ -199,10 +200,10 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 		LOGGER.info("Alert message to {} : {}", instanceName, message.toString());
 		
 		success(json, notificationData.get("incident_key"));
-
 	}
 
 
+    @Override
 	public void sendResolve(Map<String, String> notificationData) {
 		Writer message = new StringWriter();
 		
@@ -326,15 +327,15 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 			if (returnStatus != HttpURLConnection.HTTP_OK) {
 				if (returnStatus == HttpURLConnection.HTTP_BAD_REQUEST) {
 					LOGGER.error("PagerDuty responded with {} for instance {}, check Bischeck configuration", 
-							instanceName, returnStatus);
+							returnStatus, instanceName);
 					return false;
 				} else if (returnStatus == HttpURLConnection.HTTP_FORBIDDEN) {
 					LOGGER.error("PagerDuty responded with {} for instance {}, probably making to many API calls to PagerDuty", 
-							instanceName, returnStatus);
+							returnStatus, instanceName );
 					return false;
 				} else if (returnStatus >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
 					LOGGER.error("PagerDuty responded with {} for instance {}, check PagerDuty server status and vaildate your account settings", 
-							instanceName, returnStatus);
+							returnStatus, instanceName);
 					return false;
 				}
 			}
@@ -369,6 +370,7 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 		return conn;
 	}
 
+	
 	@Override
 	public void onMessage(Service message) {
 		if ( ((ServiceStateInf) message).getServiceState().isResolved() ) {
@@ -378,15 +380,16 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 		}
 	}
 
+	
 	@Override
 	public String getInstanceName() {
 		return instanceName;
 	}
 
+	
 	@Override
 	public void unregister() {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
 	}
 
 }
