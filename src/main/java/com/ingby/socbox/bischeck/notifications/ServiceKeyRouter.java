@@ -17,14 +17,14 @@ import net.sf.json.JSONObject;
 
 public class ServiceKeyRouter {
 	private final static Logger LOGGER = LoggerFactory.getLogger(ServiceKeyRouter.class);
-    
+
 	private Map<Pattern,String> pattern2ServiceKey = new HashMap<Pattern, String>();
 	private boolean serviceKeyRouting;
 	private String serviceKey;
 
 	private String defaultServiceKey;
-	
-	
+
+
 	public ServiceKeyRouter(String serviceKey) {
 		this.serviceKey = serviceKey;
 		try{	
@@ -35,14 +35,14 @@ public class ServiceKeyRouter {
 			serviceKeyRouting = false;
 		}
 	}
-	
-	
+
+
 	public ServiceKeyRouter(String serviceKey, String defaultServiceKey) {
 		this(serviceKey);
 		if (defaultServiceKey != null) {
 			this.defaultServiceKey = defaultServiceKey;
 		}
-		
+
 	}
 
 
@@ -50,13 +50,17 @@ public class ServiceKeyRouter {
 		if (serviceKeyRouting) {
 			return resolveServiceKey(hostName,serviceName);
 		} else {
-			return serviceKey;
+			if (serviceKey.isEmpty() && defaultServiceKey != null) {
+				return defaultServiceKey;
+			} else {
+				return serviceKey;
+			}
 		}
 	}
 
-	
+
 	private void parseServiceKeys(JSONObject json) {
-		
+
 		for (Object regexp : json.keySet()) {
 			try {
 				pattern2ServiceKey.put(Pattern.compile((String)regexp), json.getString((String) regexp));
@@ -69,7 +73,7 @@ public class ServiceKeyRouter {
 		}
 	}
 
-	
+
 	private String resolveServiceKey(String hostName, String serviceName) {
 		for (Entry<Pattern, String> pat: pattern2ServiceKey.entrySet()) {
 			Matcher mat = pat.getKey().matcher(Util.fullQouteHostServiceName(hostName, serviceName));
