@@ -198,6 +198,8 @@ public abstract class ServiceAbstract {
 		notification.put("incident_key", getServiceState().getCurrentIncidentId());
 		notification.put("resolved", getServiceState().isResolved().toString());
 		
+		NagiosUtil nagutil = new NagiosUtil();
+		
 		notification.put("description", new StringBuilder().
 				append(getHost().getHostname()).
 				append("-").
@@ -205,7 +207,16 @@ public abstract class ServiceAbstract {
 				append(" : ").
 				append(getLevel()). 
 				append(" : "). 
-				append(new NagiosUtil().createNagiosMessage((Service) this)).toString());
+				append(nagutil.createNagiosMessage((Service) this)).toString());
+		
+		notification.put("description_minimal", new StringBuilder().
+				append(getHost().getHostname()).
+				append("-").
+				append(getServiceName()). 
+				append(" : ").
+				append(getLevel()). 
+				append(" : "). 
+				append(nagutil.createNagiosMessage((Service) this, false)).toString());
 
 		return notification;
 	}

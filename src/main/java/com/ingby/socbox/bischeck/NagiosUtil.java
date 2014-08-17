@@ -56,14 +56,17 @@ public class NagiosUtil {
     public boolean isExtended() {
     	return this.formatWarnCrit;
     }
-    
+
+    public String createNagiosMessage(final Service service) {
+    	return createNagiosMessage(service,true);
+    }
     
     /**
      * Formatting to Nagios style return message
      * @param service
      * @return nagios return message
      */
-    public String createNagiosMessage(final Service service) {
+    public String createNagiosMessage(final Service service,final boolean perfData) {
         
         StringBuilder message = new StringBuilder();
         StringBuilder perfmessage = new StringBuilder();
@@ -148,7 +151,11 @@ public class NagiosUtil {
             totalexectime = (totalexectime + serviceItem.getExecutionTime());
             count++;
         }
-        message.append(" | ").append(perfmessage).append("avg-exec-time=").append(((totalexectime/count)+"ms"));
+        
+        if (perfData) {
+        	message.append(" | ").append(perfmessage).append("avg-exec-time=").append(((totalexectime/count)+"ms"));
+        }
+        
         return message.toString();
     }
     
