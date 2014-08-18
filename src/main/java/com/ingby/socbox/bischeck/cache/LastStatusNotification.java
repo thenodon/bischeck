@@ -26,62 +26,45 @@ import net.sf.json.JSONObject;
 
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceStateInf;
-import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
  * The class format the state changes for a service. 
  */
 public class LastStatusNotification implements Serializable, Cloneable {
 
-    
-    private static final long serialVersionUID = 1L;
 
-    private final Service service;
+	private static final long serialVersionUID = 1L;
 
-    
-    public LastStatusNotification(final Service service) {
-        this.service = service; 
-    }
+	private final Service service;
 
-    
-    /**
-     * The method create a json object of the state change. 
-     * The following example show the format:<br
-     * <code>
-     * {"state":"WARNING",<br>
-     * {"type":"HARD",<br>
-     * &nbsp;&nbsp;"SSHport":{ <br>
-     * &nbsp;&nbsp;&nbsp;&nbsp;"timestamp":1393626063324,"value":"0.000094","threshold":1.059E-4,"calcmethod":"<","state":"OK"
-     * &nbsp;&nbsp;},<br>
-     * &nbsp;&nbsp;"WEBport":{
-     * &nbsp;&nbsp;&nbsp;&nbsp;"timestamp":1393626063324,"value":"0.000085","threshold":7.48E-5,"calcmethod":"<","state":"WARNING"
-     * &nbsp;&nbsp;}<br>
-     * }<br>
-     * </code>
-     * <br>
-     * The state follow the {@link NAGIOSSTAT} for the service. Type indicate 
-     * if the state was a hard vs soft state change according to the Nagios
-     * specification. This is followed with a one to many of the individual
-     * state of the serviceitems that are part of the service. 
-     * @return the formatted json object
-     */
-    public String getJson() {
-        final JSONObject json = new JSONObject();
-        
-        final long currentTime = System.currentTimeMillis();
-        json.put("timestamp",currentTime);
-        json.put("date",new Date(currentTime).toString());
-        json.put("state",((ServiceStateInf) service).getServiceState().getState());
-        if (((ServiceStateInf) service).getServiceState().isResolved()) {
-            json.put("notification","resolved");
-        } else {
-            json.put("notification","alert");
-        }
-        
-        json.put("incident_key",((ServiceStateInf) service).getServiceState().getCurrentIncidentId());
-                
-        
-        return json.toString();
-    }
 
+	public LastStatusNotification(final Service service) {
+		this.service = service; 
+	}
+
+	public JSONObject getJsonObject() {
+		final JSONObject json = new JSONObject();
+
+		final long currentTime = System.currentTimeMillis();
+		json.put("timestamp",currentTime);
+		json.put("date",new Date(currentTime).toString());
+		json.put("state",((ServiceStateInf) service).getServiceState().getState());
+		if (((ServiceStateInf) service).getServiceState().isResolved()) {
+			json.put("notification","resolved");
+		} else {
+			json.put("notification","alert");
+		}
+
+		json.put("incident_key",((ServiceStateInf) service).getServiceState().getCurrentIncidentId());
+
+		return json;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getJson() {
+		return getJsonObject().toString();
+	}
 }

@@ -155,8 +155,7 @@ public class LastStatus implements Serializable, Cloneable {
         return copy;
     }
 
-    
-    public String getJson() {
+    public JSONObject getJsonObject() {
         JSONObject json = new JSONObject();
         json.put("timestamp", this.timestamp);
 
@@ -184,7 +183,12 @@ public class LastStatus implements Serializable, Cloneable {
             json.put("state", this.state.toString());
         }
 
-        return json.toString();
+        return json;
+    }
+
+    
+    public String getJson() {
+        return getJsonObject().toString();
     }
 
 }
