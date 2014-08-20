@@ -163,14 +163,16 @@ public class CacheCli {
 
             console = new ConsoleReader();
             history = new FileHistory(new File(historyFile));
-
-            console.print("Using bischeck configuration: ");
+            console.println("bischeck cache-cli");
+            console.println("------------------");
+            
+            console.print("- Using bischeck configuration: ");
             console.println(ConfigFileManager.initConfigDir().getAbsolutePath());
 
 
-            console.print("Cmd history: ");
+            console.print("- Cmd history: ");
             console.println(history.getFile().getAbsolutePath());
-            console.print("Null support in arrays: ");
+            console.print("- Null support in arrays: ");
             console.println(supportNull.toString());
 
             console.setHistory(history);
