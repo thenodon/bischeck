@@ -80,24 +80,41 @@ public class ShellService extends ServiceAbstract implements Service, ServiceSta
             throw se;
         } finally {
             try {
-                buf.close();
-            }catch (Exception ignore){}
+            	if (buf != null) {
+            		buf.close();
+            	}
+            }catch (IOException ignore){
+            	LOGGER.info("Closing rerources was interupted", ignore);
+            }
         
             try {
-                pr.getErrorStream().close();
-            }catch (Exception ignore){}
+            	if (pr != null && pr.getErrorStream() != null) {
+            		pr.getErrorStream().close();
+            	}
+            }catch (IOException ignore){
+            	LOGGER.info("Closing rerources was interupted", ignore);
+            }
             
             try {
-                pr.getInputStream().close();
-            }catch (Exception ignore){}
+            	if (pr != null && pr.getInputStream() != null) {
+            		pr.getInputStream().close();
+            	}
+            }catch (IOException ignore){
+            	LOGGER.info("Closing rerources was interupted", ignore);
+            }
             
             try {
-                pr.getOutputStream().close();
-            }catch (Exception ignore){}
+            	if (pr != null && pr.getOutputStream() != null) {	
+            		pr.getOutputStream().close();
+            	}
+            }catch (IOException ignore){
+            	LOGGER.info("Closing rerources was interupted", ignore);
+            }
             
-            try {
-                pr.destroy();
-            }catch (Exception ignore){}
+            
+            if (pr != null) {
+            	pr.destroy();
+            }
         }
         
         return ret;     
