@@ -102,6 +102,15 @@ public class ServiceStateTest {
         Assert.assertFalse(fsm.isStateChange());
         Assert.assertFalse(fsm.isNotification());
 
+        fsm.setState(NAGIOSSTAT.CRITICAL);
+        displayState(fsm);
+        Assert.assertEquals(fsm.getState(),NAGIOSSTAT.CRITICAL);
+        Assert.assertEquals(fsm.getStateLevel(),State.PROBLEM_HARD);
+        Assert.assertEquals(fsm.getPreviousStateLevel(),State.PROBLEM_HARD);
+        Assert.assertEquals(fsm.getSoftCount(),0);
+        Assert.assertTrue(fsm.isStateChange());
+        Assert.assertTrue(fsm.isNotification());
+
         fsm.setState(NAGIOSSTAT.OK);
         displayState(fsm);
         Assert.assertEquals(fsm.getState(),NAGIOSSTAT.OK);
