@@ -128,8 +128,8 @@ public final class BigPanda implements Notifier, MessageServerInf {
             LOGGER.error("Sedning trigger message to {} failed.", instanceName, e);
         } catch (IllegalArgumentException e) {
             LOGGER.error("Service for {} do not have a app key defined. Will not be sent by instance {}.", 
-                    Util.fullQouteHostServiceName(notificationData.get("host"),notificationData.get("service")),
-                    instanceName);
+                    Util.fullQouteHostServiceName(notificationData.get(Notifier.HOST),notificationData.get(Notifier.SERVICE)),
+                    instanceName, e);
         }
     }
 
@@ -140,44 +140,43 @@ public final class BigPanda implements Notifier, MessageServerInf {
 //          String message = send(notificationData);
 //          LOGGER.info("Resolve message to {} : {}", instanceName, message.toString());
 //      } catch (IOException e) {
-//          LOGGER.error("Sedning resolve message to {} failed.", instanceName, e);
+//          LOGGER.error("Sending resolve message to {} failed.", instanceName, e);
 //      } catch (IllegalArgumentException e) {
 //          LOGGER.error("Service for {} do not have a service key defined. Will not be sent by instance {}.", 
-//                  Util.fullQouteHostServiceName(notificationData.get("host"),notificationData.get("service")),
-//                  instanceName);
+//                  Util.fullQouteHostServiceName(notificationData.get(Notifier.HOST),notificationData.get(Notifier.SERVICE)),
+//                  instanceName, e);
 //      }
     }
 
     private String send(Map<String, String> notificationData) 
             throws IOException, IllegalArgumentException {
         
-        Writer message = new StringWriter();
-
-        final String key = skr.getServiceKey(notificationData.get("host"),notificationData.get("service"));
+        final String key = skr.getServiceKey(notificationData.get(Notifier.HOST),notificationData.get(Notifier.SERVICE));
         if (key == null) {
             throw new IllegalArgumentException();
         }
 
-        Long bptimestamp = unixEpoch(System.currentTimeMillis());
+        final Long bptimestamp = unixEpoch(System.currentTimeMillis());
+        final Writer message = new StringWriter();
         
         new JSONBuilder(message)
         .object()
         .key("app_key")
         .value(key)
         .key("status")
-        .value(notificationData.get("state").toLowerCase())
-        .key("service")
-        .value(notificationData.get("host") + "-" + notificationData.get("service"))
+        .value(notificationData.get(Notifier.STATE).toLowerCase())
+        .key("host")
+        .value(notificationData.get(Notifier.HOST))
         .key("timestamp")
         .value(bptimestamp) //Need this in notificationData
         .key("description")
-        .value(notificationData.get("description_minimal"))
+        .value(notificationData.get(Notifier.DESCRIPTION_SHORT))
         .key("check")
-        .value("bischeck")
-        .key("cluster")
-        .value(notificationData.get("host"))
+        .value(notificationData.get(Notifier.SERVICE))
+        //.key("cluster")
+        //.value(notificationData.get("host"))
         .key("incident_key")
-        .value(notificationData.get("incident_key"))
+        .value(notificationData.get(Notifier.INCIDENT_KEY))
         .endObject();
         
         if (sendMessage) {

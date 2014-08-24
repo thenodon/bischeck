@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.notifications;
 
@@ -38,36 +38,50 @@ import com.ingby.socbox.bischeck.Util;
  * </ul>
  */
 public interface Notifier {
-    /**
-     * Send a alert message to the server.
-     * @param notificationData a key value hash
-     * @throws NotifierException 
-     */
-    void sendAlert(Map<String,String> notificationData) throws NotifierException;
-    
-    
-    /**
-     * Send a resolve message to the server.
-     * @param notificationData a key value hash
-     * @throws NotifierException
-     */
-    void sendResolve(Map<String,String> notificationData) throws NotifierException;
-    
-    
-    /**
-     * Get the name of the notification server set in the server.xml tag server, like:<br>
-     * <code>
-     * &lt;server name="DUTY-1"&gt;
-     * </code>
-     * 
-     * @return the name of the server instance
-     */
-    String getInstanceName();
-    
-    
-    /**
-     * Unregister all resources related to the server instance
-     */
-    void unregister();
+
+	/**
+	 * Define allowed keys for notification data
+	 */
+	final public String HOST              = "host";
+	final public String SERVICE           = "service";
+	final public String STATE             = "state";
+	final public String DESCRIPTION       = "description";
+	final public String INCIDENT_KEY      = "incident_key";
+	final public String RESOLVED          = "resolved";
+	final public String DESCRIPTION_SHORT = "description_short";
+	final public String TIMESTAMP         = "timestamp";
+
+
+	/**
+	 * Send a alert message to the server.
+	 * @param notificationData a key value hash
+	 * @throws NotifierException 
+	 */
+	void sendAlert(Map<String,String> notificationData) throws NotifierException;
+
+
+	/**
+	 * Send a resolve message to the server.
+	 * @param notificationData a key value hash
+	 * @throws NotifierException
+	 */
+	void sendResolve(Map<String,String> notificationData) throws NotifierException;
+
+
+	/**
+	 * Get the name of the notification server set in the server.xml tag server, like:<br>
+	 * <code>
+	 * &lt;server name="DUTY-1"&gt;
+	 * </code>
+	 * 
+	 * @return the name of the server instance
+	 */
+	String getInstanceName();
+
+
+	/**
+	 * Unregister all resources related to the server instance
+	 */
+	void unregister();
 
 }

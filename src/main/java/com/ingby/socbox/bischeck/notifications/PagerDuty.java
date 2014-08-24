@@ -162,10 +162,10 @@ public final class PagerDuty implements Notifier, MessageServerInf {
     public void sendAlert(Map<String, String> notificationData) {
         Writer message = new StringWriter();
 
-        final String key = skr.getServiceKey(notificationData.get("host"),notificationData.get("service"));
+        final String key = skr.getServiceKey(notificationData.get(Notifier.HOST),notificationData.get(Notifier.SERVICE));
         if (key == null) {
             LOGGER.error("Service for {} do not have a service key defined. Will not be sent by instance {}.", 
-                    Util.fullQouteHostServiceName(notificationData.get("host"),notificationData.get("service")),
+                    Util.fullQouteHostServiceName(notificationData.get(Notifier.HOST),notificationData.get(Notifier.SERVICE)),
                     instanceName);
             return;
         }
@@ -174,17 +174,17 @@ public final class PagerDuty implements Notifier, MessageServerInf {
         .key("service_key")
         .value(key)
         .key("incident_key")
-        .value(notificationData.get("incident_key"))
+        .value(notificationData.get(Notifier.INCIDENT_KEY))
         .key("event_type")
         .value("trigger")
         .key("description")
-        .value(notificationData.get("description"))
+        .value(notificationData.get(Notifier.DESCRIPTION))
         .key("details")
         .object()
         .key("servicedef")
-        .value(notificationData.get("host") + "-" + notificationData.get("service"))
+        .value(notificationData.get(Notifier.HOST) + "-" + notificationData.get(Notifier.SERVICE))
         .key("state")
-        .value(notificationData.get("state"))
+        .value(notificationData.get(Notifier.STATE))
         .endObject()
         .endObject();
         
@@ -199,7 +199,7 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 
         LOGGER.info("Alert message to {} : {}", instanceName, message.toString());
         
-        success(json, notificationData.get("incident_key"));
+        success(json, notificationData.get(Notifier.INCIDENT_KEY));
     }
 
 
@@ -207,10 +207,10 @@ public final class PagerDuty implements Notifier, MessageServerInf {
     public void sendResolve(Map<String, String> notificationData) {
         Writer message = new StringWriter();
         
-        String key = skr.getServiceKey(notificationData.get("host"),notificationData.get("service"));
+        String key = skr.getServiceKey(notificationData.get(Notifier.HOST),notificationData.get(Notifier.SERVICE));
         if (key == null) {
             LOGGER.error("Service for {} do not have a service key defined. Will not be sent by instance {}.", 
-                    Util.fullQouteHostServiceName(notificationData.get("host"),notificationData.get("service")),
+                    Util.fullQouteHostServiceName(notificationData.get(Notifier.HOST),notificationData.get(Notifier.SERVICE)),
                     instanceName);
             return;
         }
@@ -219,11 +219,12 @@ public final class PagerDuty implements Notifier, MessageServerInf {
         .key("service_key")
         .value(key)
         .key("incident_key")
-        .value(notificationData.get("incident_key"))
+        .value(notificationData.get(Notifier.INCIDENT_KEY))
         .key("event_type")
         .value("resolve")
         .key("description")
-        .value(notificationData.get("description")).endObject();
+        .value(notificationData.get(Notifier.DESCRIPTION))
+        .endObject();
 
         
         JSONObject json = null;
@@ -236,7 +237,7 @@ public final class PagerDuty implements Notifier, MessageServerInf {
         }
         LOGGER.info("Resolve message to {} : {}", instanceName, message.toString());
         
-        success(json, notificationData.get("incident_key"));
+        success(json, notificationData.get(Notifier.INCIDENT_KEY));
     }
 
 

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.host.Host;
+import com.ingby.socbox.bischeck.notifications.Notifier;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
@@ -192,15 +193,15 @@ public abstract class ServiceAbstract {
     
     public Map<String, String> getNotificationData() {
         Map<String,String> notification = new HashMap<String, String>();
-        notification.put("host", getHost().getHostname());
-        notification.put("service", getServiceName());
-        notification.put("state", getLevel().toString());
-        notification.put("incident_key", getServiceState().getCurrentIncidentId());
-        notification.put("resolved", getServiceState().isResolved().toString());
+        notification.put(Notifier.HOST, getHost().getHostname());
+        notification.put(Notifier.SERVICE, getServiceName());
+        notification.put(Notifier.STATE, getLevel().toString());
+        notification.put(Notifier.INCIDENT_KEY, getServiceState().getCurrentIncidentId());
+        notification.put(Notifier.RESOLVED, getServiceState().isResolved().toString());
         
         NagiosUtil nagutil = new NagiosUtil();
         
-        notification.put("description", new StringBuilder().
+        notification.put(Notifier.DESCRIPTION, new StringBuilder().
                 append(getHost().getHostname()).
                 append("-").
                 append(getServiceName()). 
@@ -209,7 +210,7 @@ public abstract class ServiceAbstract {
                 append(" : "). 
                 append(nagutil.createNagiosMessage((Service) this)).toString());
         
-        notification.put("description_minimal", new StringBuilder().
+        notification.put(Notifier.DESCRIPTION_SHORT, new StringBuilder().
                 append(getHost().getHostname()).
                 append("-").
                 append(getServiceName()). 
