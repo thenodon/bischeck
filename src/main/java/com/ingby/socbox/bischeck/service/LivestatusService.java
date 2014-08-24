@@ -41,7 +41,8 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
 
     private final static Logger LOGGER = LoggerFactory.getLogger(LivestatusService.class);
     
-    static private int querytimeout = 10000; //millisec
+    // in milliseconds
+    static private int querytimeout = 10000; 
     private Socket clientSocket = null;
 
     
@@ -64,8 +65,16 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
         super.openConnection();
         
         URI uri = null;
+        try {
+        	uri = new URI(this.getConnectionUrl());
+        }  catch (URISyntaxException use) {
+            LOGGER.warn("Uri syntax is faulty",use);
+            final ServiceException se = new ServiceException(use);
+            se.setServiceName(this.serviceName);
+            throw se;
+        }
+        
         try {   
-            uri = new URI(this.getConnectionUrl());
             clientSocket = new Socket(uri.getHost(), uri.getPort());
             clientSocket.setSoTimeout(querytimeout);
         } catch (IOException ioe) {
@@ -76,17 +85,14 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
                 if (clientSocket != null) {
                     clientSocket.close();
                 }
-            } catch (IOException ignore) {}
+            } catch (IOException ignore) {
+               	LOGGER.info("Closing rerources was interupted", ignore);
+            }
             
-            ServiceException se = new ServiceException(ioe);
+            final ServiceException se = new ServiceException(ioe);
             se.setServiceName(this.serviceName);
             throw se;
-        } catch (URISyntaxException use) {
-            LOGGER.warn("Uri syntax is faulty",use);
-            ServiceException se = new ServiceException(use);
-            se.setServiceName(this.serviceName);
-            throw se;
-        }
+        } 
         setConnectionEstablished(true);
         LOGGER.debug("Connected to {}", uri.toString());
     }
@@ -97,7 +103,9 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
             if (clientSocket != null) {
                 clientSocket.close();
             }
-        } catch (IOException ignore) {}
+        } catch (IOException ignore) {
+           	LOGGER.info("Closing rerources was interupted", ignore);
+        }
     }
 
     
@@ -107,22 +115,18 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
         /*
          * Replace all \n occurrence with real newlines 
          */
-        String message = exec.replaceAll("\\\\n", "\n");
+        final String message = exec.replaceAll("\\\\n", "\n");
         
-        DataOutputStream dataOut = null;
-        BufferedReader bufIn = null;
-        
-        StringBuffer responseBuffer = new StringBuffer();
+        final StringBuffer responseBuffer = new StringBuffer();
         
         LOGGER.debug("Execute request: {}", message);
         
-        try {
+        try(DataOutputStream dataOut = new DataOutputStream(clientSocket.getOutputStream());
+        		BufferedReader bufIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
+        		) {
 
-            dataOut = new DataOutputStream(clientSocket.getOutputStream());
             dataOut.writeBytes(message);
             dataOut.flush();
-
-            bufIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             String responseLine = null;
             while ((responseLine = bufIn.readLine()) != null) {  
@@ -130,26 +134,12 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
             }  
         } catch (IOException ioe) {
             LOGGER.error("Connection failed", ioe);
-            ServiceException se = new ServiceException(ioe);
+            final ServiceException se = new ServiceException(ioe);
             se.setServiceName(this.serviceName);
             throw se;
-        } finally {    
-            try {
-                if (dataOut != null) {
-                    dataOut.close();
-                }
-            } catch (IOException ignore) {}  
-            dataOut = null;  
-
-            try {
-                if (bufIn != null) {
-                    bufIn.close();
-                }
-            } catch (IOException ignore) {}  
-            bufIn = null; 
-        }
-                
-        String responseMsg = new String(responseBuffer);
+        } 
+        
+        final String responseMsg = new String(responseBuffer);
         
         LOGGER.debug("Received response: {}", responseMsg);
         
