@@ -57,9 +57,9 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     private final String hostAddress;
     private final int connectionTimeout;
     
-    private OpenTSDBServer (String name) {
-        Properties defaultproperties = getServerProperties();
-        Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+    private OpenTSDBServer (final String name) {
+        final Properties defaultproperties = getServerProperties();
+        final Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
         hostAddress = prop.getProperty("hostAddress",
                 defaultproperties.getProperty("hostAddress"));
         port = Integer.parseInt(prop.getProperty("port",
@@ -157,9 +157,11 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
                 if (opentsdbSocket != null) {
                     opentsdbSocket.close();
                 }
-            } catch (IOException ignore) {}    
+            } catch (IOException ignore) {
+            	LOGGER.info("Closing rerources was interupted", ignore);
+            }    
             
-            long duration = context.stop()/1000000;
+            final long duration = context.stop()/1000000;
             LOGGER.debug("OpenTSDB send execute: {} ms", duration);
             
         }
@@ -168,7 +170,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     private String getMessage(Service service) {
 
         StringBuilder strbuf = new StringBuilder();
-        long currenttime = System.currentTimeMillis()/1000;
+        final long currenttime = System.currentTimeMillis()/1000;
         for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
             ServiceItem serviceItem = serviceItementry.getValue();
             //put proc.loadavg.1m 1288946927 0.36 host=foo
@@ -211,7 +213,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     }
     
     
-    private String checkNull(String str) {
+    private String checkNull(final String str) {
         if (str == null) {
             return "NaN";
         } else {
@@ -220,7 +222,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     }
 
     
-    private String checkNull(Float number) {
+    private String checkNull(final Float number) {
         if (number == null) {
             return "NaN";
         } else {
@@ -229,7 +231,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     }
     
     
-    private String checkNullMultiple(Float number1, Float number2) {
+    private String checkNullMultiple(final Float number1, final Float number2) {
         Float sum;
         try {
             sum = number1 * number2;
@@ -240,17 +242,16 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     }
     
     
-    private StringBuilder formatRow(StringBuilder strbuf, 
-            long currenttime, 
-            String host, 
-            String servicename, 
-            String serviceitemname, 
-            String metric, 
-            String value) {
+    private StringBuilder formatRow(final StringBuilder strbuf, 
+            final long currenttime, 
+            final String host, 
+            final String servicename, 
+            final String serviceitemname, 
+            final String metric, 
+            final String value) {
         
         strbuf.
-        append("put bischeck").
-        append(".").
+        append("put bischeck.").
         append(metric).
         append(" ").
         append(currenttime).
@@ -269,7 +270,7 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
     
     
     public static Properties getServerProperties() {
-        Properties defaultproperties = new Properties();
+        final Properties defaultproperties = new Properties();
         
         defaultproperties.setProperty("hostAddress","localhost");
         defaultproperties.setProperty("port","5667");
