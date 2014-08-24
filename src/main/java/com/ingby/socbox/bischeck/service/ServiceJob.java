@@ -103,13 +103,14 @@ public class ServiceJob implements Job {
 
             RunAfter runafter = new RunAfter(service.getHost().getHostname(), service.getServiceName());
             
-            try {
-                executeJob(service);
-            } catch (RuntimeException e) {
-                LOGGER.warn("Service job exception!", e);
-                throw e;
+            synchronized (service) {
+            	try {
+            		executeJob(service);
+            	} catch (RuntimeException e) {
+            		LOGGER.warn("Service job exception!", e);
+            		throw e;
+            	}
             }
-            
             // Check if there is any run after
 
             checkRunImmediate(runafter);
@@ -391,7 +392,7 @@ public class ServiceJob implements Job {
                 score = ((CacheStateInf) CacheFactory.getInstance()).addState(service);
             }
 
-            if (((ServiceStateInf) service).getServiceState().isNotification()&& 
+            if (((ServiceStateInf) service).getServiceState().isNotification() && 
                        CacheFactory.getInstance() instanceof CacheStateInf) {
                 LOGGER.info("Notification change {} {} {}", Util.fullQoutedHostServiceName(service),
                         ((ServiceStateInf) service).getServiceState().getState(),
