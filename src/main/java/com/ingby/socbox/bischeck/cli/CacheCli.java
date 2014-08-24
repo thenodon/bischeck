@@ -60,10 +60,18 @@ import jline.console.history.FileHistory;
  */
 public class CacheCli {
 
-    final static String HISTORYFILE = ".jline_history";
-    private static boolean showtime = true;
+    private static final String HISTORY_FILE = ".jline_history";
+	private static final String PROMPT = "cache-cli> ";
+	private static final String PROGRAMNAME = "CacheCli";
+	private static final CharSequence NOT_FOUND = "Not found";
+	private static final String QUIT = "quit";
+	private static final String EXIT = "exit";
+	private static final String HELP = "help";
+	private static boolean showtime = true;
     private static boolean showparse = true;
 
+   
+    
     public static void main(String[] args) throws ConfigurationException, CacheException, IOException, ParseException {
         CommandLineParser cmdParser = new GnuParser();
         CommandLine line = null;
@@ -84,7 +92,7 @@ public class CacheCli {
 
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp( "CacheCli", options );
+            formatter.printHelp(PROGRAMNAME, options );
             Util.ShellExit(0);
         }
 
@@ -114,7 +122,7 @@ public class CacheCli {
         }
 
         if (line.hasOption("pipemode")) {
-            pipe(supportNull);
+            pipe();
         } else {
             cli(supportNull);
 
@@ -122,13 +130,12 @@ public class CacheCli {
     }
 
 
-    private static void pipe(Boolean supportNull) throws IOException, ParseException {
-        BufferedReader in = null;
-
+    
+    private static void pipe() throws IOException, ParseException {
+        
         ExecuteJEP parser = new ExecuteJEP();        // Create a new parser 
 
-        try {
-            in = new BufferedReader(new InputStreamReader(System.in));
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in))){
             String line;
             boolean first = true;
             while ((line = in.readLine()) != null) {
@@ -139,11 +146,6 @@ public class CacheCli {
                 } else {
                     System.out.println(execute(parser, line));
                 }
-            }
-        }
-        finally {
-            if (in != null) {
-                in.close();
             }
         }
     }
@@ -157,14 +159,14 @@ public class CacheCli {
         ConsoleReader console = null;
         FileHistory history = null;
 
-        String historyFile = System.getProperty("user.home") + File.separator  + HISTORYFILE;
+        String historyFile = System.getProperty("user.home") + File.separator  + HISTORY_FILE;
 
         try {
 
             console = new ConsoleReader();
             history = new FileHistory(new File(historyFile));
-            console.println("bischeck cache-cli");
-            console.println("------------------");
+            console.println("Welcome to Bischeck cache-cli");
+            console.println("-----------------------------");
             
             console.print("- Using bischeck configuration: ");
             console.println(ConfigFileManager.initConfigDir().getAbsolutePath());
@@ -177,7 +179,7 @@ public class CacheCli {
 
             console.setHistory(history);
             console.println("Execution time is divided in parse/calculate/total time (ms)");
-            console.setPrompt("cachecli> ");
+            console.setPrompt(PROMPT);
 
 
             // Main loop reading cli commands
@@ -192,7 +194,7 @@ public class CacheCli {
                     continue;
                 }
 
-                if (line == null || "quit".equalsIgnoreCase(line) || "exit".equalsIgnoreCase(line) ) {
+                if (line == null || QUIT.equalsIgnoreCase(line) || EXIT.equalsIgnoreCase(line) ) {
                     break;
                 }
 
@@ -211,13 +213,13 @@ public class CacheCli {
                             console.println(lists.get(key).toString());
                         } 
                     } else {
-                        console.println("Not found");
+                        console.println(NOT_FOUND);
                     }
                     
                     continue;
                 }
 
-                if ("help".equalsIgnoreCase(line)) {
+                if (HELP.equalsIgnoreCase(line)) {
                     showhelp(console);
                     continue;
                 }
@@ -300,11 +302,11 @@ public class CacheCli {
         console.println("Help");
         console.println("====");
         console.println("On the command line any expression can be entered that bischeck ");
-        console.println("supportd to retrive and calculate on cached data.");
+        console.println("supports to retrive and calculate on cached data.");
         console.println();
         console.println("Examples:");
-        console.println("host-service-item[0] * 10");
-        console.println("avg(host0-service-item[10:20]) / avg(host1-service-item[10:20]) ");
+        console.println(PROMPT + "host-service-item[0] * 10");
+        console.println(PROMPT + "avg(host0-service-item[10:20]) / avg(host1-service-item[10:20]) ");
         console.println();
         console.println("Commands");
         console.println("========");
