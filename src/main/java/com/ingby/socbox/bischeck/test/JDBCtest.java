@@ -39,208 +39,202 @@ import com.ingby.socbox.bischeck.Util;
 
 
 public class JDBCtest {
-    private static boolean verbose = false;
+	private static boolean verbose = false;
 
-    static public void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
+	static public void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
 
-        CommandLineParser parser = new GnuParser();
-        CommandLine line = null;
+		CommandLineParser parser = new GnuParser();
+		CommandLine line = null;
 
-        // create the Options
-        Options options = new Options();
-        options.addOption("u", "usage", false, "show usage.");
-        options.addOption("c", "connection", true, "the connection url");
-        options.addOption("s", "sql", true, "the sql statement to run");
-        options.addOption("m", "meta", true, "get the table meta data");
-        options.addOption("C", "columns", true, "the number of columns to display, default 1");
-        options.addOption("d", "driver", true, "the driver class");
-        options.addOption("v", "verbose", false, "verbose outbout");
-
-
-        try {
-            // parse the command line arguments
-            line = parser.parse(options, args);
-        } catch (org.apache.commons.cli.ParseException e) {
-            System.out.println("Command parse error:" + e.getMessage());
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("JDBCtest", options);
-            Util.ShellExit(1);
-        }
-
-        if (line.hasOption("verbose")) {
-            verbose = true;
-        }
-
-        if (line.hasOption("usage")) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("Bischeck", options);
-            Util.ShellExit(0);
-        }
-
-        String driverclassname = null;
-        if (!line.hasOption("driver")) {
-            System.out.println("Driver class must be set");
-            Util.ShellExit(1);
-        } else {
-            driverclassname = line.getOptionValue("driver");
-            outputln("DriverClass: " + driverclassname);
-        }
-
-        String connectionname = null;
-        if (!line.hasOption("connection")) {
-            System.out.println("Connection url must be set");
-            Util.ShellExit(1);
-        } else {
-            connectionname = line.getOptionValue("connection");
-            outputln("Connection: " + connectionname);
-        }
-
-        String sql=null;
-        String tablename=null;
-
-        if (line.hasOption("sql")) {
-            sql = line.getOptionValue("sql");
-            outputln("SQL: " + sql);
-
-        }
-
-        if (line.hasOption("meta")) {
-            tablename = line.getOptionValue("meta");
-            outputln("Table: " + tablename);
-        }
-
-        int nrColumns = 1;
-        if (line.hasOption("columns")) {
-            nrColumns = new Integer(line.getOptionValue("columns"));
-        }
+		// create the Options
+		Options options = new Options();
+		options.addOption("u", "usage", false, "show usage.");
+		options.addOption("c", "connection", true, "the connection url");
+		options.addOption("s", "sql", true, "the sql statement to run");
+		options.addOption("m", "meta", true, "get the table meta data");
+		options.addOption("C", "columns", true, "the number of columns to display, default 1");
+		options.addOption("d", "driver", true, "the driver class");
+		options.addOption("v", "verbose", false, "verbose outbout");
 
 
-        long execStart = 0l;
-        long execEnd = 0l;
-        long openStart = 0l;
-        long openEnd = 0l;
-        long metaStart = 0l;
-        long metaEnd = 0l;
+		try {
+			// parse the command line arguments
+			line = parser.parse(options, args);
+		} catch (org.apache.commons.cli.ParseException e) {
+			System.out.println("Command parse error:" + e.getMessage());
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("JDBCtest", options);
+			Util.ShellExit(1);
+		}
+
+		if (line.hasOption("verbose")) {
+			verbose = true;
+		}
+
+		if (line.hasOption("usage")) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("Bischeck", options);
+			Util.ShellExit(0);
+		}
+
+		String driverclassname = null;
+		if (!line.hasOption("driver")) {
+			System.out.println("Driver class must be set");
+			Util.ShellExit(1);
+		} else {
+			driverclassname = line.getOptionValue("driver");
+			outputln("DriverClass: " + driverclassname);
+		}
+
+		String connectionname = null;
+		if (!line.hasOption("connection")) {
+			System.out.println("Connection url must be set");
+			Util.ShellExit(1);
+		} else {
+			connectionname = line.getOptionValue("connection");
+			outputln("Connection: " + connectionname);
+		}
+
+		String sql=null;
+		String tablename=null;
+
+		if (line.hasOption("sql")) {
+			sql = line.getOptionValue("sql");
+			outputln("SQL: " + sql);
+
+		}
+
+		if (line.hasOption("meta")) {
+			tablename = line.getOptionValue("meta");
+			outputln("Table: " + tablename);
+		}
+
+		int nrColumns = 1;
+		if (line.hasOption("columns")) {
+			nrColumns = new Integer(line.getOptionValue("columns"));
+		}
+
+
+		long execStart = 0l;
+		long execEnd = 0l;
+		long openStart = 0l;
+		long openEnd = 0l;
+		long metaStart = 0l;
+		long metaEnd = 0l;
 
 
 
-        Class.forName(driverclassname).newInstance();
-        openStart = System.currentTimeMillis();
-        Connection conn = DriverManager.getConnection(connectionname);
-        openEnd = System.currentTimeMillis();
+		Class.forName(driverclassname).newInstance();
+		openStart = System.currentTimeMillis();
+		Connection conn = DriverManager.getConnection(connectionname);
+		openEnd = System.currentTimeMillis();
 
 
-        if (tablename != null) {
-            ResultSet rsCol = null;
-            metaStart = System.currentTimeMillis();
-            DatabaseMetaData md = conn.getMetaData();
-            metaEnd = System.currentTimeMillis();
+		if (tablename != null) {
+			ResultSet rsCol = null;
+			metaStart = System.currentTimeMillis();
+			DatabaseMetaData md = conn.getMetaData();
+			metaEnd = System.currentTimeMillis();
 
-            rsCol = md.getColumns(null, null, tablename, null);
-            if (verbose) {
-                tabular("COLUMN_NAME");
-                tabular("TYPE_NAME");
-                tabular("COLUMN_SIZE");
-                tabularlast("DATA_TYPE");
-                outputln("");
-            }
-            
-            while (rsCol.next()) {
-                tabular(rsCol.getString("COLUMN_NAME"));
-                tabular(rsCol.getString("TYPE_NAME"));
-                tabular(rsCol.getString("COLUMN_SIZE"));
-                tabularlast(rsCol.getString("DATA_TYPE"));
-                outputln("", true);
-            }
-        }
+			rsCol = md.getColumns(null, null, tablename, null);
+			if (verbose) {
+				tabular("COLUMN_NAME");
+				tabular("TYPE_NAME");
+				tabular("COLUMN_SIZE");
+				tabularlast("DATA_TYPE");
+				outputln("");
+			}
+
+			while (rsCol.next()) {
+				tabular(rsCol.getString("COLUMN_NAME"));
+				tabular(rsCol.getString("TYPE_NAME"));
+				tabular(rsCol.getString("COLUMN_SIZE"));
+				tabularlast(rsCol.getString("DATA_TYPE"));
+				outputln("", true);
+			}
+		}
 
 
-        if (sql !=null) {
-            Statement stat = conn.createStatement();
-            stat.setQueryTimeout(10);
+		if (sql !=null) {
+			Statement stat = conn.createStatement();
+			stat.setQueryTimeout(10);
 
-            execStart = System.currentTimeMillis();
-            ResultSet res = stat.executeQuery(sql);
-            ResultSetMetaData rsmd = res.getMetaData();
-            execEnd = System.currentTimeMillis();
+			execStart = System.currentTimeMillis();
+			ResultSet res = stat.executeQuery(sql);
+			ResultSetMetaData rsmd = res.getMetaData();
+			execEnd = System.currentTimeMillis();
 
-            if (verbose) {
-                for (int i=1;i<nrColumns+1;i++) {
-                    if (i != nrColumns)
-                        tabular(rsmd.getColumnName(i));
-                    else 
-                        tabularlast(rsmd.getColumnName(i));
-                }
-                outputln("");
-            }
-            while (res.next()) {
-                for (int i=1;i<nrColumns+1;i++) {
-                    if (i != nrColumns)
-                        tabular(res.getString(i));
-                    else 
-                        tabularlast(res.getString(i));
-                }
-                outputln("",true);
-            }
+			if (verbose) {
+				for (int i=1;i<nrColumns+1;i++) {
+					if (i != nrColumns)
+						tabular(rsmd.getColumnName(i));
+					else 
+						tabularlast(rsmd.getColumnName(i));
+				}
+				outputln("");
+			}
+			while (res.next()) {
+				for (int i=1;i<nrColumns+1;i++) {
+					if (i != nrColumns)
+						tabular(res.getString(i));
+					else 
+						tabularlast(res.getString(i));
+				}
+				outputln("",true);
+			}
 
-            try {
-                stat.close();
-            } catch (SQLException ignore) {}
+			stat.close();
+			res.close();
+		}
 
-            try {
-                res.close();
-            } catch (SQLException ignore) {}
-        }
-        try {
-            conn.close();
-        } catch (SQLException ignore) {}
+		conn.close();
 
-        // Print the execution times
-        outputln("Open time: " + (openEnd-openStart) + " ms");
+		// Print the execution times
+		outputln("Open time: " + (openEnd-openStart) + " ms");
 
-        if (line.hasOption("meta")) {
-            outputln("Meta time: " + (metaEnd-metaStart) + " ms");
-        }
+		if (line.hasOption("meta")) {
+			outputln("Meta time: " + (metaEnd-metaStart) + " ms");
+		}
 
-        if (line.hasOption("sql")) {
-            outputln("Exec time: " + (execEnd-execStart) + " ms");
-        }
-    }
+		if (line.hasOption("sql")) {
+			outputln("Exec time: " + (execEnd-execStart) + " ms");
+		}
+	}
 
-    private static void tabular(String str) {
-        if (verbose) {
-            output(str + "\t| ");
-        } else {
-            output(str + "|", true);
-        }
-    }
+	private static void tabular(String str) {
+		if (verbose) {
+			output(str + "\t| ");
+		} else {
+			output(str + "|", true);
+		}
+	}
 
-    private static void tabularlast(String str) {
-        if (verbose) {
-            output(str);
-        } else {
-            output(str, true);
-        }
-    }
+	private static void tabularlast(String str) {
+		if (verbose) {
+			output(str);
+		} else {
+			output(str, true);
+		}
+	}
 
-    private static void outputln(String str) {
-        outputln(str,verbose);
-    }
+	private static void outputln(String str) {
+		outputln(str,verbose);
+	}
 
-    private static void outputln(String str, boolean verbose) {
-        if (verbose) {
-            System.out.println(str);
-        }
-    }
+	private static void outputln(String str, boolean verbose) {
+		if (verbose) {
+			System.out.println(str);
+		}
+	}
 
-    private static void output(String str) {
-        output(str,verbose);
-    }
+	private static void output(String str) {
+		output(str,verbose);
+	}
 
-    private static void output(String str, boolean verbose) {
-        if (verbose) {
-            System.out.print(str);
-        }
-    }
+	private static void output(String str, boolean verbose) {
+		if (verbose) {
+			System.out.print(str);
+		}
+	}
 
 }
