@@ -44,6 +44,7 @@ import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.configuration.ConfigFileManager;
 import com.ingby.socbox.bischeck.configuration.ConfigMacroUtil;
 import com.ingby.socbox.bischeck.configuration.ConfigXMLInf;
+import com.ingby.socbox.bischeck.configuration.ConfigurationException;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEPPool;
@@ -79,9 +80,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     private static XMLTwenty4Threshold twenty4hourconfig;
 
-    private String serviceName;
-    private String serviceItemName;
-    private String hostName;
+    private final String serviceName;
+    private final String serviceItemName;
+    private final String hostName;
 
     private Float warning;
     private Float critical;
@@ -168,9 +169,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 Util.ShellExit(0);
             }
             
-            Calendar c = BisCalendar.getInstance();
-            int hourThreshold = c.get(Calendar.HOUR_OF_DAY);
-            int minuteThreshold = c.get(Calendar.MINUTE);
+            Calendar cal = BisCalendar.getInstance();
+            int hourThreshold = cal.get(Calendar.HOUR_OF_DAY);
+            int minuteThreshold = cal.get(Calendar.MINUTE);
             Float metric = null;
             
             if (line.hasOption("hour")) {
@@ -201,13 +202,13 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
     
     public String show(int hourThreshold,int minuteThreshold, Float metric, int verbose) {
-        String lineSep = System.getProperty("line.separator");
-        StringBuilder showConfig = new StringBuilder();
+        StringBuilder showConfig = new StringBuilder(100);
         if (isHoliday) {
             showConfig.append("Is holiday");
             return showConfig.toString();
         }
         
+        String lineSep = System.getProperty("line.separator");
         if (verbose > 0) {
             showConfig.append(getCurrentRule()).append(lineSep);
         }
@@ -241,55 +242,52 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
         
         if (metric != null) {
-            NAGIOSSTAT state = resolveState(metric, hourThreshold, minuteThreshold);
-            showConfig.append(" State=" + state);
+            final NAGIOSSTAT state = resolveState(metric, hourThreshold, minuteThreshold);
+            showConfig.append(" State=").append(state);
         }
         
-        BischeckDecimal threshold = new BischeckDecimal(getThresholdByHourAndMinute(hourThreshold, minuteThreshold));
+        final BischeckDecimal threshold = new BischeckDecimal(getThresholdByHourAndMinute(hourThreshold, minuteThreshold));
             
         if (">".equalsIgnoreCase(calcMethod) || "<".equalsIgnoreCase(calcMethod) ) {
-            if (threshold.getFloat() != null) {
-                BischeckDecimal warn = new BischeckDecimal(threshold.getFloat()*getWarning());
-                BischeckDecimal crit = new BischeckDecimal(threshold.getFloat()*getCritical());
-                showConfig.append(" Threshold=" + threshold + " ("+getCalcMethod()+")" + 
-                        " warning=" + warn +"("+getWarning()+ ")" + 
-                        " critical=" + crit+"("+ getCritical() + ")");
-            } else {
-                showConfig.append(" Threshold=" + null + " ("+getCalcMethod()+")" + 
+            if (threshold.getFloat() == null) {                
+            	showConfig.append(" Threshold=" + null + " ("+getCalcMethod()+")" + 
                         " warning=" + null +"("+getWarning()+ ")" +
                         " critical=" + null +"("+ getCritical() + ")");
-            
+            } else {
+
+            	final BischeckDecimal warn = new BischeckDecimal(threshold.getFloat()*getWarning());
+                final BischeckDecimal crit = new BischeckDecimal(threshold.getFloat()*getCritical());
+                showConfig.append(" Threshold=" + threshold + " ("+getCalcMethod()+")" + 
+                        " warning=" + warn +"("+getWarning()+ ")" + 
+                        " critical=" + crit+"("+ getCritical() + ")");    
             }
         } else if ("=".equalsIgnoreCase(calcMethod)) {
-            if (threshold.getFloat() != null) {
-                BischeckDecimal critical =  new BischeckDecimal((getCritical()));
-                BischeckDecimal warning =  new BischeckDecimal((getWarning()));
-                
-                BischeckDecimal criticalPercentage =  new BischeckDecimal((1-getCritical()));
-                BischeckDecimal criticalBound     =  new BischeckDecimal((1-getCritical())*threshold.getFloat());
-                BischeckDecimal criticalUpBound   =  new BischeckDecimal(threshold.getFloat() + criticalBound.getFloat());
-                BischeckDecimal criticalDownBound =  new BischeckDecimal(threshold.getFloat() - criticalBound.getFloat());
-                BischeckDecimal warningPercentage =  new BischeckDecimal((1-getWarning()));
-                BischeckDecimal warningBound      =  new BischeckDecimal((1-getWarning())*threshold.getFloat());
-                BischeckDecimal warningUpBound    =  new BischeckDecimal(threshold.getFloat() + warningBound.getFloat());
-                BischeckDecimal warningDownBound  =  new BischeckDecimal(threshold.getFloat() - warningBound.getFloat());
+        	final BischeckDecimal criticalValue =  new BischeckDecimal(getCritical());
+            final BischeckDecimal warningValue =  new BischeckDecimal(getWarning());
+            
+            if (threshold.getFloat() == null) {
+                final BischeckDecimal criticalPercentage =  new BischeckDecimal(1-getCritical());
+                final BischeckDecimal warningPercentage =  new BischeckDecimal(1-getWarning());
+                showConfig.append(" Threshold=" + null + " ("+getCalcMethod()+")" + 
+                        " warning=" + null + "/" + null + 
+                        "(+-"+ warningPercentage.scaleBy(warningValue) + ")" +
+                        " critical=" + null + "/" + null + 
+                        "(+-" + criticalPercentage.scaleBy(criticalValue) + ")");                
+            } else {
+                final BischeckDecimal criticalPercentage =  new BischeckDecimal(1-getCritical());
+                final BischeckDecimal criticalBound     =  new BischeckDecimal((1-getCritical())*threshold.getFloat());
+                final BischeckDecimal criticalUpBound   =  new BischeckDecimal(threshold.getFloat() + criticalBound.getFloat());
+                final BischeckDecimal criticalDownBound =  new BischeckDecimal(threshold.getFloat() - criticalBound.getFloat());
+                final BischeckDecimal warningPercentage =  new BischeckDecimal(1-getWarning());
+                final BischeckDecimal warningBound      =  new BischeckDecimal((1-getWarning())*threshold.getFloat());
+                final BischeckDecimal warningUpBound    =  new BischeckDecimal(threshold.getFloat() + warningBound.getFloat());
+                final BischeckDecimal warningDownBound  =  new BischeckDecimal(threshold.getFloat() - warningBound.getFloat());
                 
                 showConfig.append(" Threshold=" + threshold.scaleBy(value) + " ("+getCalcMethod()+")" + 
                         " warning=" + warningUpBound + "/" + warningDownBound + 
-                        "(+-"+warningPercentage.scaleBy(warning) + ")" + 
+                        "(+-"+warningPercentage.scaleBy(warningValue) + ")" + 
                         " critical=" + criticalUpBound + "/" + criticalDownBound + 
-                        "(+-"+criticalPercentage.scaleBy(critical) + ")");
-            } else {
-                BischeckDecimal critical =  new BischeckDecimal((getCritical()));
-                BischeckDecimal warning =  new BischeckDecimal((getWarning()));
-                
-                BischeckDecimal criticalPercentage =  new BischeckDecimal((1-getCritical()));
-                BischeckDecimal warningPercentage =  new BischeckDecimal((1-getWarning()));
-                showConfig.append(" Threshold=" + null + " ("+getCalcMethod()+")" + 
-                        " warning=" + null + "/" + null + 
-                        "(+-"+ warningPercentage.scaleBy(warning) + ")" +
-                        " critical=" + null + "/" + null + 
-                        "(+-" + criticalPercentage.scaleBy(critical) + ")");
+                        "(+-"+criticalPercentage.scaleBy(criticalValue) + ")");
             }
         }
         return showConfig.toString();
@@ -388,9 +386,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         if (isHoliday) {
             state = NAGIOSSTAT.OK;
         } else {
-            Calendar c = BisCalendar.getInstance();
-            int hourThreshold = c.get(Calendar.HOUR_OF_DAY);
-            int minuteThreshold = c.get(Calendar.MINUTE);
+            final Calendar c = BisCalendar.getInstance();
+            final int hourThreshold = c.get(Calendar.HOUR_OF_DAY);
+            final int minuteThreshold = c.get(Calendar.MINUTE);
 
             state = resolveState(measuredValue, hourThreshold, minuteThreshold);
         }
@@ -410,7 +408,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     private NAGIOSSTAT resolveState(Float measuredValue, int hourThreshold, int minuteThreshold) {
         NAGIOSSTAT state = NAGIOSSTAT.OK;
         
-        Float calcthreshold = this.getThresholdByHourAndMinute(hourThreshold, minuteThreshold);
+       final Float calcthreshold = this.getThresholdByHourAndMinute(hourThreshold, minuteThreshold);
         
         /* Only check if this is a hour period that not null  and that the measured value is null
          * Maybe measured value should result in an error - but I think it should be a separate service control 
@@ -439,8 +437,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
                 }
             } else if ("=".equalsIgnoreCase(calcMethod)) {
 
-                float criticalBound =  (1-this.getCritical())*calcthreshold;
-                float warningBound =  (1-this.getWarning())*calcthreshold;
+                final float criticalBound =  (1-this.getCritical())*calcthreshold;
+                final float warningBound =  (1-this.getWarning())*calcthreshold;
 
                 if (measuredValue > calcthreshold+criticalBound || 
                         measuredValue < calcthreshold-criticalBound) {
@@ -487,9 +485,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     @Override
     public Float getThreshold() {
         
-        Calendar c = BisCalendar.getInstance();
-        int hourThreshold = c.get(Calendar.HOUR_OF_DAY);
-        int minuteThreshold = c.get(Calendar.MINUTE);
+        final Calendar cal = BisCalendar.getInstance();
+        final int hourThreshold = cal.get(Calendar.HOUR_OF_DAY);
+        final int minuteThreshold = cal.get(Calendar.MINUTE);
 
         return getThresholdByHourAndMinute(hourThreshold, minuteThreshold);
     }
@@ -542,9 +540,9 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         boolean isholiday=false;
         
         while (holiter.hasNext()) {
-            XMLHoliday holyear = holiter.next();
+            final XMLHoliday holyear = holiter.next();
             if (holyear.getYear() == year) {
-                Iterator<String> iter = holyear.getDayofyear().iterator();
+                final Iterator<String> iter = holyear.getDayofyear().iterator();
                 while (iter.hasNext() ) {
                     if (iter.next().equals(monthAndDay(month,dayofmonth))) {
                         isholiday = true;
@@ -563,11 +561,11 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     }
     
     
-    private List<XMLPeriod> findServicedef(XMLTwenty4Threshold config) {
-        Iterator<XMLServicedef> servicedefIter = config.getServicedef().iterator();
+    private List<XMLPeriod> findServicedef(final XMLTwenty4Threshold config) {
+        final Iterator<XMLServicedef> servicedefIter = config.getServicedef().iterator();
         List<XMLPeriod> periodList = null;
         while (servicedefIter.hasNext()) {
-            XMLServicedef servicedef = servicedefIter.next();
+            final XMLServicedef servicedef = servicedefIter.next();
             if (servicedef.getHostname().equals(this.hostName) &&
                 servicedef.getServicename().equals(this.serviceName) &&
                 servicedef.getServiceitemname().equals(this.serviceItemName)) {
@@ -582,7 +580,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     
 
 
-    private List<XMLPeriod> findServicedefByTemplate(XMLTwenty4Threshold config) {
+    private List<XMLPeriod> findServicedefByTemplate(final XMLTwenty4Threshold config) {
 
         List<XMLPeriod> periodList = null;
 
@@ -1053,7 +1051,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
     }
     
     
-    private synchronized static XMLTwenty4Threshold configInit() throws Exception {
+    private synchronized static XMLTwenty4Threshold configInit() throws ConfigurationException  {
         if (twenty4hourconfig == null) {
             ConfigFileManager xmlfilemgr = new ConfigFileManager();
             twenty4hourconfig  = (XMLTwenty4Threshold) xmlfilemgr.getXMLConfiguration(ConfigXMLInf.XMLCONFIG.TWENTY4HOURTHRESHOLD);
@@ -1067,7 +1065,7 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
         XMLTwenty4Threshold twenty4hourconfig;
         try {
             twenty4hourconfig = configInit();
-        } catch (Exception e) {
+        } catch (ConfigurationException e) {
             LOGGER.error("Configuration file missing or corrupted", e);
             ThresholdException te = new ThresholdException(e);
             te.setThresholdName(this.getClass().getName());
