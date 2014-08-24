@@ -24,17 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.Util;
-import com.ingby.socbox.bischeck.configuration.ConfigurationException;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
-import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.servers.MessageServerInf;
-import com.ingby.socbox.bischeck.service.JDBCService;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceStateInf;
-import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
-import com.ingby.socbox.bischeck.threshold.DummyThreshold;
-import com.ingby.socbox.bischeck.threshold.Threshold;
-import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -42,18 +35,16 @@ import com.yammer.metrics.core.TimerContext;
 public final class BigPanda implements Notifier, MessageServerInf {
     private final static Logger LOGGER = LoggerFactory.getLogger(BigPanda.class);
 
-    private static HashMap<String, BigPanda> notificator = new HashMap<String,BigPanda>();
+    private static Map<String, BigPanda> notificator = new HashMap<String,BigPanda>();
 
-    private String serviceKey;
-    private int connectionTimeout;
-    private URL url;
+    private final int connectionTimeout;
+    private final URL url;
     private final String instanceName;
-    private boolean sendMessage;
-    private ServiceKeyRouter skr;
+    private final boolean sendMessage;
+    private final ServiceKeyRouter skr;
 
-    private String defaultServiceKey;
-
-    synchronized public static BigPanda getInstance(String name) {
+    
+    synchronized public static BigPanda getInstance(final String name) {
 
         if (!notificator.containsKey(name) ) {
             notificator.put(name,new BigPanda(name));
@@ -62,11 +53,11 @@ public final class BigPanda implements Notifier, MessageServerInf {
     }
 
         
-    private BigPanda(String name) {
+    private BigPanda(final String name) {
 
         instanceName = name;
-        Properties defaultproperties = getNotificationProperties();
-        Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+        final Properties defaultproperties = getNotificationProperties();
+        final Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
 
         final String urlName = prop.getProperty("url",
                 defaultproperties.getProperty("url"));
@@ -78,10 +69,10 @@ public final class BigPanda implements Notifier, MessageServerInf {
             throw new IllegalArgumentException(e);
         }
 
-        serviceKey = prop.getProperty("app_key", 
+        final String serviceKey = prop.getProperty("app_key", 
                 defaultproperties.getProperty("app_key"));
         
-        defaultServiceKey = prop.getProperty("default_app_key");
+        final String defaultServiceKey = prop.getProperty("default_app_key");
         
         skr = new ServiceKeyRouter(serviceKey, defaultServiceKey);
 
@@ -99,7 +90,7 @@ public final class BigPanda implements Notifier, MessageServerInf {
      * @return default properties
      */
     public static Properties getNotificationProperties() {
-        Properties defaultproperties = new Properties();
+        final Properties defaultproperties = new Properties();
 
         defaultproperties.setProperty("url","https://api.bigpanda.io/data/v2/alerts");
         defaultproperties.setProperty("app_key","");
@@ -120,9 +111,9 @@ public final class BigPanda implements Notifier, MessageServerInf {
     }
 
     @Override
-    public void sendAlert(Map<String, String> notificationData) {
+    public void sendAlert(final Map<String, String> notificationData) {
         try {
-            String message = send(notificationData);
+            final String message = send(notificationData);
             LOGGER.info("Alert message to {} : {}", instanceName, message.toString());
         } catch (IOException e) {
             LOGGER.error("Sedning trigger message to {} failed.", instanceName, e);
@@ -134,7 +125,7 @@ public final class BigPanda implements Notifier, MessageServerInf {
     }
 
     @Override
-    public void sendResolve(Map<String, String> notificationData) {
+    public void sendResolve(final Map<String, String> notificationData) {
         return;
 //      try {
 //          String message = send(notificationData);
@@ -148,7 +139,7 @@ public final class BigPanda implements Notifier, MessageServerInf {
 //      }
     }
 
-    private String send(Map<String, String> notificationData) 
+    private String send(final Map<String, String> notificationData) 
             throws IOException, IllegalArgumentException {
         
         final String key = skr.getServiceKey(notificationData.get(Notifier.HOST),notificationData.get(Notifier.SERVICE));
@@ -187,13 +178,19 @@ public final class BigPanda implements Notifier, MessageServerInf {
     }
 
 
-    private Long unixEpoch(long currentTimeMillis) {
+    private Long unixEpoch(final long currentTimeMillis) {
         return currentTimeMillis / 1000L;
     }
 
 
+    /**
+     * Send the message to BigPanda 
+     * @param message the message to be POST
+     * @return json object or null if post failed
+     * @throws IOException if connection can not be created, can not send the message or can not read response
+     */
     private JSONObject sendMessage(final Writer message) throws IOException {
-        String payload = message.toString();
+        final String payload = message.toString();
         LOGGER.debug("Message is : {}", payload);
         HttpURLConnection conn = null;
 
@@ -207,17 +204,12 @@ public final class BigPanda implements Notifier, MessageServerInf {
 
         try {
             conn = createHTTPConnection(payload);
-    
-
-        if (!postHTTP(conn, payload)) {
-            return null;
-        }
-
-        json = responseHTTP(conn);      
-
+            if (postHTTP(conn, payload)) {
+            	json = responseHTTP(conn);      
+            }
         } finally {
-            long duration = context.stop()/1000000;
-            LOGGER.debug("BigPanda for {} send execute: {} ms", instanceName, duration);
+        	final long duration = context.stop()/1000000;
+        	LOGGER.debug("BigPanda for {} send execute: {} ms", instanceName, duration);
         }
 
         return json;
@@ -256,27 +248,28 @@ public final class BigPanda implements Notifier, MessageServerInf {
     }
 
     
-    private boolean postHTTP(HttpURLConnection conn, final String payload) throws IOException {
+    private boolean postHTTP(final HttpURLConnection conn, final String payload) throws IOException {
          
         try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream())) {
             
             wr.write(payload);
             wr.flush();
-            int returnStatus = conn.getResponseCode();
+            final int returnStatus = conn.getResponseCode();
             if (returnStatus != HttpURLConnection.HTTP_OK) {
                 if (returnStatus == HttpURLConnection.HTTP_BAD_REQUEST) {
                     LOGGER.error("BigPanda responded with {} for instance {}, check Bischeck configuration", 
                             returnStatus, instanceName);
-                    return false;
                 } else if (returnStatus == HttpURLConnection.HTTP_FORBIDDEN) {
                     LOGGER.error("BigPanda responded with {} for instance {}, probably making to many API calls to BigPanda", 
                             returnStatus, instanceName);
-                    return false;
                 } else if (returnStatus >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
                     LOGGER.error("BigPanda responded with {} for instance {}, check BigPanda server status and vaildate your account settings", 
                             returnStatus, instanceName);
-                    return false;
+                } else {
+                	LOGGER.error("BigPanda responded with {} for instance {}, this is a error not defined by the protocol", 
+                			returnStatus, instanceName);
                 }
+                return false;
             }
         } 
         
@@ -297,9 +290,10 @@ public final class BigPanda implements Notifier, MessageServerInf {
         conn.setRequestMethod("POST");
 
         conn.setConnectTimeout(connectionTimeout);
-        conn.setRequestProperty("Content-Length", "" + 
+        if (payload != null && payload.getBytes() != null && payload.getBytes().length != 0) {
+        	conn.setRequestProperty("Content-Length", "" + 
                 Integer.toString(payload.getBytes().length));
-
+        }
         conn.setRequestProperty("User-Agent", "bischeck");
         //TODO check if this unique per key
         conn.setRequestProperty("Authorization","Bearer 2d1dad9a41fa48e2b3fe8f2d304343b5");  
@@ -312,7 +306,7 @@ public final class BigPanda implements Notifier, MessageServerInf {
     }
 
     @Override
-    public void onMessage(Service message) {
+    public void onMessage(final Service message) {
         if ( ((ServiceStateInf) message).getServiceState().isResolved() ) {
             sendResolve(message.getNotificationData());
         } else {
