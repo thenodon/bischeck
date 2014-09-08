@@ -1,4 +1,4 @@
-<project name="bischeck" default="compile" basedir=".">
+<project name="bischeck" default="dist" basedir=".">
 
     <!-- === Property Definitions ======================================== -->
 
