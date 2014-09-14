@@ -137,7 +137,11 @@ public class CachePurgeJob implements Job {
                                 servicedef.getServiceName(), 
                                 servicedef.getServiceItemName(),
                                 System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(purgeMap.get(key)))*1000);
-                        ((CachePurgeInf) cache).trim(key, index);
+                        // if index is null there is no items in the cache older then the time offset
+                        if (index != null) {
+                        	//LOGGER.debug("Time based purge at index {} purgekey {} time offset {}", index, purgeMap.get(key),System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(purgeMap.get(key)))*1000);
+                        	((CachePurgeInf) cache).trim(key, index);
+                        } 
                     } else {
                         ((CachePurgeInf) cache).trim(key, Long.valueOf(purgeMap.get(key)));
                     }
