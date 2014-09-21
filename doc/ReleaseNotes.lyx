@@ -220,7 +220,7 @@ Release 1.1.1 is a minor upgrade of Bischeck.
  The most important is a fix for a major performance issue related to time
  based queries.
  Even if the performance issue was reported as bug, the result was correct.
- If you store high number of items per service definitions in the cache,
+ If you store a high number of items per service definitions in the cache,
  +1000, you should definitely upgrade.
  
 \end_layout
