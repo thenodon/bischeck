@@ -354,8 +354,14 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			String serviceItemName, 
 			long timestamp) {
 		
-		return getLastStatusByTime(hostName, serviceName, serviceItemName, timestamp).getValue();
-	}
+		LastStatus ls = getLastStatusByTime(hostName, serviceName, serviceItemName, timestamp);
+		
+		if (ls != null) {
+			return ls.getValue();
+		}
+		
+		return null;
+	}	
 
 	@Override
 	public String getByIndex(String hostName, 
