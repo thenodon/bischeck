@@ -39,7 +39,7 @@
     </property>
     <property>
         <key>cache.provider.redis.fastCacheSize</key>
-        <value>0</value>
+        <value>10</value>
     </property>
     <property>
         <key>cache.provider.redis.auth</key>
