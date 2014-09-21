@@ -100,6 +100,11 @@ public class CacheFactory {
 	@SuppressWarnings("unchecked")
 	public synchronized static void destroy()  throws CacheException {
 		Class<CacheInf> clazz;
+		
+		if (classCacheName == null) {
+			return;
+		}
+		
 		try {
 			clazz = (Class<CacheInf>) ClassCache.getClassByName(classCacheName);
 			(clazz.getMethod("destroy")).invoke(null);
@@ -122,7 +127,6 @@ public class CacheFactory {
 		    }
 		}
 	
-		
 		LOGGER.info("Cache provider destroyed {}", classCacheName);
 	}
 	
