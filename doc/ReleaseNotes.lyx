@@ -73,7 +73,7 @@
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
-\tracking_changes false
+\tracking_changes true
 \output_changes false
 \html_math_output 0
 \html_css_as_file 0
@@ -95,11 +95,11 @@ Release Notes
 \end_layout
 
 \begin_layout Date
-Version 1.1.0
+Version 1.1.1
 \begin_inset Newline linebreak
 \end_inset
 
-2014-06-16
+2014-09-23
 \end_layout
 
 \begin_layout Standard
@@ -114,7 +114,7 @@ Legal Notice Copyright
 \end_layout
 
 \begin_layout Standard
-© 2013 Ingenjörsbyn AB.
+© 2013-2014 Ingenjörsbyn AB.
 \begin_inset Newline newline
 \end_inset
 
@@ -209,6 +209,91 @@ LatexCommand tableofcontents
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Release 1.1.1 - 2014-09-23
+\end_layout
+
+\begin_layout Standard
+Release 1.1.1 is a minor upgrade of Bischeck.
+ The most important is a fix for a major performance issue related to time
+ based queries.
+ Even if the performance issue was reported as bug, the result was correct.
+ If you store high number of items per service definitions in the cache,
+ +1000, you should definitely upgrade.
+ 
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+Not applicable
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-259] - 
+\begin_inset Quotes eld
+\end_inset
+
+Using period rather than count for cache purge throws error
+\begin_inset Quotes erd
+\end_inset
+
+.
+ A NullPointerExceptions was thrown when there where no items in the cache
+ for the specific service definition that was older then the time interval
+ defined by the purging interval.
+ That means that there are no items in the cache that should be removed
+ which is correct.
+ The problem was that the null was not handled.
+ When there where items older then the specified purge period the items
+ are correctly removed.
+ 
+\end_layout
+
+\begin_layout Itemize
+[TR-260] - 
+\begin_inset Quotes eld
+\end_inset
+
+High CPU consumption by bischeck and redis-server
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This issue was related to time based Redis cache queries.
+ The cpu was especially high when the cache linked list was very large,
+ +1000 items.
+ From doing a sequential search to find the 
+\begin_inset Quotes eld
+\end_inset
+
+right
+\begin_inset Quotes erd
+\end_inset
+
+ timestamp, we now do a binary search resulting in a much more predictive
+ response and utilization.
+ For a linked list with 15000 items we would with the previous version had
+ to search 15000 times if the time query resolved to the last item in the
+ cache.
+ With the binary search we get instead on around 13 searches independent
+ of location of the cache.
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 1.1.1 support upgrade from release 1.1.0.
 \end_layout
 
 \begin_layout Section
