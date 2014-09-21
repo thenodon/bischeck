@@ -74,15 +74,41 @@ public class CacheTest {
 	
 	
 	@Test (groups = { "Cache" })
-	public void verifyCache() {
+	public void verifyCache() throws CacheException {
 
-		CacheInf cache = CacheFactory.getInstance();
+		CacheFactory.destroy();
 		
+		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.laststatuscache.LastStatusCache");
+		CacheInf cache = CacheFactory.getInstance();
+		cache.clear(hostname, servicename, serviceitemname);
+		allCacheTests(cache);
+		cache.clear(hostname, servicename, serviceitemname);
+		CacheFactory.destroy();
+		
+		
+		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
+		cache = CacheFactory.getInstance();
+		cache.clear(hostname, servicename, serviceitemname);
+		allCacheTests(cache);
+		cache.clear(hostname, servicename, serviceitemname);
+		CacheFactory.destroy();
+		
+		
+		CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
+		cache = CacheFactory.getInstance();
+		cache.clear(hostname, servicename, serviceitemname);
+		((com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache) cache).disableFastCache();
+		allCacheTests(cache);
+		cache.clear(hostname, servicename, serviceitemname);
+		CacheFactory.destroy();
+
+	
+	}
+
+
+	private void allCacheTests(CacheInf cache) {
 		long current = System.currentTimeMillis() - 22*300*1000;
 
-		cache.clear();
-		
-		
 		for (int i = 1; i < 11; i++) {
 			LastStatus ls = new LastStatus(""+i, (float) i,  current + i*300*1000);
 			System.out.println(CacheTest.class.getName()+">"+(new Date(ls.getTimestamp())).toString() +"> " + i+":"+ls.getValue() +">"+hostname+"-"+servicename+"-"+serviceitemname);
@@ -99,6 +125,8 @@ public class CacheTest {
 			cache.add(ls, Util.fullName( hostname, servicename, serviceitemname));
 		}
 		System.out.println("Start test - " + (new Date(ls.getTimestamp())).toString());
+		
+		
 		if (supportNull) {
 			System.out.println("SUPPORT NULL");
 
@@ -116,25 +144,41 @@ public class CacheTest {
 			// Test using ENDMARK
 			System.out.println("ENDMARK");
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[0:END]"),"21,20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[10:END]"),"10,9,8,7,6,5,4,3,2,1");
 			
 			//Combo 1
 			Assert.assertEquals(CacheEvaluator.parse("avg(" + cachekey + "[0]," + cachekey + "[6:12])"),"avg(21,15,14,13,12,10,9)");
 			//Combo 2
 			Assert.assertEquals(CacheEvaluator.parse("avg(" + cachekey + "[10]," + cachekey + "[6:12])"),"avg(null,15,14,13,12,10,9)");
-			//Combo 2
+			//Combo 2§
 			Assert.assertEquals(CacheEvaluator.parse("avg(" + cachekey + "[0]," + cachekey + "[6:12])"),"avg(21,15,14,13,12,10,9)");
 			//Combo 4
 			Assert.assertEquals(CacheEvaluator.parse("avg(" + cachekey + "[-5M:-120M]," + cachekey + "[6:12])"),"avg(null,15,14,13,12,10,9)");
 			
 			// Test that a time range with no data in the cache returns "null"
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-1M]"),"null");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M]"),"null");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-6M]"),"21");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-9M]"),"20");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-10M]"),"20");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M]"),"20");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-14M]"),"19");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-15M]"),"19");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-20M]"),"18");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-25M]"),"17");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-27M]"),"17");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-30M]"),"16");
+			
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-13M:-20M]"),"19,18");
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-6M:-20M]"),"21,20,19,18");
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M:END]"),"20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M:-105M]"),"20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-11M:-106M]"),"20,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1");
 			
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-1M:-118M]"),"null");
+			
 			// Test that a if the end time range with no data in the cache returns "null"
-			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-5M:-120M]"),"null");
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-120M]"),"null");
 
 		} else {
 			System.out.println("DO NOT SUPPORT NULL");
@@ -163,12 +207,13 @@ public class CacheTest {
 	}
 
 	@Test (groups = { "Cache" })
-	public void verifyCacheTime() {
+	public void verifyCacheTime() throws CacheException {
 
 		int count = 2000;
 		int secinterval = 300; 
 		long current = System.currentTimeMillis() - count*secinterval*1000;
 
+		CacheFactory.init();
 		CacheInf cache = CacheFactory.getInstance();
 		
 		cache.clear();

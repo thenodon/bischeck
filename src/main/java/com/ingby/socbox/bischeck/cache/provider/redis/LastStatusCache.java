@@ -421,7 +421,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
                 return null;
             }
 
-            ls = nearest(timestamp, key);
+            ls = nearestByLastStatus(timestamp, key);
 
         } catch (JedisConnectionException je) {
             connectionFailed(je);
@@ -989,7 +989,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
     }
     
     
-    private LastStatus nearest(long time,  String id) {
+    private LastStatus nearestByLastStatus(long time,  String id) {
         
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Find value for key {} at nearest timestamp {}", id, new java.util.Date(time));
@@ -998,13 +998,14 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         LastStatus nearest = null;
         
         // Search the fast cache first. If a hit is in the fast cache return 
-        nearest = nearestFast(time, id);
+        nearest = nearestByLastStatusFast(time, id);
         
         if (nearest != null) {
             incFastCacheCount();
         } else {
             // Search the slow cache
-            nearest = nearestSlow(time, id);
+            //nearest = nearestSlow(time, id);
+            nearest = nearestByLastStatusSlow(time, id);
             incRedisCacheCount();
         }
         return nearest;
@@ -1012,102 +1013,122 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
     }
 
     
-    /**
-     * The method search for the LastStatus object stored in the cache that has 
-     * a timestamp closest to the time parameter.
-     * @param time 
-     * @param listtosearch
-     * @return the LastStatus object closes to the time
-     */
-    private LastStatus nearestFast(long time, String key) {
-        if (!fastCacheEnable) {
-            return null;
-        }
+    
+    private Long nearestByIndexSlow(long time, String key) {
+    	// Search the redis cache
         
-        LinkedList<LastStatus> listtosearch = fastCache.get(key);
-        if (listtosearch == null) {
-            return null;
-        }
-        
-        if (time > listtosearch.getFirst().getTimestamp() || 
-            time < listtosearch.getLast().getTimestamp() ) {
-            return null;
-        }
-
-        LastStatus nearest = null;
-        long bestDistanceFoundYet = Long.MAX_VALUE;
-        
-        for (int i = 0; i < listtosearch.size(); i++) {
-            long d1 = Math.abs(time - listtosearch.get(i).getTimestamp());
-            long d2;
-            if (i+1 < listtosearch.size()) {
-                d2 = Math.abs(time - listtosearch.get(i+1).getTimestamp());
-            } else { 
-                d2 = Long.MAX_VALUE;
-            }
-            
-            if ( d1 < bestDistanceFoundYet ) {
-
-                // For the moment, this value is the nearest to the desired number...
-                bestDistanceFoundYet = d1;
-                nearest = listtosearch.get(i);
-                if (d1 <= d2) { 
-                    LOGGER.debug("Nearest fast for key {} break at index {}", key, i);
-                    break;
-                }
-            }
-        }
-        
-        return nearest.copy();
-
-    }
-
-
-
-    private LastStatus nearestSlow(long time, String key) {
-        // Search the redis cache
-        LastStatus nearest = null;
         Jedis jedis = null;
         try {
             jedis = jedispool.getResource();
             if (time > new LastStatus(jedis.lindex(key, 0L)).getTimestamp() || 
                     time < new LastStatus(jedis.lindex(key, jedis.llen(key)-1)).getTimestamp() ) {
-                return null;
+            	return null;
             }
 
-            long bestDistanceFoundYet = Long.MAX_VALUE;
-            long size = jedis.llen(key);
+            long listSize = jedis.llen(key);
+            
+            long low = 0L;
+            long high = listSize - 1L;
+            int countSearchDepth = 0;
+            while (low <= high) {
+                long mid = (low + high) / 2L;
+            	
+                countSearchDepth++;
+                
+                // test lower case
+                if (mid == 0) {
+                    if (listSize == 1) {
+                        return 0L;
+                    }
+                	LOGGER.debug("Time found in lower - search depth: {}", countSearchDepth);
+                    
+                    if (Math.abs( (new LastStatus(jedis.lindex(key, 0))).getTimestamp() - time) 
+                    		< Math.abs((new LastStatus(jedis.lindex(key, 1))).getTimestamp() - time) ) {
+                		return mid;
+                	} else {
+                		return mid+1;
+                    		
+                	}    
+                }
 
-            for (int i = 0; i < size; i++) {
-                long d1 = Math.abs(time - new LastStatus(jedis.lindex(key, i)).getTimestamp());
-                long d2;
-                if (i+1 < size) {
-                    d2 = Math.abs(time - new LastStatus(jedis.lindex(key, i+1)).getTimestamp());
-                } else { 
-                    d2 = Long.MAX_VALUE;
+                
+                // test upper case
+                if (mid == (listSize - 1)) {
+                	LOGGER.debug("Time found in upper - search depth: {}", countSearchDepth);
+                	return listSize - 1;
+                }
+
+                LastStatus lastMid = new LastStatus(jedis.lindex(key, mid));
+                LastStatus lastMid1 = new LastStatus(jedis.lindex(key, mid+1));
+                
+                // Test if exactly equal
+                if ( lastMid.getTimestamp()  == time ) {
+                	LOGGER.debug("Time found in exactly - search depth: {}", countSearchDepth);
+                	return mid;
+                }
+
+                if (lastMid1.getTimestamp()  == time ) {
+                	LOGGER.debug("Time found in exactly - search depth: {}", countSearchDepth);
+                	return mid+1;
                 }
                 
-                if ( d1 < bestDistanceFoundYet ) {
+                // Test if in range between mid and mid+1
+                if ( lastMid.getTimestamp() > time  && lastMid1.getTimestamp() < time) {
+                	LOGGER.debug("Time found in range - search depth: {}", countSearchDepth);
+                	if (Math.abs(lastMid.getTimestamp() - time) < Math.abs(lastMid1.getTimestamp() - time) ) {
+                		return mid;
+                	} else {
+                		return mid+1;
+                    		
+                	}
+                }
 
-                    // For the moment, this value is the nearest to the desired number...
-                    bestDistanceFoundYet = d1;
-                    nearest = new LastStatus(jedis.lindex(key, i));
-                    if (d1 <= d2) { 
-                        LOGGER.debug("Nearest slow for key {} break at index {}", key, i);
-                        break;
-                    }
+                // Keep searching.
+                if ((new LastStatus(jedis.lindex(key, mid)).getTimestamp()) > time) {
+                    low = mid + 1;
+                } else {
+                	high = mid;
                 }
             }
+            
+            LOGGER.debug("Time not found in range - search depth: {}", countSearchDepth);
+  
         } catch (JedisConnectionException je) {
             LOGGER.error("Redis connection failed: " + je.getMessage(),je);
         } finally {
             jedispool.returnResource(jedis);
         }
         
-        return nearest;
-    }
+        return null;
+    
+    }    
 
     
+    private LastStatus nearestByLastStatusSlow(long time, String key) {
+    	Jedis jedis = null;
+    	Long index = nearestByIndexSlow(time, key);
+    	if (index == null) {
+    		return null;
+    	}
+    	
+    	LastStatus ls = null;
+        try {
+            jedis = jedispool.getResource();
+        
+            ls = new LastStatus(jedis.lindex(key, index));
+    	
+        } catch (JedisConnectionException je) {
+            LOGGER.error("Redis connection failed: " + je.getMessage(),je);
+        } finally {
+            jedispool.returnResource(jedis);
+        }
+        return ls;
+      }
+
+    
+    
+
+ 
     /**
      * Return the cache index closes to the timestamp define in time
      * @param time
@@ -1156,54 +1177,27 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         return index;
     }
 
-    private Long nearestByIndexSlow(long time, String key) {
-        // Search the redis cache
-        Long index = null;
-        Jedis jedis = null;
-        try {
-            jedis = jedispool.getResource();
-            if (time > new LastStatus(jedis.lindex(key, 0L)).getTimestamp() || 
-                    time < new LastStatus(jedis.lindex(key, jedis.llen(key)-1)).getTimestamp() ) {
-                
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Out of bounds");
-                }
-                
-                return null;
-            }
-
-            long bestDistanceFoundYet = Long.MAX_VALUE;
-            long size = jedis.llen(key);
-
-            for (long i = 0; i < size; i++) {
-                long d1 = Math.abs(time - new LastStatus(jedis.lindex(key, i)).getTimestamp());
-                long d2;
-                if (i+1 < size) {
-                    d2 = Math.abs(time - new LastStatus(jedis.lindex(key, i+1)).getTimestamp()); 
-                } else { 
-                    d2 = Long.MAX_VALUE;
-                }
-                
-                if ( d1 < bestDistanceFoundYet ) {
-
-                    // For the moment, this value is the nearest to the desired number...
-                    bestDistanceFoundYet = d1;
-                    index=i;
-                    if (d1 <= d2) {
-                        LOGGER.debug("Nearest slow for key {} break at index {}", key, i);
-                        break;
-                    }
-                }
-            }
-        } catch (JedisConnectionException je) {
-            connectionFailed(je);
-        } finally {
-            jedispool.returnResource(jedis);
+    /**
+     * The method search for the LastStatus object stored in the cache that has 
+     * a timestamp closest to the time parameter.
+     * @param time 
+     * @param listtosearch
+     * @return the LastStatus object closes to the time
+     */
+    private LastStatus nearestByLastStatusFast(long time, String key) {
+        if (!fastCacheEnable) {
+            return null;
         }
-        return index;
+
+        Long index = nearestByIndexFast(time, key);
+        
+        if (index != null) {
+        	return  fastCache.get(key).get(index.intValue()).copy();
+        }
+        return null;
     }
 
-    
+        
     private Long nearestByIndex(long time, String key) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("For key {} find value in cache at index {}", key, new java.util.Date(time));
