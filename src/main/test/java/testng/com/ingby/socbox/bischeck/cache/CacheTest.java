@@ -195,13 +195,15 @@ public class CacheTest {
 			Assert.assertNull(CacheEvaluator.parse(cachekey + "[25:30]"));
 			// Test using ENDMARK
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[15:END]"),"6,5,4,3,2,1");
-						
-			// Test that a time range with no data in the cache returns "null"
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-1H:END]"),"10,9,8,7,6,5,4,3,2,1");
+	
+			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-6M:-50M]"),"21,20,19,18,17,16,15,14,13,12");
 			// Test that a time range with no data in the cache returns "null"
 			Assert.assertEquals(CacheEvaluator.parse(cachekey + "[-13M:-20M]"),"19,18");
 			// Test that a if the end time range with no data in the cache returns "null"
 			Assert.assertNull(CacheEvaluator.parse(cachekey + "[-5M:-120M]"));
 			Assert.assertNull(CacheEvaluator.parse(cachekey + "[-5M:END]"));
+			Assert.assertNull(CacheEvaluator.parse(cachekey + "[-120M]"));
 
 		}
 	}
