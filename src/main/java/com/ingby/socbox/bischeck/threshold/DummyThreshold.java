@@ -96,4 +96,7 @@ public class DummyThreshold implements Threshold {
             return null;
     }
     
+    synchronized public static void unregister() {
+        // This is intentional empty since there is nothing to unregister
+    }
 }

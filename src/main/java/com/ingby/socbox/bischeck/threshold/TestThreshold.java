@@ -129,4 +129,9 @@ public class TestThreshold implements Threshold {
     public void setThreshold(Float value) {
         this.value = value;
     }
+    
+
+    synchronized public static void unregister() {
+        // This is intentional empty since there is nothing to unregister
+    }
 }
