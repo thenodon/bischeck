@@ -1,0 +1,52 @@
+
+
+  <!-- The template generate a random number between 0-10 -->
+  <servicetemplate templatename="randtemplate">  
+    <name>rand</name>
+    <schedule>SCHEDULE</schedule>
+    <url>shell://localhost</url>
+    
+    <serviceitem>
+      <name>number</name>
+      <desc>random number between 0-10</desc>
+      <execstatement>10.0</execstatement>
+      <thresholdclass>Twenty4HourThreshold</thresholdclass>
+      <serviceitemclass>Random</serviceitemclass>    
+      <cache>  
+        <aggregate>
+          <method>avg</method>
+          <useweekend>true</useweekend>
+        </aggregate>
+        <purge>
+          <maxcount>1000</maxcount> 
+        </purge>
+      </cache>
+    </serviceitem>
+  </servicetemplate>
+
+  <!-- The template calculate a average of the 10 last numbers collected by -->
+  <!-- the randtemplate --> 
+  <servicetemplate templatename="avgrandtemplate">  
+    <name>avgrand</name>
+    <schedule>SCHEDULE</schedule>
+    <url>bischeck://localhost</url>
+    
+    <serviceitem>
+      <name>avg</name>
+      <desc>average calculation of rand number</desc>
+      <execstatement>avg($$HOSTNAME$$-rand-number[0:9])</execstatement>
+      <thresholdclass>Twenty4HourThreshold</thresholdclass>
+      <serviceitemclass>CalculateOnCache</serviceitemclass> 
+      <cache> 
+        <aggregate>
+          <method>avg</method>
+          <useweekend>true</useweekend>
+        </aggregate>
+        <purge>
+          <maxcount>1000</maxcount> 
+        </purge>
+      </cache>   
+    </serviceitem>
+
+  </servicetemplate>
+  </bischeck>

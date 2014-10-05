@@ -1,0 +1,6 @@
+#!/bin/sh
+
+
+cp $2/etc/*.xml $1/etc
+$1/bin/bischeck migration.Properties2ServerProperties -s $1/etc -d $1/etc
+

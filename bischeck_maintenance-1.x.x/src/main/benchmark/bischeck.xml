@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <bischeck>
+    <host>
+        <name>host0</name>
+        <alias>127.0.0.1</alias>
+        <desc></desc>
+        <service>
+          <template>randtemplate</template>
+        </service>
+        <service>
+          <template>avgrandtemplate</template>
+        </service>
+    </host>
+
+
+  <!-- Service template sshport with a complete serviceitem configuration -->
+  <servicetemplate templatename="randtemplate">  
+    <name>rand</name>
+    <schedule>5S</schedule>
+    <url>shell://localhost</url>
+    
+    <serviceitem>
+      <name>number</name>
+      <desc>random number between 0-10</desc>
+      <execstatement>10.0</execstatement>
+      <thresholdclass>Twenty4HourThreshold</thresholdclass>
+      <serviceitemclass>Random</serviceitemclass>    
+      <cache>  
+        <aggregate>
+          <period>H</period>
+          <method>avg</method>
+          <useweekend>true</useweekend>
+        </aggregate>
+        <purge>
+          <maxcount>1000</maxcount> 
+        </purge>
+      </cache>
+    </serviceitem>
+  </servicetemplate>
+
+  <servicetemplate templatename="avgrandtemplate">  
+    <name>avgrand</name>
+    <schedule>5S</schedule>
+    <url>bischeck://localhost</url>
+    
+    <serviceitem>
+      <name>avg</name>
+      <desc>average calculation of rand number</desc>
+      <execstatement>avg($$HOSTNAME$$-rand-number[0:9])</execstatement>
+      <thresholdclass>Twenty4HourThreshold</thresholdclass>
+      <serviceitemclass>CalculateOnCache</serviceitemclass> 
+      <cache> 
+        <aggregate>
+          <period>H</period>
+          <method>avg</method>
+          <useweekend>true</useweekend>
+        </aggregate>
+        <purge>
+          <maxcount>1000</maxcount> 
+        </purge>
+      </cache>   
+    </serviceitem>
+
+  </servicetemplate>
+  </bischeck>

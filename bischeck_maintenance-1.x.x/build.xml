@@ -1,0 +1,328 @@
+<project name="bischeck" default="compile" basedir=".">
+
+    <!-- === Property Definitions ======================================== -->
+
+    <!-- Optional overridden properties -->
+    <property file="${basedir}/version.txt"/>
+
+
+    <!-- ==== File and Directory Names =================================== -->
+    <property name="app.name" value="bischeck" />
+    <property name="app.path" value="/${app.name}" />
+    <property name="app.version" value="1.1.1"/>
+    <property name="build.home" value="${basedir}/target" />
+    <property name="dist.home" value="${basedir}/dist" />
+    <property name="bin.home" value="${basedir}/bin" />
+    <property name="etc.home" value="${basedir}/etc" />
+    <property name="examples.home" value="${basedir}/examples" />
+    <property name="resources.home" value="${basedir}/src/main/resources" />
+    <property name="docs.home" value="${basedir}/doc" />
+    <property name="src.home" value="${basedir}/src" />
+    <property name="javasrc.home" value="${basedir}/src/main/java" />
+    <property name="javasrcng.home" value="${basedir}/src/main/test/java" />
+    <property name="javagensrc.home" value="${basedir}/src/main/generated" />
+    <property name="scriptsrc.home" value="${basedir}/src/main/scripts" />
+    <property name="migscriptsrc.home" value="${basedir}/src/main/migscripts" />
+    <property name="javac_target" value="6" />
+    <property name="javac_src" value="6" />
+    <property name="version.file" value="${basedir}/version.txt" />
+	<property name="testoutput.dir" value="${basedir}/test-output" />
+	<property name="coverageoutput.dir" value="${basedir}/coverage-output" />
+
+    <!-- <property name="sonar.dynamicAnalysis" value="reuseReports" /> -->
+
+    <!--  === Compilation Control Options ================================ -->
+    <property name="compile.debug" value="true" />
+    <property name="compile.deprecation" value="false" />
+    <property name="compile.optimize" value="false" />
+
+
+    <!-- ==== Compilation Classpath ====================================== -->
+    <path id="compile.classpath">
+        <fileset dir="${basedir}/lib/">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <path id="test.classpath">
+    	<fileset dir="${basedir}/lib/">
+    	   <include name="*.jar" />
+    	</fileset>
+    	<fileset dir="${basedir}/buildlib/">
+           <include name="*.jar" />
+        </fileset>
+    	
+    </path>
+
+
+    <!-- ==== Task definitions =========================================== -->
+
+    <taskdef name="testng" classname="org.testng.TestNGAntTask">
+        <classpath refid="test.classpath"/>
+    </taskdef>
+
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+    	<classpath refid="test.classpath"/>
+    </taskdef>
+
+    <!-- === All Target ================================================= -->
+    <target name="clean" description="Delete old build and dist directories">
+        <delete dir="${build.home}" />
+    </target>
+
+
+    <target name="compile" depends="prepare" description="Compile Java sources">
+        <!-- Compile Java classes as necessary -->
+                
+        <javac destdir="${build.home}/classes"
+               debug="${compile.debug}" deprecation="${compile.deprecation}"
+               optimize="${compile.optimize}" target="${javac_target}"
+               excludes="*.java"
+               source="${javac_src}"
+               includeantruntime="false">
+
+            <src path="${javagensrc.home}" />
+            <src path="${javasrc.home}" />
+            <classpath refid="compile.classpath" />
+        	<classpath refid="test.classpath" />
+        </javac>
+
+    </target>
+
+
+    <target name="compileng" depends="compile" description="Compile Java Test-NG sources">
+            <!-- Compile Java classes as necessary -->
+                    
+            <javac destdir="${build.home}/classes"
+                   debug="${compile.debug}" deprecation="${compile.deprecation}"
+                   optimize="${compile.optimize}" target="${javac_target}"
+                   excludes="*.java"
+                   source="${javac_src}"
+                   includeantruntime="false">
+
+                <src path="${javasrcng.home}" />
+                <classpath refid="test.classpath" />
+            </javac>
+
+    </target>
+
+
+    <target name="test" depends="dist, compileng">
+       <testng outputdir="${testoutput.dir}">
+            <sysproperty key="bishome" value="${basedir}"/>
+
+            <classpath>
+                <pathelement path="${build.home}/classes"/>
+                <pathelement path="${build.home}/resources"/>
+                <fileset dir="${build.home}/lib/">
+                    <include name="*.jar" />
+                </fileset>
+                <fileset dir="${basedir}/customlib/">
+                    <include name="*.jar" />
+                </fileset>
+                <fileset dir="${basedir}/libtest/">
+                    <include name="*.jar" />
+                </fileset>
+            </classpath>
+            <classfileset dir="${build.home}/classes" includes="testng/**/*.class"/>
+        </testng>
+     </target>
+
+
+    <target name="testng" depends="compileng">
+        <jacoco:coverage destfile="${coverageoutput.dir}/jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
+          <testng outputdir="${testoutput.dir}">
+            <sysproperty key="bishome" value="${basedir}"/>
+          	<sysproperty key="xmlconfigdir" value="testetc"/>
+
+            <classpath>
+                <pathelement path="${build.home}/classes"/>
+                <pathelement path="${build.home}/resources"/>
+                <fileset dir="${build.home}/lib/">
+                    <include name="*.jar" />
+                </fileset>
+                <fileset dir="${basedir}/customlib/">
+                    <include name="*.jar" />
+                </fileset>
+
+                <fileset dir="${basedir}/libtest/">
+                   <include name="*.jar" />
+                </fileset>
+            </classpath>
+
+            <classfileset dir="${build.home}/classes" includes="testng/**/*.class"/> 
+        </testng>
+        </jacoco:coverage>           
+    	
+    	<jacoco:report xmlns:jacoco="antlib:org.jacoco.ant">
+    	                        
+    	    <executiondata>
+    	        <file file="${coverageoutput.dir}/jacoco.exec"/>
+    	    </executiondata>
+    	                        
+    	    <structure name="Bischeck">
+    	        <classfiles>
+    	            <fileset dir="${build.home}/classes"/>
+    	        </classfiles>
+    	        <sourcefiles encoding="UTF-8">
+    	            <fileset dir="${javasrc.home}"/>
+    	        </sourcefiles>
+    	    </structure>
+    	                        
+    	    <html destdir="${coverageoutput.dir}"/>
+    	                        
+    	</jacoco:report>
+    	
+    </target>
+
+
+    <target name="dist" depends="clean, genjaxb, compile, javadoc, svninfo, manuals " description="Create binary distribution">
+
+        <jar index="true" destfile="${build.home}/lib/${app.name}-${app.version}.jar" basedir="${build.home}/classes" >
+            <manifest>
+                <attribute name="Built-By" value="Anders Håål"/>
+                <attribute name="Copyright" value="(C) 2010-2014 Anders Håål, Ingenjörsbyn"/>  
+            </manifest>
+        </jar>
+
+        <copy todir="${build.home}/lib">
+           <fileset dir="${basedir}/lib"/>
+        </copy>
+
+        <copy todir="${build.home}/scripts">
+           <fileset dir="${scriptsrc.home}">
+             <include name="*.template"/>
+           </fileset>
+        </copy>
+
+        <copy todir="${build.home}/migscripts">
+           <fileset dir="${migscriptsrc.home}"/>
+        </copy>
+
+        <copy todir="${build.home}/resources">
+           <fileset dir="${resources.home}"/>
+        </copy>
+
+        <copy todir="${build.home}/etc">
+            <fileset dir="${etc.home}">
+                <exclude name="meta.xml"/>
+                <exclude name="**/repos/**"/>
+                <include name="*.xml"/>
+                <include name="jmxremote.*"/>
+            </fileset>
+        </copy>
+
+        <!--
+        <copy todir="${build.home}/examples">
+            <fileset dir="${examples.home}"/>
+        </copy>
+        -->
+
+        
+    	<copy todir="${build.home}/docs">
+    	    <fileset dir="${docs.home}">
+    		    <include name="*.pdf"/>
+    		</fileset>
+    	</copy>
+    	
+    	<copy todir="${build.home}" file="${docs.home}/README" />        
+    	<copy todir="${build.home}" file="${docs.home}/LICENSE" />
+        <copy todir="${build.home}" file="${basedir}/install" />
+        <chmod file="${build.home}/install" perm="ug+x"/>
+        <copy todir="${build.home}" file="${basedir}/svninfo.txt" />
+        <copy todir="${build.home}" file="${basedir}/migrationpath.txt" />
+        <chmod file="${build.home}/install" perm="ugo+rx"/>
+
+        <tar destfile="${build.home}/${app.name}-${app.version}.tar">
+            <tarfileset dir="${build.home}/"
+                prefix="${app.name}-${app.version}"
+                preserveLeadingSlashes="true"
+                excludes="docs/api/**/*">
+            </tarfileset>
+        </tar>
+
+        <zip destfile="${build.home}/${app.name}-${app.version}.zip">
+            <zipfileset  dir="${build.home}/" prefix="${app.name}-${app.version}" > 
+            </zipfileset>
+        </zip>
+        
+        <gzip zipfile="${build.home}/${app.name}-${app.version}.tar.gz"
+            src="${build.home}/${app.name}-${app.version}.tar"/>
+        <delete file="${build.home}/${app.name}-${app.version}.tar"/>
+        <!--
+        <delete file="${build.home}/${app.name}-${app.version}.zip"/>
+        -->
+    </target>
+
+
+    <target name="javadoc" depends="compile" description="Create Javadoc API documentation">
+        <mkdir dir="${build.home}/docs/" />
+        <javadoc
+            destdir="${build.home}/docs/javadoc"
+            author="true"
+            version="true"
+            use="true"
+            public="true"
+            windowtitle="bischeck"
+            classpath="${build.home}/classes" >
+            
+            <classpath refid="compile.classpath" />
+            
+            <link offline="false" href="http://java.sun.com/javase/6/docs/api/" />
+            
+            <fileset dir="${javasrc.home}" defaultexcludes="yes">
+                <include name="**/*.java"/>
+            </fileset>
+
+            <doctitle><![CDATA[<h1>Bischeck</h1>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright &#169; 2010-2014 Ingeng&ouml;rsbyn AB - Anders Haal. All Rights Reserved.</i>]]></bottom>
+        </javadoc>
+    </target>
+
+    
+    <target name="readme">      
+       <exec executable="/bin/bash" dir="${docs.home}">         
+       <arg value="lyx2text"/>
+       </exec>
+    </target>
+
+	<target name="manuals">      
+	       <exec executable="/bin/bash" dir="${docs.home}">         
+	       <arg value="lyx2pdf"/>
+	       </exec>
+	    </target>
+
+    <target name="genjaxb" description="Generate jaxb">
+       <exec executable="/bin/bash" dir="${basedir}">      
+        <arg value="xsdgen"/>
+       </exec>
+    </target>
+    
+
+    <target name="prepare">
+        <!-- Create build directories as needed -->
+        <mkdir dir="${build.home}" />
+        <mkdir dir="${build.home}/classes" />
+        <mkdir dir="${build.home}/docs" />
+        <mkdir dir="${build.home}/lib" />
+        <mkdir dir="${build.home}/etc" />
+        <mkdir dir="${build.home}/examples" />
+    </target>
+
+    
+    <target name="svninfo" description="svn info">
+       <exec executable="svn" output="svninfo.txt" outputproperty="svnrev">      
+            <arg value="log"/>
+       	    <arg value="--no-auth-cache"/>
+            <arg value="--username"/>
+            <arg value="anonymous"/>
+            <arg value="--password"/>
+            <arg value="nopasswd"/>
+            <arg value="-rHEAD"/>
+            <arg value="-q"/>
+       </exec>
+       <echo>${svnrev}</echo>    
+    </target>
+    
+    
+</project>

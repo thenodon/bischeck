@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# Copyright (C) 2011 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+etc=$1
+shift
+program=$1
+shift
+arg=$@
+bishome=`pwd`
+ant compile
+jmxport=-Dcom.sun.management.jmxremote.port=3333 
+jmxssl=-Dcom.sun.management.jmxremote.ssl=false 
+jmxauth=-Dcom.sun.management.jmxremote.authenticate=false 
+#jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
+#jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+
+jmx="$jmxport $jmxssl $jmxauth $jmxpasswd $jmxaccess"
+#jmem="-XX:+TraceClassloading -Xmx30m"
+#debug="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
+# -classpath $bishome/src/main/resources:$bishome/target/classes:$bishome/lib/*:$bishome/customlib/* \
+# -classpath $bishome/src/main/resources:$bishome/bin:$bishome/lib/*:$bishome/customlib/* \
+java $debug $jmx $jmem -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=$etc \
+ -classpath $bishome/src/main/resources:$bishome/target/classes:$bishome/lib/*:$bishome/customlib/* \
+ com.ingby.socbox.bischeck.$program $arg 
+

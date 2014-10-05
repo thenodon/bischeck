@@ -1,0 +1,506 @@
+#!/bin/bash
+###########################################################
+#
+# Copyright (C) 2010 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# 
+###########################################################
+
+#umask u=rwx,g=rwx,o=
+
+trap 'aborted' INT KILL HUP
+
+PATH=/sbin:/usr/sbin:$PATH
+
+function getinstalldir() {
+  curdir=`pwd`
+  installpath=`dirname $1`
+  # Check if the path is absolut or relative
+  echo $installpath | grep "^/" > /dev/null
+
+  if [ $? -eq 0 ] ; then
+    insdir=$installpath
+  else
+    insdir=$curdir/$installpath
+  fi
+  echo $insdir
+}
+
+function setifsnewline {
+  CURIFS=$IFS
+  IFS='
+'
+}
+
+function unsetifs {
+  IFS=$CURIFS
+}
+
+function postinstall () {
+  postcount=`expr $postcount + 1`
+  echo -e "$postcount) $1" >> $POST_INSTALL
+}
+
+function beginnew () {
+  echo $1
+}
+
+function begin () {
+  echo -n $1
+}
+
+function end () {
+  echo  ".... Done " $1
+}
+
+function getout {
+  bold "Fix your installation errors and re-run $0"
+  echo
+  #cleanup
+  exit
+}
+
+function errormsg () {
+  bold "Error -> "
+  echo " $@"
+}
+
+function warnmsg () {
+  bold "Warning -> "
+  echo " $@"
+}
+
+function progress () {
+  bold "OK -> "
+  echo " $@"
+}
+
+function headline() {
+  echo
+  echo -en "\\033[1;34m"
+  echo $@
+  str=`echo $@ |  sed -e "s/ /_/g"`
+  len=`expr length $str `  
+  while [ $len -ne 0 ]
+  do 
+    echo -n = 
+    len=`expr $len - 1 ` 
+  done
+  echo -en "\\033[0;39m"
+  echo
+}
+
+function bold() {
+  echo -en "\\033[1;34m"
+  echo -n $@
+  echo -en "\\033[0;39m"
+}
+
+function getdate() {
+  date +'%Y%m%d%H%M'
+}
+
+function checkpackage() {
+  rpm -q $1 >/dev/null
+  if [ $? -ne 0 ] ; then
+    echo "Package $1 is missing - exiting"
+    exit 1
+  fi 
+}
+
+function distrocheck() {
+if [ -x /usr/bin/lsb_release ] ; then
+  DISTRIBUTION=$(lsb_release -i | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
+  if [ "$DISTRIBUTION" != "unknown" ] ; then
+    VERSION=$(lsb_release -r | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
+    echo ${DISTRIBUTION}:${VERSION}
+  fi
+elif [ -f /etc/redhat-release ] ; then
+  DISTRIBUTION=$(cat /etc/redhat-release | tr '[:upper:]' '[:lower:]'| tr -s " "| cut -d" " -f1)
+  VERSION=$(cat /etc/redhat-release | tr '[:upper:]' '[:lower:]'| tr -s " "| cut -d" " -f3)
+  echo ${DISTRIBUTION}:${VERSION}
+elif [ -f /etc/debian_version ] ; then
+  DISTRIBUTION=debian
+  VERSION=$(cat /etc/debian_version)
+  echo ${DISTRIBUTION}:${VERSION}
+else
+   echo ""
+fi
+}
+
+
+function usage {
+  echo "Usage for the bischeck installer"
+  echo "-u show usage."
+  echo "-U the user name to install bischeck as and run the daemon as - default nagios."
+  echo "-J java home directory, no default value."
+  echo "-I installation directory for bischeck - default /opt/socbox/addons/bischeck."
+  echo "-R uninstall - permanently remove the installation." 
+  echo "-X upgrade from current version - if possible."
+  echo "-d set the linux distribution name if the installer can not detected. Supported are"
+  echo "   rh, rhel, redhatenterpriseserver, centos, debian and ubuntu" 
+  echo "-p the port number for the JMX RMI server, for example 3333. No default value."
+  echo "-i the IP address where the RMI port should run, for example 127.0.0.1. No default value."
+  echo "-a if authentication should be used applied on JMX connection. Default is false."
+}
+
+
+scriptname=`basename $0`
+tempdir=`mktemp -d`
+
+#
+# Setup default environment
+#
+INSTALL_USER=nagios
+NAGIOSHOST=localhost
+BISHOME="/opt/socbox/addons/bischeck"
+JAVA_HOME=""
+unistall=false
+upgrade=false
+DISTRO=""
+DISTROVERS=""
+JMXAUTH=false
+
+VERSION=$(basename `pwd` | sed -e "s/^.*-//")
+
+#Set effective user id for the installing user
+eid=$(id -un)
+    
+
+headline "Welcome to bischeck $VERSION installer"
+echo "Copyright Anders Håål, Ingenjörsbyn AB 2011-2014"
+echo "Licensed under GPL version 2"
+
+while getopts U:I:J:uRXd:p:i:a name
+do
+  case $name in
+    U)  INSTALL_USER="$OPTARG";;
+    I)  BISHOME="$OPTARG";;
+    J)  JAVA_HOME="$OPTARG";;
+    X)  upgrade=true;;
+    R)  uninstall=true;;
+    d)  DISTRO="$OPTARG";;
+    p)  JMXPORT="$OPTARG";;
+    i)  JMXSERVERIP="$OPTARG";;
+    a)  JMXAUTH=true;;
+    u)  usage; exit 0;;
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+
+#########################
+## Check distribution
+#########################
+headline "Check supported distributions"
+# Need to find a way to determine and pass on.
+if [ "x$DISTRO" = "x" ] ; then
+  DISTRO=$(distrocheck | cut -f1 -d:)
+  DISTROVERS=$(distrocheck | cut -f2 -d:)
+  if [ "x$DISTRO" = "x" ] ; then
+    echo "Can not determine distribution - please try set distribution name with -d"
+    echo "Supported distributions are rh, rhel, redhatenterpriseserver, centos, debian and ubuntu" 
+    exit 1
+  fi 
+else
+  DISTRO=$(echo $DISTRO | tr A-Z a-z)
+fi
+
+case ${DISTRO} in
+  rh|rhel|redhatenterpriseserver|centos|debian|ubuntu)
+      echo "Supported distribution - $DISTRO $DISTROVERS" 
+      ;;
+  *)
+      echo "Linux distribution $DISTRO is not supported"
+      echo "Supported distributions are rh, rhel, redhatenterpriseserver, centos, debian and ubuntu" 
+      exit 1
+      ;;
+esac;
+
+
+#########################
+## Uninstall
+#########################
+if [ "x$uninstall" = "xtrue" ] ; then
+  headline "Uninstall bischeck"
+  if [ -w $BISHOME ] ; then
+    rm -rf $BISHOME
+    progress "Remove $BISHOME"
+    if [ "$eid" = "root" ] ; then 
+      if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "redhatenterpriseserver" -o "$DISTRO" = "centos" ] ; then
+        chkconfig --del bischeckd
+      elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+        update-rc.d -f bischeckd remove
+      fi
+      rm -f /etc/init.d/bischeckd
+      progress "Remove bischeckd from /etc/init.d"
+    fi
+    exit 0
+  else
+    errormsg "No permission to remove $BISHOME"
+    exit 1
+  fi
+fi
+
+headline "Pre-installation verification"
+
+#echo "Checking software dependencies"
+
+#if [ "x$upgrade" = "xtrue" ] ; then
+#  checkpackage redhat-lsb
+#  checkpackage javasqlite
+#fi
+
+#echo "All requiered software installed"
+
+
+if [ "$eid" = "root" ] ; then 
+
+  id $INSTALL_USER > /dev/null 2>&1
+  if [ $? -ne 0 ] ; then
+    errormsg "User $INSTALL_USER do not exists"
+    initerror=true
+  else 
+    progress User "$INSTALL_USER exists"
+  fi
+else
+    INSTALL_USER=$eid
+    warnmsg "Bischeck will be installed as user $eid since you not installing as root"
+fi
+
+#########################
+## Pre install 
+#########################
+# Check that BISHOME directory do not exist
+dirpath=$(dirname $BISHOME)
+if [ "$upgrade" = "false" ] ; then
+  if [ -d $BISHOME ] ; then
+    errormsg "Directory $BISHOME already exists"
+    initerror=true
+  elif [ ! -w $dirpath ] ; then
+    errormsg "Directory $dirpath are not allowed for writing"
+    initerror=true
+  else 
+     progress "Directory $BISHOME do not exists, will be created"
+  fi
+fi
+
+# Check JAVA is installed and correct version
+if [ "x$JAVA_HOME" = "x" ] ; then
+  which java > /dev/null 2>&1
+  if [ $? != 0 ] ; then
+    errormsg "Java do not exists in path $PATH"
+    initerror=true
+  else 
+    jver=$(java -version 2>&1 | awk '/version/ {print $3}' | awk -F . '{print $2}')
+    if [ $jver -ge 6 ] ; then 
+      progress "Java runtime exists with jdk version $jver"
+    else
+      errormsg "Java version is must be 6 or higher."
+      initerror=true
+    fi
+  fi
+elif [ ! -f $JAVA_HOME/bin/java ] ; then
+  errormsg "Java do not exists in $JAVA_HOME/bin"
+  initerror=true
+else 
+  jver=$(java -version 2>&1 | awk '/version/ {print $3}' | awk -F . '{print $2}')
+  if [ $jver -eq 6 ] ; then 
+    progress "Java runtime exists"
+  else
+    errormsg "Java version is must be 6 or higher."
+    initerror=true
+  fi
+fi
+
+# Check if any JMX setting is defined, then all must be set   
+if [ "x$JMXPORT" != "x" -o  "x$JMXSERVERIP" != "x" ] ; then
+  
+  if [ "x$JMXPORT" = "x" ] ; then
+    errormsg "The JMX server port must be set, like -p 3333"
+    initerror=true
+  fi  
+  
+  if [ "x$JMXSERVERIP" = "x" ] ; then
+    errormsg "The JMX server IP must be set, -i 127.0.0.1"
+    initerror=true
+  fi  
+fi
+
+
+
+#########################
+## Upgrade check
+#########################
+if [ "$upgrade" = "true" ] ; then
+  dirowner=$(stat -c %U $BISHOME)
+   
+  #Check if the current version can be upgraded
+  if [ "$INSTALL_USER" = "$dirowner" -a -f $BISHOME/version.txt ] ; then 
+    oldversion=$(head -1 $BISHOME/version.txt)
+    newversion=$(basename `pwd` | cut -d"-" -f2)
+  
+    upgradedir=${BISHOME}_$oldversion  
+    if [ -d $upgradedir ] ; then
+      errormsg "Copy directory $upgradedir exists, must be removed to upgrade bischeck"
+      initerror=true
+    fi
+    
+    migline=$(grep $oldversion:$newversion: migrationpath.txt 2>&1)
+    migoldver=$(echo $migline | cut -d":" -f1)
+    mignewver=$(echo $migline | cut -d":" -f2)
+
+    if [ "x$migoldver" = "x$oldversion" -a "x$mignewver" = "x$newversion" ] ; then
+      progress "Upgrading bischeck from $oldversion to $newversion"
+    else
+      errormsg "Upgrading bischeck from $oldversion to $newversion is not supported"
+      initerror=true
+    fi
+    migscript=$(echo $migline | cut -d":" -f3)
+  else
+    if [ "$INSTALL_USER" != "$dirowner" ] ; then
+      errormsg "Directory $BISHOME is owned by $dirowner and not by $INSTALL_USER"
+    else
+      errormsg "Directory $BISHOME is not a Bischeck installation"
+    fi
+    initerror=true
+  fi
+fi
+
+
+#########################
+## Exit if any error was detected
+#########################
+if [ "$initerror" = "true" ] ; then
+  getout
+fi
+
+
+#########################
+## Backup old install 
+#########################
+# Create a backup directory of old bischeck installation
+
+if [ "$upgrade" = "true" ] ; then
+  headline "Prepare for upgrade"
+  if [ "$eid" = "root" ] ; then
+    progress "Stopping running Bischeck"
+    service bischeckd stop
+  fi
+  progress "Moving old installation to $upgradedir"
+  mv $BISHOME $upgradedir 
+fi
+
+
+#########################
+## Install
+#########################
+headline "Do installation of bischeck $newversion"
+if [ ! -d $BISHOME ] ; then
+    mkdir -p $BISHOME
+    mkdir $BISHOME/bin
+    mkdir $BISHOME/customlib
+    mkdir $BISHOME/etc
+    mkdir $BISHOME/examples
+    progress "Created installation directory $BISHOME"
+    
+    cp -a lib $BISHOME
+    cp -a resources $BISHOME
+    cp -a etc $BISHOME
+    cp -a examples $BISHOME
+    cp svninfo.txt $BISHOME
+    progress "Copy files to installation directory"
+    
+    echo $VERSION > $BISHOME/version.txt
+    
+    # Parse all shell scripts
+    for i in `ls scripts/*.template` ; do
+      cat  $i| sed -e "s#%BISHOME%#$BISHOME#g" \
+        -e "s#%VERSION%#$VERSION#g" \
+        -e "s#%INSTALL_USER%#$INSTALL_USER#g" \
+        -e "s#%JAVA_HOME%#$JAVA_HOME#g" \
+        -e "s#%DISTRO%#$DISTRO#g" \
+        -e "s#%JMXPORT%#$JMXPORT#g" \
+        -e "s#%JMXSERVERIP%#$JMXSERVERIP#g" \
+        -e "s#%JMXAUTH%#$JMXAUTH#g" \
+        > $BISHOME/bin/`basename ${i%\.template}`
+    done
+    progress "All script files parsed"
+    chmod 750 $BISHOME/bin/* 
+
+    if [ "$eid" = "root" ] ; then
+        progress "Install init.d script bischeckd in /etc/init.d"
+        cp $BISHOME/bin/bischeckd /etc/init.d
+        chmod 755 /etc/init.d/bischeckd
+    
+        if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+            chkconfig --add bischeckd
+        elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+            update-rc.d bischeckd defaults
+        fi
+        progress "Installed init script bischeckd"
+    else
+        bold INFO
+        echo
+        echo "Installation of the bischeckd init.d script is not done since"
+        echo "installing user is not root"
+        echo "You can install bischeckd later by running:"
+        echo "# cp $BISHOME/bin/bischeckd /etc/init.d"
+        echo "# chmod 755 /etc/init.d/bischeckd"
+        if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+            echo "# chkconfig --add bischeckd"
+        elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+            echo "# update-rc.d bischeckd defaults"
+        fi
+    fi
+    
+    
+    chown -R $INSTALL_USER:`id -gn $INSTALL_USER` $BISHOME
+    # Make all files in etc readable only for group nagios
+    chmod 640 $BISHOME/etc/*
+    # Jmx password files must be read only by user
+    chmod 600 $BISHOME/etc/jmxremote.*
+    progress "Change ownership and permissions to install user $INSTALL_USER"
+    
+    echo "Installations completed"
+else
+   errormsg "Directory $BISHOME already exists"
+   initerror=true
+   getout
+fi
+
+
+#########################
+## Upgrade
+#########################
+if [ "$upgrade" = "true" ] ; then
+  headline "Upgrade of bischeck $newversion with $oldversion"
+  cp -a $upgradedir/customlib/* $BISHOME/customlib/  2>/dev/null
+  progress "Copy existing customlib jars"    
+  sh ./migscripts/$migscript $BISHOME $upgradedir
+  progress "Migrations scripts has been executed"
+  echo "Upgrade completed"
+fi
+
+
+#########################
+## Always set permission
+#########################
+if [ ! -d $BISHOME ] ; then
+  echo "Set permission of the installation"
+  chmod -R o-rwx $BISHOME/etc
+fi

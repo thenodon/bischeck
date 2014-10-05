@@ -1,0 +1,3427 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass scrbook
+\begin_preamble
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+%\fancyhead[LE,RO]{\slshape bischeck Readme}
+\fancyhead[LE,RO]{Bischeck - dynamic and adaptive monitoring}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+%\lhead{bischeck}
+%\rhead{Text you want on the right top}
+%\chead{Text you want over the center}
+%\lfoot{left footer}
+%\rfoot{right footer}
+%\cfoot{\thepage}
+
+% \lhead{\nouppercase{\rightmark} (\nouppercase{\leftmark})}
+% \lhead{\nouppercase{\leftmark}}  
+% \chead{}
+%   \rhead{}
+%   \lfoot{2011}
+%   \cfoot{bischeck}
+%   \rfoot{\thepage}
+%   \renewcommand{\headrulewidth}{0.4pt}
+%   \renewcommand{\footrulewidth}{0.4pt}
+
+%  \renewcommand{\chaptermark}[1]{%
+ % \markboth{#1}{}}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans helvet
+\font_typewriter courier
+\font_default_family sfdefault
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle fancy
+\tracking_changes true
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Bischeck 
+\begin_inset Newline newline
+\end_inset
+
+-
+\begin_inset Newline newline
+\end_inset
+
+Installation and administration guide
+\end_layout
+
+\begin_layout Date
+Version 1.1.0
+\begin_inset Newline linebreak
+\end_inset
+
+2014-06-16
+\end_layout
+
+\begin_layout Standard
+Legal Notice Copyright 
+\end_layout
+
+\begin_layout Standard
+© 2013-2014 Ingenjörsbyn AB.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+This document is licensed by Ingenjörsbyn AB under the Creative Commons
+ Attribution-ShareAlike 3.0 Unported License, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://creativecommons.org/licenses/by-sa/3.0/
+\end_layout
+
+\end_inset
+
+.
+ If you distribute this document, or a modified version of it, you must
+ provide attribution to Ingenjörsbyn AB and provide a link to the original.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Linux® is the registered trademark of Linus Torvalds in the United States
+ and other countries.
+ 
+\end_layout
+
+\begin_layout Standard
+\noindent
+Java® is a registered trademark of Oracle and/or its affiliates.
+ 
+\end_layout
+
+\begin_layout Standard
+\noindent
+Nagios® is an official trademark of Nagios Enterprise Inc.
+ 
+\end_layout
+
+\begin_layout Standard
+\noindent
+All other trademarks are the property of their respective owners.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Abstract 
+\end_layout
+
+\begin_layout Standard
+This guide provides information of the installation and administration of
+ Bischeck.
+ For more in-depth configuration options please see the 
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck - configuration guide
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Getting help
+\end_layout
+
+\begin_layout Standard
+More information about Bischeck and related projects can be found on 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+www.bischeck.org
+\end_layout
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Installation"
+
+\end_inset
+
+Installation and upgrading
+\end_layout
+
+\begin_layout Section
+Installation
+\end_layout
+
+\begin_layout Standard
+The latest binary version of Bischeck is available here 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.bischeck.org
+\end_layout
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Download the distribution file and follow the steps below to install.
+ Make sure you have 
+\series bold
+root
+\series default
+ privileges when running the installation if you want the init scripts to
+ be installed for automatic startup and shutdown.
+ Before installing, please see the 
+\emph on
+\bar under
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:System-requirements-1"
+
+\end_inset
+
+
+\emph default
+\bar default
+ chapter.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# tar xzvf bischeck-x.y.z.tar.gz
+\end_layout
+
+\begin_layout Plain Layout
+
+# cd bischeck-x.y.z
+\end_layout
+
+\begin_layout Plain Layout
+
+# chmod 755 install 
+\end_layout
+
+\begin_layout Plain Layout
+
+# ./install -u #Get usage
+\end_layout
+
+\begin_layout Plain Layout
+
+# ./install    #Install default
+\end_layout
+
+\begin_layout Plain Layout
+
+# service bischeckd start    #Redhat/Centos
+\end_layout
+
+\begin_layout Plain Layout
+
+# /etc/init.d/bischeck start #Debian/Ubuntu
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To get a full list of available options to the install script use 
+\emph on
+-u
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# ./install -u 
+\end_layout
+
+\begin_layout Plain Layout
+
+Welcome to bischeck 1.0.0_RC2 installer 
+\end_layout
+
+\begin_layout Plain Layout
+
+==================================== 
+\end_layout
+
+\begin_layout Plain Layout
+
+Copyright Anders Håål, Ingenjörsbyn AB 2011-2013 
+\end_layout
+
+\begin_layout Plain Layout
+
+Licensed under GPL version 2
+\end_layout
+
+\begin_layout Plain Layout
+
+Usage for the bischeck installer 
+\end_layout
+
+\begin_layout Plain Layout
+
+-u show usage.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-U the user name to install bischeck as and run the daemon as - default
+ nagios.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-J java home directory, no default value.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-I installation directory for bischeck - default /opt/socbox/addons/bischeck.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-R uninstall - permanently remove the installation.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-X upgrade from current version - if possible.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-d set the linux distribution name if the installer can not detected.
+ Supported are    
+\end_layout
+
+\begin_layout Plain Layout
+
+   rh, rhel, redhatenterpriseserver, centos, debian and ubuntu 
+\end_layout
+
+\begin_layout Plain Layout
+
+-p the port number for the JMX RMI server, for example 3333.
+ No default value.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-i the IP address where the RMI port should run, for example 127.0.0.1.
+ No default value.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+-a if authentication should be used applied on JMX connection.
+ Default is false.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+By default, the 
+\emph on
+install
+\emph default
+ script will install Bischeck in directory 
+\emph on
+/opt/socbox/addons/bischeck
+\emph default
+, referred to as 
+\emph on
+$BISHOME 
+\emph default
+in this documentation and with the ownership of the user id 
+\emph on
+nagios
+\emph default
+.
+ Make sure that the user exists before running install.
+\end_layout
+
+\begin_layout Standard
+The last commands start the Bischeck daemon with the effective user id of
+ the user id set during the installation, default user 
+\emph on
+nagios
+\emph default
+.
+ The installation will configure 
+\emph on
+bischeckd
+\emph default
+ to start automatically in run level 3, 4 and 5.
+\end_layout
+
+\begin_layout Standard
+The process id of the java process running Bischeck in daemon mode will
+ be stored in a file, default in 
+\emph on
+/var/tmp/bischeck.pid.
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The location of the pid file can be changed by a setting in the Bischeck
+ properties.xml file.
+ More info in the 
+\begin_inset Quotes eld
+\end_inset
+
+Bischeck configuration guide
+\end_layout
+
+\end_inset
+
+This file is used by the 
+\emph on
+bischeckd
+\emph default
+ script to stop the java process running Bischeck and ensure that only one
+ instance of Bischeck is started on the server.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+If the installation is done as a none root user, effective user id is not
+ root, Bischeck will be installed as the user running the install script.
+ This means that the init script, 
+\emph on
+bischeckd
+\emph default
+, will not be installed in 
+\emph on
+/etc/init.d
+\emph default
+.
+ To start Bischeck, the command line utility must be used, see 
+\series default
+\emph on
+\bar under
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:Command-line-utilities"
+
+\end_inset
+
+
+\series bold
+\emph default
+\bar default
+.
+\end_layout
+
+\begin_layout Subsection
+Installation directory structure
+\end_layout
+
+\begin_layout Standard
+When the installation is complete, the following directory structure exists:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$BISHOME - 
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- /bin        - Scripts and init scripts 
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- /customlib  - Custom jar files, like jdbc drivers 
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- /etc        - Bischeck XML based configuration files
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- /lib        - All jar files requiered for Bischeck 
+\end_layout
+
+\begin_layout Plain Layout
+
+         |                including the Bischeck jar
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- /resources  - Different resources files, like XML schema 
+\end_layout
+
+\begin_layout Plain Layout
+
+         |                files, logback.xml, etc.
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- svninfo.txt - Subversion commit number for the version  
+\end_layout
+
+\begin_layout Plain Layout
+
+         |- version.txt - Bischeck version
+\end_layout
+
+\begin_layout Plain Layout
+
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Upgrading"
+
+\end_inset
+
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Download the new version as described in the previous chapter and to upgrade
+ run the 
+\emph on
+install
+\emph default
+ script with the option -X: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# ./install -X
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The upgrade will automatically stop the currently running Bischeck and save
+ the current installation in a directory parallel to the new version named
+ 
+\emph on
+bischeck_x.y.z
+\emph default
+, where x.y.z is the version of the old installation.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# ./install -I /usr/local/bischeck -X
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The
+\emph on
+ 
+\emph default
+-I switch must be used if the currently installed version of Bischeck is
+ not in the default installation directory.
+\end_layout
+
+\begin_layout Standard
+The file 
+\emph on
+migrationpath.txt
+\emph default
+ describes the supported upgrade paths and the migration scripts that will
+ run by the 
+\emph on
+install
+\emph default
+ script.
+\end_layout
+
+\begin_layout Standard
+If the upgrade is successful Bischeck can be started manually by executing:
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# service bischeckd start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Rollback upgrade
+\end_layout
+
+\begin_layout Standard
+In the event of an upgrade failure or if the new version of Bischeck do
+ not work properly a simple rollback can be conducted with the following
+ step.
+ The process assume that the installation directory is 
+\emph on
+/opt/socbox/addons/bischeck
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+Stop the new version if running:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# service bischeckd stop
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Go to the parent directory of where Bischeck has been installed:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# cd /opt/socbox/addons/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Remove the newly installed Bischeck:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# rm -rf bischeck
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Move the old version, saved by the upgrade to bischeck_x.y.z where x.y.z is
+ the version number of the previous installed version, to the install directory:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# mv bischeck_x.y.z bischeck
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Replace the init script bischeckd with the old version:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# cp bischeck/bin/bischeckd /etc/init.d/bischeckd
+\end_layout
+
+\begin_layout Plain Layout
+
+# chmod 755 /etc/init.d/bischeckd 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Getting-started"
+
+\end_inset
+
+Getting started
+\end_layout
+
+\begin_layout Standard
+In the 
+\emph on
+$BISHOME/etc
+\emph default
+ directory there are working examples of all the configuration files.
+ These files serve as an examples to get started with a simple Bischeck
+ setup of monitoring the response time of a tcp ping on the ssh port, port
+ 22, on localhost.
+ You will find this familiar if you have been using Nagios before and the
+ example uses the well known Nagios check command, 
+\emph on
+check_tcp
+\emph default
+.
+ The example assumes that you have the Nagios plugins installed.
+ To get the example running you need to perform the following steps:
+\end_layout
+
+\begin_layout Enumerate
+Go to the 
+\emph on
+$BISHOME/etc
+\emph default
+ directory, default is 
+\emph on
+/opt/socbox/addons
+\emph default
+.
+\end_layout
+
+\begin_layout Enumerate
+Edit the 
+\emph on
+bischeck.xml
+\emph default
+ at line 16 with the path to the 
+\emph on
+check_tcp
+\emph default
+ command.
+ If you have 
+\emph on
+check_tcp
+\emph default
+ installed in 
+\emph on
+/usr/lib/nagios/plugins
+\emph default
+ you do not need to edit the file.
+\end_layout
+
+\begin_layout Enumerate
+Edit the 
+\emph on
+servers.xml
+\emph default
+ file to add the correct host name, line 12, and password, line 22, for
+ your NSCA server.
+ Even if you do not have an NSCA server defined, Bischeck will still run,
+ but with a connection error when trying to send data to NSCA.
+\end_layout
+
+\begin_layout Enumerate
+Now you are done to start Bischeck and check out what happens in the log
+ file.
+ See 
+\emph on
+\bar under
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "label:Logging"
+
+\end_inset
+
+
+\emph default
+\bar default
+ for more information about Bischeck logging.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh,tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ sudo /etc/init.d/bischeckd restart
+\end_layout
+
+\begin_layout Plain Layout
+
+$ tail -f /usr/tmp/bischeck.log
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Maybe you ask yourself why you should use Bischeck to do a 
+\emph on
+check_tcp
+\emph default
+? This is just a simple example, but when you have this running you can
+ check out the 
+\emph on
+24thresholds.xml
+\emph default
+ file to get some more understanding about the power of dynamic and adaptive
+ thresholds.
+\end_layout
+
+\begin_layout Chapter
+Customization 
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Jar-customization"
+
+\end_inset
+
+Jar customization
+\end_layout
+
+\begin_layout Standard
+To enable support for custom jar files, please place them in the directory
+ 
+\emph on
+$BISHOME/customlib
+\emph default
+.
+ This can typically be jdbc drivers, custom threshold classes, etc.
+ Any jar file in the 
+\emph on
+$BISHOME/customlib
+\emph default
+ will automatically be class loaded by Bischeck.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Logging"
+
+\end_inset
+
+Logging
+\end_layout
+
+\begin_layout Standard
+Bischeck use logback, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://logback.qos.ch/
+\end_layout
+
+\end_inset
+
+ for log management.
+ The logback configuration is described in the logback.xml file located in
+ the 
+\emph on
+$BISHOME/resources
+\emph default
+ directory.
+ By default Bischeck writes log information at level INFO to file 
+\emph on
+/var/tmp/bischeck.log.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Integration-with-pnp4nagios"
+
+\end_inset
+
+Integration with pnp4nagios
+\end_layout
+
+\begin_layout Standard
+pnp4nagios can create graph layouts depending on the check command used
+ for the service on the Nagios server.
+ Since Bischeck uses a passive check, we need to create a unique check command
+ that matches the pnp4nagios layout for Bischeck.
+ Create a link in the 
+\emph on
+libexec
+\emph default
+ directory on the nagios server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+nagios$ ln -s check_dummy check_bischeck
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When describing the service, always use the check_bischeck as the check
+ command in the Nagios configuration.
+ The 
+\emph on
+check_bischeck.php
+\emph default
+ that controls the pnp4nagios layout must be copied to the directory 
+\emph on
+pnp4nagios/share/templates
+\emph default
+ on the Nagios server.
+ 
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Command-line-utilities"
+
+\end_inset
+
+Command line utilities
+\end_layout
+
+\begin_layout Standard
+There are a number of command line utilities available in Bischeck.
+ All of which can be run through the 
+\emph on
+bischeck 
+\emph default
+script located in the 
+\emph on
+$BISHOME/bin
+\emph default
+ directory.
+ To use the 
+\emph on
+bischeck
+\emph default
+ script, add it to your PATH variable.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ PATH=$BISHOME/bin:$PATH
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Run Bischeck
+\end_layout
+
+\begin_layout Standard
+The normal way to run Bischeck is as a daemon using the init.d script 
+\emph on
+bischeckd
+\emph default
+, but it is also possible to start Bischeck in continuous running mode by
+ executing:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck Execute -d
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Running in this way have limitations since the execution will not automatically
+ be placed as a background process and the effective user id will be the
+ user starting the process which may not have all necessary permissions
+ according to the installation.
+ Neither will the pid files be updated correctly.
+ For production systems, always use the init.d script.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ sudo /etc/init.d/bischeckd start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+or
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# service bischeckd start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For testing purposes, it can be beneficial to run Bischeck once and make
+ sure that everything is executing as expected.
+ This is done by executing:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck Execute
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This will override all scheduling definitions and execute everything directly,
+ but only once.
+ 
+\end_layout
+
+\begin_layout Standard
+To show the pid file used for the Bischeck daemon running:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck configuration.ConfigurationManager -p
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This command is used in the init script 
+\emph on
+bischeckd
+\emph default
+ to retrieve the current pid.
+\end_layout
+
+\begin_layout Section
+Validating configuration files
+\end_layout
+
+\begin_layout Standard
+To validate the correctness of the xml configuration files, use the following
+ command, which will return 0 if files are correct.
+ Use $? to display return status.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck configuration.ConfigurationManager -v; echo $?
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Threshold testing
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[Enhanced 1.1.0]
+\end_layout
+
+\end_inset
+
+ Verification of thresholds can be done through the command utility 
+\emph on
+bin/bischeck threshold.Twenty4HourThreshold.
+ 
+\emph default
+The utility provide different levels of information depending on input parameter
+s.
+ Mandatory parameters are host, service and serviceitem.
+ The utility also accept date and time of the day to verify the exact threshold
+ rule to use and if a ,metric value is provided it will calculate the state.
+ For complete list of options run the utility with -u
+\emph on
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck threshold.Twenty4HourThreshold -h erphost -s orders -i ediorders
+ -d 20141207 -m 899
+\end_layout
+
+\begin_layout Plain Layout
+
+899@12:57 State=WARNING Threshold=1000 (>) warning=900(0.9) critical=800(0.8)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above command will display the result of the threshold processing if
+ the metric value is 899.
+ The output display the state, threshold, warning and critical level for
+ the current time of the day, 12:57.
+ 
+\end_layout
+
+\begin_layout Standard
+The time of the day can also be set:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck threshold.Twenty4HourThreshold -h erphost -s orders -i ediorders
+ -d 20141101 -m 899 -H 16 -M 30
+\end_layout
+
+\begin_layout Plain Layout
+
+899@16:02 State=CRITICAL Threshold=1000 (>) warning=950(0.95) critical=900(0.9)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If the date, 
+\emph on
+-d, 
+\emph default
+is not set the current data will be used.
+\end_layout
+
+\begin_layout Standard
+Additional info about which rule set was select and the full hours configuration
+ can be displaed by increased verbose level:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck threshold.Twenty4HourThreshold -h erphost -s orders -i ediorders
+ -d 20141101 -m 899 -v2
+\end_layout
+
+\begin_layout Plain Layout
+
+Rule 1 - month is 2 and day is 25 - hourid: 101 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 00 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 01 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 02 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 03 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 04 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 05 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 06 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 07 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 08 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 09 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 10 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 11 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 12 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 13 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 14 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 15 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 16 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 17 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 18 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 19 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 20 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 21 threshold=1000.0 warning=0.9 critical=0.8 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 22 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hour 23 threshold=2000.0 warning=0.8 critical=0.7 
+\end_layout
+
+\begin_layout Plain Layout
+
+899@13:18 State=CRITICAL Threshold=1300 (>) warning=1170(0.9) critical=1040(0.8)
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For thresholds that are based on cached expression the threshold will be
+ calculate if the data are available in the cache..
+\end_layout
+
+\begin_layout Section
+Cache browser cli
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[1.1.0]
+\end_layout
+
+\end_inset
+
+Through the command line tool all Bischeck expressions are support to calculate
+ cached metric data.
+ This enable exploring and testing when configure new thresholds and virtual
+ services.
+ The utility support common readline functions like history.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck cli.CacheCli
+\end_layout
+
+\begin_layout Plain Layout
+
+cachecli> avg(host0-sshport-response[0:4])
+\end_layout
+
+\begin_layout Plain Layout
+
+[2/1/3 ms] avg(0.000087,0.000097,0.000092,0.000087,0.000096) = 0.0000918
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The output result is the parsed expression populated with the Bischeck cache
+ data and the calculated result.
+ It also show the time in milliseconds (ms) to parse and calculate the expressio
+n and the total time.
+ 
+\end_layout
+
+\begin_layout Standard
+By executing the utility with the 
+\emph on
+-p
+\emph default
+ option, CacheCli will read expression from stdin.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ echo avg(host0-sshport-response[0:4]) | bischeck cli.CacheCli -p
+\end_layout
+
+\begin_layout Plain Layout
+
+avg(0.000087,0.000097,0.000092,0.000087,0.000096) = 0.0000918
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For all options please use 
+\emph on
+-u
+\emph default
+ for usage.
+ 
+\end_layout
+
+\begin_layout Standard
+Use 
+\emph on
+help
+\emph default
+ inside the cli to get a list of available commands.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:bischeck-internal-surveillance"
+
+\end_inset
+
+Bischeck internal surveillance 
+\end_layout
+
+\begin_layout Standard
+Bischeck uses the Java JMX standard for internal monitoring.
+ Bischeck exposes a number of JMX MBeans that enables controlling and instrument
+ation of the running Bischeck daemon.
+ For example, Bischeck can be shutdown or reloaded through JMX.
+ A reload operation is used to force Bischeck to re-read and deploy its
+ configuration files but without restarting the process.
+\end_layout
+
+\begin_layout Standard
+JMX is only enabled when the 
+\emph on
+bischeck
+\emph default
+ script is called with the argument "
+\emph on
+Execute -d
+\emph default
+", which is the way the
+\emph on
+ bischeckd
+\emph default
+ init script call the script 
+\emph on
+bischeck
+\emph default
+ to start Bischeck in daemon mode.
+\end_layout
+
+\begin_layout Section
+JMX over RMI
+\end_layout
+
+\begin_layout Standard
+To allow remote JMX connections the following JMX settings are used by the
+ 
+\emph on
+bischeck
+\emph default
+ script located in the 
+\emph on
+$BISHOME/bin
+\emph default
+ directory.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+jmxport=-Dcom.sun.management.jmxremote.port=<set by the installer script>
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxrmiserver=-Djava.rmi.server.hostname=<set by the installer script>
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxauth=-Dcom.sun.management.jmxremote.authenticate=<set by the installer script>
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxssl=-Dcom.sun.management.jmxremote.ssl=false
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
+\end_layout
+
+\begin_layout Plain Layout
+
+jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If authentication should be used, please change the configuration of the
+ roles and passwords in the files jmxremote.access and jmxremote.password.
+ For more information on how to configure JMX, please visit 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+JMX over HTTP/JSON
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[1.1.0]
+\end_layout
+
+\end_inset
+
+ Jolokia is a jmx agent that support HTTP/JSON access and remove all the
+ problems with the standard JMX agent that use RMI.
+ RMI is especially problematic in any network environment with firewalls.
+ With Jolokia its simple to tunnel the JMX connection over 
+\emph on
+ssh
+\emph default
+.
+ Jolokia provides fine grain security and access capabilities.
+ 
+\end_layout
+
+\begin_layout Standard
+The RMI based JMX agent is still the default, but that will probobly change
+ in the future releases of Bischeck.
+ 
+\end_layout
+
+\begin_layout Standard
+Two additional configuration files has been added to the 
+\emph on
+$BISHOME/resources
+\emph default
+ directory to control the behavior of Jolokia:
+\end_layout
+
+\begin_layout Itemize
+jolokia.conf - basic setting, like port.
+ Read more in the 
+\begin_inset Quotes eld
+\end_inset
+
+JVM agent
+\begin_inset Quotes erd
+\end_inset
+
+ chapter at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.jolokia.org/reference/html/agents.html
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+jolokia-access.xml - define policy based security.
+ More info at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.jolokia.org/reference/html/security.html
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+JMX supported attributes and operations
+\end_layout
+
+\begin_layout Standard
+Bischeck enables a number of attributes and operations that can be managed
+ over JMX.
+ Please read the javadoc for the MBean classes to understand the methods
+ available or just start 
+\emph on
+jconsole, hawtio (Jolokia agent)
+\emph default
+ or equivalent tool to browse available MBeans.
+\end_layout
+
+\begin_layout Standard
+The key MBeans are:
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck:type=Execute
+\emph default
+ 
+\begin_inset Newline linebreak
+\end_inset
+
+Includes information about Bischeck version, configuration directory, reload
+ count and reload time and information about class cache
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+This is related to the class loader to secure that classes are not reloaded
+ every time Bischeck is restarted.
+\end_layout
+
+\end_inset
+
+.
+ Operations provided are shutdown and reload, where reload is a restart
+ of Bischeck without the creation of a new processbut the configuration
+ is re-read.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.configuration:name=configuration,type=ConfigurationManager
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+Display different configuration details.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.cache.provider.redis:name=stats,type=LastStatusCache
+\emph default
+
+\begin_inset Newline linebreak
+\end_inset
+
+Display different statistics about cache usage.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.servers:name=XYZ,type=CircuitBreak
+\emph default
+
+\begin_inset Newline linebreak
+\end_inset
+
+For server classes that implement a circuit break, this bean will display
+ information about the current state, the number of times the circuit break
+ has been opened, etc.
+ The circuit break can also be enabled/disabled and the timeout and fail
+ count can be changed.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.service:type=ExecuteServiceOnDemand 
+\emph default
+
+\begin_inset Note Greyedout
+status open
+
+\begin_layout Plain Layout
+[1.1.0]
+\end_layout
+
+\end_inset
+
+
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph default
+Operation to force the execution of a host service on demand.
+\end_layout
+
+\begin_layout Section
+Timers 
+\end_layout
+
+\begin_layout Standard
+Different execution times of the Bischeck daemon are also exposed through
+ JMX.
+ All timers are based on the 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://metrics.codahale.com/"
+
+\end_inset
+
+ and shows the following parameters for each defined timer:
+\end_layout
+
+\begin_layout Itemize
+FifteenMinuteRate 
+\end_layout
+
+\begin_layout Itemize
+FiveMinuteRate 
+\end_layout
+
+\begin_layout Itemize
+OneMinuteRate 
+\end_layout
+
+\begin_layout Itemize
+MeanRate 
+\end_layout
+
+\begin_layout Itemize
+Count 
+\end_layout
+
+\begin_layout Itemize
+Max
+\end_layout
+
+\begin_layout Itemize
+Min
+\end_layout
+
+\begin_layout Itemize
+Mean
+\end_layout
+
+\begin_layout Itemize
+Standard deviation (StdDev) 
+\end_layout
+
+\begin_layout Itemize
+50th Percentile
+\end_layout
+
+\begin_layout Itemize
+75th Percentile
+\end_layout
+
+\begin_layout Itemize
+95th Percentile
+\end_layout
+
+\begin_layout Itemize
+98th Percentile
+\end_layout
+
+\begin_layout Itemize
+99th Percentile
+\end_layout
+
+\begin_layout Itemize
+999th Percentile
+\end_layout
+
+\begin_layout Standard
+The timers used in Bischeck are:
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.service:name=executeTotalTimer,type=ServiceJob 
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+This is the most important metric since it shows the total count and execution
+ time to process a service definition (a host, service(s) and serviceitem(s))
+ every time it is scheduled.
+ The execution time includes connecting and retrieving data, execution of
+ the serviceitem logic, cache writes and threshold calculation.
+ It does not include the time to send data to the defined servers.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.service:name=executeServiceTimer,type=ServiceJob
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+This timer shows the count and execution time to process a service definition.
+ The execution time includes connecting and retrieving data, execution of
+ the serviceitem logic and cache writes.
+ This timer is part of the timer 
+\emph on
+executeTotal.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.service:name=executeThresholdTimer,type=ServiceJob
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+This timer shows the count and execution time to publish the result of executing
+ the service definition to the queue so it can be processed by servers.
+ This timer is part of the timer 
+\emph on
+executeTotal.
+
+\emph default
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.service:name=publishTimer,type=ServiceJob 
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+The time to publish the measured and threshold data to the configured servers.
+ This does not include the time it actually takes to send to the remote
+ servers, that is included in respective 
+\emph on
+XYZ_sendTimer
+\emph default
+.
+ The timer is part of the 
+\emph on
+executeTotal.
+
+\emph default
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.threshold:name=recalculateTimer,type=Twenty4HourThreshold
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+The time it takes to recalculate the threshold value.
+ Can be part of the executeThresholdTimer if recalculation is needed.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.configuration:name=purgeTimer,type=CachePurgeJob
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+The time it took for the cache purger to run.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.cache.provider.redis:name=writeTimer,type=LastStatusCache
+ 
+\emph default
+
+\begin_inset Newline linebreak
+\end_inset
+
+The time it took to write a single data entry to the redis cache.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.jepext:name=calulateTimer,type=ExecuteJEP
+\emph default
+
+\begin_inset Newline linebreak
+\end_inset
+
+The execution time to calculate any mathematical expressions like sum, average,
+ etc used in serviceitem and threshold logic.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.configuration:name=initializationTimer,type=ConfigurationM
+anager
+\emph default
+ 
+\begin_inset Newline linebreak
+\end_inset
+
+The time to read and setup the configuration of Bischeck.
+ This occurs on start up and on every reload.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+com.ingby.socbox.bischeck.cache:name=parseTimer,type=CacheEvaluator
+\begin_inset Newline linebreak
+\end_inset
+
+
+\emph default
+The execution time to parse and retrieve data from the fast cache and/or
+ the redis cache.
+ This includes all different ways to retrieve data based on index, index
+ range, time and time range.
+ Standard deviation could be high on this timer depending on difference
+ in logic and query pattern.
+ 
+\end_layout
+
+\begin_layout Itemize
+com.ingby.socbox.bischeck.servers:name=XYZ_sendTimer,type=<Server class> 
+\begin_inset Newline linebreak
+\end_inset
+
+The time it took to send data to server XYZ.
+ One timer exists for each server configured in the 
+\emph on
+server.xml
+\emph default
+.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Building-bischeck"
+
+\end_inset
+
+Building Bischeck from source
+\end_layout
+
+\begin_layout Standard
+To build Bischeck from source, check out the Bischeck trunk from gforge.ingby.com:
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ svn checkout --username anonymous http://gforge.ingby.com/svn/bischeck/bischeck/
+trunk bischeck
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To build a Bischeck distribution, run ant from the directory where you checked
+ out the Bischeck code: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ant dist
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This will create a compressed tar file in the 
+\shape italic
+target
+\shape default
+ directory, named bischeck-x.y.z.tar.gz where x.y.z is the version number.
+ Different versions of Bischeck can be checked out from the tags directory
+ located in 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://gforge.ingby.com/svn/bischeck/bischeck/tags
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The dist directive will also convert all documentation in lyx format to
+ pdf.
+ This requires the lyx
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+On Redhat/Centos lyx are part of the EPEL repos and should be version 2
+ or higher.
+\end_layout
+
+\end_inset
+
+ and imagemagick packages to be installed.
+\end_layout
+
+\begin_layout Standard
+To run all unit tests:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ant testng
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To set the Bischeck version number, the 
+\emph on
+build.xml
+\emph default
+ file must be edited or the ant variable 
+\emph on
+app.version
+\emph default
+ can be overridden:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ant -Dapp.version=X.Y.Z dist
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Developing-with-bischeck"
+
+\end_inset
+
+Developing with Bischeck 
+\end_layout
+
+\begin_layout Standard
+It is simple to develop your own service, serviceitem, threshold and server
+ classes.
+ To develop your own you must follow the interface that exists for each
+ type.
+ For service and serviceitems, an abstract class exists with default implementat
+ion of most of the methods described in the interfaces.
+ For more information, check out the Bischeck javadoc, that is generated
+ using ant and that is part of the distribution in the 
+\emph on
+$BISHOME/docs/javadoc
+\emph default
+ directory.
+\end_layout
+
+\begin_layout Section
+Developing custom JEP functions
+\end_layout
+
+\begin_layout Standard
+To develop custom mathematical JEP functions that operate on cached data,
+ please see the JEP documentation, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.cse.msu.edu/SENS/Software/jep-2.23/doc/website/doc/doc_usage.htm
+\end_layout
+
+\end_inset
+
+.
+ To make a function recognized by Bischeck, it should be put in a jar and
+ copied to the 
+\emph on
+$BISHOME/customlib
+\emph default
+ directory.
+ The class must then be mapped to a name that will be used in the Bischeck.
+ This is done in the file 
+\emph on
+jepextfunctions.xml
+\emph default
+ located in the 
+\emph on
+$BISHOME/resources
+\emph default
+ directory.
+ The 
+\emph on
+jepextfunctions.xml
+\emph default
+ file is a standard Java XML property file where the key is the name of
+ the function and the value is the class name that implements it.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:System-requirements-1"
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "label:System-requirements"
+
+\end_inset
+
+System requirements 
+\end_layout
+
+\begin_layout Section
+Java 
+\end_layout
+
+\begin_layout Standard
+Bischeck should run on any operating system that supports Java 6 or higher.
+ The installation and init scripts are supported on Redhat and Debian equivalent
+ Linux distributions.
+ Running on Microsoft Windows has been tested successfully but is not supported
+ by the installation scripts.
+\end_layout
+
+\begin_layout Section
+Redis
+\end_layout
+
+\begin_layout Standard
+Since version 1.0.0 of Bischeck, redis, 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.redis.io
+\end_layout
+
+\end_inset
+
+, is the default memory cache.
+ Redis provides a different range of persistence options like point-in-time
+ snapshots and persistence logs.
+ Redis also supports replication and high-availability options.
+ 
+\end_layout
+
+\begin_layout Standard
+Bischeck has been tested with redis version 2.6.7.
+ Installation of redis is not part of the Bischeck installation and should
+ be installed prior to installing Bischeck.
+ Redis is not required to run on the same server as Bischeck.
+ 
+\end_layout
+
+\begin_layout Standard
+The connection to redis is configured in the 
+\emph on
+$BISHOME/etc/property.xml
+\emph default
+ file.
+ The following properties control the connection:
+\end_layout
+
+\begin_layout Itemize
+cache.provider.redis.server - the hostname or IP address of the redis server,
+ default is localhost
+\end_layout
+
+\begin_layout Itemize
+cache.provider.redis.port - the socket port where redis server listens, default
+ is 6379
+\end_layout
+
+\begin_layout Itemize
+cache.provider.redis.db - the redis database number to use, default is 0
+\end_layout
+
+\begin_layout Itemize
+cache.provider.redis.auth - the authorization token for redis, default is the
+ empty string
+\end_layout
+
+\begin_layout Itemize
+cache.provider.redis.timeout - the connection timeout, default is 2000 ms.
+ 
+\end_layout
+
+\begin_layout Itemize
+cache.provider.redis.poolsize - the size of the redis connection pool, default
+ is 50.
+\end_layout
+
+\begin_layout Standard
+There is also an additional property that can be used with the new redis
+ based cache and that is 
+\emph on
+cache.provider.redis.fastCacheSize
+\emph default
+.
+ This parameter defines the number of cache items that for each service
+ definition (host-service-serviceitem) should be held in parallel with the
+ redis cache in the bischeck heap space.
+ If Bischeck finds the data in the fast cache on a read, access to redis
+ is not needed.
+ Data writes are always written to redis storage.
+ The default value for the option is 0, meaning that the fast cache is size
+ 0.
+ Depending on how the cached data is used in your configuration, increasing
+ the fast cache can improve performance but will also increase the heap
+ space.
+\end_layout
+
+\begin_layout Standard
+With redis it is possible to access the data in the cache at runtime.
+ Redis provides many client libraries for different programming languages,
+ 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://redis.io/clients
+\end_layout
+
+\end_inset
+
+.
+ The quickest way is just to use the 
+\emph on
+redis-cli
+\emph default
+ command line utility.
+ 
+\end_layout
+
+\begin_layout Standard
+The cache prior to version 1.0.0, should be regarded as deprecated.
+ Many of the the new features available as of version 1.0.0 are not supported
+ in the old implementation, such as e.g.
+ aggregations.
+ 
+\end_layout
+
+\begin_layout Section
+Jar dependencies
+\end_layout
+
+\begin_layout Standard
+The following jar packages are distributed as part of the Bischeck distribution.
+ All these packages have their own open source licenses.
+ 
+\end_layout
+
+\begin_layout Itemize
+commons-beanutils-1.8.3.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/beanutils/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-cli-1.2.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/cli/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-dbcp-1.4.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/proper/commons-dbcp/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-lang-2.5.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/lang/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-collections-3.2.1.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/collections/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-logging-1.1.1.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/proper/commons-logging/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-math3-3.1.1 - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/proper/commons-math/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+ezmorph-1.0.6.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ezmorph.sourceforge.net/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+jedis-2.1.0-jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/xetorthio/jedis
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/xetorthio/jedis/blob/master/LICENSE.txt
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+jep-2.4.1.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://sourceforge.net/projects/jep/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.gnu.org/licenses/gpl-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+jetlang-0.2.10.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://code.google.com/p/jetlang/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://opensource.org/licenses/BSD-3-Clause
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+jsendnsca-2.0.1.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://code.google.com/p/jsendnsca/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+json-lib-2.4 - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://json-lib.sourceforge.net/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+logback-classic-1.0.3.jar and logback-core-1.0.3.jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://logback.qos.ch/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.eclipse.org/legal/epl-v10.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+metrics-core.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/codahale/metrics
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+quartz-2.1.5.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.quartz-scheduler.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+slf4j-api-1.6.0.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.slf4j.org/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.opensource.org/licenses/mit-license.php
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+slf4j-log4j12-1.6.0.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.slf4j.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.opensource.org/licenses/mit-license.php
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+testng-6.3.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://testng.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+librato-java-1.0.1.jar- 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/librato/librato-java
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+jolokia-jvm-1.2.0-agent.jar- 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.jolokia.org/download.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+jline-2.11.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/jline/jline2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.opensource.org/licenses/bsd-license.php
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+perf4j-0.9.16.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://repository.codehaus.org/org/perf4j/perf4j/0.9.16/perf4j-0.9.16.jar
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+All jar files are distributed as part of Bischeck and located in the 
+\emph on
+lib
+\emph default
+ directory.
+ 
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:bischeck-license"
+
+\end_inset
+
+Bischeck license 
+\end_layout
+
+\begin_layout Standard
+Bischeck is licensed under GNU license version 2.
+ For more info please visit 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.gnu.org/licenses/gpl-2.0.htm
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Bug reports and feature requests
+\end_layout
+
+\begin_layout Standard
+Please submit bug reports and feature requests on 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+www.bischeck.org
+\end_layout
+
+\end_inset
+
+ in the Forge section.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Credits"
+
+\end_inset
+
+Credits
+\end_layout
+
+\begin_layout Standard
+Thanks to all people and organizations who developed all the great open
+ source software that Bischeck depends on.
+ The Bischeck project would like to thank the following companies for sponsoring
+ the project with valuable commercial tools and development environments:
+ 
+\end_layout
+
+\begin_layout Itemize
+Contemplate supports the Bischeck projects with the ThreadSafe tool for
+ advanced static analysis for Java concurrency, 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.contemplateltd.com/threadsafe
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+YourKit is kindly supporting Bischeck open source projects with its full-feature
+d Java Profiler, 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.yourkit.com/java/profiler
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Cloudbees provides continuous integration services through Jenkins, 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.cloudbees.com/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Librato to provide test environment, 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://metrics.librato.com/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

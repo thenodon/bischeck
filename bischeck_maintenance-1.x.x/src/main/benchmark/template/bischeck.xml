@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <bischeck>
+  
+    <host>
+        <name>host01</name>
+        <alias>127.0.0.1</alias>
+        <desc></desc>
+        <service>
+          <template>sshport</template>
+        </service>
+        <service>
+          <template>avgport</template>
+        </service>
+    </host>
+
+    <host>
+        <name>host02</name>
+        <alias>127.0.0.1</alias>
+        <desc></desc>
+        <service>
+          <template>sshport</template>
+        </service>
+        <service>
+          <template>avgport</template>
+        </service>
+    </host>
+    
+  <!-- Service template sshport with a complete serviceitem configuration -->
+  <servicetemplate templatename="sshport">  
+    <name>sshport</name>
+    <desc>ssh port service</desc>
+    <schedule>15S</schedule>
+    <url>shell://localhost</url>
+    
+    <serviceitem>
+      <name>response</name>
+      <desc>Response time for tcp check</desc>
+      <execstatement>{"check":"/usr/lib/nagios/plugins/check_tcp -H $$HOSTALIAS$$ -p 22","label":"time"}</execstatement>
+      <thresholdclass>Twenty4HourThreshold</thresholdclass>
+      <serviceitemclass>CheckCommandServiceItem</serviceitemclass>    
+    </serviceitem>
+  </servicetemplate>
+
+  <servicetemplate templatename="avgport">  
+    <name>avgport</name>
+    <desc>avg ssh port service</desc>
+    <schedule>15S</schedule>
+    <url>bischeck://localhost</url>
+    
+    <serviceitem>
+      <name>avg</name>
+      <desc>average calculation</desc>
+      <execstatement>avg($$HOSTNAME$$-$$SERVICENAME$$-response[0:9])</execstatement>
+      <thresholdclass>Twenty4HourThreshold</thresholdclass>
+      <serviceitemclass>CheckCommandServiceItem</serviceitemclass>    
+    </serviceitem>
+
+  </servicetemplate>
+  </bischeck>

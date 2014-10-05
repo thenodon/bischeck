@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<servers>
+
+    <server name="NSCA-NoSend">
+        <class>        NSCAServerNoSend     </class>
+        <property>
+            <key>hostAddress</key>
+            <value>localhost</value>
+        </property>
+        <property>
+            <key>encryptionMode</key>
+            <value>XOR</value>
+        </property>
+        <property>
+            <key>password</key>
+            <value>nscapassword</value>
+        </property>
+        <property>
+            <key>port</key>
+            <value>5667</value>
+        </property>
+        <property>
+            <key>connectionTimeout</key>
+            <value>5000</value>
+        </property>
+    </server>
+
+    <server name="NSCA">
+        <class>NSCAServer</class>
+        <property>
+            <key>hostAddress</key>
+            <value>localhost</value>
+        </property>
+        <property>
+            <key>encryptionMode</key>
+            <value>XOR</value>
+        </property>
+        <property>
+            <key>password</key>
+            <value>nscapassword</value>
+        </property>
+        <property>
+            <key>port</key>
+            <value>5667</value>
+        </property>
+        <property>
+            <key>connectionTimeout</key>
+            <value>5000</value>
+        </property>
+    </server>
+
+    <server name="NRDP">
+        <class>        NRDPServer    </class>
+        <property>
+            <key>hostAddress</key>
+            <value>localhost</value>
+        </property>
+    </server>
+
+    <server name="LiveStatus">
+        <class>LiveStatusServer</class>
+        <property>
+            <key>hostAddress</key>
+            <value>localhost</value>
+        </property>
+    </server>
+
+    <server name="Graphite">
+        <class>GraphiteServer</class>
+        <property>
+            <key>hostAddress</key>
+            <value>localhost</value>
+        </property>
+    </server>
+
+    <server name="OpenTSDB">
+        <class>OpenTSDBServer</class>
+        <property>
+            <key>hostAddress</key>
+            <value>localhost</value>
+        </property>
+    </server>
+
+    <server name="MetricsLibrato">
+        <class>MetricsLibratoServer</class>
+        <property>
+            <key>apiUrl</key>
+            <value>https://localhost/v1/metrics</value>
+        </property>
+        <property>
+            <key>email</key>
+            <value>foo@bar.org</value>
+        </property>
+        <property>
+            <key>authToken</key>
+            <value>111111111111111111111111111111111111111111111111</value>
+        </property>
+        <property>
+            <key>serviceAndItemName</key>
+            <value>true</value>
+        </property>
+    </server>
+
+
+</servers>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--  
+ The setting allow access from localhost 
+ For more info see http://www.jolokia.org/reference/html/security.html
+-->
+<restrict>
+
+  <remote>
+    <host>127.0.0.1</host>
+  </remote>
+
+  <commands>
+    <command>list</command>
+    <command>read</command>
+    <command>write</command>
+    <command>exec</command>
+    <command>search</command>
+    <command>version</command>
+  </commands>
+
+  
+</restrict>

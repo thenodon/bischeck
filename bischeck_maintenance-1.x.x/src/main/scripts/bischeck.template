@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# Copyright (C) 2009 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# The program starts any java class with main method located in the package
+# com.ingby.socbox.bischeck
+# The program is called from the init script bischeckd, but can also be
+# used directly from command line
+#
+
+program=$1
+shift
+arg=$@
+
+export LC_ALL=en_US.UTF-8
+
+bishome=%BISHOME%
+
+port=%JMXPORT%
+serverip=%JMXSERVERIP%
+auth=%JMXAUTH% 
+    
+#JMX settings
+if [ "x$port" != "x" -a "x$serverip" != "x" -a "x$auth" != "x" ]  ; then
+    jmxport=-Dcom.sun.management.jmxremote.port=$port
+    jmxrmiserver=-Djava.rmi.server.hostname=$serverip
+    jmxauth=-Dcom.sun.management.jmxremote.authenticate=$auth 
+    jmxssl=-Dcom.sun.management.jmxremote.ssl=false 
+    jmxpasswd=-Dcom.sun.management.jmxremote.password.file=$bishome/etc/jmxremote.password
+    jmxaccess=-Dcom.sun.management.jmxremote.access.file=$bishome/etc/jmxremote.access
+    
+    jmx="$jmxport $jmxrmiserver $jmxssl $jmxauth $jmxpasswd $jmxaccess"
+fi
+
+# resources must be before the bischeck-x.x.x.jar in the classpath
+classpath=$bishome/resources:$bishome:$bishome/lib/*:$bishome/customlib/*
+
+if [ "x$program" = "xExecute" -a "x$arg" = "x-d" ] ; then
+  java $jmx -Dbishome=$bishome -classpath $classpath com.ingby.socbox.bischeck.$program $arg
+#  java -Dbishome=$bishome -javaagent:$bishome/lib/jolokia-jvm-1.2.0-agent.jar=config=$bishome/resources/jolokia.conf -classpath $classpath com.ingby.socbox.bischeck.$program $arg
+else
+  java -Dbishome=$bishome -classpath $classpath com.ingby.socbox.bischeck.$program $arg
+fi
+

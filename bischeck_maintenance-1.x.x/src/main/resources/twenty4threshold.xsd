@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="twenty4threshold">
+		<xsd:complexType>
+		   <xsd:sequence>
+		        <xsd:element ref="servicedefgroup" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="servicedeftemplate" minOccurs="0" maxOccurs="unbounded"/>                
+				<xsd:element ref="servicedef" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="hours" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="holiday" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="servicedefgroup">
+        <xsd:complexType>
+            <xsd:sequence>
+                    <xsd:element ref="member" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element ref="template" minOccurs="1" maxOccurs="1"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+     <xsd:element name="template" type="xsd:normalizedString"/>
+     
+    <xsd:element name="member">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="hostname" minOccurs="1" maxOccurs="1"/>
+                <xsd:element ref="servicename" minOccurs="1" maxOccurs="1"/>
+                <xsd:element ref="serviceitemname" minOccurs="1" maxOccurs="1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+     <xsd:element name="servicedeftemplate">
+        <xsd:complexType>
+            <xsd:sequence>
+                
+                <xsd:element ref="period" minOccurs="1" maxOccurs="unbounded"/>
+                
+            </xsd:sequence>
+            <xsd:attribute name="templatename" type="xsd:normalizedString" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    
+    
+	<xsd:element name="servicedef">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="hostname"/>
+				<xsd:element ref="servicename"/>
+				<xsd:element ref="serviceitemname"/>
+				<xsd:element ref="period" minOccurs="1" maxOccurs="unbounded"/>
+				</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="hostname" type="xsd:normalizedString"/>
+	<xsd:element name="servicename" type="xsd:normalizedString"/>
+	<xsd:element name="serviceitemname" type="xsd:normalizedString"/>
+	
+	<xsd:element name="period">
+		<xsd:complexType>
+			<xsd:sequence>
+			<!--    <xsd:choice> maxOccurs="1" -->
+                    <xsd:element ref="months" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="weeks"  minOccurs="0" maxOccurs="unbounded"/>
+            <!--    </xsd:choice> -->
+			    <xsd:element ref="calcmethod"/>
+				<xsd:element ref="warning"/>
+				<xsd:element ref="critical"/>
+				<xsd:element ref="hoursIDREF"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	
+	<xsd:element name="calcmethod">
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:normalizedString">
+                <xsd:enumeration value="&gt;"/>
+                <xsd:enumeration value="&lt;"/>
+                <xsd:enumeration value="="/>
+            </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+	
+	<xsd:element name="months">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element ref="month" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="dayofmonth" minOccurs="0" maxOccurs="1"/>
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="month" nillable="true">
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:int">
+                <xsd:minInclusive value="1"/>
+                <xsd:maxInclusive value="12"/>
+            </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+    
+    <xsd:element name="dayofmonth" nillable="true">
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:int">
+                <xsd:minInclusive value="1"/>
+                <xsd:maxInclusive value="31"/>
+            </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+        
+	<xsd:element name="weeks">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element ref="week"  minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="dayofweek" minOccurs="0" maxOccurs="1"/>
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+    
+	<xsd:element name="week">
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:int">
+                <xsd:minInclusive value="1"/>
+                <xsd:maxInclusive value="53"/>
+            </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+	
+	<xsd:element name="dayofweek">
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:int">
+                <xsd:minInclusive value="1"/>
+                <xsd:maxInclusive value="7"/>
+            </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+    
+	<xsd:element name="warning" type="xsd:int"/>
+	<xsd:element name="critical" type="xsd:int"/>
+	<xsd:element name="hoursIDREF" type="xsd:int"/>
+	
+	<xsd:element name="holiday">
+	    <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="dayofyear" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        <xsd:attribute name="year" type="xsd:int" use="required"/>
+        
+        </xsd:complexType>
+    </xsd:element>
+    
+    
+	
+    <xsd:element name="year" type="xsd:int"/>
+    <xsd:element name="dayofyear" type="xsd:normalizedString"/>
+    
+	<xsd:element name="hours">
+		<xsd:complexType>
+		
+		<xsd:choice>                                
+            <xsd:group ref="onehour"/>
+            <xsd:group ref="intervalhour"/>
+        </xsd:choice>
+		<!--
+			<xsd:sequence>
+				<xsd:element ref="hour" minOccurs="24" maxOccurs="24"/>
+			</xsd:sequence>
+			-->
+			<xsd:attribute name="hoursID" type="xsd:int" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:group name="onehour">
+	  <xsd:sequence>
+		<xsd:element ref="hour" minOccurs="24" maxOccurs="24"/>
+	  </xsd:sequence>	
+	</xsd:group>
+	
+	<xsd:group name="intervalhour">
+	<xsd:sequence>
+		<xsd:element ref="hourinterval" minOccurs="1" maxOccurs="24"/>
+	  </xsd:sequence>
+	</xsd:group>
+	  
+	<xsd:element name="hour" type="xsd:normalizedString"/>
+
+	<xsd:element name="hourinterval">
+	  <xsd:complexType>
+		<xsd:sequence>
+		   <xsd:element ref="from"/>
+		   <xsd:element ref="to"/>
+		   <xsd:element ref="threshold"/>
+           <xsd:element ref="warning" minOccurs="0" maxOccurs="1"/>
+           <xsd:element ref="critical" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="from" type="xsd:normalizedString"/>
+	<xsd:element name="to" type="xsd:normalizedString"/>
+	<xsd:element name="threshold" type="xsd:normalizedString"/>
+
+
+</xsd:schema>

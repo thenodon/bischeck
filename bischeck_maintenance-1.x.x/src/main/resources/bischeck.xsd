@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!-- ******** -->
+    <!-- Bischeck -->
+    <!-- ******** -->
+    <xsd:element name="bischeck">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="host"  minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element ref="servicetemplate" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element ref="serviceitemtemplate" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element ref="cachetemplate" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+    
+    <!-- *************** -->
+    <!-- Host definition -->
+    <!-- *************** -->
+    <xsd:element name="host">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="name"/>
+                <xsd:element ref="inactive" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="alias" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="service" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+    
+    <!-- ****************** -->
+    <!-- Service definition -->
+    <!-- ****************** -->
+    <xsd:element name="service">
+        <xsd:complexType>        
+            <xsd:choice>                                
+                <xsd:group ref="templateServiceGroup" />
+                <xsd:group ref="serviceGroup" />
+            </xsd:choice>
+        </xsd:complexType>
+    </xsd:element>
+    
+    
+    <xsd:group name="serviceGroup">
+        <xsd:sequence>
+            <xsd:element ref="name"/>
+            <xsd:element ref="inactive" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="alias" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="schedule" minOccurs="1" maxOccurs="unbounded"/>
+            <xsd:element ref="sendserver" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="url"/>
+            <xsd:element ref="driver" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="serviceitem" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:group>    
+
+    
+    <xsd:element name="serviceoverride">
+        <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element ref="name" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="inactive" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="alias" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="schedule" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="sendserver" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="url" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="driver" minOccurs="0" maxOccurs="1"/>
+            <!-- <xsd:element ref="serviceitem" minOccurs="0" maxOccurs="unbounded"/>  -->
+        </xsd:sequence>
+    </xsd:complexType>
+    </xsd:element>    
+    
+    <xsd:element name="serviceitemoverride">
+        <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element ref="name" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="alias" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="execstatement" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="thresholdclass" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="serviceitemclass" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="cache" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    </xsd:element>    
+    
+    <xsd:group name="serviceitemGroup">
+        <xsd:sequence>
+            <xsd:element ref="name"/>
+            <xsd:element ref="alias" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="execstatement"/>
+            <xsd:element ref="thresholdclass" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="serviceitemclass"/>
+            <xsd:element ref="cache" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>   
+    </xsd:group>
+    
+    <!-- ********************** -->
+    <!-- Serviceitem definition -->
+    <!-- ********************** -->
+    <xsd:element name="serviceitem">
+        <xsd:complexType>
+            <xsd:choice>                                
+                <xsd:group ref="templateServiceItemGroup" />
+                <xsd:group ref="serviceitemGroup" />
+            </xsd:choice>
+        </xsd:complexType>
+    </xsd:element>
+    
+    
+    
+    <xsd:group name="templateServiceGroup">
+       <xsd:sequence>
+           <xsd:element ref="template" />
+           <xsd:element ref="serviceoverride" minOccurs="0" maxOccurs="1" />
+           
+       </xsd:sequence>
+    </xsd:group>
+
+    <xsd:group name="templateServiceItemGroup">
+       <xsd:sequence>
+           <xsd:element ref="template" />
+           <xsd:element ref="serviceitemoverride" minOccurs="0" maxOccurs="1" />
+           
+       </xsd:sequence>
+    </xsd:group>
+    
+    <xsd:group name="templateGroup">
+       <xsd:sequence>
+           <xsd:element ref="template" />
+       </xsd:sequence>
+    </xsd:group>
+    
+    
+    
+    <!-- **************** -->
+    <!-- Service template -->
+    <!-- **************** -->
+    <xsd:element name="servicetemplate">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="name"/>
+                <xsd:element ref="alias" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="schedule" minOccurs="1" maxOccurs="unbounded"/>
+                <xsd:element ref="sendserver" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="url"/>
+                <xsd:element ref="driver" minOccurs="0" maxOccurs="1"/>
+                <xsd:choice>                                
+                    <xsd:element ref="template" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element ref="serviceitem" minOccurs="1" maxOccurs="unbounded"/>
+                </xsd:choice>
+            </xsd:sequence>
+            <xsd:attribute name="templatename" type="xsd:normalizedString" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    
+    
+    <!-- ******************** -->
+    <!-- ServiceItem template -->
+    <!-- ******************** -->
+    <xsd:element name="serviceitemtemplate">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="name"/>
+                <xsd:element ref="alias" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="desc" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="execstatement"/>
+                <xsd:element ref="thresholdclass" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="serviceitemclass"/>
+                <xsd:element ref="cache" minOccurs="0" maxOccurs="1"/>
+            </xsd:sequence>
+            <xsd:attribute name="templatename" type="xsd:normalizedString" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="template" type="xsd:normalizedString"/>
+    
+    <xsd:element name="name" type="xsd:normalizedString"/>
+    <xsd:element name="inactive" type="xsd:boolean" default="false" />
+    <xsd:element name="alias" type="xsd:normalizedString" />
+    <xsd:element name="desc" type="xsd:normalizedString"/>
+    <xsd:element name="schedule" type="xsd:normalizedString"/>
+    <xsd:element name="url" type="xsd:normalizedString"/>
+    <xsd:element name="driver" type="xsd:normalizedString"/>
+    <xsd:element name="execstatement" type="xsd:normalizedString"/>
+    <xsd:element name="thresholdclass" type="xsd:normalizedString"/>
+    <xsd:element name="serviceitemclass" type="xsd:normalizedString"/>
+    <xsd:element name="sendserver" type="xsd:boolean" default="true"/>
+    
+    <!-- ************************* -->
+    <!-- Cache settings - optional -->
+    <!-- ************************* -->
+    <xsd:element name="cache">
+        <xsd:complexType>
+            <xsd:choice>                                
+                <xsd:group ref="templateGroup" />
+                <xsd:group ref="cacheGroup" />
+            </xsd:choice>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:group name="cacheGroup">
+        <xsd:sequence>
+            <xsd:element ref="aggregate" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element ref="purge" minOccurs="0" maxOccurs="1" />
+       </xsd:sequence>
+    </xsd:group>
+    
+    <xsd:element name="cachetemplate">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="aggregate" minOccurs="0" maxOccurs="unbounded" />
+                <xsd:element ref="purge" minOccurs="0" maxOccurs="1" />
+            </xsd:sequence>
+            <xsd:attribute name="templatename" type="xsd:normalizedString" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <!-- 
+        Aggregate define how to aggregate from the base data.
+        Period define the aggregation level - H,D,W or Y 
+        The retention define how many of the defined periods to keep. If period
+        is W and retention is 20, 20 weeks of aggregated data will be kept.
+        The method define who the aggregation will be done. avg will do a 
+        average calculation of the data on the period defined, like average for
+        a week. Min and max will just extract the min or max value in the 
+        defined period. 
+        The useweekend define if holidays and weekends should be include or not.
+    -->
+    <xsd:element name="aggregate">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="method" minOccurs="1" maxOccurs="1" />
+                <xsd:element ref="useweekend" minOccurs="1" maxOccurs="1" />
+                <xsd:element ref="retention" minOccurs="0" maxOccurs="4"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    
+    <xsd:element name="method">
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:normalizedString">
+                <xsd:enumeration value="avg"/>
+                <xsd:enumeration value="max"/>
+                <xsd:enumeration value="min"/>
+            </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:element name="useweekend" type="xsd:boolean" default="false"/>
+    
+    <xsd:element name="retention">
+        <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element ref="period" minOccurs="1" maxOccurs="1" />
+              <xsd:element ref="offset" minOccurs="1" maxOccurs="1" />
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+   
+
+    
+    <!--
+       Purge is like retention but for the base data.
+       Period is the same definition as above and offset define if data is older
+       then the offset it will be purged.
+    -->
+    <xsd:element name="purge">
+        <xsd:complexType>
+            <xsd:choice>
+                <xsd:element name="maxcount" type="xsd:long" minOccurs="0" maxOccurs="1"/>
+                <xsd:sequence>
+                   <xsd:element ref="offset" minOccurs="0" maxOccurs="1" />
+                   <xsd:element ref="period" minOccurs="0" maxOccurs="1" />
+                </xsd:sequence>
+            </xsd:choice>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="offset" type="xsd:int"/>
+    
+    <xsd:element name="period">
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:normalizedString">
+                <xsd:enumeration value="H"/>
+                <xsd:enumeration value="D"/>
+                <xsd:enumeration value="W"/>
+                <xsd:enumeration value="Y"/>
+            </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+</xsd:schema>

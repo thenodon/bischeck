@@ -1,0 +1,175 @@
+#!/bin/sh
+#
+# Copyright (C) 2009 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# chkconfig: 345 99 10
+# description: bischeckd init script
+#
+#
+### BEGIN INIT INFO
+# Provides:          bischeckd
+# Required-Start:    $syslog $network
+# Required-Stop:     $syslog $network
+# Default-Start:     3 4 5
+# Default-Stop:      0 1 2 6
+# Short-Description: Start bischeck daemon at boot time
+### END INIT INFO
+
+JAVA_HOME=%JAVA_HOME%
+PATH=$JAVA_HOME/bin:$PATH
+
+bishome=%BISHOME%
+user=%INSTALL_USER%
+DISTRO=%DISTRO%
+
+processName=com.ingby.socbox.bischeck.Execute
+
+pidFile=$(su $user -c "$bishome/bin/bischeck configuration.ConfigurationManager -p" | grep PidFile | cut -d: -f2)
+
+isrunning() {
+    ps -fu $user | grep $1 | grep java| tr -s " "| cut -f2 -d" " 
+}
+
+# Source function library.
+if [ -f /etc/init.d/functions ] ; then
+    . /etc/init.d/functions
+elif [ -f /etc/rc.d/init.d/functions ] ; then
+    . /etc/rc.d/init.d/functions
+elif [ -f /lib/lsb/init-functions ] ; then
+    . /lib/lsb/init-functions
+else
+    exit 0
+fi
+
+# Avoid using root's TMPDIR
+unset TMPDIR
+RETVAL=0
+
+
+retstatus() {
+     RETVAL=$1
+     if [ $RETVAL -eq 0 ] ; then
+        if [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+          log_end_msg $RETVAL
+        elif [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+          echo_success
+          echo
+        else 
+          echo $RETVAL 
+        fi
+    else
+        if [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+          log_end_msg $RETVAL
+        elif [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+          echo_failure
+          echo
+        else 
+          echo $RETVAL 
+        fi
+    fi
+}
+
+start() {
+    echo -n "bischeckd startup"
+    status=`isrunning $processName` 
+    if [ "x$status" = "x" ] ; then
+        rm -f $pidFile
+        
+        su $user -c "$bishome/bin/bischeck Execute -d > /dev/null 2>&1" &
+        
+        sleep 5
+        status=`isrunning $processName`
+        
+        echo $status > $pidFile
+        chown $user:`id -gn $user` $pidFile
+        
+        status=`isrunning $processName`
+        if [ ! "x$status" = "x" ] ; then
+            RETVAL=0
+        else
+            RETVAL=1
+        fi
+    else
+       RETVAL=2
+    fi
+    
+    retstatus $RETVAL
+}
+
+stop() {
+    echo -n "bischeck stopping"
+    status=`isrunning $processName` 
+    if [ ! "x$status" = "x" ] ; then
+        kill `cat $pidFile`
+        sleep 5
+        status=`isrunning $processName`
+        if [ "x$status" = "x" ] ; then
+            RETVAL=0
+        else
+            RETVAL=1
+        fi
+    else
+        RETVAL=2
+    fi
+
+    retstatus $RETVAL
+
+}
+
+status() {
+    status=`isrunning $processName` 
+    if [  ! "x$status" = "x" ] ; then
+        echo -n "$scriptName is running, pid $status"
+        RETVAL=0
+    else
+        echo -n "$scriptName is not running"
+        RETVAL=1
+    fi
+    retstatus $RETVAL
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop) 
+        stop
+        ;;
+    status)
+        status 
+        ;;
+    pidstatus)
+        status=`isrunning $processName` 
+        if [  ! "x$status" = "x" ] ; then
+           echo $status
+        else
+           echo "not running"
+        fi
+        ;;
+    restart)
+        stop  
+        start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status|pidstatus|restart}"
+        exit 1
+esac
+
+if [ $RETVAL -eq 0 ] ; then
+    exit 0
+else
+    exit 1
+fi
