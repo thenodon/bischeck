@@ -63,6 +63,8 @@ public class CacheInfTest {
     @Test (groups = { "Cache" } )
     public void verifyCache() throws CacheException {
 
+        CacheFactory.destroy();
+
         CacheFactory.init("com.ingby.socbox.bischeck.cache.provider.redis.LastStatusCache");
         CacheInf cache = CacheFactory.getInstance();
         cache.clear(hostName, serviceName, serviceItemName);
@@ -113,11 +115,18 @@ public class CacheInfTest {
         Assert.assertNull(cache.getByIndex(hostName, serviceName, serviceItemName,25));
         
         Assert.assertEquals(cache.getAll(hostName, serviceName, serviceItemName,","),"21,20,19,18,17,16,15,14,13,12,null,10,9,8,7,6,5,4,3,2,1");
-        Assert.assertEquals(cache.getByTime(hostName, serviceName, serviceItemName, System.currentTimeMillis()-13*60*1000, System.currentTimeMillis()-20*60*1000, ","),"19,18");
-        Assert.assertEquals(cache.getByTime(hostName, serviceName, serviceItemName, System.currentTimeMillis()-13*60*1000, System.currentTimeMillis()-105*60*1000, ","),
+		Assert.assertEquals(cache.getByTime(hostName, serviceName, serviceItemName, 
+				System.currentTimeMillis()-13*60*1000, 
+				System.currentTimeMillis()-20*60*1000, ","),
+				"19,18");
+		Assert.assertEquals(cache.getByTime(hostName, serviceName, serviceItemName, 
+				System.currentTimeMillis()-13*60*1000, 
+				System.currentTimeMillis()-105*60*1000, ","),
                 "19,18,17,16,15,14,13,12,null,10,9,8,7,6,5,4,3,2,1");
-        Assert.assertEquals(cache.getByTime(hostName, serviceName, serviceItemName, System.currentTimeMillis()-13*60*1000, 
-                cache.getLastTime(hostName, serviceName, serviceItemName), ","),"19,18,17,16,15,14,13,12,null,10,9,8,7,6,5,4,3,2,1");
+		Assert.assertEquals(cache.getByTime(hostName, serviceName, serviceItemName, 
+				System.currentTimeMillis()-13*60*1000, 
+				cache.getLastTime(hostName, serviceName, serviceItemName), ","),
+				"19,18,17,16,15,14,13,12,null,10,9,8,7,6,5,4,3,2,1");
     }
 
 }
