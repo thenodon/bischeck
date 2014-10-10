@@ -12,7 +12,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -23,14 +22,14 @@ import net.sf.json.util.JSONBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.servers.MessageServerInf;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceStateInf;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+
 
 public final class BigPanda implements Notifier, MessageServerInf {
     private final static Logger LOGGER = LoggerFactory.getLogger(BigPanda.class);
@@ -195,11 +194,10 @@ public final class BigPanda implements Notifier, MessageServerInf {
         HttpURLConnection conn = null;
 
         final String timerName = instanceName+"_sendTimer";
-
-        final Timer timer = Metrics.newTimer(BigPanda.class, 
-                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
+        final Timer timer = MetricsManager.getTimer(BigPanda.class,timerName);
+        final Timer.Context context = timer.time();
+        
+        
         JSONObject json = null;
 
         try {

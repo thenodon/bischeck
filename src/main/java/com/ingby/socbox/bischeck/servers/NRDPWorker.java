@@ -30,7 +30,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,13 +43,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+
 
 public class NRDPWorker implements WorkerInf, Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(NRDPWorker.class);
@@ -144,11 +143,9 @@ public class NRDPWorker implements WorkerInf, Runnable {
     private void connectAndSend(String xml) throws ServerException {
         
         final String timerName = instanceName+"_sendTimer";
-
-        final Timer timer = Metrics.newTimer(NRDPServer.class, 
-                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
+        final Timer timer = MetricsManager.getTimer(NRDPServer.class, timerName);
+        final Timer.Context context = timer.time();
+        
         HttpURLConnection conn = null;
         
     

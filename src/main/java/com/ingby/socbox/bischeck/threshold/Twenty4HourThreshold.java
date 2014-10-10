@@ -24,7 +24,6 @@ import java.util.Calendar;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -36,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import org.nfunk.jep.ParseException;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.BisCalendar;
 import com.ingby.socbox.bischeck.BischeckDecimal;
 import com.ingby.socbox.bischeck.Util;
@@ -48,6 +48,7 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationException;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEP;
 import com.ingby.socbox.bischeck.jepext.ExecuteJEPPool;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHoliday;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHourinterval;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLHours;
@@ -59,9 +60,6 @@ import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLServicedefgroup;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLServicedeftemplate;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLTwenty4Threshold;
 import com.ingby.socbox.bischeck.xsd.twenty4threshold.XMLWeeks;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 
 /**
  * The threshold class that split the day in 24 hourly buckets. The buckets are
@@ -504,9 +502,8 @@ public class Twenty4HourThreshold implements Threshold, ConfigXMLInf {
 
         LOGGER.debug("Threshold cache miss for {}-{}-{}", hostName, serviceName, serviceItemName);
 
-        final Timer timer = Metrics.newTimer(Twenty4HourThreshold.class, 
-                "recalculateTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext ctxthreshold = timer.time();
+        final Timer timer = MetricsManager.getTimer(Twenty4HourThreshold.class,"recalculateTimer");
+        final Timer.Context ctxthreshold = timer.time();
         
         if (thresholdByPeriod[hourThreshold] == null || 
                 thresholdByPeriod[(hourThreshold+1) % HOURS_PER_DAY] == null) {

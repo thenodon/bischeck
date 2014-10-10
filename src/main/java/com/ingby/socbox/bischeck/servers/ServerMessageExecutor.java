@@ -26,9 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import org.jetlang.channels.Channel;
 import org.jetlang.channels.MemoryChannel;
 import org.jetlang.core.Callback;
 import org.jetlang.core.Disposable;
@@ -37,13 +35,12 @@ import org.jetlang.fibers.PoolFiberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.notifications.Notifier;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 
 /**
  * ServerMessageExecutor manage the messages asynchronously between a 
@@ -212,10 +209,9 @@ public final class ServerMessageExecutor {
      */
     synchronized public void executeInternal(String host, String service, NAGIOSSTAT level, String message) {
 
-        final Timer timer = Metrics.newTimer(ServerMessageExecutor.class, 
-                "executeInternal" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
+    	final Timer timer = MetricsManager.getTimer(ServerMessageExecutor.class,"executeInternal");
+        final Timer.Context context = timer.time();
+        
         try { 
 
             Iterator<String> iter = serverSet.keySet().iterator();

@@ -19,26 +19,22 @@
 package com.ingby.socbox.bischeck.servers;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Timer;
 import com.googlecode.jsendnsca.MessagePayload;
 import com.googlecode.jsendnsca.NagiosException;
 import com.googlecode.jsendnsca.NagiosPassiveCheckSender;
 import com.googlecode.jsendnsca.NagiosSettings;
-import com.googlecode.jsendnsca.MessagePayload.UnknownHostRuntimeException;
-import com.googlecode.jsendnsca.builders.MessagePayloadBuilder;
 import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+
 
 public class NSCAWorker implements WorkerInf, Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(NSCAWorker.class);
@@ -108,12 +104,9 @@ public class NSCAWorker implements WorkerInf, Runnable {
         }
         
         final String timerName = instanceName+"_sendTimer";
-
-        final Timer timer = Metrics.newTimer(NSCAServer.class, 
-                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
-
+        final Timer timer = MetricsManager.getTimer(NSCAServer.class, timerName);
+        final Timer.Context context = timer.time();
+        
         try {
             sender.send(payload);
 

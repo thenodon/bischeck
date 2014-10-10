@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.sf.json.JSONObject;
@@ -42,6 +42,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Tuple;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.MBeanManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.Util;
@@ -55,12 +56,11 @@ import com.ingby.socbox.bischeck.cache.LastStatusNotification;
 import com.ingby.socbox.bischeck.cache.LastStatusState;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceState;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+
 
 
 /**
@@ -377,10 +377,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
         CacheQueue<LastStatus> fifo;
 
         Jedis jedis = null;
-        final Timer timer = Metrics.newTimer(LastStatusCache.class, 
-                "writeTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
+        final Timer timer = MetricsManager.getTimer(LastStatusCache.class,"writeTimer");
+        final Timer.Context context = timer.time();
+        
         try {
             jedis = jedispool.getResource();
 
@@ -1337,11 +1336,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
          key.append(service.getServiceName());
 
          Long score = null;
-
          Jedis jedis = null;
-         final Timer timer = Metrics.newTimer(LastStatusCache.class, 
-                 "stateWriteTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-         final TimerContext context = timer.time();
+         final Timer timer = MetricsManager.getTimer(LastStatusCache.class,"stateWriteTimer");
+         final Timer.Context context = timer.time();
 
          try {
              jedis = jedispool.getResource();
@@ -1375,9 +1372,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 
          Jedis jedis = null;
-         final Timer timer = Metrics.newTimer(LastStatusCache.class, 
-                 "notifyWriteTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-         final TimerContext context = timer.time();
+         final Timer timer = MetricsManager.getTimer(LastStatusCache.class,"notifyWriteTimer");
+         final Timer.Context context = timer.time();
 
          try {
              jedis = jedispool.getResource();
@@ -1406,9 +1402,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 
 
          Jedis jedis = null;
-         final Timer timer = Metrics.newTimer(LastStatusCache.class, 
-                 "stateReadTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-         final TimerContext context = timer.time();
+         final Timer timer = MetricsManager.getTimer(LastStatusCache.class,"stateReadTimer");
+         final Timer.Context context = timer.time();
 
          Set<Tuple> returnTulpe = null;
 

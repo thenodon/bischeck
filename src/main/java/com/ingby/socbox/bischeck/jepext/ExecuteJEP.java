@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +34,10 @@ import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
 import org.nfunk.jep.function.PostfixMathCommandI;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.ClassCache;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
+
 
 /**
  * The main class to execute JEP based math expressions
@@ -127,9 +126,9 @@ public class ExecuteJEP {
         
         LOGGER.debug("Parse : {}", executeexp);
         
-        final Timer timer = Metrics.newTimer(ExecuteJEP.class, 
-                "calulateTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
+        final Timer timer = MetricsManager.getTimer(ExecuteJEP.class,"calulateTimer");
+        final Timer.Context context = timer.time();
+        
         Float value = null;
         try {
             parser.parseExpression(executeexp);

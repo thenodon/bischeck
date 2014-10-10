@@ -25,7 +25,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,14 +41,14 @@ import static org.quartz.JobBuilder.*;
 import static org.quartz.TriggerBuilder.*;
 import static org.quartz.CronScheduleBuilder.*;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.ServiceDef;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CachePurgeInf;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
+
 
 /**
  * This class is executed as a Quartz job to purge cache data according to:<br>
@@ -116,10 +115,10 @@ public class CachePurgeJob implements Job {
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        final Timer timer = Metrics.newTimer(CachePurgeJob.class, 
-                "purgeTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-        
+
+    	final Timer timer = MetricsManager.getTimer(CachePurgeJob.class,"purgeTimer");
+        final Timer.Context context = timer.time();
+
         try {
             Map<String, String> purgeMap = ConfigurationManager.getInstance().getPurgeMap();
             LOGGER.info("CachePurge purging {}", purgeMap.size());
@@ -139,7 +138,6 @@ public class CachePurgeJob implements Job {
                                 System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(purgeMap.get(key)))*1000);
                         // if index is null there is no items in the cache older then the time offset
                         if (index != null) {
-                        	//LOGGER.debug("Time based purge at index {} purgekey {} time offset {}", index, purgeMap.get(key),System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(purgeMap.get(key)))*1000);
                         	((CachePurgeInf) cache).trim(key, index);
                         } 
                     } else {

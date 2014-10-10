@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,9 +52,11 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import ch.qos.logback.classic.Level;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.MBeanManager;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.host.Host;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.notifications.Notifier;
 import com.ingby.socbox.bischeck.servers.Server;
 import com.ingby.socbox.bischeck.service.RunAfter;
@@ -82,9 +83,6 @@ import com.ingby.socbox.bischeck.xsd.servers.XMLServer;
 import com.ingby.socbox.bischeck.xsd.servers.XMLServers;
 import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlproperty;
 import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlservices;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 
 /**
  * The ConfigurationManager class is responsible for all core configuration of 
@@ -245,10 +243,9 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         if (configMgr == null ) 
             configMgr = new ConfigurationManager();
 
-        final Timer timer = Metrics.newTimer(ConfigurationManager.class, 
-                "initializationTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
+        final Timer timer = MetricsManager.getTimer(ConfigurationManager.class,"initializationTimer");
+        final Timer.Context context = timer.time();
+        
         configMgr.allocateDataStructs();
         
         try {

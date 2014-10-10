@@ -12,7 +12,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -23,10 +22,12 @@ import net.sf.json.util.JSONBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationException;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.servers.MessageServerInf;
 import com.ingby.socbox.bischeck.service.JDBCService;
 import com.ingby.socbox.bischeck.service.Service;
@@ -35,9 +36,7 @@ import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
 import com.ingby.socbox.bischeck.threshold.DummyThreshold;
 import com.ingby.socbox.bischeck.threshold.Threshold;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+
 
 public final class PagerDuty implements Notifier, MessageServerInf {
     private final static Logger LOGGER = LoggerFactory.getLogger(PagerDuty.class);
@@ -246,11 +245,9 @@ public final class PagerDuty implements Notifier, MessageServerInf {
         HttpURLConnection conn = null;
 
         final String timerName = instanceName+"_sendTimer";
-
-        final Timer timer = Metrics.newTimer(PagerDuty.class, 
-                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
+        final Timer timer = MetricsManager.getTimer(PagerDuty.class,timerName);
+        final Timer.Context context = timer.time();
+        
         JSONObject json = null;
 
         try {

@@ -42,19 +42,18 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheStateInf;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 import com.ingby.socbox.bischeck.threshold.ThresholdException;
 import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 
 /**
  * The ServiceJob is a quartz job that execute the task of each {@link Service} 
@@ -89,10 +88,13 @@ public class ServiceJob implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        final Timer timer = Metrics.newTimer(ServiceJob.class, 
-                "executeTotalTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext timercontext = timer.time();
-
+//        final Timer timer = Metrics.newTimer(ServiceJob.class, 
+//                "executeTotalTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+//        final TimerContext timercontext = timer.time();
+        final Timer timer = MetricsManager.getTimer(ServiceJob.class,"executeTotalTimer");
+        final Timer.Context timercontext = timer.time();
+        
+        
         Service service = null;
         
         try {
@@ -116,9 +118,10 @@ public class ServiceJob implements Job {
             checkRunImmediate(runafter);
 
             if (service.isSendServiceData()) {
-                final Timer timerPub = Metrics.newTimer(ServiceJob.class, 
-                        "publishTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-                final TimerContext contextPub = timerPub.time();
+
+            	final Timer timerPub = MetricsManager.getTimer(ServiceJob.class,"publishTimer");
+                final Timer.Context contextPub = timerPub.time();
+                
                 try {
                     ServerMessageExecutor.getInstance().publishServer(service); 
                 }finally {          
@@ -128,9 +131,10 @@ public class ServiceJob implements Job {
             }
             
             if (((ServiceStateInf) service).getServiceState().isNotification()) {
-                final Timer timerPubNotification = Metrics.newTimer(ServiceJob.class, 
-                        "publishNotificationTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-                final TimerContext contextPubNotification = timerPubNotification.time();
+                
+                final Timer timerPubNotification = MetricsManager.getTimer(ServiceJob.class,"publishNotificationTimer");
+                final Timer.Context contextPubNotification = timerPubNotification.time();
+                
                 try {
                     ServerMessageExecutor.getInstance().publishNotifiers(service); 
                 }finally {          
@@ -286,10 +290,10 @@ public class ServiceJob implements Job {
 
     
     private void executeService(Service service, ServiceItem serviceitem) {
-        final Timer timer = Metrics.newTimer(ServiceJob.class, 
-                "executeServiceTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
 
+        final Timer timer = MetricsManager.getTimer(ServiceJob.class,"executeServiceTimer");
+        final Timer.Context context = timer.time();
+        
         try {
             if (service.isConnectionEstablished()) {
                 try {
@@ -324,10 +328,9 @@ public class ServiceJob implements Job {
 
         NAGIOSSTAT currentState = service.getLevel();
 
-        final Timer timer = Metrics.newTimer(ServiceJob.class, 
-                "executeThresholdTimer", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext ctxthreshold = timer.time();
-
+        final Timer timer = MetricsManager.getTimer(ServiceJob.class,"executeThresholdTimer");
+        final Timer.Context ctxthreshold = timer.time();
+        
         // Get the threshold class
         try {
             serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));

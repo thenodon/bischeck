@@ -28,17 +28,16 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.BischeckDecimal;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.librato.metrics.HttpPoster;
 import com.librato.metrics.LibratoBatch;
 import com.librato.metrics.NingHttpPoster;
 import com.librato.metrics.Sanitizer;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 
 
 /**
@@ -170,10 +169,9 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
     private void connectAndSend(LibratoBatch batch, String source) {
         Long duration = null;
         final String timerName = instanceName+"_sendTimer";
-        final Timer timer = Metrics.newTimer(MetricsLibratoServer.class, 
-                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
+        final Timer timer = MetricsManager.getTimer(MetricsLibratoServer.class, timerName);
+        final Timer.Context context = timer.time();
+        
         long currentTimeInSec = System.currentTimeMillis()/1000;
         try {
             batch.post(source, currentTimeInSec);

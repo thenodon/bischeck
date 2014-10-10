@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -12,13 +11,13 @@ import java.util.regex.PatternSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
 import com.ingby.socbox.bischeck.ServiceDef;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
+
 
 /**
  * The main class to manage parsing and execution of cache data in
@@ -46,11 +45,10 @@ public final class CacheEvaluator {
      * @return
      */
     public static String parse(final String statement) {
-        final Timer timer = Metrics.newTimer(CacheEvaluator.class, "parseTimer",
-                TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-
-        final TimerContext context = timer.time();
-
+    	
+        final Timer timer = MetricsManager.getTimer(CacheEvaluator.class, "parseTimer");
+        final Timer.Context context = timer.time();
+        
         CacheEvaluator cacheeval;
         try {
             cacheeval = new CacheEvaluator(statement);

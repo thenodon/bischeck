@@ -24,17 +24,15 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 
 /**
  * 
@@ -116,11 +114,13 @@ public final class ServerExecutor {
      * servers.
      */
     synchronized public void execute(Service service) {
+//
+//        final Timer timer = Metrics.newTimer(ServerExecutor.class, 
+//                "execute" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+//        final TimerContext context = timer.time();
 
-        final Timer timer = Metrics.newTimer(ServerExecutor.class, 
-                "execute" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
+        final Timer timer = MetricsManager.getTimer(ServerExecutor.class,"execute");
+        final Timer.Context context = timer.time();
         try { 
             Iterator<String> iter = serverSet.keySet().iterator();
 
@@ -155,12 +155,10 @@ public final class ServerExecutor {
 
     synchronized public void executeInternal(String host, String service, NAGIOSSTAT level, String message) {
 
-        final Timer timer = Metrics.newTimer(ServerExecutor.class, 
-                "executeInternal" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
+    	final Timer timer = MetricsManager.getTimer(ServerExecutor.class,"executeInternal");
+        final Timer.Context context = timer.time();
+        
         try { 
-
             Iterator<String> iter = serverSet.keySet().iterator();
 
             while (iter.hasNext()) {    

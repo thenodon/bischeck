@@ -29,18 +29,17 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+
 
 /**
  * This class is responsible to send bischeck data to a opentsdb server
@@ -126,10 +125,9 @@ public final class OpenTSDBServer implements Server,  MessageServerInf {
         PrintWriter out = null;
         
         final String timerName = instanceName+"_sendTimer";
-
-        final Timer timer = Metrics.newTimer(OpenTSDBServer.class, 
-                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
+        final Timer timer = MetricsManager.getTimer(OpenTSDBServer.class,timerName);
+        final Timer.Context context = timer.time();
+        
 
         try {
             

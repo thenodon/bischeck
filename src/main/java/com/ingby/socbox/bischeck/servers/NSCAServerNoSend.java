@@ -22,11 +22,12 @@ package com.ingby.socbox.bischeck.servers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Timer;
 import com.googlecode.jsendnsca.MessagePayload;
 
 import com.googlecode.jsendnsca.NagiosPassiveCheckSender;
@@ -37,15 +38,13 @@ import com.googlecode.jsendnsca.encryption.Encryption;
 import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+
 /**
  * Nagios server integration over NSCA protocol, using the jnscasend package.
  * The class is for pure testing. It do the same as NSCAServer except the send.
- * @author andersh
  *
  */
 public final class NSCAServerNoSend implements Server, ServerInternal, MessageServerInf {
@@ -172,11 +171,9 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
         }
         
         final String timerName = instanceName+"_send";
-
-        final Timer timer = Metrics.newTimer(NSCAServerNoSend.class, 
-                timerName , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-        final TimerContext context = timer.time();
-
+        final Timer timer = MetricsManager.getTimer(NSCAServerNoSend.class, timerName);
+        final Timer.Context context = timer.time();
+        
         try {
             // Do nothing 
         } finally { 
