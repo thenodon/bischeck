@@ -16,26 +16,25 @@ import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 public class ServiceKeyRouter {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ServiceKeyRouter.class);
+    private final static Logger LOGGER = LoggerFactory
+            .getLogger(ServiceKeyRouter.class);
 
-    private Map<Pattern,String> pattern2ServiceKey = new HashMap<Pattern, String>();
+    private Map<Pattern, String> pattern2ServiceKey = new HashMap<Pattern, String>();
     private boolean serviceKeyRouting;
     private String serviceKey;
 
     private String defaultServiceKey;
 
-
     public ServiceKeyRouter(String serviceKey) {
         this.serviceKey = serviceKey;
-        try{    
+        try {
             JSONObject json = JSONObject.fromObject(serviceKey);
             serviceKeyRouting = true;
-            parseServiceKeys(json); 
+            parseServiceKeys(json);
         } catch (JSONException ex) {
             serviceKeyRouting = false;
         }
     }
-
 
     public ServiceKeyRouter(String serviceKey, String defaultServiceKey) {
         this(serviceKey);
@@ -45,10 +44,9 @@ public class ServiceKeyRouter {
 
     }
 
-
     public String getServiceKey(String hostName, String serviceName) {
         if (serviceKeyRouting) {
-            return resolveServiceKey(hostName,serviceName);
+            return resolveServiceKey(hostName, serviceName);
         } else {
             if (serviceKey.isEmpty() && defaultServiceKey != null) {
                 return defaultServiceKey;
@@ -58,29 +56,28 @@ public class ServiceKeyRouter {
         }
     }
 
-
     private void parseServiceKeys(JSONObject json) {
 
         for (Object regexp : json.keySet()) {
             try {
-                pattern2ServiceKey.put(Pattern.compile((String)regexp), json.getString((String) regexp));
+                pattern2ServiceKey.put(Pattern.compile((String) regexp),
+                        json.getString((String) regexp));
             } catch (PatternSyntaxException pe) {
-                LOGGER.error("{} is not a valid regular expression. No incidents will be routes to service key {}", 
-                        (String) regexp,
-                        json.getString((String) regexp), 
-                        pe);
+                LOGGER.error(
+                        "{} is not a valid regular expression. No incidents will be routes to service key {}",
+                        (String) regexp, json.getString((String) regexp), pe);
             }
         }
     }
 
-
     private String resolveServiceKey(String hostName, String serviceName) {
-        for (Entry<Pattern, String> pat: pattern2ServiceKey.entrySet()) {
-            Matcher mat = pat.getKey().matcher(Util.fullQouteHostServiceName(hostName, serviceName));
+        for (Entry<Pattern, String> pat : pattern2ServiceKey.entrySet()) {
+            Matcher mat = pat.getKey().matcher(
+                    Util.fullQouteHostServiceName(hostName, serviceName));
             if (mat.find()) {
                 return pat.getValue();
             }
-        } 
+        }
 
         if (defaultServiceKey != null) {
             return defaultServiceKey;
