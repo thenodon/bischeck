@@ -10,6 +10,7 @@
         </jxb:globalBindings>
      
         <jxb:schemaBindings>
+            <jxb:package name="com.ingby.socbox.bischeck.xsd.laststatuscache"/>
             <jxb:nameXmlTransform>
               <!--  <jxb:typeName prefix="XML"/> -->
                 <jxb:elementName prefix="XML"/>
