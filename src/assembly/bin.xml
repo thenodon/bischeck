@@ -1,0 +1,140 @@
+<assembly>
+	<formats>
+		<format>tar.gz</format>
+		<format>zip</format>
+	</formats>
+
+	<fileSets>
+
+		<!-- bischeck jar -->
+		<fileSet>
+			<directory>target</directory>
+			<outputDirectory>lib</outputDirectory>
+			<includes>
+				<include>bischeck*.jar</include>
+			</includes>
+		</fileSet>
+
+		<!-- Getting started etc -->
+		<fileSet>
+			<directory>etc</directory>
+			<outputDirectory>etc</outputDirectory>
+			<includes>
+				<include>*.xml</include>
+				<include>jmxremote.*</include>
+			</includes>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0660</fileMode>
+		</fileSet>
+
+		<!-- Template scripts -->
+		<fileSet>
+			<directory>src/main/scripts</directory>
+			<outputDirectory>scripts</outputDirectory>
+			<includes>
+				<include>*.template</include>
+			</includes>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0660</fileMode>
+		</fileSet>
+
+		<!-- All resources files -->
+		<fileSet>
+			<directory>src/main/resources</directory>
+			<outputDirectory>resources</outputDirectory>
+			<includes>
+				<include>*.*</include>
+			</includes>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0660</fileMode>
+		</fileSet>
+
+		<!-- Migscripts -->
+		<fileSet>
+			<directory>src/main/migscripts</directory>
+			<outputDirectory>migscripts</outputDirectory>
+			<includes>
+				<include>*.*</include>
+			</includes>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0660</fileMode>
+		</fileSet>
+
+		<!-- Migration path file -->
+		<fileSet>
+			<directory>.</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>migrationpath.txt</include>
+			</includes>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0660</fileMode>
+		</fileSet>
+
+		<!-- Install script -->
+		<fileSet>
+			<directory>.</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>install</include>
+			</includes>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0750</fileMode>
+		</fileSet>
+
+		<!-- README and LICENSE file -->
+		<fileSet>
+			<directory>doc</directory>
+			<outputDirectory></outputDirectory>
+			<includes>
+				<include>README</include>
+				<include>LICENSE</include>
+			</includes>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0660</fileMode>
+		</fileSet>
+
+		<!-- Release Notes and manuals -->
+		<fileSet>
+			<directory>doc</directory>
+			<outputDirectory>docs</outputDirectory>
+			<includes>
+				<include>Bischeck configuration guide.pdf</include>
+				<include>Bischeck installation and administration guide.pdf
+				</include>
+				<include>ReleaseNotes.pdf</include>
+			</includes>
+			<fileMode>0660</fileMode>
+		</fileSet>
+
+		<!-- javadoc -->
+		<fileSet>
+			<directory>${project.build.directory}/javadoc</directory>
+			<outputDirectory>docs/javadoc</outputDirectory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+			<fileMode>0660</fileMode>
+		</fileSet>
+
+
+		<!-- All dependency jars -->
+		<fileSet>
+			<directory>target</directory>
+			<outputDirectory>lib</outputDirectory>
+			<includes>
+				<include>generate-assembly-*.jar</include>
+			</includes>
+		</fileSet>
+
+	</fileSets>
+
+	<dependencySets>
+		<dependencySet>
+			<scope>runtime</scope>
+			<outputDirectory>lib</outputDirectory>
+			<useProjectArtifact>false</useProjectArtifact>
+			<unpack>false</unpack>
+		</dependencySet>
+	</dependencySets>
+</assembly>
