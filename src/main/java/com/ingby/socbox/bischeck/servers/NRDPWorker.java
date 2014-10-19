@@ -147,13 +147,13 @@ public class NRDPWorker implements WorkerInf, Runnable {
         final Timer.Context context = timer.time();
         
         HttpURLConnection conn = null;
-        
+        OutputStreamWriter wr = null;
     
-        try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream())){
+        try {
             LOGGER.debug("{} - Url: {}",instanceName, urlstr);
             String payload = cmd+xml;
             conn = createHTTPConnection(payload);
-            
+            wr = new OutputStreamWriter(conn.getOutputStream());
             wr.write(payload);
             wr.flush();
             
@@ -220,6 +220,15 @@ public class NRDPWorker implements WorkerInf, Runnable {
         } finally { 
             long duration = context.stop()/1000000;
             LOGGER.debug("{} - Nrdp send execute: {} ms", instanceName, duration);
+            if (wr != null) {
+                try {
+                    wr.close();
+                } catch (IOException ignore) {
+                }
+            }
+            if(conn != null) {
+                conn.disconnect();
+            }
         }
     }
 
