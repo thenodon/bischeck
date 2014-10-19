@@ -28,7 +28,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+
 
 /**
  * Pooled version of JDBC based service
