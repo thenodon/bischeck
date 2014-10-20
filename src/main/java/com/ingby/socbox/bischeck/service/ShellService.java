@@ -44,14 +44,14 @@ public class ShellService extends ServiceAbstract implements Service, ServiceSta
 
     
     @Override
-    public void openConnection() throws ServiceException { 
+    public void openConnection() throws ServiceConnectionException { 
         super.openConnection();
         setConnectionEstablished(true);
     }
 
     
     @Override
-    public void closeConnection() throws ServiceException {}
+    public void closeConnection() throws ServiceConnectionException {}
 
     
     @Override 

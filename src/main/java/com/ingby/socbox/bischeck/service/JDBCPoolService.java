@@ -56,13 +56,13 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
 
     
     @Override
-    public void openConnection() throws ServiceException {   
+    public void openConnection() throws ServiceConnectionException {   
         try {
             this.connection = JDBCPoolServiceUtil.getConnection(this.getConnectionUrl());
         } catch (SQLException sqle) {
             setConnectionEstablished(false);
             LOGGER.warn("Open connection failed",sqle);
-            ServiceException se = new ServiceException(sqle);
+            ServiceConnectionException se = new ServiceConnectionException(sqle);
             se.setServiceName(this.serviceName);
             throw se;
         }
@@ -70,12 +70,12 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
     }
     
     @Override
-    public void closeConnection() throws ServiceException {
+    public void closeConnection() throws ServiceConnectionException {
         try {
             this.connection.close();
         } catch (SQLException sqle) {
             LOGGER.warn("Closing connection failed",sqle);
-            ServiceException se = new ServiceException(sqle);
+            ServiceConnectionException se = new ServiceConnectionException(sqle);
             se.setServiceName(this.serviceName);
             throw se;
         }

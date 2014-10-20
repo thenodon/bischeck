@@ -62,6 +62,7 @@ public class SQLServiceitemTest {
         jdbc.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
         sql = new SQLServiceItem("serviceItemName");
         sql.setService(jdbc);
+        jdbc.addServiceItem(sql);
         host.addService(jdbc);
         jdbc.setHost(host);
 

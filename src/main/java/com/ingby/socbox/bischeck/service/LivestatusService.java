@@ -61,7 +61,7 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
 
     
     @Override
-    public void openConnection() throws ServiceException {
+    public void openConnection() throws ServiceConnectionException {
         super.openConnection();
         
         URI uri = null;
@@ -69,7 +69,7 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
         	uri = new URI(this.getConnectionUrl());
         }  catch (URISyntaxException use) {
             LOGGER.warn("Uri syntax is faulty",use);
-            final ServiceException se = new ServiceException(use);
+            final ServiceConnectionException se = new ServiceConnectionException(use);
             se.setServiceName(this.serviceName);
             throw se;
         }
@@ -89,7 +89,7 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
                	LOGGER.info("Closing rerources was interupted", ignore);
             }
             
-            final ServiceException se = new ServiceException(ioe);
+            final ServiceConnectionException se = new ServiceConnectionException(ioe);
             se.setServiceName(this.serviceName);
             throw se;
         } 
@@ -98,7 +98,7 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
     }
     
     @Override
-    public void closeConnection() throws ServiceException{
+    public void closeConnection() throws ServiceConnectionException{
         try {
             if (clientSocket != null) {
                 clientSocket.close();

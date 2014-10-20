@@ -94,7 +94,7 @@ public abstract class ServiceAbstract {
     }
 
     
-    void openConnection() throws ServiceException{
+    void openConnection() throws ServiceConnectionException {
         // Create the service state object at first open
         if (fsm == null) {
             fsm = ServiceState.ServiceStateFactory((Service) this);

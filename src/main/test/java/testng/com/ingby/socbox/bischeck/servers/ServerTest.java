@@ -14,6 +14,7 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceConnectionException;
 import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
 import com.ingby.socbox.bischeck.service.ServiceFactoryException;
@@ -48,7 +49,7 @@ public class ServerTest {
     }
     
     @Test (groups = { "Server" } )
-    public void execute() throws ServiceFactoryException, ServiceItemFactoryException, ThresholdException, ServiceException, ServiceItemException {
+    public void execute() throws ServiceFactoryException, ServiceItemFactoryException, ThresholdException, ServiceException, ServiceItemException, ServiceConnectionException {
         Service service = null;
         
         Assert.assertNotEquals(serverexecutor, null);

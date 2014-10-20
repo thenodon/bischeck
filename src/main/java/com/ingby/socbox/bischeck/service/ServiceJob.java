@@ -265,20 +265,35 @@ public class ServiceJob implements Job {
 
                     CacheFactory.getInstance().add(service,serviceitem);
 
-                } catch (ServiceException e) {
-                    // If the connection fail
-                    service.setLevel(levelOnError());
-                    
+                } catch (ServiceConnectionException e) {
                     if (saveNullOnConnectionError) {
                         serviceitem.setLatestExecuted("null");
                         // Will get state on serviceitem that is unknown
                         CacheFactory.getInstance().add(service,serviceitem);
                     }
-                    LOGGER.warn("Connection to {} failed for {}", Util.obfuscatePassword(service.getConnectionUrl()), 
-                            Util.fullQoutedName(service, serviceitem), e);
+                    LOGGER.warn("{} - connection to {} failed for {}",  
+                            Util.fullQoutedName(service, serviceitem), Util.obfuscatePassword(service.getConnectionUrl()), e);
+                    service.setLevel(levelOnError());
                     
+                } catch (ServiceItemException|ServiceException sexp) {
+                    LOGGER.warn("{} - execution prepare and/or query \"{}\" failed",
+                            Util.fullQoutedName(service, serviceitem), 
+                            serviceitem.getExecution(), 
+                            sexp);
+                    service.setLevel(levelOnError());
+                
+                } catch (ThresholdException te) {
+                  LOGGER.warn("{} - threshold excution {} failed", 
+                          Util.fullQoutedName(service, serviceitem), 
+                          serviceitem.getThresholdClassName(), 
+                          te);
+                  service.setLevel(levelOnError());
+                
+                } finally {
+                    try {
+                        service.closeConnection();
+                    } catch (ServiceConnectionException ignore) {}
                 }
-
             }
         } 
         LOGGER.debug("Resolved service state for {} set to {}", Util.fullQoutedHostServiceName(service), service.getLevel());
@@ -289,32 +304,32 @@ public class ServiceJob implements Job {
     }
 
     
-    private void executeService(Service service, ServiceItem serviceitem) {
+    private void executeService(Service service, ServiceItem serviceitem) throws ServiceItemException, ServiceException {
 
         final Timer timer = MetricsManager.getTimer(ServiceJob.class,"executeServiceTimer");
         final Timer.Context context = timer.time();
         
         try {
             if (service.isConnectionEstablished()) {
-                try {
+                //try {
 
                     serviceitem.execute();
             
-                } catch (ServiceItemException|ServiceException sexp) {
-                    LOGGER.warn("{} execution prepare and/or query \"{}\" failed",
-                            Util.fullQoutedName(service, serviceitem), 
-                            serviceitem.getExecution(), 
-                            sexp);
-                    service.setLevel(levelOnError());
-                    
-                } finally {
-                    try {
-                        service.closeConnection();
-                    } catch (ServiceException ignore) {}
-                }
+//                } catch (ServiceItemException|ServiceException sexp) {
+//                    LOGGER.warn("{} execution prepare and/or query \"{}\" failed",
+//                            Util.fullQoutedName(service, serviceitem), 
+//                            serviceitem.getExecution(), 
+//                            sexp);
+//                    service.setLevel(levelOnError());
+//                }
             }
+//                } finally {
+//                    try {
+//                        service.closeConnection();
+//                    } catch (ServiceException ignore) {}
+//                }
+//            }
         } finally {
-            
             long executetime = context.stop()/1000000;          
             serviceitem.setExecutionTime(executetime);
             LOGGER.debug("Time to execute {} : {} ms",
@@ -324,7 +339,7 @@ public class ServiceJob implements Job {
     }
 
     
-    private void executeThreshold(Service service, ServiceItem serviceitem) {
+    private void executeThreshold(Service service, ServiceItem serviceitem) throws ThresholdException {
 
         NAGIOSSTAT currentState = service.getLevel();
 
@@ -343,9 +358,9 @@ public class ServiceJob implements Job {
                         
             currentState = resolveServiceState(currentState, lastState);
             
-        } catch (ThresholdException te) {
-            LOGGER.warn("Threshold excution failed", te);
-            currentState = levelOnError();
+//        } catch (ThresholdException te) {
+//            LOGGER.warn("Threshold excution failed", te);
+//            currentState = levelOnError();
         } finally {
             ctxthreshold.stop();
         }

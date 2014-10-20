@@ -15,6 +15,7 @@ import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceConnectionException;
 import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.service.ServiceFactoryException;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
@@ -34,7 +35,7 @@ public class Twenty4HourThresholdTest {
     }
 
     @Test (groups = { "Threshold" } )
-    public void execute() throws ServiceFactoryException, ServiceItemFactoryException, ThresholdException, ServiceException, ServiceItemException {
+    public void execute() throws ServiceFactoryException, ServiceItemFactoryException, ThresholdException, ServiceException, ServiceItemException, ServiceConnectionException {
 
 
         Host host = confMgmr.getHostConfig().get("myhost");

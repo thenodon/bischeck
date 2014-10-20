@@ -121,15 +121,15 @@ public interface Service {
      * method is called.   
      * @throws ServiceException if the opening of connection fail
      */
-    void openConnection() throws ServiceException;
+    void openConnection() throws ServiceConnectionException;
     
     
     /**
      * The method close the connection and any recourses related to the 
      * connection when the method is called. 
-     * @throws  ServiceException if the closing of connection failes
+     * @throws  ServiceException if the closing of connection fails
      */
-    void closeConnection() throws ServiceException ;
+    void closeConnection() throws ServiceConnectionException ;
 
     
     /**

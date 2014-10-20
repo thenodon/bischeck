@@ -58,7 +58,7 @@ public class JDBCService extends ServiceAbstract implements Service, ServiceStat
 
     
     @Override
-    public void openConnection() throws ServiceException {
+    public void openConnection() throws ServiceConnectionException {
         super.openConnection();
         
         try {
@@ -66,7 +66,7 @@ public class JDBCService extends ServiceAbstract implements Service, ServiceStat
         } catch (SQLException sqle) {
             setConnectionEstablished(false);
             LOGGER.warn("Open connection failed",sqle);
-            ServiceException se = new ServiceException(sqle);
+            ServiceConnectionException se = new ServiceConnectionException(sqle);
             se.setServiceName(this.serviceName);
             throw se;
         }
@@ -75,12 +75,12 @@ public class JDBCService extends ServiceAbstract implements Service, ServiceStat
 
     
     @Override
-    public void closeConnection() throws ServiceException {
+    public void closeConnection() throws ServiceConnectionException {
         try {
             this.connection.close();
         } catch (SQLException sqle) {
             LOGGER.warn("Closing connection failed",sqle);
-            ServiceException se = new ServiceException(sqle);
+            ServiceConnectionException se = new ServiceConnectionException(sqle);
             se.setServiceName(this.serviceName);
             throw se;
         }
