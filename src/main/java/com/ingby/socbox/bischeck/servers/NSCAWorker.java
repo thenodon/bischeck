@@ -33,6 +33,7 @@ import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 
@@ -42,10 +43,10 @@ public class NSCAWorker implements WorkerInf, Runnable {
     private NagiosUtil nagutil;
     private NagiosPassiveCheckSender sender;
     private String instanceName;
-    private BlockingQueue<Service> bq;
+    private BlockingQueue<ServiceTO> bq;
     private ServerCircuitBreak circuitBreak;
     
-    public NSCAWorker(String instanceName, BlockingQueue<Service> bq, ServerCircuitBreak circuitBreak, NagiosSettings settings) {
+    public NSCAWorker(String instanceName, BlockingQueue<ServiceTO> bq, ServerCircuitBreak circuitBreak, NagiosSettings settings) {
         
         sender = new NagiosPassiveCheckSender(settings);
         this.nagutil = new NagiosUtil();
@@ -65,15 +66,15 @@ public class NSCAWorker implements WorkerInf, Runnable {
         LOGGER.debug("Worker count {}", runCount);
     
         while (runCount > 0) {
-            Service service = null;
+            ServiceTO serviceTo = null;
             try {
-                service = bq.take();
+                serviceTo = bq.take();
             } catch (InterruptedException e1) {
                 LOGGER.info("Worker thread is interupted for {}",instanceName);
                 break;
             }
             
-            circuitBreak.execute(this,service);
+            circuitBreak.execute(this,serviceTo);
             
             runCount--;
         }
@@ -81,26 +82,26 @@ public class NSCAWorker implements WorkerInf, Runnable {
     }
 
     @Override
-    public void send(Service service) throws ServerException {
+    public void send(ServiceTO serviceTo) throws ServerException {
 
         NAGIOSSTAT level;
-        MessagePayload payload = new MessagePayload(service.getHost().getHostname(), null, service.getServiceName(), "");
+        MessagePayload payload = new MessagePayload(serviceTo.getHostName(), null, serviceTo.getServiceName(), "");
         
         // Check the last connection status for the Service
-        if ( service.isConnectionEstablished() ) {
-            level = service.getLevel();
-            payload.setMessage(level + nagutil.createNagiosMessage(service));
+        if ( serviceTo.isConnectionEstablished() ) {
+            level = serviceTo.getLevel();
+            payload.setMessage(level + nagutil.createNagiosMessage(serviceTo));
         } else {
             // If no connection is established still write a value 
             // of null value=null;
             level=NAGIOSSTAT.CRITICAL;
-            payload.setMessage(level + " " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
+            payload.setMessage(level + " " + Util.obfuscatePassword(serviceTo.getUrl()) + " failed");
         }
 
         payload.setLevel(level.toString());
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
+            LOGGER.info(ServerUtil.logFormat(instanceName, serviceTo, payload.getMessage()));
         }
         
         final String timerName = instanceName+"_sendTimer";

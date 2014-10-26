@@ -18,6 +18,7 @@ import com.ingby.socbox.bischeck.service.ServiceConnectionException;
 import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
 import com.ingby.socbox.bischeck.service.ServiceFactoryException;
+import com.ingby.socbox.bischeck.service.ServiceTO.ServiceTOBuilder;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
@@ -85,8 +86,9 @@ public class ServerTest {
         serviceItem.execute();
         serviceItem.setExecutionTime(100L);
         service.closeConnection();
+        
 
-        serverexecutor.publishServer(service);
+        serverexecutor.publishServer(new ServiceTOBuilder(service).build());
 
         
     }

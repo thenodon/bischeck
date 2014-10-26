@@ -36,7 +36,7 @@ import com.googlecode.jsendnsca.NagiosSettings;
 import com.googlecode.jsendnsca.builders.NagiosSettingsBuilder;
 import com.googlecode.jsendnsca.encryption.Encryption;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
-import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 
 /**
  * Nagios server integration over NSCA protocol, using the jnscasend package.
@@ -49,7 +49,7 @@ public final class NSCAServer implements Server, MessageServerInf {
     private final ServerCircuitBreak circuitBreak;
     
     private final int MAX_QUEUE = 10;
-    private final LinkedBlockingQueue<Service> subTaskQueue;
+    private final LinkedBlockingQueue<ServiceTO> subTaskQueue;
     
     private final ExecutorService execService;
     
@@ -122,7 +122,7 @@ public final class NSCAServer implements Server, MessageServerInf {
      */
     private NSCAServer(String name) {
         instanceName=name;
-        subTaskQueue = new LinkedBlockingQueue<Service>();
+        subTaskQueue = new LinkedBlockingQueue<ServiceTO>();
         execService = Executors.newCachedThreadPool();
         settings = getNSCAConnection(name);
         circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
@@ -156,7 +156,7 @@ public final class NSCAServer implements Server, MessageServerInf {
     }
     
     @Override
-    public void send(Service service) throws ServerException {
+    public void send(ServiceTO serviceTo) throws ServerException {
         /*
          * Use the Worker send instead
          */
@@ -180,7 +180,7 @@ public final class NSCAServer implements Server, MessageServerInf {
 
 
     @Override
-    public void onMessage(Service message) {
+    public void onMessage(ServiceTO message) {
         subTaskQueue.offer(message);
         
         LOGGER.debug("{} - Worker pool size {} and queue size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize(),subTaskQueue.size());

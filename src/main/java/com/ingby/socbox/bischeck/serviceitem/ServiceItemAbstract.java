@@ -57,6 +57,16 @@ public abstract class ServiceItemAbstract {
     protected Threshold threshold;
     private String classname;
     private NAGIOSSTAT curstate;
+    private Exception exception;
+    private boolean hasException;
+    
+    public void reset() {
+        latestValue = null;
+        exception = null;
+        hasException = false;
+        curstate = NAGIOSSTAT.UNKNOWN;
+        exectime = 0L;
+    }
     
     public void setService(Service service) {
         this.service = service;
@@ -164,4 +174,5 @@ public abstract class ServiceItemAbstract {
     public NAGIOSSTAT getEvaluatedThreshold() {
         return curstate;
     }
+    
 }

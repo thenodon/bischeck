@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
-import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 /**
  * Nagios server integration over http based NRDP protocol.
  * <br>
@@ -58,7 +58,7 @@ public final class NRDPServer implements Server, MessageServerInf {
     private final ServerCircuitBreak circuitBreak;
     
     private final int MAX_QUEUE = 10;
-    private final LinkedBlockingQueue<Service> subTaskQueue;
+    private final LinkedBlockingQueue<ServiceTO> subTaskQueue;
    
     private ExecutorService execService;
 
@@ -100,7 +100,7 @@ public final class NRDPServer implements Server, MessageServerInf {
         
         instanceName=name;
 
-        subTaskQueue = new LinkedBlockingQueue<Service>();
+        subTaskQueue = new LinkedBlockingQueue<ServiceTO>();
         execService = Executors.newCachedThreadPool();
 
         circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
@@ -169,7 +169,7 @@ public final class NRDPServer implements Server, MessageServerInf {
     
     
     @Override
-    public void send(Service service) {
+    public void send(ServiceTO serviceTo) {
         /*
          * Use the Worker send instead
          */
@@ -190,7 +190,7 @@ public final class NRDPServer implements Server, MessageServerInf {
     }
 
     @Override
-    public void onMessage(Service message) {
+    public void onMessage(ServiceTO message) {
         subTaskQueue.offer(message);
 
         LOGGER.debug("{} - Worker pool size {} and queue size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize(),subTaskQueue.size());

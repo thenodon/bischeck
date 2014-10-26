@@ -32,6 +32,7 @@ import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
@@ -113,7 +114,7 @@ public final class ServerExecutor {
      * @param service the Service object that contain data to be send to the 
      * servers.
      */
-    synchronized public void execute(Service service) {
+    synchronized public void execute(ServiceTO serviceTo) {
 //
 //        final Timer timer = Metrics.newTimer(ServerExecutor.class, 
 //                "execute" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
@@ -131,7 +132,7 @@ public final class ServerExecutor {
                     Method method = serverSet.get(name).getMethod(GETINSTANCE,String.class);
                     Server server = (Server) method.invoke(null,name);
 
-                    server.send(service);
+                    server.send(serviceTo);
 
                 } catch (IllegalArgumentException e) {
                     LOGGER.error(e.toString(), e);

@@ -10,7 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -23,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.Timer;
+import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationException;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
@@ -30,8 +30,8 @@ import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.servers.MessageServerInf;
 import com.ingby.socbox.bischeck.service.JDBCService;
-import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.service.ServiceStateInf;
+import com.ingby.socbox.bischeck.service.ServiceTO;
+import com.ingby.socbox.bischeck.service.ServiceTO.ServiceTOBuilder;
 import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
 import com.ingby.socbox.bischeck.threshold.DummyThreshold;
 import com.ingby.socbox.bischeck.threshold.Threshold;
@@ -84,7 +84,10 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 
         PagerDuty pd = PagerDuty.getInstance("Test");
 
-        pd.sendAlert(jdbcService.getNotificationData());
+        ServiceTOBuilder builder = new ServiceTOBuilder(jdbcService);
+        ServiceTO serviceTo = builder.build();
+
+        pd.sendAlert(serviceTo);
         // pd.sendResolve(jdbcService.getNotificationData());
 
     }
@@ -161,38 +164,36 @@ public final class PagerDuty implements Notifier, MessageServerInf {
     }
 
     @Override
-    public void sendAlert(Map<String, String> notificationData) {
+    public void sendAlert(ServiceTO serviceTo) {
         Writer message = new StringWriter();
 
-        final String key = skr.getServiceKey(
-                notificationData.get(Notifier.HOST),
-                notificationData.get(Notifier.SERVICE));
+        final String key = skr.getServiceKey(serviceTo.getHostName(),
+                serviceTo.getServiceName());
         if (key == null) {
             LOGGER.error(
                     "Service for {} do not have a service key defined. Will not be sent by instance {}.",
-                    Util.fullQouteHostServiceName(
-                            notificationData.get(Notifier.HOST),
-                            notificationData.get(Notifier.SERVICE)),
-                    instanceName);
+                    Util.fullQouteHostServiceName(serviceTo.getHostName(),
+                            serviceTo.getServiceName()), instanceName);
             return;
         }
+
+        NagiosUtil nu = new NagiosUtil(false);
         new JSONBuilder(message)
                 .object()
                 .key("service_key")
                 .value(key)
                 .key("incident_key")
-                .value(notificationData.get(Notifier.INCIDENT_KEY))
+                .value(serviceTo.getIncidentKey())
                 .key("event_type")
                 .value("trigger")
                 .key("description")
-                .value(notificationData.get(Notifier.DESCRIPTION))
+                .value(nu.createNagiosMessage(serviceTo, true))
                 .key("details")
                 .object()
                 .key("servicedef")
-                .value(notificationData.get(Notifier.HOST) + "-"
-                        + notificationData.get(Notifier.SERVICE)).key("state")
-                .value(notificationData.get(Notifier.STATE)).endObject()
-                .endObject();
+                .value(serviceTo.getHostName() + "-"
+                        + serviceTo.getServiceName()).key("state")
+                .value(serviceTo.getLevel().toString()).endObject().endObject();
 
         JSONObject json = null;
         try {
@@ -207,29 +208,29 @@ public final class PagerDuty implements Notifier, MessageServerInf {
         LOGGER.info("Alert message to {} : {}", instanceName,
                 message.toString());
 
-        success(json, notificationData.get(Notifier.INCIDENT_KEY));
+        success(json, serviceTo.getIncidentKey());
     }
 
     @Override
-    public void sendResolve(Map<String, String> notificationData) {
+    public void sendResolve(ServiceTO serviceTo) {
         Writer message = new StringWriter();
 
-        String key = skr.getServiceKey(notificationData.get(Notifier.HOST),
-                notificationData.get(Notifier.SERVICE));
+        String key = skr.getServiceKey(serviceTo.getHostName(),
+                serviceTo.getServiceName());
         if (key == null) {
             LOGGER.error(
                     "Service for {} do not have a service key defined. Will not be sent by instance {}.",
-                    Util.fullQouteHostServiceName(
-                            notificationData.get(Notifier.HOST),
-                            notificationData.get(Notifier.SERVICE)),
-                    instanceName);
+                    Util.fullQouteHostServiceName(serviceTo.getHostName(),
+                            serviceTo.getServiceName()), instanceName);
             return;
         }
+
+        NagiosUtil nu = new NagiosUtil(false);
+
         new JSONBuilder(message).object().key("service_key").value(key)
-                .key("incident_key")
-                .value(notificationData.get(Notifier.INCIDENT_KEY))
+                .key("incident_key").value(serviceTo.getIncidentKey())
                 .key("event_type").value("resolve").key("description")
-                .value(notificationData.get(Notifier.DESCRIPTION)).endObject();
+                .value(nu.createNagiosMessage(serviceTo, true)).endObject();
 
         JSONObject json = null;
         try {
@@ -243,7 +244,7 @@ public final class PagerDuty implements Notifier, MessageServerInf {
         LOGGER.info("Resolve message to {} : {}", instanceName,
                 message.toString());
 
-        success(json, notificationData.get(Notifier.INCIDENT_KEY));
+        success(json, serviceTo.getIncidentKey());
     }
 
     private JSONObject sendMessage(final Writer message) throws IOException {
@@ -390,11 +391,11 @@ public final class PagerDuty implements Notifier, MessageServerInf {
     }
 
     @Override
-    public void onMessage(Service message) {
-        if (((ServiceStateInf) message).getServiceState().isResolved()) {
-            sendResolve(message.getNotificationData());
+    public void onMessage(ServiceTO message) {
+        if (message.isResolved()) {
+            sendResolve(message);
         } else {
-            sendAlert(message.getNotificationData());
+            sendAlert(message);
         }
     }
 

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.service;
 
@@ -30,20 +30,20 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
- * The ServiceAbstract class provide most of the methods needed by a Service 
+ * The ServiceAbstract class provide most of the methods needed by a Service
  * implementation. The methods not implemented in the abstract class are: <b>
  * <ul>
  * <li>public void openConnection() throws ServiceException</li>
  * <li>public void closeConnection() throws ServiceException</li>
  * <li>public String getNSCAMessage()</li>
  * <li>public String executeStmt(String exec) throws ServiceException</li>
- * </ul> 
- *
+ * </ul>
+ * 
  */
 
 public abstract class ServiceAbstract {
 
-    protected HashMap<String,ServiceItem> servicesItems = new HashMap<String,ServiceItem>();
+    protected HashMap<String, ServiceItem> servicesItems = new HashMap<String, ServiceItem>();
     protected String serviceName;
     protected String decscription;
     protected String alias;
@@ -54,85 +54,71 @@ public abstract class ServiceAbstract {
     private NAGIOSSTAT level = NAGIOSSTAT.UNKNOWN;
     private boolean connectionEstablished = false;
     private Boolean sendServiceData = true;
-    
-    private ServiceState fsm = null;
-    
 
-    
+    private ServiceState fsm = null;
+
     public String getServiceName() {
         return serviceName;
     }
 
-    
     public String getConnectionUrl() {
         return connectionUrl;
     }
 
-    
     public void setConnectionUrl(String connectionUrl) {
         this.connectionUrl = connectionUrl;
     }
 
-    
     public String getDecscription() {
         return decscription;
     }
 
-    
     public void setDecscription(String decscription) {
         this.decscription = decscription;
     }
 
-    
     public String getDriverClassName() {
         return driverClassName;
     }
 
-    
     public void setDriverClassName(String driverClassName) {
         this.driverClassName = driverClassName;
     }
 
-    
     void openConnection() throws ServiceConnectionException {
         // Create the service state object at first open
         if (fsm == null) {
             fsm = ServiceState.ServiceStateFactory((Service) this);
         }
     }
-    
-    
+
     public void setHost(Host host) {
         this.host = host;
     }
 
-    
     public Host getHost() {
         return this.host;
     }
-    
-    
+
     public void setSchedules(List<String> schedulelist) {
         this.schedulelist = schedulelist;
     }
 
-    
     public List<String> getSchedules() {
         return this.schedulelist;
-    }    
-    
+    }
+
     public void addServiceItem(ServiceItem serviceItem) {
         servicesItems.put(serviceItem.getServiceItemName(), serviceItem);
     }
 
-    
-    public HashMap<String,ServiceItem> getServicesItems() {
+    public HashMap<String, ServiceItem> getServicesItems() {
         return servicesItems;
     }
 
-    
     public ServiceItem getServiceItemByName(String name) {
-        for (Map.Entry<String, ServiceItem> serviceItementry: servicesItems.entrySet()) {
+        for (Map.Entry<String, ServiceItem> serviceItementry : servicesItems
+                .entrySet()) {
             ServiceItem serviceItem = serviceItementry.getValue();
             if (serviceItem.getServiceItemName().compareTo(name) == 0) {
                 return serviceItem;
@@ -141,41 +127,33 @@ public abstract class ServiceAbstract {
         return null;
     }
 
-    
-    public NAGIOSSTAT getLevel(){
+    public NAGIOSSTAT getLevel() {
         return level;
     }
 
-    
     public void setLevel(NAGIOSSTAT level) {
         this.level = level;
     }
-    
-    
+
     public boolean isConnectionEstablished() {
         return connectionEstablished;
     }
-    
-    
-    protected void setConnectionEstablished(boolean connected){
+
+    protected void setConnectionEstablished(boolean connected) {
         connectionEstablished = connected;
     }
 
-
-    public Boolean isSendServiceData(){
+    public Boolean isSendServiceData() {
         return sendServiceData;
     }
-    
-    
-    public void setSendServiceData(Boolean sendServiceData){
+
+    public void setSendServiceData(Boolean sendServiceData) {
         this.sendServiceData = sendServiceData;
     }
-
 
     public String getAlias() {
         return alias;
     }
-
 
     public void setAlias(String alias) {
         this.alias = alias;
@@ -186,39 +164,7 @@ public abstract class ServiceAbstract {
         return fsm;
     }
 
-
     public void setServiceState() {
         fsm.setState(getLevel());
-    }
-    
-    public Map<String, String> getNotificationData() {
-        Map<String,String> notification = new HashMap<String, String>();
-        notification.put(Notifier.HOST, getHost().getHostname());
-        notification.put(Notifier.SERVICE, getServiceName());
-        notification.put(Notifier.STATE, getLevel().toString());
-        notification.put(Notifier.INCIDENT_KEY, getServiceState().getCurrentIncidentId());
-        notification.put(Notifier.RESOLVED, getServiceState().isResolved().toString());
-        
-        NagiosUtil nagutil = new NagiosUtil();
-        
-        notification.put(Notifier.DESCRIPTION, new StringBuilder().
-                append(getHost().getHostname()).
-                append("-").
-                append(getServiceName()). 
-                append(" : ").
-                append(getLevel()). 
-                append(" : "). 
-                append(nagutil.createNagiosMessage((Service) this)).toString());
-        
-        notification.put(Notifier.DESCRIPTION_SHORT, new StringBuilder().
-                append(getHost().getHostname()).
-                append("-").
-                append(getServiceName()). 
-                append(" : ").
-                append(getLevel()). 
-                append(" : "). 
-                append(nagutil.createNagiosMessage((Service) this, false)).toString());
-
-        return notification;
     }
 }

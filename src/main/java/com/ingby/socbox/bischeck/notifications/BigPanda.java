@@ -23,12 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.Timer;
+import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.servers.MessageServerInf;
-import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.service.ServiceStateInf;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 
 public final class BigPanda implements Notifier, MessageServerInf {
     private final static Logger LOGGER = LoggerFactory
@@ -113,9 +113,9 @@ public final class BigPanda implements Notifier, MessageServerInf {
     }
 
     @Override
-    public void sendAlert(final Map<String, String> notificationData) {
+    public void sendAlert(final ServiceTO serviceTo) {
         try {
-            final String message = send(notificationData);
+            final String message = send(serviceTo);
             LOGGER.info("Alert message to {} : {}", instanceName,
                     message.toString());
         } catch (IOException e) {
@@ -124,36 +124,33 @@ public final class BigPanda implements Notifier, MessageServerInf {
         } catch (IllegalArgumentException e) {
             LOGGER.error(
                     "Service for {} do not have a app key defined. Will not be sent by instance {}.",
-                    Util.fullQouteHostServiceName(
-                            notificationData.get(Notifier.HOST),
-                            notificationData.get(Notifier.SERVICE)),
-                    instanceName, e);
+                    Util.fullQouteHostServiceName(serviceTo.getHostName(),
+                            serviceTo.getServiceName()), instanceName, e);
         }
     }
 
     @Override
-    public void sendResolve(final Map<String, String> notificationData) {
-        return;
-        // try {
-        // String message = send(notificationData);
-        // LOGGER.info("Resolve message to {} : {}", instanceName,
-        // message.toString());
-        // } catch (IOException e) {
-        // LOGGER.error("Sending resolve message to {} failed.", instanceName,
-        // e);
-        // } catch (IllegalArgumentException e) {
-        // LOGGER.error("Service for {} do not have a service key defined. Will not be sent by instance {}.",
-        // Util.fullQouteHostServiceName(notificationData.get(Notifier.HOST),notificationData.get(Notifier.SERVICE)),
-        // instanceName, e);
-        // }
+    public void sendResolve(final ServiceTO serviceTo) {
+        try {
+            String message = send(serviceTo);
+            LOGGER.info("Resolve message to {} : {}", instanceName,
+                    message.toString());
+        } catch (IOException e) {
+            LOGGER.error("Sending resolve message to {} failed.", instanceName,
+                    e);
+        } catch (IllegalArgumentException e) {
+            LOGGER.error(
+                    "Service for {} do not have a service key defined. Will not be sent by instance {}.",
+                    Util.fullQouteHostServiceName(serviceTo.getHostName(),
+                            serviceTo.getServiceName()), instanceName, e);
+        }
     }
 
-    private String send(final Map<String, String> notificationData)
-            throws IOException, IllegalArgumentException {
+    private String send(final ServiceTO serviceTo) throws IOException,
+            IllegalArgumentException {
 
-        final String key = skr.getServiceKey(
-                notificationData.get(Notifier.HOST),
-                notificationData.get(Notifier.SERVICE));
+        final String key = skr.getServiceKey(serviceTo.getHostName(),
+                serviceTo.getServiceName());
         if (key == null) {
             throw new IllegalArgumentException();
         }
@@ -161,22 +158,22 @@ public final class BigPanda implements Notifier, MessageServerInf {
         final Long bptimestamp = unixEpoch(System.currentTimeMillis());
         final Writer message = new StringWriter();
 
+        NagiosUtil nu = new NagiosUtil(false);
+
         new JSONBuilder(message).object().key("app_key").value(key)
                 .key("status")
-                .value(notificationData.get(Notifier.STATE).toLowerCase())
-                .key("host")
-                .value(notificationData.get(Notifier.HOST))
+                .value(serviceTo.getLevel().toString().toLowerCase())
+                .key("host").value(serviceTo.getHostName())
                 .key("timestamp")
                 .value(bptimestamp)
                 // Need this in notificationData
-                .key("description")
-                .value(notificationData.get(Notifier.DESCRIPTION_SHORT))
+                .key("description").value(nu.createNagiosMessage(serviceTo))
                 .key("check")
-                .value(notificationData.get(Notifier.SERVICE))
+                .value(serviceTo.getServiceName())
                 // .key("cluster")
                 // .value(notificationData.get("host"))
-                .key("incident_key")
-                .value(notificationData.get(Notifier.INCIDENT_KEY)).endObject();
+                .key("incident_key").value(serviceTo.getIncidentKey())
+                .endObject();
 
         if (sendMessage) {
             sendMessage(message);
@@ -329,11 +326,11 @@ public final class BigPanda implements Notifier, MessageServerInf {
     }
 
     @Override
-    public void onMessage(final Service message) {
-        if (((ServiceStateInf) message).getServiceState().isResolved()) {
-            sendResolve(message.getNotificationData());
+    public void onMessage(final ServiceTO message) {
+        if (message.isResolved()) {
+            sendResolve(message);
         } else {
-            sendAlert(message.getNotificationData());
+            sendAlert(message);
         }
     }
 

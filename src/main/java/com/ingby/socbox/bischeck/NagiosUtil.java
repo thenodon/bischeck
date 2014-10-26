@@ -23,7 +23,9 @@ import java.util.Map;
 
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemTO;
 
 /**
  * Common utilities to manage Nagios integration 
@@ -166,6 +168,148 @@ public class NagiosUtil {
         StringBuilder perfmessage = new StringBuilder();
         
         perfmessage.append(serviceItem.getServiceItemName()).append("=");
+        if (currentMeasure != null) {
+            perfmessage.append(currentMeasure.toString());
+        }
+        perfmessage.append(";");
+        if (warnValue != null) {
+            perfmessage.append(warnValue.toString());
+        }
+        perfmessage.append(";");
+        if (critValue != null) {
+            perfmessage.append(critValue.toString());
+        }
+        
+        perfmessage.append(";0; threshold=");
+        
+        if (threshold == null) {
+            //TODO this is compatibility, should be set to U  
+            perfmessage.append("0");
+        } else {
+            perfmessage.append(threshold.toString());
+        }
+        perfmessage.append(";0;0;0; ");
+        
+        if (isExtended()) {
+            if (threshold != null) {
+                perfmessage.append("warning=").
+                append(warnValue.toString()).
+                append(";0;0;0; ").
+                append("critical=").
+                append(critValue.toString()).
+                append(";0;0;0; ");
+            } else {
+                perfmessage.append("warning=").
+                append("0").
+                append(";0;0;0; ").
+                append("critical=").
+                append("0").
+                append(";0;0;0; ");
+            }
+        }
+        return perfmessage;
+    }
+
+    public String createNagiosMessage(final ServiceTO serviceTo) {
+        return createNagiosMessage(serviceTo, true);
+    }
+    
+    
+    public String createNagiosMessage(final ServiceTO serviceTo, final boolean perfData) {
+        StringBuilder message = new StringBuilder();
+        StringBuilder perfmessage = new StringBuilder();
+        
+        message.append(" ");
+        perfmessage.append(" ");
+        
+        int count = 0;
+        long totalexectime = 0;
+
+        for (String serviceItementry: serviceTo.getServiceItemTONames()) {
+            ServiceItemTO serviceItemTo = serviceTo.getServiceItemTO(serviceItementry);
+            
+            
+            BischeckDecimal warnValue = null;
+            BischeckDecimal critValue = null;
+            BischeckDecimal threshold = null;
+            String method = "NA";
+
+            
+            BischeckDecimal currentMeasure = new BischeckDecimal(serviceItemTo.getValue());
+            
+            if (serviceItemTo.hasThreshold()) {
+                Float currentThreshold = serviceItemTo.getThreshold();    
+                threshold = new BischeckDecimal(currentThreshold).scaleBy(currentMeasure);
+                
+                method = serviceItemTo.getMethod();
+
+                if ("=".equalsIgnoreCase(method)) {
+                    Float warnfloat = new Float ((1-serviceItemTo.getWarning())*currentThreshold);
+                    Float critfloat = new Float ((1-serviceItemTo.getCritical())*currentThreshold);;
+                    warnValue = new BischeckDecimal(warnfloat).scaleBy(threshold);
+                    critValue = new BischeckDecimal(critfloat).scaleBy(threshold);
+                    
+                    message.append(serviceItemTo.getName()).
+                    append(" = ").
+                    append(currentMeasure).
+                    append(" (").
+                    append(threshold.toString()).
+                    append(" ").append(method).append(" ").
+                    append(warnValue.toString()).
+                    append(" ").append(method).append("  +-W ").append(method).append(" ").
+                    append(critValue.toString()).
+                    append(" ").append(method).append("  +-C ").append(method).append(" ) ");
+                    
+                } else {
+                    Float warnfloat = new Float (serviceItemTo.getWarning()*currentThreshold);
+                    Float critfloat = new Float (serviceItemTo.getCritical()*currentThreshold);
+                    warnValue = new BischeckDecimal(warnfloat).scaleBy(threshold);
+                    critValue = new BischeckDecimal(critfloat).scaleBy(threshold);
+                    
+                    message.append(serviceItemTo.getName()).
+                    append(" = ").
+                    append(currentMeasure).
+                    append(" (").
+                    append(threshold.toString()).
+                    append(" ").append(method).append(" ").
+                    append(warnValue.toString()).
+                    append(" ").append(method).append("  W ").append(method).append(" ").
+                    append(critValue.toString()).
+                    append(" ").append(method).append("  C ").append(method).append(" ) ");
+                    
+                }
+
+            } else {
+                message.append(serviceItemTo.getName()).
+                append(" = ").
+                append(currentMeasure).
+                append(" (NA) ");
+                
+            }
+
+            // Building the performance string 
+            if (!currentMeasure.isNull()) {
+                perfmessage.append(performanceMessage(serviceItemTo, warnValue, critValue,
+                    threshold, currentMeasure));
+            }
+            
+            totalexectime = (totalexectime + serviceItemTo.getExecTime());
+            count++;
+        }
+        
+        if (perfData) {
+            message.append(" | ").append(perfmessage).append("avg-exec-time=").append(((totalexectime/count)+"ms"));
+        }
+        
+        return message.toString();
+    }
+    
+    private StringBuilder performanceMessage(
+            ServiceItemTO serviceItemTo, BischeckDecimal warnValue,
+            BischeckDecimal critValue, BischeckDecimal threshold, BischeckDecimal currentMeasure) {
+        StringBuilder perfmessage = new StringBuilder();
+        
+        perfmessage.append(serviceItemTo.getName()).append("=");
         if (currentMeasure != null) {
             perfmessage.append(currentMeasure.toString());
         }

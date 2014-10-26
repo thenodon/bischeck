@@ -18,7 +18,7 @@
 */
 package com.ingby.socbox.bischeck.servers;
 
-import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 
 public interface WorkerInf {
     
@@ -31,6 +31,6 @@ public interface WorkerInf {
      * @throws ServerException if any communication exception occur. 
      * If {@ ServerCircuitBreak} is used it will be triggered by the exception.
      */
-    void send(Service service) throws ServerException;
+    void send(ServiceTO serviceTo) throws ServerException;
 
 }

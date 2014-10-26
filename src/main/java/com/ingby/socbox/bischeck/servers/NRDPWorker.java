@@ -48,6 +48,7 @@ import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 
@@ -57,13 +58,13 @@ public class NRDPWorker implements WorkerInf, Runnable {
     private String cmd;
     private NagiosUtil nagutil;
     private String instanceName;
-    private BlockingQueue<Service> bq;
+    private BlockingQueue<ServiceTO> bq;
     private ServerCircuitBreak circuitBreak;
     private URL url;
     private Integer connectionTimeout;
     
     
-    public NRDPWorker(String instanceName, BlockingQueue<Service> bq, ServerCircuitBreak circuitBreak, String urlstr, String cmd, Integer connectionTimeout) {
+    public NRDPWorker(String instanceName, BlockingQueue<ServiceTO> bq, ServerCircuitBreak circuitBreak, String urlstr, String cmd, Integer connectionTimeout) {
         
         this.nagutil = new NagiosUtil();
         this.urlstr = urlstr;
@@ -91,15 +92,15 @@ public class NRDPWorker implements WorkerInf, Runnable {
         LOGGER.debug("{} - Worker count {}", instanceName, runCount);
     
         while (runCount > 0) {
-            Service service = null;
+            ServiceTO serviceTo = null;
             try {
-                service = bq.take();
+                serviceTo = bq.take();
             } catch (InterruptedException e1) {
                 LOGGER.info("{} - Worker thread is interupted", instanceName);
                 break;
             }
             
-            circuitBreak.execute(this,service);
+            circuitBreak.execute(this,serviceTo);
             
             runCount--;
         }
@@ -108,7 +109,7 @@ public class NRDPWorker implements WorkerInf, Runnable {
 
     
     @Override
-    public void send(Service service) throws ServerException {
+    public void send(ServiceTO serviceTo) throws ServerException {
 
         NAGIOSSTAT level;
 
@@ -116,24 +117,24 @@ public class NRDPWorker implements WorkerInf, Runnable {
          * Check the last connection status for the Service
          */
         String xml = null;
-        if ( service.isConnectionEstablished() ) {
-            level = service.getLevel();
+        if ( serviceTo.isConnectionEstablished() ) {
+            level = serviceTo.getLevel();
             xml = xmlNRDPFormat(level, 
-                    service.getHost().getHostname(),
-                    service.getServiceName(),
-                    nagutil.createNagiosMessage(service));
+                    serviceTo.getHostName(),
+                    serviceTo.getServiceName(),
+                    nagutil.createNagiosMessage(serviceTo));
         } else {
             // If no connection is established still write a value 
             // of null 
             level=NAGIOSSTAT.CRITICAL;
             xml = xmlNRDPFormat(level, 
-                    service.getHost().getHostname(),
-                    service.getServiceName(),
-                    Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
+                    serviceTo.getHostName(),
+                    serviceTo.getServiceName(),
+                    Util.obfuscatePassword(serviceTo.getUrl()) + " failed");
         }
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info(ServerUtil.logFormat(instanceName, service, xml));
+            LOGGER.info(ServerUtil.logFormat(instanceName, serviceTo, xml));
         }
         
         connectAndSend(xml);

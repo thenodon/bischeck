@@ -40,6 +40,7 @@ import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.notifications.Notifier;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
@@ -70,8 +71,8 @@ public final class ServerMessageExecutor {
     private ExecutorService execService = null;
     private PoolFiberFactory poolFactory = null;
 
-    private MemoryChannel<Service> channelServers;
-    private MemoryChannel<Service> channelNotifiers;
+    private MemoryChannel<ServiceTO> channelServers;
+    private MemoryChannel<ServiceTO> channelNotifiers;
 
    
     /**
@@ -84,8 +85,8 @@ public final class ServerMessageExecutor {
         // TODO - check how the pool size of this is managed compared to fixed
         execService = Executors.newFixedThreadPool(serverSet.size()*10);
         poolFactory = new PoolFiberFactory(execService);
-        channelServers = new MemoryChannel<Service>();
-        channelNotifiers = new MemoryChannel<Service>();
+        channelServers = new MemoryChannel<ServiceTO>();
+        channelNotifiers = new MemoryChannel<ServiceTO>();
 
         Iterator<String> iter = serverSet.keySet().iterator();
 
@@ -106,26 +107,23 @@ public final class ServerMessageExecutor {
                     //add subscription for message on receiver thread
                     Disposable disposable = null;
                     if (server instanceof Server) {
-                        disposable = channelServers.subscribe(fiber, (Callback<Service>) server);
+                        disposable = channelServers.subscribe(fiber, (Callback<ServiceTO>) server);
                     } else if (server instanceof Notifier) {
-                        disposable = channelNotifiers.subscribe(fiber, (Callback<Service>) server);
+                        disposable = channelNotifiers.subscribe(fiber, (Callback<ServiceTO>) server);
                     }
                 
                     // Add the disposable so it can be removed when shutdown
                     serverUnSub.put(instanceName, disposable);
+                    LOGGER.info("Register {}", instanceName);
                 }
 
-            } catch (IllegalArgumentException e) {
-                LOGGER.error(e.toString(), e);
-            } catch (IllegalAccessException e) {
-                LOGGER.error(e.toString(), e);
-            } catch (InvocationTargetException e) {
-                LOGGER.error(e.toString(), e);
-            } catch (SecurityException e) {
-                LOGGER.error(e.toString(), e);
-            } catch (NoSuchMethodException e) {
-                LOGGER.error(e.toString(), e);
-            }
+            } catch (IllegalArgumentException | 
+                    IllegalAccessException | 
+                    InvocationTargetException | 
+                    SecurityException | 
+                    NoSuchMethodException e) {
+                LOGGER.error("Failed to register {} ", instanceName, e);
+            } 
         }
     }
 
@@ -162,16 +160,12 @@ public final class ServerMessageExecutor {
                 LOGGER.info("Unregister server {}", name);
                 Method method = serverSet.get(name).getMethod(UNREGISTER,String.class);
                 method.invoke(null,name);
-            } catch (IllegalArgumentException e) {
-                LOGGER.error(e.toString(), e);
-            } catch (IllegalAccessException e) {
-                LOGGER.error(e.toString(), e);
-            } catch (InvocationTargetException e) {
-                LOGGER.error(e.toString(), e);
-            } catch (SecurityException e) {
-                LOGGER.error(e.toString(), e);
-            } catch (NoSuchMethodException e) {
-                LOGGER.error(e.toString(), e);
+            } catch (IllegalArgumentException | 
+                    IllegalAccessException | 
+                    InvocationTargetException |
+                    SecurityException |
+                    NoSuchMethodException e) {
+                LOGGER.error("Failed to unregister {} ", name, e);
             }
         }
         
@@ -190,13 +184,21 @@ public final class ServerMessageExecutor {
      * @param service the Service object that contain data to be send to the 
      * servers.
      */
-    public void publishServer(Service service) {
-        channelServers.publish(service);
+//    public void publishServer(Service service) {
+//        channelServers.publish(service);
+//    }
+
+    public void publishServer(ServiceTO serviceTo) {
+        channelServers.publish(serviceTo);
     }
 
-    public void publishNotifiers(Service service) {
-        channelNotifiers.publish(service);
+    public void publishNotifiers(ServiceTO serviceTo) {
+        channelNotifiers.publish(serviceTo);
     }
+//
+//    public void publishNotifiers(Service service) {
+//        channelNotifiers.publish(service);
+//    }
 
 
     /**
@@ -244,5 +246,6 @@ public final class ServerMessageExecutor {
             LOGGER.debug("Internal execution time: {} ms", duration);
         }
     }
+
 }
 

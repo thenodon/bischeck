@@ -32,8 +32,8 @@ import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.BischeckDecimal;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
-import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.service.ServiceTO;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemTO;
 import com.librato.metrics.HttpPoster;
 import com.librato.metrics.LibratoBatch;
 import com.librato.metrics.NingHttpPoster;
@@ -139,10 +139,10 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
     
     
     @Override
-    public synchronized void send(Service service) {
+    public synchronized void send(ServiceTO serviceTo) {
         
         if(!doNotSendRegex.isEmpty()) {
-            if (msts.doNotSend(service)) {
+            if (msts.doNotSend(serviceTo)) {
                 return;
             }
         }
@@ -153,15 +153,15 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
                 TimeUnit.MILLISECONDS, 
                 "bischeck", poster);
 
-        String logmesg = addMetrics(batch, service);
+        String logmesg = addMetrics(batch, serviceTo);
 
         if (LOGGER.isInfoEnabled())
-            LOGGER.info(ServerUtil.logFormat(instanceName, service, logmesg));
+            LOGGER.info(ServerUtil.logFormat(instanceName, serviceTo, logmesg));
         
         if (serviceAndItemName) {   
-            connectAndSend(batch, service.getHost().getHostname());
+            connectAndSend(batch, serviceTo.getHostName());
         } else {
-            connectAndSend(batch, service.getHost().getHostname()+nameSeparator+service.getServiceName());
+            connectAndSend(batch, serviceTo.getHostName()+nameSeparator+serviceTo.getServiceName());
         }
     }
 
@@ -184,40 +184,40 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
     }
 
     
-    private String addMetrics(LibratoBatch batch, Service service) {
+    private String addMetrics(LibratoBatch batch, ServiceTO serviceTo) {
         StringBuilder strbuf = new StringBuilder();
         strbuf.append(" ");
         
-        for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
-            ServiceItem serviceItem = serviceItementry.getValue();
+        for (Map.Entry<String, ServiceItemTO> serviceItementry: serviceTo.getServiceItemTO().entrySet()) {
+            ServiceItemTO serviceItemTo = serviceItementry.getValue();
             
             StringBuilder metricName = new StringBuilder();
             
             if (serviceAndItemName) {
-                metricName.append(service.getServiceName()).
+                metricName.append(serviceTo.getServiceName()).
                     append(nameSeparator).
-                    append(serviceItem.getServiceItemName()); 
+                    append(serviceItemTo.getName()); 
             } else {
-                metricName.append(serviceItem.getServiceItemName()); 
+                metricName.append(serviceItemTo.getName()); 
             }   
             
-            if (serviceItem.getLatestExecuted() != null){
+            if (serviceItemTo.getValue() != null){
                 strbuf.append(metricName).
                     append("=").
-                    append(serviceItem.getLatestExecuted());
+                    append(serviceItemTo.getValue());
 
                 batch.addGaugeMeasurement(metricName.toString(),
-                        new BigDecimal(serviceItem.getLatestExecuted()));       
+                        new BigDecimal(serviceItemTo.getValue()));       
             }   
             
-            if (sendThreshold && serviceItem.getThreshold().getThreshold() != null){
+            if (sendThreshold && serviceItemTo.getThreshold() != null){
                 strbuf.append(" ").
                     append(metricName).
                     append("_threshold=").
-                    append(new BischeckDecimal(serviceItem.getThreshold().getThreshold()));
+                    append(new BischeckDecimal(serviceItemTo.getThreshold()));
                 
                 batch.addGaugeMeasurement(metricName.toString()+"_threshold",
-                        new BigDecimal(serviceItem.getThreshold().getThreshold()));     
+                        new BigDecimal(serviceItemTo.getThreshold()));     
             }
         }
         
@@ -242,7 +242,7 @@ public final class MetricsLibratoServer implements Server, MessageServerInf {
     }
 
     @Override
-    public void onMessage(Service message) {
+    public void onMessage(ServiceTO message) {
         send(message);
     }
     

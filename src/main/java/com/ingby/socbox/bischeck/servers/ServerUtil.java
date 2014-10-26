@@ -15,12 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 package com.ingby.socbox.bischeck.servers;
 
 import org.slf4j.Logger;
 
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 
 
 /**
@@ -41,10 +42,15 @@ public class ServerUtil {
      * @return the string to log
      */
     public static String logFormat(String instanceName, Service service, String message) {
-        
+
         return logFormat(instanceName, service.getHost().getHostname(),service.getServiceName(), message);
     }
 
+    public static String logFormat(String instanceName, ServiceTO serviceTo, String message) {
+
+        return logFormat(instanceName, serviceTo.getHostName(),serviceTo.getServiceName(), message);
+    }
+    
     /**
      * One line grep friendly log message 
      * @param instanceName name of the server instance
@@ -62,7 +68,7 @@ public class ServerUtil {
         append(serviceName).
         append(":").
         append(message);
-        
+
         return strbuf.toString();
     }
 

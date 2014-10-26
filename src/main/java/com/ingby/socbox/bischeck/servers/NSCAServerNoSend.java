@@ -39,7 +39,7 @@ import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
-import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
@@ -138,21 +138,21 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
     
     
     @Override
-    synchronized public void send(Service service) {
+    synchronized public void send(ServiceTO serviceTo) {
         NAGIOSSTAT level;
     
         MessagePayload payload = new MessagePayloadBuilder()
-        .withHostname(service.getHost().getHostname())
-        .withServiceName(service.getServiceName())
+        .withHostname(serviceTo.getHostName())
+        .withServiceName(serviceTo.getServiceName())
         .create();
         
         /*
          * Check the last connection status for the Service
          */
-        if ( service.isConnectionEstablished() ) {
+        if ( serviceTo.isConnectionEstablished() ) {
             try {
-                level = service.getLevel();
-                payload.setMessage(level + nagutil.createNagiosMessage(service));
+                level = serviceTo.getLevel();
+                payload.setMessage(level + nagutil.createNagiosMessage(serviceTo));
             } catch (Exception e) {
                 level=NAGIOSSTAT.CRITICAL;
                 payload.setMessage(level + " " + e.getMessage());
@@ -161,13 +161,13 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
             // If no connection is established still write a value 
             // of null
             level=NAGIOSSTAT.CRITICAL;
-            payload.setMessage(level + " " + Util.obfuscatePassword(service.getConnectionUrl()) + " failed");
+            payload.setMessage(level + " " + Util.obfuscatePassword(serviceTo.getUrl()) + " failed");
         }
         
         payload.setLevel(level.toString());
         
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info(ServerUtil.logFormat(instanceName, service, payload.getMessage()));
+            LOGGER.info(ServerUtil.logFormat(instanceName, serviceTo, payload.getMessage()));
         }
         
         final String timerName = instanceName+"_send";
@@ -197,7 +197,7 @@ public final class NSCAServerNoSend implements Server, ServerInternal, MessageSe
 
 
     @Override
-    public void onMessage(Service message) {
+    public void onMessage(ServiceTO message) {
         send(message);
     }
     @Override

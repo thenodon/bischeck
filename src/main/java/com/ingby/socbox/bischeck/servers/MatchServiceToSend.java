@@ -30,7 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemTO;
 
 /**
  * This class is used to check if a string match a specific pattern. The pattern
@@ -88,6 +90,29 @@ public class MatchServiceToSend {
             append(service.getHost().getHostname()).append("-").
             append(service.getServiceName()).append("-").
             append(serviceItem.getServiceItemName());
+            if (isMatch(st.toString())) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Matching regex - will not send " + st.toString());
+                }
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    public boolean doNotSend(ServiceTO serviceTo) {
+        /*
+         * Loop through all host, service and serviceitems and check if 
+         * match regex described doNotSendRegex 
+         */
+        for (Map.Entry<String, ServiceItemTO> serviceItementry: serviceTo.getServiceItemTO().entrySet()) { 
+            ServiceItemTO serviceItem = serviceItementry.getValue();
+
+            StringBuffer st = new StringBuffer().
+            append(serviceTo.getHostName()).append("-").
+            append(serviceTo.getServiceName()).append("-").
+            append(serviceItem.getName());
             if (isMatch(st.toString())) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Matching regex - will not send " + st.toString());

@@ -37,7 +37,9 @@ import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemTO;
 
 /**
  * This class is responsible to send bischeck data to a graphite server
@@ -116,27 +118,27 @@ public final class GraphiteServer implements Server, MessageServerInf {
     
     
     @Override
-    synchronized public void send(Service service) {
+    synchronized public void send(ServiceTO serviceTo) {
         String message;    
 
         /*
          * Check if the message should be sent
          */        
         if(!doNotSendRegex.isEmpty()) {
-            if (msts.doNotSend(service)) {
+            if (msts.doNotSend(serviceTo)) {
                 return;
             }
         }
         
-        if ( service.isConnectionEstablished()) {
-            message = getMessage(service);
+        if ( serviceTo.isConnectionEstablished()) {
+            message = getMessage(serviceTo);
         } else {
             message = null;
         }
 
         
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info(ServerUtil.logFormat(instanceName, service, message));
+            LOGGER.info(ServerUtil.logFormat(instanceName, serviceTo, message));
         }
         
         connectAndSend(message);
@@ -178,47 +180,47 @@ public final class GraphiteServer implements Server, MessageServerInf {
     }
 
     
-    private String getMessage(Service service) {
+    private String getMessage(ServiceTO serviceTo) {
 
         StringBuilder strbuf = new StringBuilder();
         long currenttime = System.currentTimeMillis()/1000;
-        for (Map.Entry<String, ServiceItem> serviceItementry: service.getServicesItems().entrySet()) {
-            ServiceItem serviceItem = serviceItementry.getValue();
+        for (Map.Entry<String, ServiceItemTO> serviceItementry: serviceTo.getServiceItemTO().entrySet()) {
+            ServiceItemTO serviceItemTo = serviceItementry.getValue();
             
             
             strbuf = formatRow(strbuf, 
                     currenttime,
-                    service.getHost().getHostname(), 
-                    service.getServiceName(), 
-                    serviceItem.getServiceItemName(), 
+                    serviceTo.getHostName(), 
+                    serviceTo.getServiceName(), 
+                    serviceItemTo.getName(), 
                     "measured", 
-                    checkNull(serviceItem.getLatestExecuted()));
+                    checkNull(serviceItemTo.getValue()));
 
             strbuf = formatRow(strbuf, 
                     currenttime,
-                    service.getHost().getHostname(), 
-                    service.getServiceName(), 
-                    serviceItem.getServiceItemName(), 
+                    serviceTo.getHostName(), 
+                    serviceTo.getServiceName(), 
+                    serviceItemTo.getName(), 
                     "threshold", 
-                    checkNull(serviceItem.getThreshold().getThreshold()));
+                    checkNull(serviceItemTo.getThreshold()));
 
             strbuf = formatRow(strbuf, 
                     currenttime,
-                    service.getHost().getHostname(), 
-                    service.getServiceName(), 
-                    serviceItem.getServiceItemName(), 
+                    serviceTo.getHostName(), 
+                    serviceTo.getServiceName(), 
+                    serviceItemTo.getName(), 
                     "warning", 
-                    checkNullMultiple(serviceItem.getThreshold().getWarning(),
-                            serviceItem.getThreshold().getThreshold()));
+                    checkNullMultiple(serviceItemTo.getWarning(),
+                            serviceItemTo.getThreshold()));
 
             strbuf = formatRow(strbuf, 
                     currenttime,
-                    service.getHost().getHostname(), 
-                    service.getServiceName(), 
-                    serviceItem.getServiceItemName(), 
+                    serviceTo.getHostName(), 
+                    serviceTo.getServiceName(), 
+                    serviceItemTo.getName(), 
                     "critical", 
-                    checkNullMultiple(serviceItem.getThreshold().getCritical(),
-                            serviceItem.getThreshold().getThreshold()));
+                    checkNullMultiple(serviceItemTo.getCritical(),
+                            serviceItemTo.getThreshold()));
         }
         return strbuf.toString();
     }
@@ -291,7 +293,7 @@ public final class GraphiteServer implements Server, MessageServerInf {
 
     
     @Override
-    public void onMessage(Service message) {
+    public void onMessage(ServiceTO message) {
         send(message);
     }
     

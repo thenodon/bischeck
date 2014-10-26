@@ -184,7 +184,12 @@ public interface ServiceItem {
      */
     void setAlias(String alias);
 
-    /////////////////////
+  
+    /**
+     * Reset all runtime values, used before new collection is executed
+     */
+    void reset();
+    
     
     NAGIOSSTAT evaluateThreshold();
     

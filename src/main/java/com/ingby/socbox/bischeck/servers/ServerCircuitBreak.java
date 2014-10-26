@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.MBeanManager;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 
 /**
  * This is a circuit break solution for the send method of the 
@@ -178,13 +179,13 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
      * @param worker the worker to execute {@link WorkerInf}
      * @param service the service object to be sent 
      */
-    public void execute(WorkerInf worker, Service service) {
+    public void execute(WorkerInf worker, ServiceTO serviceTo) {
 
         final State currState = getState(); 
         switch (currState) {
         case CLOSED:
             try {
-                worker.send(service); 
+                worker.send(serviceTo); 
                 exceptionCount.set(0); 
             } catch (ServerException e) {
                 if (isEnabled && exceptionCount.incrementAndGet() >= exceptionThreshold) { 
@@ -205,7 +206,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
         case HALF_OPEN:
             LOGGER.info("{} - Half opened circut break", server.getInstanceName());
             try {
-                worker.send(service); 
+                worker.send(serviceTo); 
                 reset(); 
             } catch (ServerException e) {
                 totalFailed.incrementAndGet();
@@ -223,13 +224,13 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
      * Execute the {@link Server#send(Service)} method through the circuit break.
      * @param service the service object to be sent 
      */
-    public void execute(Service service) {
+    public void execute(ServiceTO serviceTo) {
 
         final State currState = getState(); 
         switch (currState) {
         case CLOSED:
             try {
-                server.send(service); 
+                server.send(serviceTo); 
                 exceptionCount.set(0); 
             } catch (ServerException e) {
                 if (isEnabled && exceptionCount.incrementAndGet() >= exceptionThreshold) { 
@@ -250,7 +251,7 @@ public class ServerCircuitBreak implements ServerCircuitBreakMBean {
         case HALF_OPEN:
             LOGGER.info("{} - Half opened circut break", server.getInstanceName());
             try {
-                server.send(service); 
+                server.send(serviceTo); 
                 reset(); 
             } catch (ServerException e) {
                 totalFailed.incrementAndGet();

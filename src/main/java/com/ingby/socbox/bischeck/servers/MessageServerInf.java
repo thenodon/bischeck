@@ -20,19 +20,19 @@ package com.ingby.socbox.bischeck.servers;
 
 import org.jetlang.core.Callback;
 
-import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceTO;
 
 /**
  * The interface used by Server implementations to manage async message based 
  * communication with ServiceJobs.
  * 
  */
-public interface MessageServerInf extends Callback<Service>{
+public interface MessageServerInf extends Callback<ServiceTO>{
     
     
     /**
      * The callback method used by any {@link Server} to receive messages with 
      * the {@link Service} data to processes 
      */
-    void onMessage(Service message);    
+    void onMessage(ServiceTO message);    
 }
