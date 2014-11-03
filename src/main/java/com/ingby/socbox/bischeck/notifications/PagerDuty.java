@@ -24,18 +24,10 @@ import org.slf4j.LoggerFactory;
 import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.Util;
-import com.ingby.socbox.bischeck.configuration.ConfigurationException;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
-import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.servers.MessageServerInf;
-import com.ingby.socbox.bischeck.service.JDBCService;
 import com.ingby.socbox.bischeck.service.ServiceTO;
-import com.ingby.socbox.bischeck.service.ServiceTO.ServiceTOBuilder;
-import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
-import com.ingby.socbox.bischeck.threshold.DummyThreshold;
-import com.ingby.socbox.bischeck.threshold.Threshold;
-import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 public final class PagerDuty implements Notifier, MessageServerInf {
     private final static Logger LOGGER = LoggerFactory
