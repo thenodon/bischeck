@@ -1,3 +1,22 @@
+/*
+#
+# Copyright (C) 2009-2014 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+ */
+
 package com.ingby.socbox.bischeck.notifications;
 
 import java.io.BufferedReader;
@@ -10,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -30,10 +50,12 @@ import com.ingby.socbox.bischeck.servers.MessageServerInf;
 import com.ingby.socbox.bischeck.service.ServiceTO;
 
 public final class PagerDuty implements Notifier, MessageServerInf {
-    private final static Logger LOGGER = LoggerFactory
+    private static final Logger LOGGER = LoggerFactory
             .getLogger(PagerDuty.class);
 
-    private static HashMap<String, PagerDuty> notificator = new HashMap<String, PagerDuty>();
+    private static final int JSON_SIZE = 3;
+
+    private static Map<String, PagerDuty> notificator = new HashMap<>();
 
     private String serviceKey;
     private int connectionTimeout;
@@ -43,7 +65,6 @@ public final class PagerDuty implements Notifier, MessageServerInf {
     private ServiceKeyRouter skr;
 
     private String defaultServiceKey;
-
 
     synchronized public static PagerDuty getInstance(String name) {
 
@@ -112,7 +133,7 @@ public final class PagerDuty implements Notifier, MessageServerInf {
      * @param name
      *            of the server instance
      */
-    synchronized public static void unregister(final String name) {
+    public static synchronized void unregister(final String name) {
         notificator.remove(name);
     }
 
@@ -220,7 +241,7 @@ public final class PagerDuty implements Notifier, MessageServerInf {
             json = responseHTTP(conn);
 
         } finally {
-            long duration = context.stop() / 1000000;
+            long duration = context.stop() / MetricsManager.TO_MILLI;
             LOGGER.debug("PagerDuty for {} send execute: {} ms", instanceName,
                     duration);
         }
@@ -273,7 +294,7 @@ public final class PagerDuty implements Notifier, MessageServerInf {
                 LOGGER.error(
                         "PagerDuty returned null json object for message {} for instance {}",
                         sb.toString(), instanceName);
-            } else if (json.size() != 3 || !json.has("status")
+            } else if (json.size() != JSON_SIZE || !json.has("status")
                     || !json.has("incident_key")) {
                 LOGGER.error(
                         "PagerDuty returned faulty json message for {} for instance {}",
@@ -355,11 +376,6 @@ public final class PagerDuty implements Notifier, MessageServerInf {
     @Override
     public String getInstanceName() {
         return instanceName;
-    }
-
-    @Override
-    public void unregister() {
-        // TODO Auto-generated method stub
     }
 
 }

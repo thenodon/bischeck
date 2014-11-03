@@ -1,6 +1,6 @@
 /*
 #
-# Copyright (C) 2010-2012 Anders Håål, Ingenjorsbyn AB
+# Copyright (C) 2010-2014 Anders Håål, Ingenjorsbyn AB
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
  */
-
 package com.ingby.socbox.bischeck.notifications;
 
 import com.ingby.socbox.bischeck.service.ServiceTO;
@@ -55,9 +54,5 @@ public interface Notifier {
      */
     String getInstanceName();
 
-    /**
-     * Unregister all resources related to the server instance
-     */
-    void unregister();
 
 }

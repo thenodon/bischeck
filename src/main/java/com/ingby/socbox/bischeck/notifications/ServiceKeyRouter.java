@@ -1,3 +1,21 @@
+/*
+#
+# Copyright (C) 2009-2014 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+ */
 package com.ingby.socbox.bischeck.notifications;
 
 import java.util.HashMap;
@@ -16,7 +34,7 @@ import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 public class ServiceKeyRouter {
-    private final static Logger LOGGER = LoggerFactory
+    private static final Logger LOGGER = LoggerFactory
             .getLogger(ServiceKeyRouter.class);
 
     private Map<Pattern, String> pattern2ServiceKey = new HashMap<Pattern, String>();
@@ -31,7 +49,8 @@ public class ServiceKeyRouter {
             JSONObject json = JSONObject.fromObject(serviceKey);
             serviceKeyRouting = true;
             parseServiceKeys(json);
-        } catch (JSONException ex) {
+        } catch (JSONException e) {
+            LOGGER.warn("Could not create json from object {}",serviceKey.toString(), e);
             serviceKeyRouting = false;
         }
     }
@@ -62,10 +81,10 @@ public class ServiceKeyRouter {
             try {
                 pattern2ServiceKey.put(Pattern.compile((String) regexp),
                         json.getString((String) regexp));
-            } catch (PatternSyntaxException pe) {
+            } catch (PatternSyntaxException e) {
                 LOGGER.error(
                         "{} is not a valid regular expression. No incidents will be routes to service key {}",
-                        (String) regexp, json.getString((String) regexp), pe);
+                        (String) regexp, json.getString((String) regexp), e);
             }
         }
     }

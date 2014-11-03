@@ -1,3 +1,22 @@
+/*
+#
+# Copyright (C) 2009-2014 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+ */
+
 package com.ingby.socbox.bischeck.notifications;
 
 import java.io.BufferedReader;
@@ -31,7 +50,7 @@ import com.ingby.socbox.bischeck.servers.MessageServerInf;
 import com.ingby.socbox.bischeck.service.ServiceTO;
 
 public final class BigPanda implements Notifier, MessageServerInf {
-    private final static Logger LOGGER = LoggerFactory
+    private static final Logger LOGGER = LoggerFactory
             .getLogger(BigPanda.class);
 
     private static Map<String, BigPanda> notificator = new HashMap<String, BigPanda>();
@@ -42,7 +61,7 @@ public final class BigPanda implements Notifier, MessageServerInf {
     private final boolean sendMessage;
     private final ServiceKeyRouter skr;
 
-    synchronized public static BigPanda getInstance(final String name) {
+    public static synchronized BigPanda getInstance(final String name) {
 
         if (!notificator.containsKey(name)) {
             notificator.put(name, new BigPanda(name));
@@ -114,46 +133,57 @@ public final class BigPanda implements Notifier, MessageServerInf {
 
     @Override
     public void sendAlert(final ServiceTO serviceTo) {
+
+        final String key = getServiceKey(serviceTo.getHostName(),
+                serviceTo.getServiceName());
+        if (key == null) {
+            return;
+        }
+
         try {
-            final String message = send(serviceTo);
+            final String message = send(serviceTo, key);
             LOGGER.info("Alert message to {} : {}", instanceName,
                     message.toString());
         } catch (IOException e) {
             LOGGER.error("Sedning trigger message to {} failed.", instanceName,
                     e);
-        } catch (IllegalArgumentException e) {
-            LOGGER.error(
-                    "Service for {} do not have a app key defined. Will not be sent by instance {}.",
-                    Util.fullQouteHostServiceName(serviceTo.getHostName(),
-                            serviceTo.getServiceName()), instanceName, e);
         }
     }
 
     @Override
     public void sendResolve(final ServiceTO serviceTo) {
+
+        final String key = getServiceKey(serviceTo.getHostName(),
+                serviceTo.getServiceName());
+        if (key == null) {
+            return;
+        }
+
         try {
-            String message = send(serviceTo);
+            String message = send(serviceTo, key);
             LOGGER.info("Resolve message to {} : {}", instanceName,
                     message.toString());
         } catch (IOException e) {
             LOGGER.error("Sending resolve message to {} failed.", instanceName,
                     e);
-        } catch (IllegalArgumentException e) {
-            LOGGER.error(
-                    "Service for {} do not have a service key defined. Will not be sent by instance {}.",
-                    Util.fullQouteHostServiceName(serviceTo.getHostName(),
-                            serviceTo.getServiceName()), instanceName, e);
         }
     }
 
-    private String send(final ServiceTO serviceTo) throws IOException,
-            IllegalArgumentException {
-
-        final String key = skr.getServiceKey(serviceTo.getHostName(),
-                serviceTo.getServiceName());
+    private String getServiceKey(String hostName, String serviceName) {
+        final String key = skr.getServiceKey(hostName, serviceName);
         if (key == null) {
-            throw new IllegalArgumentException();
+            LOGGER.error(
+                    "Service for {} do not have a service key defined. Will not be sent by instance {}.",
+                    Util.fullQouteHostServiceName(hostName, serviceName),
+                    instanceName);
+            return null;
+        } else {
+            return key;
         }
+    }
+
+    private String send(final ServiceTO serviceTo, String key)
+            throws IOException {
 
         final Long bptimestamp = unixEpoch(System.currentTimeMillis());
         final Writer message = new StringWriter();
@@ -213,7 +243,7 @@ public final class BigPanda implements Notifier, MessageServerInf {
                 json = responseHTTP(conn);
             }
         } finally {
-            final long duration = context.stop() / 1000000;
+            final long duration = context.stop() / MetricsManager.TO_MILLI;
             LOGGER.debug("BigPanda for {} send execute: {} ms", instanceName,
                     duration);
         }
@@ -337,12 +367,6 @@ public final class BigPanda implements Notifier, MessageServerInf {
     @Override
     public String getInstanceName() {
         return instanceName;
-    }
-
-    @Override
-    public void unregister() {
-        // TODO Auto-generated method stub
-
     }
 
 }
