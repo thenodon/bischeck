@@ -52,45 +52,6 @@ public final class PagerDuty implements Notifier, MessageServerInf {
 
     private String defaultServiceKey;
 
-    public static void main(final String[] args) throws ConfigurationException {
-        ConfigurationManager confMgmr;
-        try {
-            confMgmr = ConfigurationManager.getInstance();
-        } catch (java.lang.IllegalStateException e) {
-            System.setProperty("bishome", ".");
-            System.setProperty("xmlconfigdir", "etc");
-
-            ConfigurationManager.init();
-            confMgmr = ConfigurationManager.getInstance();
-        }
-
-        Host host = new Host("sqlHost");
-        JDBCService jdbcService = new JDBCService("sqlService", null);
-        // Set faulty driver url -> connection will fail
-        jdbcService
-                .setConnectionUrl("jdbc:derby:memoryNOTEXISTS:myDB;create=true");
-        jdbcService.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-        jdbcService.setLevel(NAGIOSSTAT.CRITICAL);
-
-        SQLServiceItem sqlServiceItem = new SQLServiceItem("sqlItem");
-        sqlServiceItem.setService(jdbcService);
-        sqlServiceItem.setThresholdClassName("DummyThreshold");
-        Threshold threshold = new DummyThreshold("sqlHost", "jdbc", "sql");
-        sqlServiceItem.setThreshold(threshold);
-
-        host.addService(jdbcService);
-        jdbcService.setHost(host);
-        jdbcService.addServiceItem(sqlServiceItem);
-
-        PagerDuty pd = PagerDuty.getInstance("Test");
-
-        ServiceTOBuilder builder = new ServiceTOBuilder(jdbcService);
-        ServiceTO serviceTo = builder.build();
-
-        pd.sendAlert(serviceTo);
-        // pd.sendResolve(jdbcService.getNotificationData());
-
-    }
 
     synchronized public static PagerDuty getInstance(String name) {
 
