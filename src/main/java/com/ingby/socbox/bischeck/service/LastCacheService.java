@@ -32,7 +32,8 @@ public class LastCacheService extends ServiceAbstract implements Service, Servic
 
     
     
-    public LastCacheService (String serviceName, Properties notUsed) {
+    public LastCacheService (String serviceName, Properties bischeckProperties) {
+        super(bischeckProperties);
         this.serviceName = serviceName;
     }
 

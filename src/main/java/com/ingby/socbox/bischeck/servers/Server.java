@@ -30,7 +30,7 @@ public interface Server {
     /**
      * Send the Service information to the server. Implementation is responsible
      * to manage protocol and formatting of message data.
-     * @param service
+     * @param serviceTo
      * @throws ServerException if any communication exception occur. 
      * If {@ ServerCircuitBreak} is used it will be triggered by the exception.
      */

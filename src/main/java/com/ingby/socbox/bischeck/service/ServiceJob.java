@@ -25,9 +25,9 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,42 +57,47 @@ import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
- * The ServiceJob is a quartz job that execute the task of each {@link Service} 
- * object. That include both connection setup and {@link ServiceItem} execution 
+ * The ServiceJob is a quartz job that execute the task of each {@link Service}
+ * object. That include both connection setup and {@link ServiceItem} execution
  * and threshold validation
  * 
  * TODO rewrite the whole handling of states
  */
 public class ServiceJob implements Job {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ServiceJob.class);
+    private final static Logger LOGGER = LoggerFactory
+            .getLogger(ServiceJob.class);
 
-    static private int runAfterDelay = 10; //in seconds
+    static private int runAfterDelay = 10; // in seconds
     static private boolean saveNullOnConnectionError;
 
     static {
         try {
-            runAfterDelay = Integer.parseInt(ConfigurationManager.getInstance().getProperties().
-                    getProperty("runAfterDelay", Integer.toString(runAfterDelay)));
+            runAfterDelay = Integer.parseInt(ConfigurationManager
+                    .getInstance()
+                    .getProperties()
+                    .getProperty("runAfterDelay",
+                            Integer.toString(runAfterDelay)));
         } catch (NumberFormatException ne) {
-            LOGGER.error("Property {} is not set correct to an integer: {}", 
-                    runAfterDelay, 
-                    ConfigurationManager.getInstance().getProperties().getProperty(
-                            "runAfterDelay"));
+            LOGGER.error("Property {} is not set correct to an integer: {}",
+                    runAfterDelay, ConfigurationManager.getInstance()
+                            .getProperties().getProperty("runAfterDelay"));
         }
 
-        saveNullOnConnectionError = Boolean.parseBoolean(ConfigurationManager.getInstance().getProperties().
-                getProperty("saveNullOnConnectionError", "false").toLowerCase());
+        saveNullOnConnectionError = Boolean.parseBoolean(ConfigurationManager
+                .getInstance().getProperties()
+                .getProperty("saveNullOnConnectionError", "false")
+                .toLowerCase());
 
     }
 
-
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(JobExecutionContext context)
+            throws JobExecutionException {
 
-        final Timer timer = MetricsManager.getTimer(ServiceJob.class,"executeTotalTimer");
+        final Timer timer = MetricsManager.getTimer(ServiceJob.class,
+                "executeTotalTimer");
         final Timer.Context timercontext = timer.time();
-
 
         Service service = null;
 
@@ -102,8 +107,9 @@ public class ServiceJob implements Job {
             // Get the Service object passed by the context
             service = (Service) dataMap.get("service");
 
-            RunAfter runafter = new RunAfter(service.getHost().getHostname(), service.getServiceName());
-            
+            RunAfter runafter = new RunAfter(service.getHost().getHostname(),
+                    service.getServiceName());
+
             ServiceTO serviceTo;
             synchronized (service) {
                 try {
@@ -119,42 +125,45 @@ public class ServiceJob implements Job {
 
             if (service.isSendServiceData()) {
 
-                final Timer timerPub = MetricsManager.getTimer(ServiceJob.class,"publishTimer");
+                final Timer timerPub = MetricsManager.getTimer(
+                        ServiceJob.class, "publishTimer");
                 final Timer.Context contextPub = timerPub.time();
 
                 try {
-                    ServerMessageExecutor.getInstance().publishServer(serviceTo); 
-                }finally {          
-                    Long duration = contextPub.stop()/1000000;
+                    ServerMessageExecutor.getInstance()
+                            .publishServer(serviceTo);
+                } finally {
+                    Long duration = contextPub.stop() / MetricsManager.TO_MILLI;
                     LOGGER.debug("Publish to servers time: {} ms", duration);
                 }
             }
 
             if (((ServiceStateInf) service).getServiceState().isNotification()) {
 
-                final Timer timerPubNotification = MetricsManager.getTimer(ServiceJob.class,"publishNotificationTimer");
-                final Timer.Context contextPubNotification = timerPubNotification.time();
+                final Timer timerPubNotification = MetricsManager.getTimer(
+                        ServiceJob.class, "publishNotificationTimer");
+                final Timer.Context contextPubNotification = timerPubNotification
+                        .time();
 
                 try {
-                    //ServerMessageExecutor.getInstance().publishNotifiers(service);
-                    ServerMessageExecutor.getInstance().publishNotifiers(serviceTo);
-                } finally {          
-                    Long duration = contextPubNotification.stop()/1000000;
+                    // ServerMessageExecutor.getInstance().publishNotifiers(service);
+                    ServerMessageExecutor.getInstance().publishNotifiers(
+                            serviceTo);
+                } finally {
+                    Long duration = contextPubNotification.stop()
+                            / MetricsManager.TO_MILLI;
                     LOGGER.debug("Publish to notifiers time: {} ms", duration);
                 }
             }
 
         } finally {
-            long executetime = timercontext.stop()/1000000;             
-            if (LOGGER.isDebugEnabled()){
+            long executetime = timercontext.stop() / MetricsManager.TO_MILLI;
+            if (LOGGER.isDebugEnabled()) {
                 StringBuilder strbuf = new StringBuilder();
-                strbuf.append("Total execution time").
-                append(service.getHost().getHostname()).
-                append("-").
-                append(service.getServiceName()).
-                append(" : ").
-                append(executetime).
-                append(" ms");
+                strbuf.append("Total execution time")
+                        .append(service.getHost().getHostname()).append("-")
+                        .append(service.getServiceName()).append(" : ")
+                        .append(executetime).append(" ms");
                 LOGGER.debug(strbuf.toString());
             }
         }
@@ -162,34 +171,35 @@ public class ServiceJob implements Job {
 
     private void checkRunImmediate(RunAfter runafter) {
 
-        LOGGER.debug("Service {}-{} has runAfter {}",
-                runafter.getHostname(),
-                runafter.getServicename(),
-                ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter));
+        LOGGER.debug("Service {}-{} has runAfter {}", runafter.getHostname(),
+                runafter.getServicename(), ConfigurationManager.getInstance()
+                        .getRunAfterMap().containsKey(runafter));
 
-        if (ConfigurationManager.getInstance().getRunAfterMap().containsKey(runafter)) {
-            for (Service servicetorunafter : ConfigurationManager.getInstance().getRunAfterMap().get(runafter)) {
+        if (ConfigurationManager.getInstance().getRunAfterMap()
+                .containsKey(runafter)) {
+            for (Service servicetorunafter : ConfigurationManager.getInstance()
+                    .getRunAfterMap().get(runafter)) {
 
                 LOGGER.debug("The services to run after is: {}-{}",
-                        servicetorunafter.getHost().getHostname(), 
+                        servicetorunafter.getHost().getHostname(),
                         servicetorunafter.getServiceName());
             }
 
             try {
-                runImmediate(ConfigurationManager.getInstance().getRunAfterMap().get(runafter));
+                runImmediate(ConfigurationManager.getInstance()
+                        .getRunAfterMap().get(runafter));
             } catch (SchedulerException e) {
-                LOGGER.warn("Scheduled immediate job for {}-{} failed with exception",  
-                        runafter.getHostname(),
-                        runafter.getServicename(), 
-                        e);
+                LOGGER.warn(
+                        "Scheduled immediate job for {}-{} failed with exception",
+                        runafter.getHostname(), runafter.getServicename(), e);
             }
         }
     }
 
-
     /**
-     * Used to kick of services that has a schedule that depends of the execution
-     * of a different schedule.
+     * Used to kick of services that has a schedule that depends of the
+     * execution of a different schedule.
+     * 
      * @param services
      * @throws SchedulerException
      */
@@ -198,57 +208,57 @@ public class ServiceJob implements Job {
 
         Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
 
-        for (Service service:services) {
+        for (Service service : services) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Service to run immiediate {}-{}",
-                        service.getHost().getHostname(), 
-                        service.getServiceName());
+                LOGGER.debug("Service to run immiediate {}-{}", service
+                        .getHost().getHostname(), service.getServiceName());
             }
 
-            Map<String,Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put("service", service);
             JobDataMap jobmap = new JobDataMap(map);
 
-
             JobDetail job = newJob(ServiceJob.class)
-                    .withIdentity(service.getServiceName()+(jobid++), service.getHost().getHostname())
-                    .withDescription(service.getHost().getHostname()+"-"+service.getServiceName())
-                    .usingJobData(jobmap)
-                    .build();
+                    .withIdentity(service.getServiceName() + (jobid++),
+                            service.getHost().getHostname())
+                    .withDescription(
+                            service.getHost().getHostname() + "-"
+                                    + service.getServiceName())
+                    .usingJobData(jobmap).build();
 
             Trigger trigger = null;
 
-            Calendar  cal = Calendar.getInstance();
+            Calendar cal = Calendar.getInstance();
             cal.add(Calendar.SECOND, runAfterDelay);
-            Date future=cal.getTime();
+            Date future = cal.getTime();
 
             trigger = newTrigger()
-                    .withIdentity(service.getServiceName()+"Trigger-"+(jobid), service.getHost().getHostname()+"TriggerGroup")
-                    .startAt(future)
-                    .build();
+                    .withIdentity(
+                            service.getServiceName() + "Trigger-" + (jobid),
+                            service.getHost().getHostname() + "TriggerGroup")
+                    .startAt(future).build();
 
             sched.scheduleJob(job, trigger);
 
         }
     }
 
-
     /**
      * Execute the the full service definition and its threshold
+     * 
      * @param service
-     * @return 
      * @return
-     * @throws ServiceItemException 
-     * @throws ServiceException 
+     * @return
+     * @throws ServiceItemException
+     * @throws ServiceException
      */
     public ServiceTO executeJob(Service service) {
 
-        // Initial state
-        service.setLevel(NAGIOSSTAT.OK);
+        // Reset service and all it service items transient data
+        service.reset();
 
-        Map<String,Exception> expMap = new HashMap<String, Exception>();
-
-        for (Map.Entry<String, ServiceItem> serviceitementry: service.getServicesItems().entrySet()) {
+        for (Map.Entry<String, ServiceItem> serviceitementry : service
+                .getServicesItems().entrySet()) {
             ServiceItem serviceitem = serviceitementry.getValue();
 
             String fullservicename = Util.fullName(service, serviceitem);
@@ -256,190 +266,175 @@ public class ServiceJob implements Job {
             LOGGER.debug("Executing ServiceItem: {}", fullservicename);
 
             synchronized (service) {
-                if(LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} State before execute service {}", fullservicename, service.getLevel().toString());
+
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} State before execute service {}",
+                            fullservicename, service.getLevel().toString());
                 }
 
-                serviceitem.reset();
-
+                // Only set to false if connection fail
+                boolean addToCache = true;
                 try {
-                    executeForEachServiceItem(service, serviceitem);
-
-                } catch (ServiceConnectionException e) {
-                    if (saveNullOnConnectionError) {
-                        serviceitem.setLatestExecuted("null");
-                        // Will get state on serviceitem that is unknown
-                        CacheFactory.getInstance().add(service,serviceitem);
+                    // Make connection
+                    try {
+                        service.openConnection();
+                    } catch (ServiceConnectionException e) {
+                        if (!saveNullOnConnectionError) {
+                            addToCache = false;
+                        }
+                        LOGGER.warn("{} - connection to {} failed for {}", Util
+                                .fullQoutedName(service, serviceitem), Util
+                                .obfuscatePassword(service.getConnectionUrl()),
+                                e);
+                        service.addException(e);
                     }
-                    LOGGER.warn("{} - connection to {} failed for {}",  
-                            Util.fullQoutedName(service, serviceitem), Util.obfuscatePassword(service.getConnectionUrl()), e);
-                    service.setLevel(levelOnError());
-                    expMap.put(serviceitem.getServiceItemName(), e);
 
-                } catch (ServiceItemException|ServiceException sexp) {
-                    LOGGER.warn("{} - execution prepare and/or query \"{}\" failed",
-                            Util.fullQoutedName(service, serviceitem), 
-                            serviceitem.getExecution(), 
-                            sexp);
-                    service.setLevel(levelOnError());
-                    expMap.put(serviceitem.getServiceItemName(), sexp);
+                    // Collect data
+                    if (service.isConnectionEstablished()) {
+                        executeService(service, serviceitem);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("{} State after execute service {}",
+                                    fullservicename, service.getLevel()
+                                            .toString());
+                        }
+                    }
 
-                } catch (ThresholdException te) {
-                    LOGGER.warn("{} - threshold excution {} failed", 
-                            Util.fullQoutedName(service, serviceitem), 
-                            serviceitem.getThresholdClassName(), 
-                            te);
-                    service.setLevel(levelOnError());
-                    expMap.put(serviceitem.getServiceItemName(), te);
+                    // Execute threshold
+                    executeThreshold(service, serviceitem);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("{} State after threshold service {}",
+                                fullservicename, service.getLevel().toString());
+                    }
                 } finally {
                     try {
                         service.closeConnection();
-                    } catch (ServiceConnectionException ignore) {}
+                    } catch (ServiceConnectionException ignore) {
+                    }
+                }
+
+                if (addToCache) {
+                    CacheFactory.getInstance().add(service, serviceitem);
                 }
             }
-        } 
+        }
 
+        LOGGER.debug("Resolved service state for {} set to {}",
+                Util.fullQoutedHostServiceName(service), service.getLevel());
 
-        LOGGER.debug("Resolved service state for {} set to {}", Util.fullQoutedHostServiceName(service), service.getLevel());
-
-
-        // All serviceitems executed and evaluated with thresholds, check if a state change occurred and save it
+        // All serviceitems executed and evaluated with thresholds, check if a
+        // state change occurred and save it
         saveStateChange(service);
         ServiceTOBuilder builder = new ServiceTOBuilder(service);
-        builder.exceptions(expMap);
-        builder.notification((((ServiceStateInf) service).getServiceState().isNotification()));
-        builder.incidentkey((((ServiceStateInf) service).getServiceState().getCurrentIncidentId()));
-        builder.resolved((((ServiceStateInf) service).getServiceState().isResolved()));
-        
+        builder.notification((((ServiceStateInf) service).getServiceState()
+                .isNotification()));
+        builder.incidentkey((((ServiceStateInf) service).getServiceState()
+                .getCurrentIncidentId()));
+        builder.resolved((((ServiceStateInf) service).getServiceState()
+                .isResolved()));
+
         return builder.build();
-        //ServiceStatus serviceStatus = new ServiceStatusBuilder(service).exception(x).build();
-        //return serviceStatus;
     }
 
-    private void executeForEachServiceItem(Service service, ServiceItem serviceitem)
-            throws ServiceConnectionException, ServiceItemException,
-            ServiceException, ThresholdException {
+    private void executeService(Service service, ServiceItem serviceitem) {
 
-        String fullservicename = Util.fullName(service, serviceitem);
-
-        service.openConnection();
-
-        executeService(service, serviceitem);
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{} State after execute service {}", fullservicename, service.getLevel().toString());
-        }
-
-        executeThreshold(service, serviceitem);
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{} State after threshold service {}", fullservicename, service.getLevel().toString());
-        }
-
-        CacheFactory.getInstance().add(service,serviceitem);
-    }
-
-
-    private void executeService(Service service, ServiceItem serviceitem) throws ServiceItemException, ServiceException {
-
-        final Timer timer = MetricsManager.getTimer(ServiceJob.class,"executeServiceTimer");
+        final Timer timer = MetricsManager.getTimer(ServiceJob.class,
+                "executeServiceTimer");
         final Timer.Context context = timer.time();
 
         try {
-            if (service.isConnectionEstablished()) {
-                serviceitem.execute();
-            }
+            serviceitem.execute();
+        } catch (ServiceItemException | ServiceException e) {
+            LOGGER.warn("{} - execution prepare and/or query \"{}\" failed",
+                    Util.fullQoutedName(service, serviceitem),
+                    serviceitem.getExecution(), e);
+            serviceitem.addException(e);
         } finally {
-            long executetime = context.stop()/1000000;          
+            long executetime = context.stop() / MetricsManager.TO_MILLI;
             serviceitem.setExecutionTime(executetime);
             LOGGER.debug("Time to execute {} : {} ms",
-                    serviceitem.getExecution(),
-                    serviceitem.getExecutionTime());
+                    serviceitem.getExecution(), serviceitem.getExecutionTime());
         }
     }
 
-
-    private void executeThreshold(Service service, ServiceItem serviceitem) throws ThresholdException {
+    private void executeThreshold(Service service, ServiceItem serviceitem) {
 
         NAGIOSSTAT currentState = service.getLevel();
 
-        final Timer timer = MetricsManager.getTimer(ServiceJob.class,"executeThresholdTimer");
+        final Timer timer = MetricsManager.getTimer(ServiceJob.class,
+                "executeThresholdTimer");
         final Timer.Context ctxthreshold = timer.time();
 
         // Get the threshold class
         try {
-            serviceitem.setThreshold(ThresholdFactory.getCurrent(service,serviceitem));
+            serviceitem.setThreshold(ThresholdFactory.getCurrent(service,
+                    serviceitem));
 
-            // Always report the state for the worst service item 
-            LOGGER.debug("{} last executed value {}", serviceitem.getServiceItemName(), serviceitem.getLatestExecuted());
+            // Always report the state for the worst service item
+            LOGGER.debug("{} last executed value {}",
+                    serviceitem.getServiceItemName(),
+                    serviceitem.getLatestExecuted());
 
             NAGIOSSTAT lastState = serviceitem.evaluateThreshold();
-            LOGGER.debug("Service {} Item {} resolved to {}, current {}",service.getServiceName(), serviceitem.getServiceItemName(),lastState.toString(), currentState.toString());
+            LOGGER.debug("Service {} Item {} resolved to {}, current {}",
+                    service.getServiceName(), serviceitem.getServiceItemName(),
+                    lastState.toString(), currentState.toString());
 
-            currentState = resolveServiceState(currentState, lastState);
-
+        } catch (ThresholdException e) {
+            LOGGER.warn("{} - threshold excution {} failed",
+                    Util.fullQoutedName(service, serviceitem),
+                    serviceitem.getThresholdClassName(), e);
+            serviceitem.addException(e);
         } finally {
             ctxthreshold.stop();
         }
-        LOGGER.debug("Service {} set to {}", service.getServiceName(), currentState.toString());
-        service.setLevel(currentState);
+        LOGGER.debug("Service {} set to {}", service.getServiceName(),
+                currentState.toString());
 
     }
 
     /**
-     * Resolve the state to the most severe of the current 
-     * @param currentstate the state currently set
-     * @param laststate the state from the last serviceitem
-     * @return
-     */
-    private NAGIOSSTAT resolveServiceState(NAGIOSSTAT currentstate,
-            NAGIOSSTAT laststate) {
-        // TODO manage unknown in relation to warning and critical
-        if (laststate.val() > currentstate.val() ) { 
-            currentstate = laststate;
-        }
-        return currentstate;
-    }
-
-
-    /**
-     * Check if the service support state change, {@link ServiceStateInf}, and 
-     * if the the {@link ServiceState) for the {@link Service} indicate that 
-     * a state change occurred the change is written to the cache if the cache
-     * support {@link CacheStateInf} 
+     * Check if the service support state change, {@link ServiceStateInf}, and
+     * if the the {@link ServiceState) for the {@link Service} indicate that a
+     * state change occurred the change is written to the cache if the cache
+     * support {@link CacheStateInf}
+     * 
      * @param service
      */
     private void saveStateChange(Service service) {
 
-        if (service instanceof ServiceStateInf && CacheFactory.getInstance() instanceof CacheStateInf) {
+        if (service instanceof ServiceStateInf
+                && CacheFactory.getInstance() instanceof CacheStateInf) {
             // TODO This is not nice since its not encapsulated in the Service
             ((ServiceStateInf) service).setServiceState();
 
             Long score = null;
-            if ( ((ServiceStateInf) service).getServiceState().isStateChange() && 
-                    CacheFactory.getInstance() instanceof CacheStateInf ) {
-                LOGGER.info("State change {} from {} ({}) to {} ({})", Util.fullQoutedHostServiceName(service),
-                        ((ServiceStateInf) service).getServiceState().getPreviousState(),
-                        ((ServiceStateInf) service).getServiceState().getPreviousStateLevel(),
-                        ((ServiceStateInf) service).getServiceState().getState(),
-                        ((ServiceStateInf) service).getServiceState().getStateLevel());
+            if (((ServiceStateInf) service).getServiceState().isStateChange()
+                    && CacheFactory.getInstance() instanceof CacheStateInf) {
+                LOGGER.info("State change {} from {} ({}) to {} ({})", Util
+                        .fullQoutedHostServiceName(service),
+                        ((ServiceStateInf) service).getServiceState()
+                                .getPreviousState(),
+                        ((ServiceStateInf) service).getServiceState()
+                                .getPreviousStateLevel(),
+                        ((ServiceStateInf) service).getServiceState()
+                                .getState(), ((ServiceStateInf) service)
+                                .getServiceState().getStateLevel());
 
-                score = ((CacheStateInf) CacheFactory.getInstance()).addState(service);
+                score = ((CacheStateInf) CacheFactory.getInstance())
+                        .addState(service);
             }
 
-            if (((ServiceStateInf) service).getServiceState().isNotification() && 
-                    CacheFactory.getInstance() instanceof CacheStateInf) {
-                LOGGER.info("Notification change {} {} {}", Util.fullQoutedHostServiceName(service),
-                        ((ServiceStateInf) service).getServiceState().getState(),
-                        ((ServiceStateInf) service).getServiceState().getCurrentIncidentId());
-                ((CacheStateInf) CacheFactory.getInstance()).addNotification(service, score);
+            if (((ServiceStateInf) service).getServiceState().isNotification()
+                    && CacheFactory.getInstance() instanceof CacheStateInf) {
+                LOGGER.info("Notification change {} {} {}", Util
+                        .fullQoutedHostServiceName(service),
+                        ((ServiceStateInf) service).getServiceState()
+                                .getState(), ((ServiceStateInf) service)
+                                .getServiceState().getCurrentIncidentId());
+                ((CacheStateInf) CacheFactory.getInstance()).addNotification(
+                        service, score);
             }
 
         }
     }
-
-
-    private NAGIOSSTAT levelOnError() {
-        return NAGIOSSTAT.CRITICAL;
-    }
 }
-
-

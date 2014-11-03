@@ -15,10 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.servers;
-
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,156 +39,176 @@ import com.ingby.socbox.bischeck.service.ServiceTO;
 
 /**
  * Nagios server integration over NSCA protocol, using the jnscasend package.
- *
+ * 
  */
 public final class NSCAServer implements Server, MessageServerInf {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(NSCAServer.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(NSCAServer.class);
     private final String instanceName;
     private final ServerCircuitBreak circuitBreak;
-    
-    private final int MAX_QUEUE = 10;
+
+    private static final int MAX_QUEUE = 10;
+    private static final int WAIT_TERMINIATION_MS = 10000;
     private final LinkedBlockingQueue<ServiceTO> subTaskQueue;
-    
+
     private final ExecutorService execService;
-    
+
     /**
-     * The server map is used to manage multiple configuration based on the 
-     * same NSCAServer class.
+     * The server map is used to manage multiple configuration based on the same
+     * NSCAServer class.
      */
-    private static Map<String,NSCAServer> servers = new HashMap<String,NSCAServer>();
+    private static Map<String, NSCAServer> servers = new HashMap<String, NSCAServer>();
     private NagiosSettings settings;
-    
-    
-    
+
     /**
-     * Retrieve the Server object. The method is invoked from class ServerExecutor
-     * execute method. The created Server object is placed in the class internal 
-     * Server object list.
-     * @param name the name of the configuration in server.xml like 
-     * {@code &lt;server name="my"&gt;}
+     * Retrieve the Server object. The method is invoked from class
+     * ServerExecutor execute method. The created Server object is placed in the
+     * class internal Server object list.
+     * 
+     * @param name
+     *            the name of the configuration in server.xml like
+     *            {@code &lt;server name="my"&gt;}
      * @return Server object
      */
-    synchronized public static Server getInstance(String name) {
+    public static synchronized Server getInstance(String name) {
 
-        if (!servers.containsKey(name) ) {
-            servers.put(name,new NSCAServer(name));
+        if (!servers.containsKey(name)) {
+            servers.put(name, new NSCAServer(name));
         }
         return servers.get(name);
     }
-    
-    
+
     /**
      * Unregister the server and its configuration
-     * @param name of the server instance
+     * 
+     * @param name
+     *            of the server instance
      */
-    synchronized public static void unregister(String name) {
+    public static synchronized void unregister(String name) {
         getInstance(name).unregister();
         servers.remove(name);
     }
-    
+
     @Override
-    synchronized public void unregister() {
+    public synchronized void unregister() {
         // check queue
         LOGGER.info("{} - Unregister called", instanceName);
-       
+
         execService.shutdown();
-        
+
         execService.shutdownNow();
-        
+
         try {
-            execService.awaitTermination(5000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e1) {}
-            
-        
+            execService.awaitTermination(WAIT_TERMINIATION_MS / 2,
+                    TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e1) {
+        }
+
         LOGGER.info("{} - Shutdown is done", instanceName);
-        
-        for (int waitCount=0;waitCount < 3; waitCount++) {
+
+        for (int waitCount = 0; waitCount < 3; waitCount++) {
             try {
-                if (execService.awaitTermination(10000, TimeUnit.MILLISECONDS) && execService.isTerminated()) {
-                    LOGGER.info("{} - ExecutorService and all workers terminated", instanceName);
+                if (execService.awaitTermination(WAIT_TERMINIATION_MS,
+                        TimeUnit.MILLISECONDS) && execService.isTerminated()) {
+                    LOGGER.info(
+                            "{} - ExecutorService and all workers terminated",
+                            instanceName);
                     break;
                 }
-            } catch (InterruptedException e) {}            
+            } catch (InterruptedException e) {
+            }
         }
-        LOGGER.info("{} - All workers stopped",instanceName);
+        LOGGER.info("{} - All workers stopped", instanceName);
         circuitBreak.destroy();
     }
-    
+
     /**
-     * Constructor 
+     * Constructor
+     * 
      * @param name
      */
     private NSCAServer(String name) {
-        instanceName=name;
+        instanceName = name;
         subTaskQueue = new LinkedBlockingQueue<ServiceTO>();
         execService = Executors.newCachedThreadPool();
         settings = getNSCAConnection(name);
-        circuitBreak = new ServerCircuitBreak(this,ConfigurationManager.getInstance().getServerProperiesByName(name));
-        execService.execute(new NSCAWorker(name, subTaskQueue,circuitBreak, settings));
-       
+        circuitBreak = new ServerCircuitBreak(this, ConfigurationManager
+                .getInstance().getServerProperiesByName(name));
+        execService.execute(new NSCAWorker(name, subTaskQueue, circuitBreak,
+                settings));
+
     }
-    
-    
-    private NagiosSettings getNSCAConnection(String name)  {
+
+    private NagiosSettings getNSCAConnection(String name) {
         Properties defaultproperties = getServerProperties();
-        Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
+        Properties prop = ConfigurationManager.getInstance()
+                .getServerProperiesByName(name);
         return new NagiosSettingsBuilder()
-        .withNagiosHost(prop.getProperty("hostAddress",
-                defaultproperties.getProperty("hostAddress")))
-        .withPort(Integer.parseInt(prop.getProperty("port", 
-                defaultproperties.getProperty("port"))))
-        .withEncryption(Encryption.valueOf(prop.getProperty("encryptionMode", 
-                defaultproperties.getProperty("encryptionMode"))))
-        .withPassword(prop.getProperty("password",
-                defaultproperties.getProperty("password")))
-        .withConnectionTimeout(Integer.parseInt(prop.getProperty("connectionTimeout",
-                defaultproperties.getProperty("connectionTimeout"))))
-        .create();
+                .withNagiosHost(
+                        prop.getProperty("hostAddress",
+                                defaultproperties.getProperty("hostAddress")))
+                .withPort(
+                        Integer.parseInt(prop.getProperty("port",
+                                defaultproperties.getProperty("port"))))
+                .withEncryption(
+                        Encryption.valueOf(prop
+                                .getProperty("encryptionMode",
+                                        defaultproperties
+                                                .getProperty("encryptionMode"))))
+                .withPassword(
+                        prop.getProperty("password",
+                                defaultproperties.getProperty("password")))
+                .withConnectionTimeout(
+                        Integer.parseInt(prop.getProperty("connectionTimeout",
+                                defaultproperties
+                                        .getProperty("connectionTimeout"))))
+                .create();
     }
-    
-    
-    
+
     @Override
     public String getInstanceName() {
         return instanceName;
     }
-    
+
     @Override
     public void send(ServiceTO serviceTo) throws ServerException {
         /*
          * Use the Worker send instead
          */
     }
-    
+
     /**
      * Get the default properties
+     * 
      * @return default properties
      */
     public static Properties getServerProperties() {
         Properties defaultproperties = new Properties();
-        
-        defaultproperties.setProperty("hostAddress","localhost");
-        defaultproperties.setProperty("port","5667");
-        defaultproperties.setProperty("encryptionMode","XOR");
-        defaultproperties.setProperty("password","");
-        defaultproperties.setProperty("connectionTimeout","5000");
-        
+
+        defaultproperties.setProperty("hostAddress", "localhost");
+        defaultproperties.setProperty("port", "5667");
+        defaultproperties.setProperty("encryptionMode", "XOR");
+        defaultproperties.setProperty("password", "");
+        defaultproperties.setProperty("connectionTimeout", "5000");
+
         return defaultproperties;
     }
-
 
     @Override
     public void onMessage(ServiceTO message) {
         subTaskQueue.offer(message);
-        
-        LOGGER.debug("{} - Worker pool size {} and queue size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize(),subTaskQueue.size());
-        
+
+        LOGGER.debug("{} - Worker pool size {} and queue size {}",
+                instanceName, ((ThreadPoolExecutor) execService).getPoolSize(),
+                subTaskQueue.size());
+
         /* If the queue is larger then 10 start new workers */
         if (subTaskQueue.size() > MAX_QUEUE) {
-            execService.execute(new NSCAWorker(instanceName, subTaskQueue, circuitBreak, settings));
-            LOGGER.info("{} - Increase worker pool size {}", instanceName, ((ThreadPoolExecutor) execService).getPoolSize());
+            execService.execute(new NSCAWorker(instanceName, subTaskQueue,
+                    circuitBreak, settings));
+            LOGGER.info("{} - Increase worker pool size {}", instanceName,
+                    ((ThreadPoolExecutor) execService).getPoolSize());
         }
     }
 }
-

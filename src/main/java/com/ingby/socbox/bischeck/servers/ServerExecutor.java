@@ -89,11 +89,9 @@ public final class ServerExecutor {
                 Method method = serverSet.get(name).getMethod(UNREGISTER,
                         String.class);
                 method.invoke(null, name);
-            } catch (IllegalArgumentException |  
-                    IllegalAccessException | 
-                    InvocationTargetException | 
-                    SecurityException | 
-                    NoSuchMethodException e) {
+            } catch (IllegalArgumentException | IllegalAccessException
+                    | InvocationTargetException | SecurityException
+                    | NoSuchMethodException e) {
                 LOGGER.error("Failed to unregister {} ", name, e);
             }
         }
@@ -129,12 +127,9 @@ public final class ServerExecutor {
 
                     server.send(serviceTo);
 
-                } catch (IllegalArgumentException |
-                        IllegalAccessException |
-                        InvocationTargetException | 
-                        SecurityException | 
-                        NoSuchMethodException | 
-                        ServerException e) {
+                } catch (IllegalArgumentException | IllegalAccessException
+                        | InvocationTargetException | SecurityException
+                        | NoSuchMethodException | ServerException e) {
                     LOGGER.error("Failed to execute {} ", name, e);
                 }
             }
@@ -167,11 +162,9 @@ public final class ServerExecutor {
                                 service, level, message);
                     }
 
-                } catch (IllegalArgumentException | 
-                        IllegalAccessException | 
-                        InvocationTargetException | 
-                        SecurityException | 
-                        NoSuchMethodException e) {
+                } catch (IllegalArgumentException | IllegalAccessException
+                        | InvocationTargetException | SecurityException
+                        | NoSuchMethodException e) {
                     LOGGER.error("Failed to execute internal {} ", name, e);
                 }
             }

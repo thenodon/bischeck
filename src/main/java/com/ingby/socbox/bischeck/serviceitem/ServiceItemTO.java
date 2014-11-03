@@ -1,7 +1,9 @@
 package com.ingby.socbox.bischeck.serviceitem;
 
-import com.ingby.socbox.bischeck.service.Service;
-import com.ingby.socbox.bischeck.service.ServiceTO.ServiceTOBuilder;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 public class ServiceItemTO {
     private String name;
@@ -11,35 +13,34 @@ public class ServiceItemTO {
     private Float warning;
     private Float critical;
     private Float threshold;
-    private boolean hasThreshold;
+    private Boolean hasThreshold;
+    private List<Exception> exceptions;
+    private NAGIOSSTAT status;
 
-    private ServiceItemTO(ServiceItemTOBuilder builder) {
-        
-    }
-    
-    public ServiceItemTO(String name, String value, Long execTime, String method, Float threshold, Float warning, Float critical) {
-        this.name = name;
-        this.value = value;
-        this.execTime = execTime;
-        this.method = method;
-        
-        this.threshold = threshold;
-        this.warning = warning;
-        this.critical = critical;
-        if (threshold != null) {
+    @SuppressWarnings("unchecked")
+    public ServiceItemTO(ServiceItem serviceItem) {
+        this.name = serviceItem.getServiceItemName();
+        this.value = serviceItem.getLatestExecuted();
+        this.execTime = serviceItem.getExecutionTime();
+        if (serviceItem.getThreshold() != null
+                && serviceItem.getThreshold().getThreshold() != null) {
+            this.method = serviceItem.getThreshold().getCalcMethod();
+
+            this.threshold = serviceItem.getThreshold().getThreshold();
+            this.status = serviceItem.evaluateThreshold();
+            this.warning = serviceItem.getThreshold().getWarning();
+            this.critical = serviceItem.getThreshold().getCritical();
             this.hasThreshold = true;
         } else {
-            this.hasThreshold = false;    
+            this.hasThreshold = false;
         }
+        if (serviceItem.hasException()) {
+            exceptions = (List<Exception>) ((LinkedList<Exception>) serviceItem
+                    .getExceptions()).clone();
+        }
+
     }
 
-    public ServiceItemTO(String name, String value, Long execTime ) {
-        this.name = name;
-        this.value = value;
-        this.execTime = execTime;
-        this.hasThreshold = false;
-    }
-    
     public boolean hasThreshold() {
         return hasThreshold;
     }
@@ -47,54 +48,49 @@ public class ServiceItemTO {
     public String getName() {
         return name;
     }
+
     public String getValue() {
         return value;
     }
+
     public Long getExecTime() {
         return execTime;
     }
+
     public String getMethod() {
         return method;
     }
+
     public Float getWarning() {
         return warning;
     }
+
     public Float getCritical() {
         return critical;
     }
+
     public Float getThreshold() {
         return threshold;
     }
+
     public boolean isHasThreshold() {
         return hasThreshold;
     }
-    
-    public static class ServiceItemTOBuilder {
-        private String name;
-        private String value;
-        private Long execTime;
-        private String method;
-        private Float warning;
-        private Float critical;
-        private Float threshold;
-        private boolean hasThreshold;
 
-        public ServiceItemTOBuilder(ServiceItem serviceItem) {
-            this.name = serviceItem.getServiceItemName();
-            this.value = serviceItem.getLatestExecuted();
-            this.execTime = serviceItem.getExecutionTime();
-            if(serviceItem.getThreshold() != null) {
-                this.method = serviceItem.getThreshold().getCalcMethod();
-
-                this.threshold = serviceItem.getThreshold().getThreshold();
-                this.warning = serviceItem.getThreshold().getWarning();
-                this.critical = serviceItem.getThreshold().getCritical();
-                this.hasThreshold = true;
-            } else {
-                this.hasThreshold = false;    
-            }   
+    public boolean hasException() {
+        if (exceptions == null) {
+            return false;
         }
-        
-        
+
+        if (exceptions.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
     }
+
+    public NAGIOSSTAT getStatus() {
+        return status;
+    }
+
 }

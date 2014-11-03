@@ -38,7 +38,8 @@ public class ShellService extends ServiceAbstract implements Service, ServiceSta
     private final static Logger LOGGER = LoggerFactory.getLogger(ShellService.class);
     
     
-    public ShellService (String serviceName, Properties notUsed) {
+    public ShellService (String serviceName, Properties bischeckProperties) {
+        super(bischeckProperties);
         this.serviceName = serviceName;
     }
 

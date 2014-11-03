@@ -47,6 +47,7 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
 
     
     public LivestatusService (String serviceName, Properties bischeckProperties) {
+        super(bischeckProperties);
         this.serviceName = serviceName;
         
         if (bischeckProperties != null) {

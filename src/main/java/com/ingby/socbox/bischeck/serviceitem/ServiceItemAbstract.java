@@ -15,9 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.serviceitem;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import com.ingby.socbox.bischeck.QueryDate;
 import com.ingby.socbox.bischeck.service.Service;
@@ -25,24 +28,17 @@ import com.ingby.socbox.bischeck.threshold.Threshold;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
- * The ServiceItemAbstract class provide most of the methods needed by a 
- * ServiceItem implementation. The methods not implemented from the interface 
- * {@link ServiceItem} in the abstract 
- * class is: <b>
- * <code>
+ * The ServiceItemAbstract class provide most of the methods needed by a
+ * ServiceItem implementation. The methods not implemented from the interface
+ * {@link ServiceItem} in the abstract class is: <b> <code>
  * public void execute() throws Exception 
- * </code>
- * <b>
- * In the implementation class the following constructor must also be 
- * implemented:
- * <code>
+ * </code> <b> In the implementation class the following constructor must also
+ * be implemented: <code>
  * public ServiceItemImpl(String name) 
- * </code> 
- * <br>
- * Where name is the the name of the serviceitem taken from the bischeck.xml 
- * configuration file.   
+ * </code> <br>
+ * Where name is the the name of the serviceitem taken from the bischeck.xml
+ * configuration file.
  */
-
 
 public abstract class ServiceItemAbstract {
 
@@ -57,98 +53,81 @@ public abstract class ServiceItemAbstract {
     protected Threshold threshold;
     private String classname;
     private NAGIOSSTAT curstate;
-    private Exception exception;
-    private boolean hasException;
-    
+    private List<Exception> exceptions;
+
     public void reset() {
         latestValue = null;
-        exception = null;
-        hasException = false;
+        exceptions = null;
         curstate = NAGIOSSTAT.UNKNOWN;
         exectime = 0L;
     }
-    
+
     public void setService(Service service) {
         this.service = service;
     }
 
-    
     public String getServiceItemName() {
         return this.serviceItemName;
     }
 
-    
     public String getDecscription() {
         return decscription;
     }
 
-    
     public void setDecscription(String decscription) {
         this.decscription = decscription;
     }
-    
-    
+
     public String getExecution() {
-        return QueryDate.parse(execution);    
+        return QueryDate.parse(execution);
     }
 
-    
     public String getExecutionStat() {
-        return execution;    
+        return execution;
     }
-    
-    
+
     public void setExecution(String execution) {
         this.execution = execution;
     }
 
-    
-    public void execute() throws Exception {                
-        latestValue = service.executeStmt(this.getExecution());    
+    public void execute() throws Exception {
+        latestValue = service.executeStmt(this.getExecution());
     }
 
-    
     public String getThresholdClassName() {
         return this.thresholdclassname;
-        
+
     }
 
-    
     public void setThresholdClassName(String thresholdclassname) {
         this.thresholdclassname = thresholdclassname;
     }
 
-    
     public void setLatestExecuted(String value) {
         latestValue = value;
     }
 
-    
     public String getLatestExecuted() {
         return latestValue;
     }
 
-    
     public void setExecutionTime(Long exectime) {
         this.exectime = exectime;
     }
 
-    
     public Long getExecutionTime() {
         return exectime;
     }
 
-    
     public Threshold getThreshold() {
         return this.threshold;
     }
 
-    
     public void setThreshold(Threshold threshold) {
         this.threshold = threshold;
     }
 
-    public void setClassName(String classname){
+    public void setClassName(String classname) {
         this.classname = classname;
     }
 
@@ -156,11 +135,9 @@ public abstract class ServiceItemAbstract {
         return this.classname;
     }
 
-
     public String getAlias() {
         return alias;
     }
-
 
     public void setAlias(String alias) {
         this.alias = alias;
@@ -170,9 +147,32 @@ public abstract class ServiceItemAbstract {
         curstate = getThreshold().getState(getLatestExecuted());
         return curstate;
     }
-    
+
     public NAGIOSSTAT getEvaluatedThreshold() {
         return curstate;
     }
-    
+
+    public void addException(Exception exception) {
+        if (exceptions == null) {
+            exceptions = new LinkedList<>();
+        }
+        exceptions.add(exception);
+    }
+
+    public List<Exception> getExceptions() {
+        return exceptions;
+    }
+
+    public boolean hasException() {
+        if (exceptions == null) {
+            return false;
+        }
+
+        if (exceptions.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
 }

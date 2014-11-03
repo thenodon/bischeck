@@ -42,6 +42,7 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
     private Connection connection;
         
     public JDBCPoolService (String serviceName, Properties bischeckProperties) {
+        super(bischeckProperties);
         this.serviceName = serviceName;
     
         if (bischeckProperties != null) {

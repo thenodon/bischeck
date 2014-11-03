@@ -20,12 +20,12 @@
 package com.ingby.socbox.bischeck.service;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
-import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.host.Host;
-import com.ingby.socbox.bischeck.notifications.Notifier;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
@@ -51,9 +51,29 @@ public abstract class ServiceAbstract {
     protected String driverClassName;
     protected Host host;
     protected List<String> schedulelist;
-    private NAGIOSSTAT level = NAGIOSSTAT.UNKNOWN;
     private boolean connectionEstablished = false;
     private Boolean sendServiceData = true;
+    private List<Exception> exceptions;
+
+    private NAGIOSSTAT stateOnExecException = NAGIOSSTAT.CRITICAL;
+    private NAGIOSSTAT stateOnConnectionException = NAGIOSSTAT.CRITICAL;
+
+    public ServiceAbstract(Properties bischeckProperties) {
+        if (bischeckProperties != null) {
+            stateOnExecException = NAGIOSSTAT.valueOf(bischeckProperties
+                    .getProperty("stateOnExecException", "UNKNOWN"));
+            stateOnConnectionException = NAGIOSSTAT.valueOf(bischeckProperties
+                    .getProperty("stateOnConnectionException", "CRITICAL"));
+        }
+    }
+
+    public void reset() {
+        exceptions = null;
+        connectionEstablished = false;
+        for (ServiceItem serviceitem : getServicesItems().values()) {
+            serviceitem.reset();
+        }
+    }
 
     private ServiceState fsm = null;
 
@@ -128,11 +148,28 @@ public abstract class ServiceAbstract {
     }
 
     public NAGIOSSTAT getLevel() {
-        return level;
-    }
+        // If service has exception
+        if (hasException()) {
+            return stateOnConnectionException;
+        }
 
-    public void setLevel(NAGIOSSTAT level) {
-        this.level = level;
+        // If service item has exception
+        for (ServiceItem serviceItem : getServicesItems().values()) {
+            if (serviceItem.hasException()) {
+                return stateOnExecException;
+            }
+        }
+
+        NAGIOSSTAT level = NAGIOSSTAT.OK;
+        for (ServiceItem serviceItem : getServicesItems().values()) {
+            if (serviceItem.getEvaluatedThreshold() != null) {
+                if (serviceItem.getEvaluatedThreshold().val() > level.val()) {
+                    level = serviceItem.getEvaluatedThreshold();
+                }
+            }
+        }
+        return level;
+
     }
 
     public boolean isConnectionEstablished() {
@@ -166,5 +203,25 @@ public abstract class ServiceAbstract {
 
     public void setServiceState() {
         fsm.setState(getLevel());
+    }
+
+    public void addException(Exception exception) {
+        if (exceptions == null) {
+            exceptions = new LinkedList<>();
+        }
+        exceptions.add(exception);
+    }
+
+    public List<Exception> getExceptions() {
+        return exceptions;
+    }
+
+    public boolean hasException() {
+        if (exceptions != null) {
+            if (!exceptions.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

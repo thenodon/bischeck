@@ -19,10 +19,12 @@
 
 package testng.com.ingby.socbox.bischeck.service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
+import java.util.Set;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -30,47 +32,45 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import testng.com.ingby.socbox.bischeck.TestUtils;
-
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.host.Host;
 
 import com.ingby.socbox.bischeck.service.JDBCService;
-import com.ingby.socbox.bischeck.service.ServiceConnectionException;
-import com.ingby.socbox.bischeck.service.ServiceException;
+import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.service.ServiceTO.ServiceTOBuilder;
 import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
-import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 public class ServiceStatusTest {
 
 
 
     private CacheInf cache;
-    private Host host;
-    private JDBCService jdbc;
-    private SQLServiceItem sql;
-
+    
     @BeforeClass
     public void beforeTest() throws Exception {
-
+        
+        
         TestUtils.getConfigurationManager();    
-        CacheFactory.init();
+        
+        // Create table
+        //Creating a database table
+        Connection con = DriverManager.getConnection("jdbc:derby:memory:myDB;create=true");
+        Statement stat = con.createStatement();
+        try {
+            stat.execute("drop table test");
+        } catch (SQLException ignore) {}
+        stat.execute("create table test (id INT, value INT, createdate date)");
+        stat.execute("insert into test (id, value, createdate) values (1,1000,CURRENT_DATE)");
+        stat.execute("insert into test (id, value, createdate) values (2,1000,CURRENT_DATE)");
+        stat.execute("insert into test (id, value, createdate) values (3,2000,CURRENT_DATE)");
+        stat.execute("insert into test (id, value, createdate) values (4,3000,'2010-12-31')");
+        con.commit();
 
-        host = new Host("host");
-        jdbc = new JDBCService("test",null);
-        jdbc.setConnectionUrl("jdbc:derby:memory:myDBxyz;create=true");
-        jdbc.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-        sql = new SQLServiceItem("serviceItemName");
-        jdbc.addServiceItem(sql);
-        sql.setService(jdbc);
-        sql.setLatestExecuted("1.3");
-        host.addService(jdbc);
-        jdbc.setHost(host);
-        jdbc.setLevel(NAGIOSSTAT.CRITICAL);
-
+        
+        
         CacheFactory.init();
 
         cache = CacheFactory.getInstance();     
@@ -82,43 +82,74 @@ public class ServiceStatusTest {
     public void afterTest() throws CacheException {
         CacheFactory.destroy();
     }
+    
+    
+    
 
     @Test (groups = { "ServiceItem" })
     public void verifyServiceStatus() throws Exception {
-        ServiceTO status = new ServiceTOBuilder(jdbc).build();
-        Assert.assertEquals(status.getHostName(), "host");
-        Set<String> items = status.getServiceItemTONames();
-        for (String name : items) {
-            System.out.println(name);
+    
+        Host host;
+        JDBCService jdbc;
+        SQLServiceItem sql;
 
-        }
-
+        host = new Host("host");
+        jdbc = new JDBCService("test",null);
+        jdbc.setConnectionUrl("jdbc:derby:memory:myDB;create=true");
+        jdbc.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+        sql = new SQLServiceItem("serviceItemName");
+        jdbc.addServiceItem(sql);
+        sql.setService(jdbc);
+        //sql.setLatestExecuted("1.3");
+        host.addService(jdbc);
+        jdbc.setHost(host);
+    
+        
+        
+        ServiceJob job = new ServiceJob();
+        sql.setExecution("select sum(value) from test");
+        job.executeJob(jdbc);
+        
+        Assert.assertEquals(sql.hasException(), false);
+        Assert.assertEquals(jdbc.hasException(), false);
+        
+        ServiceTO serviceTo = new ServiceTOBuilder(jdbc).build();
+        
+        Assert.assertEquals(serviceTo.getHostName(), "host");
+        Set<String> items = serviceTo.getServiceItemTONames();     
         Assert.assertEquals(items.contains("serviceItemName"), true);
-        Assert.assertEquals(status.hasException(), false);
-        Assert.assertEquals(status.hasException(), false);
+        Assert.assertEquals(serviceTo.hasException(), false);
 
 
+        // ServiceItem exec exception
+        sql.setExecution("select sum(value) from test1");
+        job = new ServiceJob();
+        job.executeJob(jdbc);
+        
+        Assert.assertEquals(sql.hasException(),true);
+        
         ServiceTOBuilder build = new ServiceTOBuilder(jdbc);
-        Map<String, Exception> expMap = new HashMap<String,Exception>();
-        expMap.put("serviceItemName", new ServiceException("Very bad"));
+      
+        serviceTo = build.build();
 
-        status = build.exceptions(expMap).build();
-
-
-        Assert.assertEquals(status.hasException(), true);
-        Assert.assertEquals(status.isConnectionEstablished(), true);
+        Assert.assertEquals(serviceTo.hasException(), true);
+        Assert.assertEquals(serviceTo.isConnectionEstablished(), true);
 
 
-
+        // Service connetion exception
+        sql.setExecution("select sum(value) from test");
+        jdbc.setConnectionUrl("jdbc:derby:memory:myDBNOTEXISTS;create=true");
+        job = new ServiceJob();
+        job.executeJob(jdbc);
+        
+        Assert.assertEquals(sql.hasException(),true);
+        
         build = new ServiceTOBuilder(jdbc);
-        expMap = new HashMap<String,Exception>();
-        expMap.put("serviceItemName", new ServiceConnectionException("Very bad"));
+      
+        serviceTo = build.build();
 
-        status = build.exceptions(expMap).build();
-
-
-        Assert.assertEquals(status.hasException(), true);
-        Assert.assertEquals(status.isConnectionEstablished(), false);
-
+        Assert.assertEquals(serviceTo.hasException(), true);
+        Assert.assertEquals(serviceTo.isConnectionEstablished(), true);
+        
     }
 }

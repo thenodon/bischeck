@@ -15,10 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.service;
-
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -33,39 +32,42 @@ import org.slf4j.LoggerFactory;
 /**
  * Service to connect and execute JDBC/SQL.
  */
-public class JDBCService extends ServiceAbstract implements Service, ServiceStateInf {
+public class JDBCService extends ServiceAbstract implements Service,
+        ServiceStateInf {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(JDBCService.class);
-    
+    private final static Logger LOGGER = LoggerFactory
+            .getLogger(JDBCService.class);
+
     static private int querytimeout = 10;
     private Connection connection;
-    
-    
-    
-    public JDBCService (String serviceName, Properties bischeckProperties) {
+
+    public JDBCService(String serviceName, Properties bischeckProperties) {
+        super(bischeckProperties);
         this.serviceName = serviceName;
-        
+
         if (bischeckProperties != null) {
             try {
-                querytimeout = Integer.parseInt(bischeckProperties.getProperty("JDBCService.querytimeout","10"));
+                querytimeout = Integer.parseInt(bischeckProperties.getProperty(
+                        "JDBCService.querytimeout", "10"));
             } catch (NumberFormatException ne) {
-                LOGGER.error("Property JDBCSerivce.querytimeout is not set correct to an integer: {}", 
-                        bischeckProperties.getProperty("JDBCSerivce.querytimeout"));
+                LOGGER.error(
+                        "Property JDBCSerivce.querytimeout is not set correct to an integer: {}",
+                        bischeckProperties
+                                .getProperty("JDBCSerivce.querytimeout"));
             }
         }
-        
+
     }
 
-    
     @Override
     public void openConnection() throws ServiceConnectionException {
         super.openConnection();
-        
+
         try {
-            this.connection = DriverManager.getConnection(this.getConnectionUrl());
+            connection = DriverManager.getConnection(this.getConnectionUrl());
         } catch (SQLException sqle) {
             setConnectionEstablished(false);
-            LOGGER.warn("Open connection failed",sqle);
+            LOGGER.warn("Open connection failed", sqle);
             ServiceConnectionException se = new ServiceConnectionException(sqle);
             se.setServiceName(this.serviceName);
             throw se;
@@ -73,42 +75,42 @@ public class JDBCService extends ServiceAbstract implements Service, ServiceStat
         setConnectionEstablished(true);
     }
 
-    
     @Override
     public void closeConnection() throws ServiceConnectionException {
         try {
-            this.connection.close();
+            if (connection != null) {
+                connection.close();
+            }
         } catch (SQLException sqle) {
-            LOGGER.warn("Closing connection failed",sqle);
+            LOGGER.warn("Closing connection failed", sqle);
             ServiceConnectionException se = new ServiceConnectionException(sqle);
             se.setServiceName(this.serviceName);
             throw se;
         }
     }
 
-    
-    @Override 
+    @Override
     public String executeStmt(String exec) throws ServiceException {
-        
-        try (Statement statement = this.connection.createStatement();
-             ResultSet res = statement.executeQuery(exec);
-            ){
-        
-            statement.setQueryTimeout(querytimeout);
-            
-            if (res.next()) {//Changed from first - not working with as400 jdbc driver
-                return (res.getString(1));
+        String statementResult = null;
+        if (connection != null) {
+
+            try (Statement statement = connection.createStatement();
+                    ResultSet res = statement.executeQuery(exec);) {
+
+                statement.setQueryTimeout(querytimeout);
+
+                if (res.next()) {// Changed from first - not working with as400
+                                 // jdbc driver
+                    statementResult = (res.getString(1));
+                }
+            } catch (SQLException sqle) {
+                LOGGER.warn("Executing {} statement failed", exec, sqle);
+                ServiceException se = new ServiceException(sqle);
+                se.setServiceName(this.serviceName);
+                throw se;
             }
-        } catch (SQLException sqle) {
-            LOGGER.warn("Executing {} statement failed",exec, sqle);
-            ServiceException se = new ServiceException(sqle);
-            se.setServiceName(this.serviceName);
-            throw se;
         }
-        
-        return null;
-    }    
+        return statementResult;
+    }
 
 }
-
-

@@ -205,7 +205,7 @@ public interface Service {
      * 
      * @param level
      */
-    void setLevel(NAGIOSSTAT level);
+    // void setLevel(NAGIOSSTAT level);
 
     /**
      * Check if the service has a valid connection
@@ -243,5 +243,32 @@ public interface Service {
      * @param alias
      */
     void setAlias(String alias);
+
+    /**
+     * Add an exception to the service
+     * 
+     * @param exception
+     */
+    void addException(Exception exception);
+
+    /**
+     * Get a list of the exception that has occurred
+     * 
+     * @return
+     */
+    List<Exception> getExceptions();
+
+    /**
+     * True if exceptions exists
+     * 
+     * @return
+     */
+    boolean hasException();
+
+    /**
+     * Reset all transient data. Must be called before new collection of data is
+     * done
+     */
+    void reset();
 
 }
