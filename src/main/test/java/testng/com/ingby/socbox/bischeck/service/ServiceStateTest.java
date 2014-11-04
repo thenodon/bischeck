@@ -452,4 +452,59 @@ public class ServiceStateTest {
         Assert.assertFalse(fsm.isNotification());
         Assert.assertTrue(fsm.isStateChange());
     }
+    
+    @Test (groups = { "ServiceState" })
+    public void verifyFSMStateUnkown() {
+        ServiceState fsm = null;
+        fsm = new ServiceState(2,true);
+        displayState(fsm);
+
+        fsm.setState(NAGIOSSTAT.OK);
+        displayState(fsm);
+        Assert.assertEquals(fsm.getState(),NAGIOSSTAT.OK);
+        Assert.assertEquals(fsm.getStateLevel(),State.OKAY_HARD);
+        Assert.assertEquals(fsm.getPreviousStateLevel(),State.OKAY_HARD);
+        Assert.assertTrue(fsm.isStateChange());
+        Assert.assertFalse(fsm.isNotification());
+
+        fsm.setState(NAGIOSSTAT.UNKNOWN);
+        displayState(fsm);
+        Assert.assertEquals(fsm.getState(),NAGIOSSTAT.UNKNOWN);
+        Assert.assertEquals(fsm.getStateLevel(),State.PROBLEM_SOFT);
+        Assert.assertEquals(fsm.getPreviousStateLevel(),State.OKAY_HARD);
+        Assert.assertTrue(fsm.isStateChange());
+        Assert.assertFalse(fsm.isNotification());
+
+        fsm.setState(NAGIOSSTAT.UNKNOWN);
+        displayState(fsm);
+        Assert.assertEquals(fsm.getState(),NAGIOSSTAT.UNKNOWN);
+        Assert.assertEquals(fsm.getStateLevel(),State.PROBLEM_SOFT);
+        Assert.assertEquals(fsm.getPreviousStateLevel(),State.PROBLEM_SOFT);
+        Assert.assertTrue(fsm.isStateChange());
+        Assert.assertFalse(fsm.isNotification());
+
+        fsm.setState(NAGIOSSTAT.UNKNOWN);
+        displayState(fsm);
+        Assert.assertEquals(fsm.getState(),NAGIOSSTAT.UNKNOWN);
+        Assert.assertEquals(fsm.getStateLevel(),State.PROBLEM_HARD);
+        Assert.assertEquals(fsm.getPreviousStateLevel(),State.PROBLEM_SOFT);
+        Assert.assertTrue(fsm.isStateChange());
+        Assert.assertTrue(fsm.isNotification());
+
+        fsm.setState(NAGIOSSTAT.UNKNOWN);
+        displayState(fsm);
+        Assert.assertEquals(fsm.getState(),NAGIOSSTAT.UNKNOWN);
+        Assert.assertEquals(fsm.getStateLevel(),State.PROBLEM_HARD);
+        Assert.assertEquals(fsm.getPreviousStateLevel(),State.PROBLEM_HARD);
+        Assert.assertFalse(fsm.isStateChange());
+        Assert.assertFalse(fsm.isNotification());
+
+        fsm.setState(NAGIOSSTAT.UNKNOWN);
+        displayState(fsm);
+        Assert.assertEquals(fsm.getState(),NAGIOSSTAT.UNKNOWN);
+        Assert.assertEquals(fsm.getStateLevel(),State.PROBLEM_HARD);
+        Assert.assertEquals(fsm.getPreviousStateLevel(),State.PROBLEM_HARD);
+        Assert.assertFalse(fsm.isStateChange());
+        Assert.assertFalse(fsm.isNotification());
+    }
 }
