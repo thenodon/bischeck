@@ -52,13 +52,13 @@ public class Min extends PostfixMathCommand {
     @SuppressWarnings("unchecked")
     @Override
     public void run(Stack stack) throws ParseException {
-        checkStack(stack);// check the stack
+        checkStack(stack);
     
         if (curNumberOfParameters < 1) {
             throw new ParseException("No arguments for Min");
         }
 
-        Object min = (Object) new Double(Double.MAX_VALUE);;
+        Object min = (Object) new Double(Double.MAX_VALUE);
         Object param;
         int i = 0;
         int j = 0;

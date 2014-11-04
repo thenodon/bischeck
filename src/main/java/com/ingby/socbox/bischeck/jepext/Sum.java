@@ -19,7 +19,6 @@
 
 package com.ingby.socbox.bischeck.jepext;
 
-
 import java.util.*;
 
 import org.nfunk.jep.*;
@@ -27,7 +26,7 @@ import org.nfunk.jep.function.Add;
 
 /**
  * Calculate the sum of a series of values
- *
+ * 
  */
 public class Sum extends org.nfunk.jep.function.Sum {
     private Add addFun = new Add();
@@ -40,13 +39,13 @@ public class Sum extends org.nfunk.jep.function.Sum {
         // Use a variable number of arguments
         super();
         this.supportNull = Util.getSupportNull();
-        
+
     }
 
     public Sum(boolean supportNull) {
         // Use a variable number of arguments
         super();
-        this.supportNull  = supportNull;
+        this.supportNull = supportNull;
     }
 
     /**
@@ -56,14 +55,14 @@ public class Sum extends org.nfunk.jep.function.Sum {
     @SuppressWarnings("unchecked")
     @Override
     public void run(Stack stack) throws ParseException {
-        
+
         checkStack(stack);
         if (curNumberOfParameters < 1) {
             throw new ParseException("No arguments for Sum");
         }
-        
+
         Object sum = (Object) new Double(0);
-        
+
         Object param;
         int i = 0;
         int j = 0;
@@ -73,18 +72,17 @@ public class Sum extends org.nfunk.jep.function.Sum {
             param = stack.pop();
             if (!(supportNull && param instanceof Null)) {
                 // add it to the sum (order is important for String arguments)
-                sum = addFun.add(param, sum);   
+                sum = addFun.add(param, sum);
                 j++;
             }
             i++;
         }
-        
-        if (j != 0 ) {
+
+        if (j != 0) {
             stack.push(sum);
-        } else { 
+        } else {
             stack.push(new Null());
         }
     }
 
-    
 }

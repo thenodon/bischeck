@@ -53,14 +53,14 @@ public class Max extends PostfixMathCommand {
     @SuppressWarnings("unchecked")
     @Override
     public void run(Stack stack) throws ParseException {
-        checkStack(stack);// check the stack
+        checkStack(stack);
 
         if (curNumberOfParameters < 1) {
             throw new ParseException("No arguments for Max");
         }
     
 
-        Object max = (Object) new Double(0);;
+        Object max = (Object) new Double(0);
         Object param;
         int i = 0;
         int j = 0;

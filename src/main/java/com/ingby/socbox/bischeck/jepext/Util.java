@@ -5,47 +5,31 @@ import java.util.Stack;
 
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 
-public class Util {
+public final class Util {
+
+    private Util() {
+
+    }
 
     /**
      * Check if remove of Null objects,notFullListParse, is set by the
      * ConfigurationManager
+     * 
      * @return true if set
      */
     public static boolean getSupportNull() {
+        boolean supportNull = false;
         try {
-            if ("true".equalsIgnoreCase(ConfigurationManager.getInstance().getProperties().
-                    getProperty("notFullListParse","false"))) {
-                return true;
+            if ("true".equalsIgnoreCase(ConfigurationManager.getInstance()
+                    .getProperties().getProperty("notFullListParse", "false"))) {
+                supportNull = true;
             } else {
-                return false;
+                supportNull = false;
             }
         } catch (NullPointerException ne) {
-            return false;
+            supportNull = false;
         }
+        return supportNull;
     }
 
-
-    /**
-     * Remove every stack object that is of class Null
-     * @param stack
-     * @return the number of items removed from the stack
-     */
-    @Deprecated
-    public static int deleteNullFromStack(Stack<Object> stack) {
-        int deletedNulls = 0;
-
-        Iterator<Object> itr = stack.iterator();
-
-        while (itr.hasNext()) {
-            Object obj = itr.next();
-
-            if (obj instanceof Null) {
-                itr.remove();
-                deletedNulls++;
-            }
-        }
-
-        return deletedNulls;
-    }
 }

@@ -23,54 +23,44 @@ import java.util.*;
 import org.nfunk.jep.*;
 import org.nfunk.jep.function.PostfixMathCommand;
 
-
 import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLS;
 import com.ingby.socbox.bischeck.jepext.perdictive.CalculateOLSException;
 
 /**
- * Calculate the slope value ifor a series of data points,
- * based on the ordinary least square method.
+ * Calculate the slope value for a series of data points, based on the ordinary
+ * least square method.
  */
-public class OrdinaryLeastSquaresSlope extends PostfixMathCommand
-{
-    public OrdinaryLeastSquaresSlope()
-    {
+public class OrdinaryLeastSquaresSlope extends PostfixMathCommand {
+    public OrdinaryLeastSquaresSlope() {
         numberOfParameters = 6;
     }
-    
-    
+
     @SuppressWarnings("unchecked")
     @Override
-    public void run(Stack inStack)
-        throws ParseException 
-    {
-        checkStack(inStack); // check the stack
+    public void run(Stack inStack) throws ParseException {
+       
+        checkStack(inStack);
+        
         Object timeOffset = inStack.pop();
-        Object resolution =  inStack.pop();
-        Object resolutionMethod =  inStack.pop();
+        Object resolution = inStack.pop();
+        Object resolutionMethod = inStack.pop();
         Object serviceItemName = inStack.pop();
-        Object serviceName =  inStack.pop();
-        Object hostName =  inStack.pop();
-        
-        
+        Object serviceName = inStack.pop();
+        Object hostName = inStack.pop();
+
         CalculateOLS ols = null;
         try {
-            ols = new CalculateOLS((String) hostName, 
-                (String) serviceName, 
-                (String) serviceItemName, 
-                (String) resolutionMethod, 
-                (String) resolution, 
-                (String) timeOffset);
-        } 
-        catch (CalculateOLSException ce) {
+            ols = new CalculateOLS((String) hostName, (String) serviceName,
+                    (String) serviceItemName, (String) resolutionMethod,
+                    (String) resolution, (String) timeOffset);
+        } catch (CalculateOLSException ce) {
             throw new ParseException(ce.getMessage());
         }
-        
-    
+
         Double forecastValue = ols.getPredictiveSlope();
-        
-        inStack.push(forecastValue); 
+
+        inStack.push(forecastValue);
         return;
     }
-    
+
 }

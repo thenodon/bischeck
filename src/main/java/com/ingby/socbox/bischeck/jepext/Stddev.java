@@ -19,7 +19,6 @@
 
 package com.ingby.socbox.bischeck.jepext;
 
-
 import java.util.*;
 
 import org.nfunk.jep.*;
@@ -27,7 +26,7 @@ import org.nfunk.jep.function.Add;
 
 /**
  * Calculate the sum of a series of values
- *
+ * 
  */
 public class Stddev extends org.nfunk.jep.function.Sum {
     private Add addFun = new Add();
@@ -40,13 +39,13 @@ public class Stddev extends org.nfunk.jep.function.Sum {
         // Use a variable number of arguments
         super();
         this.supportNull = Util.getSupportNull();
-        
+
     }
 
     public Stddev(boolean supportNull) {
         // Use a variable number of arguments
         super();
-        this.supportNull  = supportNull;
+        this.supportNull = supportNull;
     }
 
     /**
@@ -56,20 +55,20 @@ public class Stddev extends org.nfunk.jep.function.Sum {
     @SuppressWarnings("unchecked")
     @Override
     public void run(Stack stack) throws ParseException {
-        
+
         checkStack(stack);
         if (curNumberOfParameters < 1) {
             throw new ParseException("No arguments for Stddev");
         }
-        
+
         Object sum = (Object) new Double(0);
-        
+
         Object param;
         int paramCount = 0;
         int numberNotNull = 0;
-        
+
         Double[] square = new Double[curNumberOfParameters];
-                
+
         // repeat summation for each one of the current parameters
         while (paramCount < (curNumberOfParameters)) {
             // get the parameter from the stack
@@ -77,29 +76,28 @@ public class Stddev extends org.nfunk.jep.function.Sum {
             if (!(supportNull && param instanceof Null)) {
                 // add it to the sum (order is important for String arguments)
                 square[numberNotNull] = (Double) param;
-                sum = addFun.add(param, sum);   
+                sum = addFun.add(param, sum);
 
                 numberNotNull++;
             }
             paramCount++;
         }
-        
-        // Calculate the average and the standard deviation 
-        if (numberNotNull != 0 ) {
+
+        // Calculate the average and the standard deviation
+        if (numberNotNull != 0) {
             sum = (Double) sum / numberNotNull;
             // push the result on the inStack
             Double stdsum = new Double(0);
             for (int stdcount = 0; stdcount < numberNotNull; stdcount++) {
-                stdsum += Math.pow((square[stdcount]-(Double) sum),2);  
+                stdsum += Math.pow(square[stdcount] - (Double) sum, 2);
             }
-            
-            Double stdev = Math.sqrt(stdsum/numberNotNull);
-            
+
+            Double stdev = Math.sqrt(stdsum / numberNotNull);
+
             stack.push(stdev);
-        } else { 
+        } else {
             stack.push(new Null());
         }
     }
 
-    
 }
