@@ -225,7 +225,7 @@ public class ServiceState {
                         previousFSM = State.PROBLEM_SOFT;
                     }
                 }
-            } else if (previousState.equals(NAGIOSSTAT.CRITICAL) || previousState.equals(NAGIOSSTAT.WARNING)){
+            } else if (previousState.equals(NAGIOSSTAT.CRITICAL) || previousState.equals(NAGIOSSTAT.WARNING) || previousState.equals(NAGIOSSTAT.UNKNOWN)){
                 
                 if (currentState.equals(NAGIOSSTAT.OK)) {
                     fsm = State.OKAY_HARD;
@@ -246,6 +246,7 @@ public class ServiceState {
                 previousFSM = State.OKAY_HARD;
             }
         }
+        
         LOGGER.debug("Construct state {}",this.toString());
     }
 
@@ -350,14 +351,19 @@ public class ServiceState {
             stateChange = false;
         } else if (previousFSM.equals(State.PROBLEM_HARD) && fsm.equals(State.PROBLEM_HARD)) {
             if ((getState() == NAGIOSSTAT.CRITICAL && previousState == NAGIOSSTAT.WARNING) ||
-                (getState() == NAGIOSSTAT.WARNING && previousState == NAGIOSSTAT.CRITICAL)
+                (getState() == NAGIOSSTAT.CRITICAL && previousState == NAGIOSSTAT.UNKNOWN) ||
+                (getState() == NAGIOSSTAT.WARNING && previousState == NAGIOSSTAT.CRITICAL) ||
+                (getState() == NAGIOSSTAT.WARNING && previousState == NAGIOSSTAT.UNKNOWN) ||
+                (getState() == NAGIOSSTAT.UNKNOWN && previousState == NAGIOSSTAT.WARNING) ||
+                (getState() == NAGIOSSTAT.UNKNOWN && previousState == NAGIOSSTAT.CRITICAL)
                 ) {
                 // This means its an update on existing incident
                 resolved = false;
                 notify = true;
                 stateChange = true;
             } else if ((getState() == NAGIOSSTAT.CRITICAL && previousState == NAGIOSSTAT.CRITICAL) ||
-                (getState() == NAGIOSSTAT.WARNING && previousState == NAGIOSSTAT.WARNING)
+                (getState() == NAGIOSSTAT.WARNING && previousState == NAGIOSSTAT.WARNING) ||
+                (getState() == NAGIOSSTAT.UNKNOWN && previousState == NAGIOSSTAT.UNKNOWN)
                 ) {
                 resolved = false;
                 notify = false;
