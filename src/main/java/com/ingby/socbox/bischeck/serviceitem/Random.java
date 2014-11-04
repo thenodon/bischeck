@@ -15,39 +15,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.serviceitem;
-
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.ingby.socbox.bischeck.service.ServiceException;
 
 /**
- * The class simply generate a random number between 0 and the number define
- * in the executestatement.
+ * The class simply generate a random number between 0 and the number define in
+ * the executestatement.
  */
 public class Random extends ServiceItemAbstract implements ServiceItem {
-    
-    private final static Logger LOGGER = LoggerFactory.getLogger(Random.class);
-    
+
     public Random(String name) {
-        this.serviceItemName = name;    
+        this.serviceItemName = name;
     }
-    
-    
+
     /**
-     * The serviceitem 
+     * The serviceitem
      */
     @Override
-    public void execute() throws ServiceException, ServiceItemException {                
+    public void execute() throws ServiceException, ServiceItemException {
 
         Float rand = (float) Math.random() * Float.parseFloat(getExecution());
         setLatestExecuted(Float.toString(rand));
-        
+
     }
 }
-
