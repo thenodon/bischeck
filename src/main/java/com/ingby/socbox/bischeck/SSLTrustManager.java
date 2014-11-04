@@ -13,20 +13,26 @@ import javax.net.ssl.X509TrustManager;
 
 public class SSLTrustManager {
 
-    public static void disableCertificateValidation() throws KeyManagementException, NoSuchAlgorithmException {
-        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+    private SSLTrustManager() {
+
+    }
+
+    public static void disableCertificateValidation()
+            throws KeyManagementException, NoSuchAlgorithmException {
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                 return null;
             }
 
-            public void checkClientTrusted(X509Certificate[] certs, String authType) {
-            }
-            
-            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            public void checkClientTrusted(X509Certificate[] certs,
+                    String authType) {
             }
 
-        }
-        };
+            public void checkServerTrusted(X509Certificate[] certs,
+                    String authType) {
+            }
+
+        } };
 
         // Install the all-trusting trust manager
         SSLContext sc = null;

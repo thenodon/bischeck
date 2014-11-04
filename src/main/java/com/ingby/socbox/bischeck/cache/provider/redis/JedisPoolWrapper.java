@@ -32,7 +32,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
  */
 public class JedisPoolWrapper {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(JedisPoolWrapper.class);
+    private static final  Logger LOGGER = LoggerFactory.getLogger(JedisPoolWrapper.class);
 
     private JedisPool jedispool;
 
@@ -46,8 +46,7 @@ public class JedisPoolWrapper {
      */
     public JedisPoolWrapper(String redisserver, Integer redisport, Integer redistimeout, String redisauth, Integer redisdb, Integer maxPoolSize) {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
-        //poolConfig.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
-        //poolConfig.setMaxTotal(maxPoolSize);// setMaxActive(maxPoolSize);
+        // TODO - maxPoolSize is currently not used - need to see if it can be set
         poolConfig.setBlockWhenExhausted(true);
         //LOGGER.info("Max active: {} Max Idel: {} When exhusted: {}",poolConfig.getMaxActive(), poolConfig.getMaxIdle(), poolConfig.getWhenExhaustedAction());
         LOGGER.info("Max total: {} Max Idel: {} When exhusted: {}",poolConfig.getMaxTotal(), poolConfig.getMaxIdle(), poolConfig.getBlockWhenExhausted());

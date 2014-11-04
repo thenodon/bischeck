@@ -15,21 +15,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 package com.ingby.socbox.bischeck.servers;
 
 import com.ingby.socbox.bischeck.service.ServiceTO;
 
 public interface WorkerInf {
-    
+
     int MAX_RUNS_BEFORE_END = 100;
-    
+
     /**
      * Send the Service information to the server. Implementation is responsible
      * to manage protocol and formatting of message data.
+     * 
      * @param service
-     * @throws ServerException if any communication exception occur. 
-     * If {@ ServerCircuitBreak} is used it will be triggered by the exception.
+     * @throws ServerException
+     *             if any communication exception occur. If @
+     *             ServerCircuitBreak} is used it will be triggered by the
+     *             exception.
      */
     void send(ServiceTO serviceTo) throws ServerException;
 

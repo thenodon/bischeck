@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.service;
 
@@ -23,23 +23,27 @@ import java.sql.Connection;
 
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.dbcp.ManagedBasicDataSource;
 
 /**
- * Utility class for pooled connection. 
- *
+ * Utility class for pooled connection.
+ * 
  */
 public class JDBCPoolServiceUtil {
 
-  
-    
-    private static ConcurrentHashMap<String,ManagedBasicDataSource> poolmap = new ConcurrentHashMap<String,ManagedBasicDataSource>();
-    
-    static public Connection getConnection(String connectionurl) throws SQLException {
-        
+    private static ConcurrentMap<String, ManagedBasicDataSource> poolmap = new ConcurrentHashMap<String, ManagedBasicDataSource>();
+
+    private JDBCPoolServiceUtil() {
+
+    }
+
+    public static Connection getConnection(String connectionurl)
+            throws SQLException {
+
         Connection jdbccon = null;
-        
+
         synchronized (connectionurl) {
             if (poolmap.containsKey(connectionurl)) {
                 ManagedBasicDataSource bds = poolmap.get(connectionurl);
@@ -48,12 +52,10 @@ public class JDBCPoolServiceUtil {
                 ManagedBasicDataSource bds = new ManagedBasicDataSource();
                 bds.setUrl(connectionurl);
                 poolmap.putIfAbsent(connectionurl, bds);
-                jdbccon = bds.getConnection();      
+                jdbccon = bds.getConnection();
             }
         }
         return jdbccon;
     }
-    
+
 }
-
-

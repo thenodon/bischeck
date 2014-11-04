@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.service;
 
@@ -28,84 +28,82 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 /**
  * Pooled version of JDBC based service
- *
+ * 
  */
 public class JDBCPoolService extends ServiceAbstract implements Service {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(JDBCPoolService.class);
-    
-    static private int querytimeout = 10;
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(JDBCPoolService.class);
+
+    private static int querytimeout = 10;
     private Connection connection;
-        
-    public JDBCPoolService (String serviceName, Properties bischeckProperties) {
+
+    public JDBCPoolService(String serviceName, Properties bischeckProperties) {
         super(bischeckProperties);
         this.serviceName = serviceName;
-    
+
         if (bischeckProperties != null) {
             try {
-                querytimeout = Integer.parseInt(bischeckProperties.getProperty("JDBCService.querytimeout","10"));
+                querytimeout = Integer.parseInt(bischeckProperties.getProperty(
+                        "JDBCService.querytimeout", "10"));
             } catch (NumberFormatException ne) {
-                LOGGER.error("Property JDBCSerivce.querytimeout is not set correct to an integer: {}", 
-                        bischeckProperties.getProperty("JDBCSerivce.querytimeout"));
+                LOGGER.error(
+                        "Property JDBCSerivce.querytimeout is not set correct to an integer: {}",
+                        bischeckProperties
+                                .getProperty("JDBCSerivce.querytimeout"));
             }
         }
     }
 
-    
     @Override
-    public void openConnection() throws ServiceConnectionException {   
+    public void openConnection() throws ServiceConnectionException {
         try {
-            this.connection = JDBCPoolServiceUtil.getConnection(this.getConnectionUrl());
+            this.connection = JDBCPoolServiceUtil.getConnection(this
+                    .getConnectionUrl());
         } catch (SQLException sqle) {
             setConnectionEstablished(false);
-            LOGGER.warn("Open connection failed",sqle);
+            LOGGER.warn("Open connection failed", sqle);
             ServiceConnectionException se = new ServiceConnectionException(sqle);
             se.setServiceName(this.serviceName);
             throw se;
         }
         setConnectionEstablished(true);
     }
-    
+
     @Override
     public void closeConnection() throws ServiceConnectionException {
         try {
             this.connection.close();
         } catch (SQLException sqle) {
-            LOGGER.warn("Closing connection failed",sqle);
+            LOGGER.warn("Closing connection failed", sqle);
             ServiceConnectionException se = new ServiceConnectionException(sqle);
             se.setServiceName(this.serviceName);
             throw se;
         }
     }
 
-    
-    @Override 
+    @Override
     public String executeStmt(String exec) throws ServiceException {
-        
-        
+
         try (Statement statement = this.connection.createStatement();
-             ResultSet res = statement.executeQuery(exec);
-            ){
-            
+                ResultSet res = statement.executeQuery(exec);) {
+
             statement.setQueryTimeout(querytimeout);
 
-            if (res.next()) { //Changed from first - not working with as400 jdbc driver
-                return (res.getString(1));
+            if (res.next()) {
+                // Changed from first - not working with as400 jdbc driver
+                return res.getString(1);
             }
         } catch (SQLException sqle) {
-            LOGGER.warn("Executing {} statement failed",exec, sqle);
+            LOGGER.warn("Executing {} statement failed", exec, sqle);
             ServiceException se = new ServiceException(sqle);
             se.setServiceName(this.serviceName);
             throw se;
-        } 
+        }
 
         return null;
-    }    
+    }
 
 }
-
-
