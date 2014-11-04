@@ -24,23 +24,31 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 
 public class MetricsManager {
-	private static final String METRICS_DOMAIN = "bischeck-timers";
-	private static final MetricRegistry metricsRegister = new MetricRegistry();
-	private static final JmxReporter reporter = JmxReporter.forRegistry(metricsRegister).inDomain(METRICS_DOMAIN).build();
+    private static final String METRICS_DOMAIN = "bischeck-timers";
 
-	public static final long TO_MILLI = 1000000L;
-	
-    //private static final HealthCheckRegistry healthChecksRegister = new HealthCheckRegistry();
-    
+    private static final MetricRegistry METRICS_REGISTER = new MetricRegistry();
+
+    private static final JmxReporter JMX_REPORTER = JmxReporter
+            .forRegistry(METRICS_REGISTER).inDomain(METRICS_DOMAIN).build();
+
+    public static final long TO_MILLI = 1000000L;
+
+    // private static final HealthCheckRegistry healthChecksRegister = new
+    // HealthCheckRegistry();
+
     static {
-    	reporter.start();
+        JMX_REPORTER.start();
     }
-    
+
+    private MetricsManager() {
+
+    }
+
     public static MetricRegistry getRegister() {
-    	return metricsRegister;
+        return METRICS_REGISTER;
     }
-    
+
     public static Timer getTimer(Class<?> clazz, String timerName) {
-    	return metricsRegister.timer(MetricRegistry.name(clazz, timerName));
+        return METRICS_REGISTER.timer(MetricRegistry.name(clazz, timerName));
     }
 }
