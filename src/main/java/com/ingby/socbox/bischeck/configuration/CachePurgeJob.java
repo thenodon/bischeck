@@ -15,14 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.configuration;
 
 import java.text.ParseException;
 
-
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -49,7 +49,6 @@ import com.ingby.socbox.bischeck.cache.CachePurgeInf;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 
-
 /**
  * This class is executed as a Quartz job to purge cache data according to:<br>
  * <ul>
@@ -57,96 +56,154 @@ import com.ingby.socbox.bischeck.monitoring.MetricsManager;
  * <li>Purge data older then a specific time from purging time - like 2 days</li>
  * </ul>
  * <br>
- * The purging strategy is based on what is specified in the &lt;cache&gt; tag 
- * in the bischeck.xml file. The job is used both for &lt;purge&gt; and 
- * &lt;retention&gt;.
- * <br>
+ * The purging strategy is based on what is specified in the &lt;cache&gt; tag
+ * in the bischeck.xml file. The job is used both for &lt;purge&gt; and
+ * &lt;retention&gt;. <br>
  * The class take one property cachePurgeJobCron that is a cron expression when
- * the purge job should be run. The default is every five minutes with start 
- * 2 minutes after the hour , "0 2/5 * * * ? *" 
+ * the purge job should be run. The default is every five minutes with start 2
+ * minutes after the hour , "0 2/5 * * * ? *"
  */
 public class CachePurgeJob implements Job {
 
-    private final static Logger  LOGGER = LoggerFactory.getLogger(CachePurgeJob.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(CachePurgeJob.class);
 
     private static Scheduler sched;
-    
-    
+
     /**
      * Initialize the purge job
-     * @param prop the properties used for the purge job
+     * 
+     * @param prop
+     *            the properties used for the purge job
      * @throws SchedulerException
      * @throws ParseException
      */
     public static void init(Properties prop) throws SchedulerException {
-        
-        
+
         sched = StdSchedulerFactory.getDefaultScheduler();
         if (!sched.isStarted()) {
             sched.start();
         }
-        
-        
-        JobDetail job = newJob(CachePurgeJob.class).
-            withIdentity("CachePurge", "DailyMaintenance").
-            withDescription("CachePurge").    
-            build();
-                
-        
+
+        JobDetail job = newJob(CachePurgeJob.class)
+                .withIdentity("CachePurge", "DailyMaintenance")
+                .withDescription("CachePurge").build();
+
         CronTrigger trigger = newTrigger()
-        .withIdentity("CachePurgeTrigger", "DailyMaintenance")
-        .withSchedule(cronSchedule(prop.getProperty("cachePurgeJobCron","0 2/5 * * * ? *")))
-        .forJob("CachePurge", "DailyMaintenance")
-        .build();
-        
+                .withIdentity("CachePurgeTrigger", "DailyMaintenance")
+                .withSchedule(
+                        cronSchedule(prop.getProperty("cachePurgeJobCron",
+                                "0 2/5 * * * ? *")))
+                .forJob("CachePurge", "DailyMaintenance").build();
+
         // If job exists delete and add
         if (sched.getJobDetail(job.getKey()) != null) {
             sched.deleteJob(job.getKey());
         }
-        
+
         Date ft = sched.scheduleJob(job, trigger);
-        
+
         sched.addJob(job, true);
-        
-        LOGGER.info("{} has been scheduled to run at: {} and repeat based on expression: {}",
+
+        LOGGER.info(
+                "{} has been scheduled to run at: {} and repeat based on expression: {}",
                 job.getDescription(), ft, trigger.getCronExpression());
     }
-    
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
 
-    	final Timer timer = MetricsManager.getTimer(CachePurgeJob.class,"purgeTimer");
+        final Timer timer = MetricsManager.getTimer(CachePurgeJob.class,
+                "purgeTimer");
         final Timer.Context context = timer.time();
 
         try {
-            Map<String, String> purgeMap = ConfigurationManager.getInstance().getPurgeMap();
+            Map<String, String> purgeMap = ConfigurationManager.getInstance()
+                    .getPurgeMap();
             LOGGER.info("CachePurge purging {}", purgeMap.size());
             CacheInf cache = CacheFactory.getInstance();
-            
+
+            Map<String, Long> trimMap = new HashMap<>();
+
             for (String key : purgeMap.keySet()) {
                 if (cache instanceof CachePurgeInf) {
                     LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
-                    
+
                     if (CacheUtil.isByTime(purgeMap.get(key))) {
                         // find the index of the time
                         ServiceDef servicedef = new ServiceDef(key);
-                        Long index = cache.getIndexByTime( 
+                        Long index = cache.getIndexByTime(
                                 servicedef.getHostName(),
-                                servicedef.getServiceName(), 
+                                servicedef.getServiceName(),
                                 servicedef.getServiceItemName(),
-                                System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(purgeMap.get(key)))*1000);
-                        // if index is null there is no items in the cache older then the time offset
+                                System.currentTimeMillis()
+                                        + ((long) CacheUtil
+                                                .calculateByTime(purgeMap
+                                                        .get(key))) * 1000);
+                        // if index is null there is no items in the cache older
+                        // then the time offset
                         if (index != null) {
-                        	((CachePurgeInf) cache).trim(key, index);
-                        } 
+                            trimMap.put(key, index);
+                            // ((CachePurgeInf) cache).trim(key, index);
+                        }
                     } else {
-                        ((CachePurgeInf) cache).trim(key, Long.valueOf(purgeMap.get(key)));
+                        trimMap.put(key, Long.valueOf(purgeMap.get(key)));
+
+                        // ((CachePurgeInf) cache).trim(key,
+                        // Long.valueOf(purgeMap.get(key)));
+                    }
+                }
+            }
+            ((CachePurgeInf) cache).trimBatch(trimMap);
+
+        } finally {
+            long duration = context.stop() / 1000000;
+            LOGGER.info("CachePurge executed in {} ms", duration);
+        }
+    }
+
+    // @Override
+    public void executeOLD(JobExecutionContext arg0)
+            throws JobExecutionException {
+
+        final Timer timer = MetricsManager.getTimer(CachePurgeJob.class,
+                "purgeTimer");
+        final Timer.Context context = timer.time();
+
+        try {
+            Map<String, String> purgeMap = ConfigurationManager.getInstance()
+                    .getPurgeMap();
+            LOGGER.info("CachePurge purging {}", purgeMap.size());
+            CacheInf cache = CacheFactory.getInstance();
+
+            for (String key : purgeMap.keySet()) {
+                if (cache instanceof CachePurgeInf) {
+                    LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
+
+                    if (CacheUtil.isByTime(purgeMap.get(key))) {
+                        // find the index of the time
+                        ServiceDef servicedef = new ServiceDef(key);
+                        Long index = cache.getIndexByTime(
+                                servicedef.getHostName(),
+                                servicedef.getServiceName(),
+                                servicedef.getServiceItemName(),
+                                System.currentTimeMillis()
+                                        + ((long) CacheUtil
+                                                .calculateByTime(purgeMap
+                                                        .get(key))) * 1000);
+                        // if index is null there is no items in the cache older
+                        // then the time offset
+                        if (index != null) {
+                            ((CachePurgeInf) cache).trim(key, index);
+                        }
+                    } else {
+                        ((CachePurgeInf) cache).trim(key,
+                                Long.valueOf(purgeMap.get(key)));
                     }
                 }
             }
         } finally {
-            long duration = context.stop()/1000000;
+            long duration = context.stop() / 1000000;
             LOGGER.info("CachePurge executed in {} ms", duration);
         }
     }
