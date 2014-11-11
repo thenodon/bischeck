@@ -27,11 +27,13 @@ import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.service.Service;
+import com.ingby.socbox.bischeck.service.ServiceException;
 import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.service.ShellService;
 import com.ingby.socbox.bischeck.service.ServiceTO.ServiceTOBuilder;
 import com.ingby.socbox.bischeck.serviceitem.CheckCommandServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
+import com.ingby.socbox.bischeck.serviceitem.ServiceItemException;
 import com.ingby.socbox.bischeck.threshold.DummyThreshold;
 import com.ingby.socbox.bischeck.threshold.TestThreshold;
 import com.ingby.socbox.bischeck.threshold.Threshold;
@@ -172,6 +174,9 @@ public class NagiosUtilTest {
         Assert.assertEquals(
                 nagutil.createNagiosMessage(serviceTo),
                 " SERVICEITEM = 179029728.98 (100.21 > 90.19 >  W > 84.41 >  C > )  |  SERVICEITEM=179029728.98;90.19;84.41;0; threshold=100.21;0;0;0; avg-exec-time=10ms");
+        Assert.assertEquals(
+                nagutil.createNagiosMessage(serviceTo,false),
+                " SERVICEITEM = 179029728.98 (100.21 > 90.19 >  W > 84.41 >  C > ) ");
 
         serviceItem.setLatestExecuted("1.79029728E8");
         ((TestThreshold) threshold).setCalcMethod("<");
@@ -308,6 +313,84 @@ public class NagiosUtilTest {
         Assert.assertEquals(
                 nagutil.createNagiosMessage(serviceTo),
                 " SERVICEITEM = 179029728 (NA)  |  SERVICEITEM=179029728;;;0; threshold=0;0;0;0; warning=0;0;0;0; critical=0;0;0;0; avg-exec-time=10ms");
+    }
+
+    @Test(groups = { "NagiosUtil" })
+    public void verifyPerfDataExceptions() {
+        NagiosUtil nagutil = new NagiosUtil();
+        ServiceItem serviceItem = new CheckCommandServiceItem("SERVICEITEM");
+        Service service = new ShellService("SERVICE", null);
+        service.addServiceItem(serviceItem);
+        Host host = new Host("HOST");
+        host.addService(service);
+        service.setHost(host);
+        
+        service.setConnectionUrl("jdbc:mysql://localhost/bischecktest?user=bischeck&amp;password=bischeck");
+        service.addException(new ServiceException());
+        
+        Threshold threshold = new TestThreshold("HOST", "SERVICE",
+                "SERVICEITEM");
+
+        serviceItem.setExecutionTime(10L);
+        serviceItem.setLatestExecuted(null);
+
+        serviceItem.setThreshold(threshold);
+        serviceItem.setExecution("select count(*) from order");
+        ((TestThreshold) threshold).setWarning(1.0F);
+        ((TestThreshold) threshold).setCritical(0.8F);
+        ((TestThreshold) threshold).setThreshold(5.928746E7F);
+
+        ServiceTOBuilder builder = new ServiceTOBuilder(service);
+        ServiceTO serviceTo = builder.build();
+
+        Assert.assertEquals((float) serviceTo.getServiceItemTO("SERVICEITEM")
+                .getThreshold(), (float) new Float("59287460.0"), 0);
+
+        ((TestThreshold) threshold).setCalcMethod(">");
+        builder = new ServiceTOBuilder(service);
+        serviceTo = builder.build();
+
+        Assert.assertEquals(
+                nagutil.createNagiosMessage(serviceTo),
+                " Connection failed - jdbc:mysql://localhost/bischecktest?user=bischeck&amp;password=bischeck |  SERVICEITEM=Nan;59287460;47429968;0; threshold=59287460;0;0;0; avg-exec-time=10ms");
+
+        nagutil = new NagiosUtil();
+        serviceItem = new CheckCommandServiceItem("SERVICEITEM");
+        service = new ShellService("SERVICE", null);
+        service.addServiceItem(serviceItem);
+        host = new Host("HOST");
+        host.addService(service);
+        service.setHost(host);
+        
+        service.setConnectionUrl("jdbc:mysql://localhost/bischecktest?user=bischeck&amp;password=bischeck");
+        //service.addException(new ServiceException());
+        
+        threshold = new TestThreshold("HOST", "SERVICE",
+                "SERVICEITEM");
+
+        serviceItem.setExecutionTime(10L);
+        serviceItem.setLatestExecuted(null);
+        serviceItem.addException(new ServiceItemException());
+        serviceItem.setThreshold(threshold);
+        serviceItem.setExecution("select count(*) from order");
+        ((TestThreshold) threshold).setWarning(1.0F);
+        ((TestThreshold) threshold).setCritical(0.8F);
+        ((TestThreshold) threshold).setThreshold(5.928746E7F);
+
+        builder = new ServiceTOBuilder(service);
+        serviceTo = builder.build();
+
+        Assert.assertEquals((float) serviceTo.getServiceItemTO("SERVICEITEM")
+                .getThreshold(), (float) new Float("59287460.0"), 0);
+
+        ((TestThreshold) threshold).setCalcMethod(">");
+        builder = new ServiceTOBuilder(service);
+        serviceTo = builder.build();
+
+        Assert.assertEquals(
+                nagutil.createNagiosMessage(serviceTo),
+                " Execute statement failed - select count(*) from order |  SERVICEITEM=Nan;59287460;47429968;0; threshold=59287460;0;0;0; avg-exec-time=10ms");
+
     }
 
 }

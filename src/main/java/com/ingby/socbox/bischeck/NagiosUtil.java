@@ -19,8 +19,6 @@
 
 package com.ingby.socbox.bischeck;
 
-import org.nfunk.jep.function.Str;
-
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemTO;
@@ -29,8 +27,8 @@ import com.ingby.socbox.bischeck.serviceitem.ServiceItemTO;
  * Common utilities to manage Nagios integration
  */
 public class NagiosUtil {
-    public static final String CONNECTION_FAILED = "[Connection failed]";
-    public static final String EXECUTE_FAILED = "[Execute failed]";
+    public static final String CONNECTION_FAILED = " [Connection failed]";
+    public static final String EXECUTE_FAILED = " [Execute failed]";
 
     private boolean formatWarnCrit = false;
     private String notANumber = "Nan";
@@ -76,12 +74,12 @@ public class NagiosUtil {
     }
 
     public String createNagiosMessage(final ServiceTO serviceTo,
-            final boolean perfData) {
-        StringBuilder message = new StringBuilder();
-        StringBuilder perfmessage = new StringBuilder();
+            final boolean showPerformanceData) {
+        StringBuilder serviceOutput = new StringBuilder();
+        StringBuilder servicePerfData = new StringBuilder();
 
-        message.append(" ");
-        perfmessage.append(" ");
+        serviceOutput.append(" ");
+        servicePerfData.append(" ");
 
         int count = 0;
         long totalexectime = 0;
@@ -111,23 +109,15 @@ public class NagiosUtil {
                     Float critfloat = new Float(
                             (1 - serviceItemTo.getCritical())
                                     * currentThreshold);
-                    ;
+
                     warnValue = new BischeckDecimal(warnfloat)
                             .scaleBy(threshold);
                     critValue = new BischeckDecimal(critfloat)
                             .scaleBy(threshold);
 
-                    message.append(serviceItemTo.getName())
-                            .append(" = ")
-                            .append(currentMeasure.isNull() ? notANumber
-                                    : currentMeasure).append(" (")
-                            .append(threshold.toString()).append(" ")
-                            .append(method).append(" ")
-                            .append(warnValue.toString()).append(" ")
-                            .append(method).append("  +-W ").append(method)
-                            .append(" ").append(critValue.toString())
-                            .append(" ").append(method).append("  +-C ")
-                            .append(method).append(" ) ");
+                    serviceOutput.append(formatInInterval(serviceItemTo,
+                            warnValue, critValue, threshold, method,
+                            currentMeasure));
 
                 } else {
                     Float warnfloat = new Float(serviceItemTo.getWarning()
@@ -139,22 +129,15 @@ public class NagiosUtil {
                     critValue = new BischeckDecimal(critfloat)
                             .scaleBy(threshold);
 
-                    message.append(serviceItemTo.getName())
-                            .append(" = ")
-                            .append(currentMeasure.isNull() ? notANumber
-                                    : currentMeasure).append(" (")
-                            .append(threshold.toString()).append(" ")
-                            .append(method).append(" ")
-                            .append(warnValue.toString()).append(" ")
-                            .append(method).append("  W ").append(method)
-                            .append(" ").append(critValue.toString())
-                            .append(" ").append(method).append("  C ")
-                            .append(method).append(" ) ");
+                    serviceOutput.append(formatGreaterOrLess(serviceItemTo,
+                            warnValue, critValue, threshold, method,
+                            currentMeasure));
 
                 }
 
             } else {
-                message.append(serviceItemTo.getName())
+                serviceOutput
+                        .append(serviceItemTo.getName())
                         .append(" = ")
                         .append(currentMeasure.isNull() ? notANumber
                                 : currentMeasure).append(" (NA) ");
@@ -162,31 +145,108 @@ public class NagiosUtil {
             }
 
             // Building the performance string
-            perfmessage.append(performanceMessage(serviceItemTo, warnValue,
-                    critValue, threshold, currentMeasure));
+            if (showPerformanceData) {
+                servicePerfData.append(performanceMessage(serviceItemTo,
+                        warnValue, critValue, threshold, currentMeasure));
 
-            totalexectime = (totalexectime + serviceItemTo.getExecTime());
-            count++;
+                totalexectime = (totalexectime + serviceItemTo.getExecTime());
+                count++;
+            }
         }
+
+        StringBuilder serviceOutputExecption = formatException(serviceTo);
+
+        StringBuilder output = formatFinalOutput(showPerformanceData,
+                serviceOutput, servicePerfData, serviceOutputExecption, count,
+                totalexectime);
+
+        return output.toString();
+    }
+
+    private StringBuilder formatFinalOutput(final boolean showPerformanceData,
+            StringBuilder serviceOutput, StringBuilder servicePerfData,
+            StringBuilder serviceOutputExecption, int count, long totalexectime) {
+        StringBuilder output = new StringBuilder();
+
+        if (serviceOutputExecption.length() == 0) {
+
+            if (showPerformanceData) {
+                output.append(serviceOutput).append(" | ")
+                        .append(servicePerfData).append("avg-exec-time=")
+                        .append(((totalexectime / count) + "ms"));
+            } else {
+                output.append(serviceOutput);
+            }
+        } else {
+            if (showPerformanceData) {
+                output.append(serviceOutputExecption).append(" | ")
+                        .append(servicePerfData).append("avg-exec-time=")
+                        .append(((totalexectime / count) + "ms"));
+            } else {
+                output.append(serviceOutputExecption);
+            }
+        }
+        return output;
+    }
+
+    private StringBuilder formatException(final ServiceTO serviceTo) {
+        StringBuilder serviceOutputExecption = new StringBuilder();
+
         if (serviceTo.hasException() && showException) {
             if (serviceTo.getExceptions() != null
                     && !serviceTo.getExceptions().isEmpty()) {
-                message.append(CONNECTION_FAILED);
-            }
-            for (ServiceItemTO serviceItemTo : serviceTo.getServiceItemTO()
-                    .values()) {
-                if (serviceItemTo.hasException()) {
-                    message.append(EXECUTE_FAILED);
+                // serviceOutputExecption.append(CONNECTION_FAILED);
+                serviceOutputExecption.append(" Connection failed - ").append(
+                        serviceTo.getUrl());
+            } else {
+                for (ServiceItemTO serviceItemTo : serviceTo.getServiceItemTO()
+                        .values()) {
+                    if (serviceItemTo.hasException()) {
+                        // serviceOutputExecption.append(EXECUTE_FAILED);
+                        serviceOutputExecption.append(
+                                " Execute statement failed - ").append(
+                                serviceItemTo.getExecStatement());
+                    }
                 }
             }
         }
+        return serviceOutputExecption;
+    }
 
-        if (perfData) {
-            message.append(" | ").append(perfmessage).append("avg-exec-time=")
-                    .append(((totalexectime / count) + "ms"));
-        }
+    private StringBuilder formatGreaterOrLess(ServiceItemTO serviceItemTo,
+            BischeckDecimal warnValue, BischeckDecimal critValue,
+            BischeckDecimal threshold, String method,
+            BischeckDecimal currentMeasure) {
 
-        return message.toString();
+        StringBuilder message = new StringBuilder();
+
+        message.append(serviceItemTo.getName()).append(" = ")
+                .append(currentMeasure.isNull() ? notANumber : currentMeasure)
+                .append(" (").append(threshold.toString()).append(" ")
+                .append(method).append(" ").append(warnValue.toString())
+                .append(" ").append(method).append("  W ").append(method)
+                .append(" ").append(critValue.toString()).append(" ")
+                .append(method).append("  C ").append(method).append(" ) ");
+
+        return message;
+    }
+
+    private StringBuilder formatInInterval(ServiceItemTO serviceItemTo,
+            BischeckDecimal warnValue, BischeckDecimal critValue,
+            BischeckDecimal threshold, String method,
+            BischeckDecimal currentMeasure) {
+
+        StringBuilder message = new StringBuilder();
+
+        message.append(serviceItemTo.getName()).append(" = ")
+                .append(currentMeasure.isNull() ? notANumber : currentMeasure)
+                .append(" (").append(threshold.toString()).append(" ")
+                .append(method).append(" ").append(warnValue.toString())
+                .append(" ").append(method).append("  +-W ").append(method)
+                .append(" ").append(critValue.toString()).append(" ")
+                .append(method).append("  +-C ").append(method).append(" ) ");
+
+        return message;
     }
 
     private StringBuilder performanceMessage(ServiceItemTO serviceItemTo,
