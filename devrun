@@ -33,7 +33,7 @@ jmx="$jmxport $jmxssl $jmxauth $jmxpasswd $jmxaccess"
 #debug="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
 # -classpath $bishome/src/main/resources:$bishome/target/classes:$bishome/lib/*:$bishome/customlib/* \
 # -classpath $bishome/src/main/resources:$bishome/bin:$bishome/lib/*:$bishome/customlib/* \
-java $debug $jmx $jmem -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=$etc \
+java $debug $jmx $jmem -DhawtioWarLocation=$bishome/hawtiowar -Dorg.quartz.scheduler.jmx.export=true  -Dbishome=$bishome -Dxmlconfigdir=$etc \
  -classpath $bishome/src/main/resources:$bishome/target/classes:$bishome/lib/*:$bishome/customlib/* \
  com.ingby.socbox.bischeck.$program $arg 
 
