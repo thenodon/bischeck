@@ -41,15 +41,14 @@ public class LastCacheService extends ServiceAbstract implements Service, Servic
     @Override
     public void openConnection() throws ServiceConnectionException {
         super.openConnection();
-        // The use of LastStatusCache do not need a connection
         setConnectionEstablished(true); 
     }
 
 
     @Override
     public void closeConnection() throws ServiceConnectionException {
-        // The use of LastStatusCache do not need a connection
-    }
+        super.closeConnection();
+     }
 
     @Override
     public boolean isConnectionEstablished() {

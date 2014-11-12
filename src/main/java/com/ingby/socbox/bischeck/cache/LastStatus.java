@@ -21,17 +21,11 @@ package com.ingby.socbox.bischeck.cache;
 
 import java.io.Serializable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
-
-//import com.ingby.socbox.bischeck.xsd.laststatuscache.XMLEntry;
 
 /**
  * The class is responsible to manage data that goes in and out of the
@@ -39,8 +33,6 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  * The class support different constructors from object, data and json.
  */
 public class LastStatus implements Serializable, Cloneable {
-    private final static Logger LOGGER = LoggerFactory
-            .getLogger(LastStatus.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -81,14 +73,7 @@ public class LastStatus implements Serializable, Cloneable {
         this.state = NAGIOSSTAT.valueOf(ls.getState());
     }
 
-    public LastStatus(String jsonstr) {
-        JSONObject json = null;
-        try {
-            json = (JSONObject) JSONSerializer.toJSON(jsonstr);
-        } catch (ClassCastException ce) {
-            LOGGER.warn("Cast exception on json string <" + jsonstr + ">", ce);
-            throw ce;
-        }
+    public LastStatus(JSONObject json) {
 
         this.value = json.getString("value");
         if ("null".equalsIgnoreCase(json.getString("threshold"))) {

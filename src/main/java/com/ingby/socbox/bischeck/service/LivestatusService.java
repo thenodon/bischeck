@@ -99,7 +99,8 @@ public class LivestatusService extends ServiceAbstract implements Service, Servi
     }
     
     @Override
-    public void closeConnection() throws ServiceConnectionException{
+    public void closeConnection() throws ServiceConnectionException {
+        super.closeConnection();
         try {
             if (clientSocket != null) {
                 clientSocket.close();

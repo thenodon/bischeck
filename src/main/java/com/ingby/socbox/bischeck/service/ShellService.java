@@ -52,7 +52,9 @@ public class ShellService extends ServiceAbstract implements Service, ServiceSta
 
     
     @Override
-    public void closeConnection() throws ServiceConnectionException {}
+    public void closeConnection() throws ServiceConnectionException {
+        super.closeConnection();
+    }
 
     
     @Override 

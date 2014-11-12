@@ -21,9 +21,9 @@ package com.ingby.socbox.bischeck.cache;
 
 import java.io.Serializable;
 import java.util.Date;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -38,57 +38,95 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  */
 public class LastStatusState implements Serializable, Cloneable {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(LastStatusState.class);
-
-
 	private static final long serialVersionUID = 1L;
 
 	private static final String HARD = "HARD";
 	private static final String SOFT = "SOFT";
 	private static final String NA = "N/A";
 
-	private Service service;
+    private Long timestamp;
+    private String date;
+    private String state;
+    private String previousState;
+    private String type;
+    private Integer softCount;
+    private Boolean connectionStatus;
+    private Map<String,LastStatus> serviceItemsList = new HashMap<>();
 
-
+    
+	public LastStatusState(final JSONObject json) {
+	    timestamp = json.getLong("timestamp");
+        date = json.getString("date");
+        state = json.getString("state");
+        previousState = json.getString("previousState");
+        type = json.getString("type");    
+        softCount = json.getInt("softCount");
+        connectionStatus = json.getBoolean("connectionStatus");
+        
+        JSONArray arrayElement = json.getJSONArray("serviceitems");
+        @SuppressWarnings("unchecked")
+        Iterator<JSONObject> iter = arrayElement.iterator();
+        while (iter.hasNext()) {
+            JSONObject obj = iter.next();
+            serviceItemsList.put(obj.getString("serviceitem"), new LastStatus(obj));
+        }    
+	}
+    
 	public LastStatusState(Service service) {
-		this.service = service; 
+		timestamp = service.getLastCheckTime();
+        date = new Date(service.getLastCheckTime()).toString();
+        
+        
+        if (service instanceof ServiceStateInf && ((ServiceStateInf) service).getServiceState() != null) {
+            state = ((ServiceStateInf) service).getServiceState().getState().toString();
+            previousState = ((ServiceStateInf) service).getServiceState().getPreviousState().toString();
+            softCount = ((ServiceStateInf) service).getServiceState().getSoftCount();
+            
+            if (((ServiceStateInf) service).getServiceState().isHardState()) {
+                type = HARD;
+            } else {
+                type = SOFT;
+            }
+        } else {
+            type = NA;
+        }
+
+        
+
+        connectionStatus = service.isConnectionEstablished();
+
+        for (ServiceItem item : service.getServicesItems().values()) {
+            serviceItemsList.put(item.getServiceItemName(), new LastStatus(item));
+        }
+
 	}
 
 
-	public JSONObject getJsonObject() {
+	public JSONObject toJson() {
 		JSONObject json = new JSONObject();
 
-		long currentTime = System.currentTimeMillis();
-		json.put("timestamp",currentTime);
-		json.put("date",new Date(currentTime).toString());
-		json.put("state",((ServiceStateInf) service).getServiceState().getState());
-		json.put("previousState",((ServiceStateInf) service).getServiceState().getPreviousState());
-		if (service instanceof ServiceStateInf) {
-			if (((ServiceStateInf) service).getServiceState().isHardState()) {
-				json.put("type",HARD);
-			} else {
-				json.put("type",SOFT);
-			}
-		} else {
-			json.put("type",NA);
-		}
+		json.put("timestamp",timestamp);
+        json.put("date",date);
+        json.put("state",state);
+        json.put("previousState",previousState);
+        json.put("type",type);
+        
+        json.put("softCount", softCount);
 
-		json.put("softCount", ((ServiceStateInf) service).getServiceState().getSoftCount());
+        json.put("connectionStatus", connectionStatus);
 
-		json.put("connectionStatus", service.isConnectionEstablished());
+        JSONArray array = new JSONArray();
 
-		JSONArray array = new JSONArray();
+        for (String item : serviceItemsList.keySet()) {
+            JSONObject arrayElement = new JSONObject();
+            arrayElement.put("serviceitem",item);
+            arrayElement.putAll(serviceItemsList.get(item).getJsonObject());
+            array.add(arrayElement);
+        }
 
-		for (ServiceItem item : service.getServicesItems().values()) {
-			JSONObject arrayElement = new JSONObject();
-			arrayElement.put("serviceitem",item.getServiceItemName());
-			arrayElement.putAll((new LastStatus(item)).getJsonObject());
-			array.add(arrayElement);
-		}
+        json.put("serviceitems", array);
 
-		json.put("serviceitems", array);
-
-		return json;
+        return json;
 	}
 
 	/**
@@ -130,8 +168,39 @@ public class LastStatusState implements Serializable, Cloneable {
 	 * state of the serviceitems that are part of the service. 
 	 * @return the formatted json object
 	 */
-	public String getJson() {        
-		return getJsonObject().toString();
+	public String toJsonString() {        
+		return toJson().toString();
 	}
 
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public String getPreviousState() {
+        return previousState;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Integer getSoftCount() {
+        return softCount;
+    }
+
+    public Boolean getConnectionStatus() {
+        return connectionStatus;
+    }
+
+    public Map<String, LastStatus> getServiceItemsList() {
+        return serviceItemsList;
+    }
 }

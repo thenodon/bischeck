@@ -59,6 +59,7 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
 
     @Override
     public void openConnection() throws ServiceConnectionException {
+        super.openConnection();
         try {
             this.connection = JDBCPoolServiceUtil.getConnection(this
                     .getConnectionUrl());
@@ -74,6 +75,7 @@ public class JDBCPoolService extends ServiceAbstract implements Service {
 
     @Override
     public void closeConnection() throws ServiceConnectionException {
+        super.closeConnection();
         try {
             this.connection.close();
         } catch (SQLException sqle) {

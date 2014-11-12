@@ -35,12 +35,16 @@ import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CacheStateInf;
+import com.ingby.socbox.bischeck.cache.LastStatusNotification;
+import com.ingby.socbox.bischeck.cache.LastStatusState;
 import com.ingby.socbox.bischeck.host.Host;
 
 import com.ingby.socbox.bischeck.service.JDBCService;
+import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceState;
 import com.ingby.socbox.bischeck.service.ServiceState.State;
+import com.ingby.socbox.bischeck.service.ServiceStateInf;
 import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
 import com.ingby.socbox.bischeck.threshold.DummyThreshold;
 import com.ingby.socbox.bischeck.threshold.Threshold;
@@ -49,9 +53,9 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 public class ServiceStateCacheTest {
 
     private CacheInf cache;
-    private Host host;
-    private JDBCService jdbcService;
-    private SQLServiceItem sqlServiceItem;
+//    private Host host;
+//    private JDBCService jdbcService;
+//    private SQLServiceItem sqlServiceItem;
 
     @BeforeClass
     public void beforeTest() throws Exception {
@@ -87,6 +91,10 @@ public class ServiceStateCacheTest {
 
     // @Test (groups = { "ServiceState" })
     public void connectionFailed() throws Exception {
+        Host host;
+        JDBCService jdbcService;
+        SQLServiceItem sqlServiceItem;
+
         host = new Host("sqlHost");
         jdbcService = new JDBCService("sqlService", null);
         // Set faulty driver url -> connection will fail
@@ -134,6 +142,9 @@ public class ServiceStateCacheTest {
     public void getStateFromCache() throws Exception {
 
         cache.clear();
+        Host host;
+        JDBCService jdbcService;
+        SQLServiceItem sqlServiceItem;
 
         host = new Host("sqlHost");
         jdbcService = new JDBCService("sqlService", null);
@@ -151,12 +162,16 @@ public class ServiceStateCacheTest {
         jdbcService.setHost(host);
         jdbcService.addServiceItem(sqlServiceItem);
 
+
         // OK since nothing exists in the cache (cleared above)
         ServiceJob job = new ServiceJob();
         sqlServiceItem.setExecution("select sum(value) from test");
+        //Service jdbcService = getService("select sum(value) from test");
         job.executeJob(jdbcService);
-        ServiceState serviceState = ((CacheStateInf) cache)
-                .getState(jdbcService);
+        
+        
+                
+        ServiceState serviceState = ((ServiceStateInf)jdbcService).getServiceState();
         System.out.println(serviceState.toString());
         Assert.assertEquals(serviceState.getState().equals(NAGIOSSTAT.OK), true);
         Assert.assertEquals(
@@ -165,22 +180,37 @@ public class ServiceStateCacheTest {
         Assert.assertEquals(serviceState.getStateLevel()
                 .equals(State.OKAY_HARD), true);
 
+        LastStatusState lss = ((CacheStateInf)cache).getStateJson(jdbcService);
+        Assert.assertEquals(lss.getState(),"OK");
+        Assert.assertEquals(lss.getTimestamp(), jdbcService.getLastCheckTime());
+        LastStatusNotification lsn = ((CacheStateInf)cache).getNotificationJson(jdbcService);
+        Assert.assertNull(lsn);
+         
+
+        
         job = new ServiceJob();
         sqlServiceItem.setExecution("select sum(value) from test");
+        //jdbcService = getService("select sum(value) from test");
         job.executeJob(jdbcService);
-        serviceState = ((CacheStateInf) cache).getState(jdbcService);
+        serviceState = ((ServiceStateInf)jdbcService).getServiceState();
         System.out.println(serviceState.toString());
         Assert.assertEquals(serviceState.getState().equals(NAGIOSSTAT.OK), true);
         Assert.assertEquals(
-                serviceState.getPreviousState().equals(NAGIOSSTAT.UNKNOWN),
+                serviceState.getPreviousState().equals(NAGIOSSTAT.OK),
                 true);
         Assert.assertEquals(serviceState.getStateLevel()
                 .equals(State.OKAY_HARD), true);
 
+        lss = ((CacheStateInf)cache).getStateJson(jdbcService);
+        Assert.assertEquals(lss.getState(),"OK");
+        Assert.assertNotEquals(lss.getTimestamp(), jdbcService.getLastCheckTime());
+        lsn = ((CacheStateInf)cache).getNotificationJson(jdbcService);
+        Assert.assertNull(lsn);
+        
         job = new ServiceJob();
         sqlServiceItem.setExecution("select sum(value) from test1");
         job.executeJob(jdbcService);
-        serviceState = ((CacheStateInf) cache).getState(jdbcService);
+        serviceState = ((ServiceStateInf)jdbcService).getServiceState();
         System.out.println(serviceState.toString());
         Assert.assertEquals(
                 serviceState.getState().equals(NAGIOSSTAT.CRITICAL), true);
@@ -189,10 +219,17 @@ public class ServiceStateCacheTest {
         Assert.assertEquals(
                 serviceState.getStateLevel().equals(State.PROBLEM_SOFT), true);
 
+        lss = ((CacheStateInf)cache).getStateJson(jdbcService);
+        Assert.assertEquals(lss.getState(),"CRITICAL");
+        Assert.assertEquals(lss.getTimestamp(), jdbcService.getLastCheckTime());
+        lsn = ((CacheStateInf)cache).getNotificationJson(jdbcService);
+        Assert.assertNull(lsn);
+        
+        
         job = new ServiceJob();
         sqlServiceItem.setExecution("select sum(value) from test1");
         job.executeJob(jdbcService);
-        serviceState = ((CacheStateInf) cache).getState(jdbcService);
+        serviceState = ((ServiceStateInf)jdbcService).getServiceState();
         System.out.println(serviceState.toString());
         Assert.assertEquals(
                 serviceState.getState().equals(NAGIOSSTAT.CRITICAL), true);
@@ -202,10 +239,16 @@ public class ServiceStateCacheTest {
         Assert.assertEquals(
                 serviceState.getStateLevel().equals(State.PROBLEM_SOFT), true);
 
+        lss = ((CacheStateInf)cache).getStateJson(jdbcService);
+        Assert.assertEquals(lss.getState(),"CRITICAL");
+        Assert.assertEquals(lss.getTimestamp(), jdbcService.getLastCheckTime());
+        lsn = ((CacheStateInf)cache).getNotificationJson(jdbcService);
+        Assert.assertNull(lsn);
+        
         job = new ServiceJob();
         sqlServiceItem.setExecution("select sum(value) from test1");
         job.executeJob(jdbcService);
-        serviceState = ((CacheStateInf) cache).getState(jdbcService);
+        serviceState = ((ServiceStateInf)jdbcService).getServiceState();
         System.out.println(serviceState.toString());
         Assert.assertEquals(
                 serviceState.getState().equals(NAGIOSSTAT.CRITICAL), true);
@@ -215,10 +258,16 @@ public class ServiceStateCacheTest {
         Assert.assertEquals(
                 serviceState.getStateLevel().equals(State.PROBLEM_SOFT), true);
 
+        lss = ((CacheStateInf)cache).getStateJson(jdbcService);
+        Assert.assertEquals(lss.getState(),"CRITICAL");
+        Assert.assertEquals(lss.getTimestamp(), jdbcService.getLastCheckTime());
+        lsn = ((CacheStateInf)cache).getNotificationJson(jdbcService);
+        Assert.assertNull(lsn);
+        
         job = new ServiceJob();
         sqlServiceItem.setExecution("select sum(value) from test1");
         job.executeJob(jdbcService);
-        serviceState = ((CacheStateInf) cache).getState(jdbcService);
+        serviceState = ((ServiceStateInf)jdbcService).getServiceState();
         System.out.println(serviceState.toString());
         Assert.assertEquals(
                 serviceState.getState().equals(NAGIOSSTAT.CRITICAL), true);
@@ -227,11 +276,19 @@ public class ServiceStateCacheTest {
                 true);
         Assert.assertEquals(
                 serviceState.getStateLevel().equals(State.PROBLEM_HARD), true);
-
+        
+        lss = ((CacheStateInf)cache).getStateJson(jdbcService);
+        Assert.assertEquals(lss.getState(),"CRITICAL");
+        Assert.assertEquals(lss.getTimestamp(), jdbcService.getLastCheckTime());
+        lsn = ((CacheStateInf)cache).getNotificationJson(jdbcService);
+        Assert.assertNotNull(lsn);
+        Assert.assertEquals(lsn.getNotification(), "alert");
+        String incidentKey = lsn.getIncident_key();
+        
         job = new ServiceJob();
         sqlServiceItem.setExecution("select sum(value) from test");
         job.executeJob(jdbcService);
-        serviceState = ((CacheStateInf) cache).getState(jdbcService);
+        serviceState = ((ServiceStateInf)jdbcService).getServiceState();
         System.out.println(serviceState.toString());
         Assert.assertEquals(serviceState.getState().equals(NAGIOSSTAT.OK), true);
         Assert.assertEquals(
@@ -240,10 +297,20 @@ public class ServiceStateCacheTest {
         Assert.assertEquals(serviceState.getStateLevel()
                 .equals(State.OKAY_HARD), true);
 
+        lss = ((CacheStateInf)cache).getStateJson(jdbcService);
+        Assert.assertEquals(lss.getState(),"OK");
+        Assert.assertEquals(lss.getTimestamp(), jdbcService.getLastCheckTime());
+        lsn = ((CacheStateInf)cache).getNotificationJson(jdbcService);
+        Assert.assertNotNull(lsn);
+        Assert.assertEquals(incidentKey, lsn.getIncident_key());
+        Assert.assertEquals(lsn.getNotification(), "resolved");
+        Assert.assertEquals(lss.getServiceItemsList().get("sqlItem").getValue(),"7000");
+        Assert.assertEquals(lss.getServiceItemsList().get("sqlItem").getState(),"OK");
+        
         job = new ServiceJob();
         sqlServiceItem.setExecution("select sum(value) from test1");
         job.executeJob(jdbcService);
-        serviceState = ((CacheStateInf) cache).getState(jdbcService);
+        serviceState = ((ServiceStateInf)jdbcService).getServiceState();
         System.out.println(serviceState.toString());
         Assert.assertEquals(
                 serviceState.getState().equals(NAGIOSSTAT.CRITICAL), true);
@@ -251,20 +318,16 @@ public class ServiceStateCacheTest {
                 serviceState.getPreviousState().equals(NAGIOSSTAT.OK), true);
         Assert.assertEquals(
                 serviceState.getStateLevel().equals(State.PROBLEM_SOFT), true);
-        /*
-         * job = new ServiceJob();
-         * sqlServiceItem.setExecution("select sum(value) from test1");
-         * job.executeJob(jdbcService); serviceState = ((CacheStateInf)
-         * cache).getState(jdbcService);
-         * System.out.println(serviceState.toString());
-         * Assert.assertEquals(serviceState
-         * .getState().equals(NAGIOSSTAT.CRITICAL), true);
-         * Assert.assertEquals(serviceState
-         * .getPreviousState().equals(NAGIOSSTAT.CRITICAL), true);
-         * Assert.assertEquals
-         * (serviceState.getStateLevel().equals(State.PROBLEM_SOFT), true);
-         */
-
+        
+        lss = ((CacheStateInf)cache).getStateJson(jdbcService);
+        Assert.assertEquals(lss.getState(),"CRITICAL");
+        Assert.assertEquals(lss.getTimestamp(), jdbcService.getLastCheckTime());
+        lsn = ((CacheStateInf)cache).getNotificationJson(jdbcService);
+        Assert.assertNotNull(lsn);
+        Assert.assertNotEquals(lss.getTimestamp(), lsn.getTimestamp());
+        Assert.assertEquals(lss.getServiceItemsList().get("sqlItem").getValue(),"null");
+        
+        
         // Create new service object and read from cache
 
         host = new Host("sqlHost");
@@ -283,11 +346,10 @@ public class ServiceStateCacheTest {
         jdbcService.setHost(host);
         jdbcService.addServiceItem(sqlServiceItem);
 
-        // OK since nothing exists in the cache (cleared above)
         job = new ServiceJob();
         sqlServiceItem.setExecution("select sum(value) from test1");
         job.executeJob(jdbcService);
-        serviceState = ((CacheStateInf) cache).getState(jdbcService);
+        serviceState = ((ServiceStateInf)jdbcService).getServiceState();
         System.out.println(serviceState.toString());
         Assert.assertEquals(
                 serviceState.getState().equals(NAGIOSSTAT.CRITICAL), true);
@@ -296,6 +358,16 @@ public class ServiceStateCacheTest {
                 true);
         Assert.assertEquals(
                 serviceState.getStateLevel().equals(State.PROBLEM_SOFT), true);
+        
+        Assert.assertEquals(lss.getState(),"CRITICAL");
+        System.out.println(lss.getTimestamp() +":"+ jdbcService.getLastCheckTime());
+        
+        lss = ((CacheStateInf)cache).getStateJson(jdbcService);
+        Assert.assertEquals(lss.getTimestamp(), jdbcService.getLastCheckTime());
+        lsn = ((CacheStateInf)cache).getNotificationJson(jdbcService);
+        Assert.assertNotNull(lsn);
+        Assert.assertNotEquals(lss.getTimestamp(), lsn.getTimestamp());
+        
 
     }
 }

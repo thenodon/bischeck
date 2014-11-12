@@ -32,39 +32,69 @@ import com.ingby.socbox.bischeck.service.ServiceStateInf;
  */
 public class LastStatusNotification implements Serializable, Cloneable {
 
-
 	private static final long serialVersionUID = 1L;
-
-	private final Service service;
-
+	    
+    private Long timestamp;
+    private String date;
+    private String state;
+    private String notification;
+    private String incident_key;
+    
+	public LastStatusNotification(final JSONObject serviceNotificationJson) {
+	    timestamp = serviceNotificationJson.getLong("timestamp");
+        date = serviceNotificationJson.getString("date");
+        state = serviceNotificationJson.getString("state");
+        notification = serviceNotificationJson.getString("notification");
+        incident_key = serviceNotificationJson.getString("incident_key");
+    }
 
 	public LastStatusNotification(final Service service) {
-		this.service = service; 
+		timestamp = service.getLastCheckTime();
+		date = new Date(service.getLastCheckTime()).toString();
+		state = ((ServiceStateInf) service).getServiceState().getState().toString();
+		if (((ServiceStateInf) service).getServiceState().isResolved()) {
+	        notification = "resolved";
+	    } else {
+	        notification = "alert";
+	    }
+		incident_key = ((ServiceStateInf) service).getServiceState().getCurrentIncidentId();
+	
 	}
 
-	public JSONObject getJsonObject() {
+	public JSONObject toJson() {
 		final JSONObject json = new JSONObject();
 
-		final long currentTime = System.currentTimeMillis();
-		json.put("timestamp",currentTime);
-		json.put("date",new Date(currentTime).toString());
-		json.put("state",((ServiceStateInf) service).getServiceState().getState());
-		if (((ServiceStateInf) service).getServiceState().isResolved()) {
-			json.put("notification","resolved");
-		} else {
-			json.put("notification","alert");
-		}
-
-		json.put("incident_key",((ServiceStateInf) service).getServiceState().getCurrentIncidentId());
+        json.put("timestamp",timestamp);
+        json.put("date",date);
+        json.put("state",state);
+        json.put("notification",notification);
+        json.put("incident_key",incident_key);
 
 		return json;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	public String getJson() {
-		return getJsonObject().toString();
+	public String toJsonString() {
+		return toJson().toString();
 	}
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public String getNotification() {
+        return notification;
+    }
+
+    public String getIncident_key() {
+        return incident_key;
+    }
+
 }

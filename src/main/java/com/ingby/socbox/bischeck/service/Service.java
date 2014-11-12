@@ -270,5 +270,7 @@ public interface Service {
      * done
      */
     void reset();
+    
+    Long getLastCheckTime();
 
 }

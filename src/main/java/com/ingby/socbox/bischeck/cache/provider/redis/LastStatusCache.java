@@ -503,11 +503,13 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                         index);
                 String redstr = jedis.lindex(key, index);
 
-                if (redstr == null) {
+                JSONObject json = string2Json(redstr);
+
+                if (json == null) {
                     return null;
                 } else {
                     incRedisCacheCount();
-                    ls = new LastStatus(redstr);
+                    ls = new LastStatus(json);
                 }
             }
         } catch (JedisConnectionException je) {
@@ -517,6 +519,17 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         }
 
         return ls;
+    }
+
+    private JSONObject string2Json(String redstr) {
+        JSONObject json;
+        try {
+            json = (JSONObject) JSONSerializer.toJSON(redstr);
+        } catch (ClassCastException ce) {
+            LOGGER.warn("Cast exception on json string <" + redstr + ">", ce);
+            return null;
+        }
+        return json;
     }
 
     @Override
@@ -589,7 +602,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                 incRedisCacheCount(toIndex - fromIndex + 1);
 
                 for (String redstr : lsstr) {
-                    LastStatus ls = new LastStatus(redstr);
+                    JSONObject json = string2Json(redstr);
+                    LastStatus ls = new LastStatus(json);
                     lslist.add(ls);
                 }
             }
@@ -1080,9 +1094,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         Jedis jedis = null;
         try {
             jedis = jedispool.getResource();
-            if (time > new LastStatus(jedis.lindex(key, 0L)).getTimestamp()
-                    || time < new LastStatus(jedis.lindex(key,
-                            jedis.llen(key) - 1)).getTimestamp()) {
+            if (time > new LastStatus(string2Json(jedis.lindex(key, 0L)))
+                    .getTimestamp()
+                    || time < new LastStatus(string2Json(jedis.lindex(key,
+                            jedis.llen(key) - 1))).getTimestamp()) {
                 return null;
             }
 
@@ -1104,9 +1119,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                     LOGGER.debug("Time found in lower - search depth: {}",
                             countSearchDepth);
 
-                    if (Math.abs((new LastStatus(jedis.lindex(key, 0)))
-                            .getTimestamp() - time) < Math.abs((new LastStatus(
-                            jedis.lindex(key, 1))).getTimestamp() - time)) {
+                    if (Math.abs((new LastStatus(string2Json(jedis.lindex(key,
+                            0)))).getTimestamp() - time) < Math
+                            .abs((new LastStatus(string2Json(jedis.lindex(key,
+                                    1)))).getTimestamp() - time)) {
                         return mid;
                     } else {
                         return mid + 1;
@@ -1121,8 +1137,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                     return listSize - 1;
                 }
 
-                LastStatus lastMid = new LastStatus(jedis.lindex(key, mid));
-                LastStatus lastMid1 = new LastStatus(jedis.lindex(key, mid + 1));
+                LastStatus lastMid = new LastStatus(string2Json(jedis.lindex(
+                        key, mid)));
+                LastStatus lastMid1 = new LastStatus(string2Json(jedis.lindex(
+                        key, mid + 1)));
 
                 // Test if exactly equal
                 if (lastMid.getTimestamp() == time) {
@@ -1152,7 +1170,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                 }
 
                 // Keep searching.
-                if ((new LastStatus(jedis.lindex(key, mid)).getTimestamp()) > time) {
+                if ((new LastStatus(string2Json(jedis.lindex(key, mid)))
+                        .getTimestamp()) > time) {
                     low = mid + 1;
                 } else {
                     high = mid;
@@ -1197,7 +1216,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         try {
             jedis = jedispool.getResource();
 
-            ls = new LastStatus(jedis.lindex(key, index));
+            ls = new LastStatus(string2Json(jedis.lindex(key, index)));
 
         } catch (JedisConnectionException je) {
             LOGGER.error("Redis connection failed: " + je.getMessage(), je);
@@ -1394,14 +1413,14 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     }
 
     @Override
-    public Long addState(Service service) {
+    public void addState(Service service) {
         StringBuilder key = new StringBuilder();
         key.append("state/");
         key.append(service.getHost().getHostname()).append(
                 ObjectDefinitions.getCacheKeySep());
         key.append(service.getServiceName());
 
-        Long score = null;
+        // Long score = null;
         Jedis jedis = null;
         final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
                 "stateWriteTimer");
@@ -1414,24 +1433,20 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
             LastStatusState lss = new LastStatusState(service);
 
             // score is current time in millisecond
-            score = System.currentTimeMillis();
-            jedis.zadd(key.toString(), (double) score, lss.getJson());
+            // score = System.currentTimeMillis();
+            jedis.zadd(key.toString(), (double) service.getLastCheckTime(),
+                    lss.toJsonString());
         } catch (JedisConnectionException je) {
             connectionFailed(je);
         } finally {
             context.stop();
             jedispool.returnResource(jedis);
         }
-        return score;
+        // return score;
     }
 
     @Override
-    public Long addNotification(Service service) {
-        return addNotification(service, System.currentTimeMillis());
-    }
-
-    @Override
-    public Long addNotification(Service service, Long score) {
+    public void addNotification(Service service) {
         StringBuilder key = new StringBuilder();
         key.append("notification/");
         key.append(service.getHost().getHostname()).append(
@@ -1450,17 +1465,17 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
             LastStatusNotification lsn = new LastStatusNotification(service);
 
             // score is current time in millisecond
-            jedis.zadd(key.toString(), (double) score, lsn.getJson());
+            jedis.zadd(key.toString(), (double) service.getLastCheckTime(),
+                    lsn.toJsonString());
         } catch (JedisConnectionException je) {
             connectionFailed(je);
         } finally {
             context.stop();
             jedispool.returnResource(jedis);
         }
-        return score;
     }
 
-    @Override
+    // @Override
     public ServiceState getState(Service service) {
 
         StringBuilder key = new StringBuilder();
@@ -1550,4 +1565,96 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         }
     }
 
+    @Override
+    public LastStatusState getStateJson(Service service) {
+
+        StringBuilder key = new StringBuilder();
+        key.append("state/");
+        key.append(service.getHost().getHostname()).append(
+                ObjectDefinitions.getCacheKeySep());
+        key.append(service.getServiceName());
+
+        Jedis jedis = null;
+        final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
+                "stateReadTimer");
+        final Timer.Context context = timer.time();
+
+        Set<Tuple> returnTulpe = null;
+
+        try {
+            jedis = jedispool.getResource();
+
+            // get the maximum score limited to 1
+            returnTulpe = jedis.zrevrangeByScoreWithScores(key.toString(),
+                    "+inf", "-inf", 0, 1);
+
+        } catch (JedisConnectionException je) {
+            connectionFailed(je);
+        } finally {
+            context.stop();
+            jedispool.returnResource(jedis);
+        }
+
+        // If no state exists in cache
+        if (returnTulpe == null || returnTulpe.isEmpty()
+                || returnTulpe.size() > 1) {
+            return null;
+        }
+
+        // Read the first tulpe
+        Tuple lastState = returnTulpe.iterator().next();
+
+        JSONObject stateJson = null;
+        try {
+            stateJson = (JSONObject) JSONSerializer.toJSON(lastState
+                    .getElement());
+        } catch (ClassCastException ce) {
+            LOGGER.warn("Cast exception on json string < {} >", lastState, ce);
+            return null;
+        }
+        return new LastStatusState(stateJson);
+    }
+
+    @Override
+    public LastStatusNotification getNotificationJson(Service service) {
+        StringBuilder key = new StringBuilder();
+        // Checking if latest state has same score as latest notification
+        // if yes must get the incident number
+        key = new StringBuilder();
+        key.append("notification/");
+        key.append(service.getHost().getHostname()).append(
+                ObjectDefinitions.getCacheKeySep());
+        key.append(service.getServiceName());
+
+        Set<Tuple> returnTulpe = null;
+        Jedis jedis = null;
+
+        try {
+            jedis = jedispool.getResource();
+            returnTulpe = jedis.zrevrangeByScoreWithScores(key.toString(),
+                    "+inf", "-inf", 0, 1);
+
+        } finally {
+            jedispool.returnResource(jedis);
+        }
+
+        if (returnTulpe == null || returnTulpe.isEmpty()
+                || returnTulpe.size() > 1) {
+            return null;// new ServiceState(true);
+        }
+
+        JSONObject notificationJson = null;
+        Tuple lastNotification = null;
+
+        lastNotification = returnTulpe.iterator().next();
+        try {
+            notificationJson = (JSONObject) JSONSerializer
+                    .toJSON(lastNotification.getElement());
+        } catch (ClassCastException ce) {
+            LOGGER.warn("Cast exception on json string < {} >",
+                    lastNotification, ce);
+            return null;
+        }
+        return new LastStatusNotification(notificationJson);
+    }
 }

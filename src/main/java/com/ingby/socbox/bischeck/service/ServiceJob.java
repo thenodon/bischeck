@@ -25,7 +25,6 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +46,6 @@ import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheStateInf;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
-import com.ingby.socbox.bischeck.notifications.Notifier;
 import com.ingby.socbox.bischeck.servers.ServerMessageExecutor;
 import com.ingby.socbox.bischeck.service.ServiceTO.ServiceTOBuilder;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
@@ -420,8 +418,9 @@ public class ServiceJob implements Job {
                                 .getState(), ((ServiceStateInf) service)
                                 .getServiceState().getStateLevel());
 
-                score = ((CacheStateInf) CacheFactory.getInstance())
-                        .addState(service);
+                ((CacheStateInf) CacheFactory.getInstance()).addState(service);
+                // score = ((CacheStateInf) CacheFactory.getInstance())
+                // .addState(service);
             }
 
             if (((ServiceStateInf) service).getServiceState().isNotification()
@@ -431,8 +430,10 @@ public class ServiceJob implements Job {
                         ((ServiceStateInf) service).getServiceState()
                                 .getState(), ((ServiceStateInf) service)
                                 .getServiceState().getCurrentIncidentId());
-                ((CacheStateInf) CacheFactory.getInstance()).addNotification(
-                        service, score);
+                ((CacheStateInf) CacheFactory.getInstance())
+                        .addNotification(service);
+                // ((CacheStateInf) CacheFactory.getInstance()).addNotification(
+                // service, score);
             }
 
         }

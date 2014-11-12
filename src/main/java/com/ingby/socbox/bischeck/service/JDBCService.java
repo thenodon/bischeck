@@ -77,6 +77,7 @@ public class JDBCService extends ServiceAbstract implements Service,
 
     @Override
     public void closeConnection() throws ServiceConnectionException {
+        super.closeConnection();
         try {
             if (connection != null) {
                 connection.close();

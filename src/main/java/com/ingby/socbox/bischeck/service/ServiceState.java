@@ -31,6 +31,8 @@ import net.sf.json.JSONObject;
 
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheStateInf;
+import com.ingby.socbox.bischeck.cache.LastStatusNotification;
+import com.ingby.socbox.bischeck.cache.LastStatusState;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
@@ -134,9 +136,22 @@ public class ServiceState {
      */
     public static ServiceState ServiceStateFactory(Service service) {
         CacheStateInf cache = (CacheStateInf) CacheFactory.getInstance();       
-        ServiceState state = cache.getState(service);
-
-        return state;
+        //ServiceState state = cache.getState(service);
+        
+        LastStatusState state = cache.getStateJson(service);
+        LastStatusNotification notificsation = cache.getNotificationJson(service);
+        
+        if (state == null) {
+            return new ServiceState(true);
+        } else {
+            // get score
+            if (notificsation != null && notificsation.getTimestamp() == state.getTimestamp()) {
+                return new ServiceState(state.toJson(), notificsation.getIncident_key());
+            } else {
+                return new ServiceState(state.toJson());
+            }
+            
+        }
     }
 
 

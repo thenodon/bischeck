@@ -57,6 +57,8 @@ public abstract class ServiceAbstract {
 
     private NAGIOSSTAT stateOnExecException = NAGIOSSTAT.CRITICAL;
     private NAGIOSSTAT stateOnConnectionException = NAGIOSSTAT.CRITICAL;
+    
+    private Long lastCheckTime = null;
 
     public ServiceAbstract(Properties bischeckProperties) {
         if (bischeckProperties != null) {
@@ -107,11 +109,16 @@ public abstract class ServiceAbstract {
 
     void openConnection() throws ServiceConnectionException {
         // Create the service state object at first open
+        lastCheckTime = System.currentTimeMillis();
         if (fsm == null) {
             fsm = ServiceState.ServiceStateFactory((Service) this);
         }
     }
 
+    void closeConnection() throws ServiceConnectionException {
+
+    }
+    
     public void setHost(Host host) {
         this.host = host;
     }
@@ -223,5 +230,9 @@ public abstract class ServiceAbstract {
             }
         }
         return false;
+    }
+    
+    public Long getLastCheckTime() {
+        return lastCheckTime;
     }
 }
