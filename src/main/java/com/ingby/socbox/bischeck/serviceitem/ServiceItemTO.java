@@ -16,12 +16,15 @@ public class ServiceItemTO {
     private Boolean hasThreshold;
     private List<Exception> exceptions;
     private NAGIOSSTAT status;
+    private String execStatement;
 
     @SuppressWarnings("unchecked")
     public ServiceItemTO(ServiceItem serviceItem) {
         this.name = serviceItem.getServiceItemName();
         this.value = serviceItem.getLatestExecuted();
         this.execTime = serviceItem.getExecutionTime();
+        this.execStatement = serviceItem.getExecutionStat();
+        
         if (serviceItem.getThreshold() != null
                 && serviceItem.getThreshold().getThreshold() != null) {
             this.method = serviceItem.getThreshold().getCalcMethod();
@@ -39,6 +42,10 @@ public class ServiceItemTO {
                     .getExceptions()).clone();
         }
 
+    }
+
+    public String getExecStatement() {
+        return execStatement;
     }
 
     public boolean hasThreshold() {
