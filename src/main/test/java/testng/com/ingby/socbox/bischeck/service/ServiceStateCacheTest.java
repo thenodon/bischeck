@@ -45,6 +45,7 @@ import com.ingby.socbox.bischeck.service.ServiceJob;
 import com.ingby.socbox.bischeck.service.ServiceState;
 import com.ingby.socbox.bischeck.service.ServiceState.State;
 import com.ingby.socbox.bischeck.service.ServiceStateInf;
+import com.ingby.socbox.bischeck.service.StateConfig;
 import com.ingby.socbox.bischeck.serviceitem.SQLServiceItem;
 import com.ingby.socbox.bischeck.threshold.DummyThreshold;
 import com.ingby.socbox.bischeck.threshold.Threshold;
@@ -369,5 +370,53 @@ public class ServiceStateCacheTest {
         Assert.assertNotEquals(lss.getTimestamp(), lsn.getTimestamp());
         
 
+    }
+    @Test(groups = { "ServiceState" })
+    public void getStateFromCacheWithStateConfig() throws Exception {
+
+        cache.clear();
+        Host host;
+        JDBCService jdbcService;
+        SQLServiceItem sqlServiceItem;
+
+        host = new Host("sqlHost");
+        jdbcService = new JDBCService("sqlService", null);
+        // Set faulty driver url -> connection will fail
+        jdbcService.setConnectionUrl("jdbc:derby:memory:myDB;create=true");
+        jdbcService.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+
+        sqlServiceItem = new SQLServiceItem("sqlItem");
+        sqlServiceItem.setService(jdbcService);
+        sqlServiceItem.setThresholdClassName("DummyThreshold");
+        Threshold threshold = new DummyThreshold("sqlHost", "jdbc", "sql");
+        sqlServiceItem.setThreshold(threshold);
+
+        host.addService(jdbcService);
+        jdbcService.setHost(host);
+        jdbcService.addServiceItem(sqlServiceItem);
+        jdbcService.setStateConfig(new StateConfig(1));
+
+        // OK since nothing exists in the cache (cleared above)
+        ServiceJob job = new ServiceJob();
+        sqlServiceItem.setExecution("select sum(value) from test");
+        job.executeJob(jdbcService);
+        
+        
+                
+        ServiceState serviceState = ((ServiceStateInf)jdbcService).getServiceState();
+        Assert.assertEquals(serviceState.getMaxSoftCount(), new Integer(1));
+        System.out.println(serviceState.toString());
+        Assert.assertEquals(serviceState.getState().equals(NAGIOSSTAT.OK), true);
+        Assert.assertEquals(
+                serviceState.getPreviousState().equals(NAGIOSSTAT.UNKNOWN),
+                true);
+        Assert.assertEquals(serviceState.getStateLevel()
+                .equals(State.OKAY_HARD), true);
+
+        LastStatusState lss = ((CacheStateInf)cache).getStateJson(jdbcService);
+        Assert.assertEquals(lss.getState(),"OK");
+        Assert.assertEquals(lss.getTimestamp(), jdbcService.getLastCheckTime());
+        LastStatusNotification lsn = ((CacheStateInf)cache).getNotificationJson(jdbcService);
+        Assert.assertNull(lsn);
     }
 }
