@@ -45,10 +45,12 @@ import com.ingby.socbox.bischeck.threshold.ThresholdFactory;
  */
 public class ThresholdCacheClearJob implements Job {
 
-    private final static Logger  LOGGER = LoggerFactory.getLogger(ThresholdCacheClearJob.class);
+    private static final Logger  LOGGER = LoggerFactory.getLogger(ThresholdCacheClearJob.class);
 
     private static Scheduler sched;
 
+    private static final String DAILY_MAINTENANCE = "DailyMaintenance";
+    private static final String DEPLETE_THRESHOLD_CACHE = "DepleteThresholdCache";
     public static void init(Properties prop) throws SchedulerException {
         
         
@@ -58,16 +60,16 @@ public class ThresholdCacheClearJob implements Job {
         }
         
         JobDetail job = newJob(ThresholdCacheClearJob.class).
-            withIdentity("DepleteThresholdCache", "DailyMaintenance").
-            withDescription("DepleteThresholdCache").    
+            withIdentity(DEPLETE_THRESHOLD_CACHE, DAILY_MAINTENANCE).
+            withDescription(DEPLETE_THRESHOLD_CACHE).    
             build();
                 
         
         // Every day at 10 sec past midnight
         CronTrigger trigger = newTrigger()
-        .withIdentity("DepleteThresholdCacheTrigger", "DailyMaintenance")
+        .withIdentity(DEPLETE_THRESHOLD_CACHE + "Trigger", DAILY_MAINTENANCE)
         .withSchedule(cronSchedule(prop.getProperty("thresholdCacheClear","10 0 00 * * ? *")))
-        .forJob("DepleteThresholdCache", "DailyMaintenance")
+        .forJob(DEPLETE_THRESHOLD_CACHE, DAILY_MAINTENANCE)
         .build();
         
         // If job exists delete and add

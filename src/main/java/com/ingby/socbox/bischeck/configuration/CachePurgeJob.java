@@ -70,6 +70,9 @@ public class CachePurgeJob implements Job {
 
     private static Scheduler sched;
 
+    private static final String DAILY_MAINTENANCE = "DailyMaintenance";
+    private static final String CACHE_PURGE = "CachePurge";
+
     /**
      * Initialize the purge job
      * 
@@ -86,15 +89,15 @@ public class CachePurgeJob implements Job {
         }
 
         JobDetail job = newJob(CachePurgeJob.class)
-                .withIdentity("CachePurge", "DailyMaintenance")
-                .withDescription("CachePurge").build();
+                .withIdentity(CACHE_PURGE, DAILY_MAINTENANCE)
+                .withDescription(CACHE_PURGE).build();
 
         CronTrigger trigger = newTrigger()
-                .withIdentity("CachePurgeTrigger", "DailyMaintenance")
+                .withIdentity(CACHE_PURGE + "Trigger", DAILY_MAINTENANCE)
                 .withSchedule(
                         cronSchedule(prop.getProperty("cachePurgeJobCron",
                                 "0 2/5 * * * ? *")))
-                .forJob("CachePurge", "DailyMaintenance").build();
+                .forJob(CACHE_PURGE, DAILY_MAINTENANCE).build();
 
         // If job exists delete and add
         if (sched.getJobDetail(job.getKey()) != null) {
@@ -144,20 +147,16 @@ public class CachePurgeJob implements Job {
                         // then the time offset
                         if (index != null) {
                             trimMap.put(key, index);
-                            // ((CachePurgeInf) cache).trim(key, index);
                         }
                     } else {
                         trimMap.put(key, Long.valueOf(purgeMap.get(key)));
-
-                        // ((CachePurgeInf) cache).trim(key,
-                        // Long.valueOf(purgeMap.get(key)));
                     }
                 }
             }
             ((CachePurgeInf) cache).trimBatch(trimMap);
 
         } finally {
-            long duration = context.stop() / 1000000;
+            long duration = context.stop() / MetricsManager.TO_MILLI;
             LOGGER.info("CachePurge executed in {} ms", duration);
         }
     }
@@ -203,7 +202,7 @@ public class CachePurgeJob implements Job {
                 }
             }
         } finally {
-            long duration = context.stop() / 1000000;
+            long duration = context.stop() / MetricsManager.TO_MILLI;
             LOGGER.info("CachePurge executed in {} ms", duration);
         }
     }
