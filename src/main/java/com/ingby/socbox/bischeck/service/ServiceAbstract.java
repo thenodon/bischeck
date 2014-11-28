@@ -78,6 +78,7 @@ public abstract class ServiceAbstract {
     }
 
     private ServiceState fsm = null;
+    private StateConfig stateConfig;
 
     public String getServiceName() {
         return serviceName;
@@ -234,5 +235,13 @@ public abstract class ServiceAbstract {
     
     public Long getLastCheckTime() {
         return lastCheckTime;
+    }
+    
+    public void setStateConfig(StateConfig stateConfig) {
+        this.stateConfig = stateConfig;
+    }
+    
+    public StateConfig getStateConfig() {
+        return stateConfig;
     }
 }

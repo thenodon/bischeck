@@ -271,6 +271,18 @@ public interface Service {
      */
     void reset();
     
+    /**
+     * Return the timestamp of the last time the service was executed
+     * @return
+     */
     Long getLastCheckTime();
+
+    /**
+     * Set the configuration for the Service state properties
+     * @param stateConfig
+     */
+    void setStateConfig(StateConfig stateConfig);
+    
+    StateConfig getStateConfig();
 
 }
