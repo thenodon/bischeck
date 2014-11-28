@@ -202,13 +202,12 @@
     <xsd:element name="state">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element ref="softcount" minOccurs="1" maxOccurs="1" />
-                
+                <xsd:element ref="maxsoft" minOccurs="1" maxOccurs="1" />
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
     
-    <xsd:element name="softcount" type="xsd:integer" default="3"/>
+    <xsd:element name="maxsoft" type="xsd:integer" default="3"/>
     
     <!-- ************************* -->
     <!-- Cache settings - optional -->

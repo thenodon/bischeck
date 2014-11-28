@@ -64,6 +64,7 @@ import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
 import com.ingby.socbox.bischeck.service.ServiceFactoryException;
 import com.ingby.socbox.bischeck.service.ServiceJobConfig;
+import com.ingby.socbox.bischeck.service.StateConfig;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactory;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemFactoryException;
@@ -77,6 +78,7 @@ import com.ingby.socbox.bischeck.xsd.bischeck.XMLService;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLServiceitem;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLServiceitemtemplate;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLServicetemplate;
+import com.ingby.socbox.bischeck.xsd.bischeck.XMLState;
 import com.ingby.socbox.bischeck.xsd.properties.XMLProperties;
 import com.ingby.socbox.bischeck.xsd.properties.XMLProperty;
 import com.ingby.socbox.bischeck.xsd.servers.XMLServer;
@@ -517,6 +519,13 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
         } else {
             service.setSendServiceData(true);
         }
+
+        if (serviceconfig.getState() != null) {
+            XMLState state = serviceconfig.getState();
+            if (state.getMaxsoft() != null) {
+                service.setStateConfig(new StateConfig(state.getMaxsoft().intValue()));
+            }
+        }
         return service;
     }
 
@@ -592,6 +601,14 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
                 service.setSendServiceData(serviceconfig.getServiceoverride().isSendserver());
             }
         }
+        
+        if (serviceconfig.getState() != null) {
+            XMLState state = serviceconfig.getState();
+            if (state.getMaxsoft() != null) {
+                service.setStateConfig(new StateConfig(state.getMaxsoft().intValue()));
+            }
+        }
+        
         return service;
     }
 
