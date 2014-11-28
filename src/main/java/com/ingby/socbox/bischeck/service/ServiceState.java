@@ -136,13 +136,16 @@ public class ServiceState {
      */
     public static ServiceState ServiceStateFactory(Service service) {
         CacheStateInf cache = (CacheStateInf) CacheFactory.getInstance();       
-        //ServiceState state = cache.getState(service);
         
         LastStatusState state = cache.getStateJson(service);
         LastStatusNotification notificsation = cache.getNotificationJson(service);
         
         if (state == null) {
-            return new ServiceState(true);
+            if (service.getStateConfig() != null) {
+                return new ServiceState(service.getStateConfig().getMaxSoftCount(), true);
+            } else {
+                return new ServiceState(true);
+            }
         } else {
             // get score
             if (notificsation != null && notificsation.getTimestamp() == state.getTimestamp()) {
@@ -483,6 +486,9 @@ public class ServiceState {
         return currentIncidentId;
     }
 
+    public Integer getMaxSoftCount() {
+        return maxSoft;
+    }
     public String toString() {
         StringBuilder strbui = new StringBuilder();
         strbui.append("{");
