@@ -405,7 +405,6 @@ public class ServiceJob implements Job {
             // TODO This is not nice since its not encapsulated in the Service
             ((ServiceStateInf) service).setServiceState();
 
-            Long score = null;
             if (((ServiceStateInf) service).getServiceState().isStateChange()
                     && CacheFactory.getInstance() instanceof CacheStateInf) {
                 LOGGER.info("State change {} from {} ({}) to {} ({})", Util
@@ -419,8 +418,6 @@ public class ServiceJob implements Job {
                                 .getServiceState().getStateLevel());
 
                 ((CacheStateInf) CacheFactory.getInstance()).addState(service);
-                // score = ((CacheStateInf) CacheFactory.getInstance())
-                // .addState(service);
             }
 
             if (((ServiceStateInf) service).getServiceState().isNotification()
@@ -432,8 +429,7 @@ public class ServiceJob implements Job {
                                 .getServiceState().getCurrentIncidentId());
                 ((CacheStateInf) CacheFactory.getInstance())
                         .addNotification(service);
-                // ((CacheStateInf) CacheFactory.getInstance()).addNotification(
-                // service, score);
+
             }
 
         }
