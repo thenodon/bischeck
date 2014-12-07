@@ -1427,10 +1427,12 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     public void addState(Service service) {
 
         StringBuilder key = new StringBuilder();
-        key.append("state/");
-        key.append(service.getHost().getHostname()).append(
-                ObjectDefinitions.getCacheKeySep());
-        key.append(service.getServiceName());
+        String serviceHost = Util.fullQoutedHostServiceName(service);
+        key.append("state/")
+        .append(serviceHost);
+//        .append(service.getHost().getHostname())
+//        .append(ObjectDefinitions.getCacheKeySep())
+//        .append(service.getServiceName());
 
         // Do not save aggregations
         if (key.toString().matches(".*/[H:D:W:M]/.*")) {
@@ -1454,11 +1456,11 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
             pipe.zadd(key.toString(), (double) service.getLastCheckTime(),
                     lss.toJsonString());
             // Update the state if changed or check if the current is a member
-            if (!lss.getState().equals(lss.getPreviousState())) {
-                pipe.sadd(lss.getState(), key.toString());
-                pipe.srem(lss.getPreviousState(), key.toString());
-            } else if (!jedis.sismember(lss.getState(), key.toString())) {
-                pipe.sadd(lss.getState(), key.toString());
+            if (!lss.getState().equals(lss.getPreviousState())) { 
+                pipe.sadd(lss.getState(), serviceHost);
+                pipe.srem(lss.getPreviousState(), serviceHost);
+            } else if (!jedis.sismember(lss.getState(), serviceHost)) {
+                pipe.sadd(lss.getState(), serviceHost);
             }
 
             pipe.sync();
@@ -1476,10 +1478,13 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     @Override
     public void addNotification(Service service) {
         StringBuilder key = new StringBuilder();
-        key.append("notification/");
-        key.append(service.getHost().getHostname()).append(
-                ObjectDefinitions.getCacheKeySep());
-        key.append(service.getServiceName());
+        String serviceHost = Util.fullQoutedHostServiceName(service);
+        
+        key.append("notification/")
+        .append(serviceHost);
+//        .append(service.getHost().getHostname())
+//        .append(ObjectDefinitions.getCacheKeySep())
+//        .append(service.getServiceName());
 
         Jedis jedis = null;
         final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
@@ -1497,10 +1502,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
             pipe.zadd(key.toString(), (double) service.getLastCheckTime(),
                     lsn.toJsonString());
             if (lsn.getNotification().equals(LastStatusNotification.ALERT)) {
-                pipe.sadd(LastStatusNotification.ALERT, key.toString());
+                pipe.sadd(LastStatusNotification.ALERT, serviceHost);
             } else if (lsn.getNotification().equals(
                     LastStatusNotification.RESOLVED)) {
-                pipe.srem(LastStatusNotification.ALERT, key.toString());
+                pipe.srem(LastStatusNotification.ALERT, serviceHost);
             }
             pipe.sync();
 
