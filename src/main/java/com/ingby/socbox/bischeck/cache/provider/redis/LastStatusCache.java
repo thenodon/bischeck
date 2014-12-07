@@ -258,7 +258,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     /*
      * **********************************************
      * **********************************************
-     * Public methods**********************************************
+     * Public methods 
+     * **********************************************
      * **********************************************
      */
 
@@ -281,7 +282,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
 
         try {
             jedis = jedispool.getResource();
-
+            
             Set<String> keys = jedis.keys(pattern);
 
             for (String key : keys) {
@@ -331,9 +332,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     private void warmUpFastCache() {
         Map<String, Host> hostsmap = ConfigurationManager.getInstance()
                 .getHostConfig();
-        Jedis jedis = null;
-        try {
-            jedis = jedispool.getResource();
+//        Jedis jedis = null;
+//        try {
+//            jedis = jedispool.getResource();
 
             for (Map.Entry<String, Host> hostentry : hostsmap.entrySet()) {
                 Host host = hostentry.getValue();
@@ -368,23 +369,25 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                     }
                 }
             }
-        } catch (JedisConnectionException je) {
-            connectionFailed(je);
-        } finally {
-            jedispool.returnResource(jedis);
-        }
+//        } catch (JedisConnectionException je) {
+//            connectionFailed(je);
+//        } finally {
+//            jedispool.returnResource(jedis);
+//        }
     }
 
     /*
      * **********************************************
      * **********************************************
-     * Implement CacheInf**********************************************
+     * Implement CacheInf
+     * **********************************************
      * **********************************************
      */
 
     /*
      * **********************************************
-     * Add methods**********************************************
+     * Add methods
+     * **********************************************
      */
 
     @Override
@@ -632,7 +635,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
 
     /*
      * **********************************************
-     * Get data methods - String**********************************************
+     * Get data methods - String
+     * **********************************************
      */
 
     @Override
@@ -729,7 +733,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
 
     /*
      * **********************************************
-     * Position and size methods**********************************************
+     * Position and size methods
+     * **********************************************
      */
     @Override
     public Long size(String hostName, String serviceName, String serviceItemName) {
@@ -803,7 +808,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
 
     /*
      * **********************************************
-     * Clear methods**********************************************
+     * Clear methods
+     * **********************************************
      */
     @Override
     public void clear() {
@@ -842,7 +848,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     /*
      * **********************************************
      * **********************************************
-     * Implement LastStatusMBean**********************************************
+     * Implement LastStatusMBean
+     * **********************************************
      * **********************************************
      */
 
@@ -925,7 +932,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     /*
      * **********************************************
      * **********************************************
-     * Private methods**********************************************
+     * Private methods
+     * **********************************************
      * **********************************************
      */
 
@@ -939,32 +947,35 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     private void updateMetaData(Jedis jedis, Host host, Service service,
             ServiceItem serviceItem) {
 
+        Pipeline pipe = jedis.pipelined();
         String key = "config/"
                 + Util.fullName(host.getHostname(), service.getServiceName(),
                         serviceItem.getServiceItemName());
-        jedis.hset(key, "hostName", host.getHostname());
-        jedis.hset(key, "hostDesc", checkNull(host.getDecscription()));
+        pipe.hset(key, "hostName", host.getHostname());
+        pipe.hset(key, "hostDesc", checkNull(host.getDecscription()));
 
-        jedis.hset(key, "serviceName", service.getServiceName());
-        jedis.hset(key, "serviceDesc", checkNull(service.getDecscription()));
-        jedis.hset(key, "serviceConnectionUrl", service.getConnectionUrl());
-        jedis.hset(key, "serviceDriverClass",
+        pipe.hset(key, "serviceName", service.getServiceName());
+        pipe.hset(key, "serviceDesc", checkNull(service.getDecscription()));
+        pipe.hset(key, "serviceConnectionUrl", service.getConnectionUrl());
+        pipe.hset(key, "serviceDriverClass",
                 checkNull(service.getDriverClassName()));
         int i = 0;
         for (String schedule : service.getSchedules()) {
-            jedis.hset(key, "serviceSchedule-" + i, checkNull(schedule));
+            pipe.hset(key, "serviceSchedule-" + i, checkNull(schedule));
             i++;
         }
 
-        jedis.hset(key, "serviceItemName", serviceItem.getServiceItemName());
-        jedis.hset(key, "serviceItemDesc",
+        pipe.hset(key, "serviceItemName", serviceItem.getServiceItemName());
+        pipe.hset(key, "serviceItemDesc",
                 checkNull(serviceItem.getDecscription()));
-        jedis.hset(key, "serviceItemExecuteStatement",
+        pipe.hset(key, "serviceItemExecuteStatement",
                 checkNull(serviceItem.getExecutionStat()));
-        jedis.hset(key, "serviceItemClassName",
+        pipe.hset(key, "serviceItemClassName",
                 checkNull(serviceItem.getClassName()));
-        jedis.hset(key, "serviceItemThresholdClass",
+        pipe.hset(key, "serviceItemThresholdClass",
                 checkNull(serviceItem.getThresholdClassName()));
+        
+        pipe.sync();
     }
 
     private String checkNull(String str) {
@@ -1414,11 +1425,18 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
 
     @Override
     public void addState(Service service) {
+
         StringBuilder key = new StringBuilder();
         key.append("state/");
         key.append(service.getHost().getHostname()).append(
                 ObjectDefinitions.getCacheKeySep());
         key.append(service.getServiceName());
+
+        // Do not save aggregations
+        if (key.toString().matches(".*/[H:D:W:M]/.*")) {
+            LOGGER.info("Aggrgation key {} - do not save", key.toString());
+            return;
+        }
 
         // Long score = null;
         Jedis jedis = null;
@@ -1428,14 +1446,24 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
 
         try {
             jedis = jedispool.getResource();
+            Pipeline pipe = jedis.pipelined();
 
             // Add redis
             LastStatusState lss = new LastStatusState(service);
 
-            // score is current time in millisecond
-            // score = System.currentTimeMillis();
-            jedis.zadd(key.toString(), (double) service.getLastCheckTime(),
+            pipe.zadd(key.toString(), (double) service.getLastCheckTime(),
                     lss.toJsonString());
+            // Update the state if changed or check if the current is a member
+            if (!lss.getState().equals(lss.getPreviousState())) {
+                pipe.sadd(lss.getState(), key.toString());
+                pipe.srem(lss.getPreviousState(), key.toString());
+            } else if (!jedis.sismember(lss.getState(), key.toString())) {
+                pipe.sadd(lss.getState(), key.toString());
+            }
+
+            pipe.sync();
+            //
+
         } catch (JedisConnectionException je) {
             connectionFailed(je);
         } finally {
@@ -1460,13 +1488,22 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
 
         try {
             jedis = jedispool.getResource();
+            Pipeline pipe = jedis.pipelined();
 
             // Add redis
             LastStatusNotification lsn = new LastStatusNotification(service);
 
             // score is current time in millisecond
-            jedis.zadd(key.toString(), (double) service.getLastCheckTime(),
+            pipe.zadd(key.toString(), (double) service.getLastCheckTime(),
                     lsn.toJsonString());
+            if (lsn.getNotification().equals(LastStatusNotification.ALERT)) {
+                pipe.sadd(LastStatusNotification.ALERT, key.toString());
+            } else if (lsn.getNotification().equals(
+                    LastStatusNotification.RESOLVED)) {
+                pipe.srem(LastStatusNotification.ALERT, key.toString());
+            }
+            pipe.sync();
+
         } catch (JedisConnectionException je) {
             connectionFailed(je);
         } finally {

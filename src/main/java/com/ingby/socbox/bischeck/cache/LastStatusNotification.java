@@ -40,6 +40,9 @@ public class LastStatusNotification implements Serializable, Cloneable {
     private String notification;
     private String incident_key;
     
+    public static final String RESOLVED = "resolved";
+    public static final String ALERT = "alert";
+    
 	public LastStatusNotification(final JSONObject serviceNotificationJson) {
 	    timestamp = serviceNotificationJson.getLong("timestamp");
         date = serviceNotificationJson.getString("date");
@@ -53,9 +56,9 @@ public class LastStatusNotification implements Serializable, Cloneable {
 		date = new Date(service.getLastCheckTime()).toString();
 		state = ((ServiceStateInf) service).getServiceState().getState().toString();
 		if (((ServiceStateInf) service).getServiceState().isResolved()) {
-	        notification = "resolved";
+	        notification = RESOLVED;
 	    } else {
-	        notification = "alert";
+	        notification = ALERT;
 	    }
 		incident_key = ((ServiceStateInf) service).getServiceState().getCurrentIncidentId();
 	
