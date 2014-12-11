@@ -129,10 +129,10 @@ public class LastStatus implements Serializable, Cloneable {
         JSONObject json = new JSONObject();
         json.put("timestamp", this.timestamp);
 
-        if (value == null) {
+        if (value == null || "null".equals(value)) {
             json.put("value", "null");
         } else {
-            json.put("value", this.value);
+            json.put("value", new Float(this.value));
         }
 
         if (threshold == null) {
