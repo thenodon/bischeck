@@ -526,6 +526,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
 
     private JSONObject string2Json(String redstr) {
         JSONObject json;
+        if (redstr == null) {
+            return null;
+        }
         try {
             json = (JSONObject) JSONSerializer.toJSON(redstr);
         } catch (ClassCastException ce) {
