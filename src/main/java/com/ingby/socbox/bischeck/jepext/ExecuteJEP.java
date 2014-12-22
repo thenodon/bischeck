@@ -78,6 +78,8 @@ public class ExecuteJEP {
                 new com.ingby.socbox.bischeck.jepext.Stddev());
         parser.addFunction("median",
                 new com.ingby.socbox.bischeck.jepext.Median());
+        parser.addFunction("avgMad",
+                new com.ingby.socbox.bischeck.jepext.AverageMad());
 
         // Add additional functions if available
         URL resourceUrl = ExecuteJEP.class.getClassLoader().getResource(

@@ -178,7 +178,13 @@ public class JEPExtTest {
 
             expr ="median(2, 3, 4, 5)";
             Assert.assertEquals(calc(expr),new Float(3.5));
-
+            
+            expr = "avgMad(25.33, 30.45, 22.43, 35.86, 30123.45, 50125.5)";
+            Assert.assertEquals(calc(expr),new Float(28.5175));
+            
+            expr = "avgMad(102, 104, 108, 160, 107, 60)";
+            Assert.assertEquals(calc(expr),new Float(105.25));
+            
         } else {
             System.out.println("Not Null in function tests");
             expr = "avg(null,null,null,4,2)";
@@ -265,6 +271,12 @@ public class JEPExtTest {
                     "multNull(avg(1.09064474E9, 1.07112954E9),0.5))";
             Assert.assertNull(calc(expr));
 
+
+            expr = "avgMad(25.33, 30.45, 22.43, 35.86, 30123.45, 50125.5)";
+            Assert.assertEquals(calc(expr),new Float(28.5175));
+            
+            expr = "avgMad(102, 104, 108, 160, 107, 60)";
+            Assert.assertEquals(calc(expr),new Float(105.25));
         }
 
     }
