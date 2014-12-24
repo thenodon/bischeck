@@ -202,7 +202,10 @@
     <xsd:element name="state">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element ref="maxsoft" minOccurs="1" maxOccurs="1" />
+                <!-- max number of times in soft before going to hard state -->
+                <xsd:element ref="maxsoft" minOccurs="0" maxOccurs="1" />
+                <!-- specify the purging of state and notfication in cache -->
+                <xsd:element ref="purge" minOccurs="0" maxOccurs="1" />
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
