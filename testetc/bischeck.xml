@@ -130,7 +130,12 @@
       <name>myShell</name>
       <schedule>10S</schedule>
       <url>shell://localhost</url>
-
+      <state>
+        <purge>
+          <offset>1</offset>
+          <period>D</period>
+        </purge>
+      </state>
       <serviceitem>
         <name>myShellItem</name>
         <execstatement>{"check":"echo Ok|time=10;;;;","label":"time"}</execstatement>
