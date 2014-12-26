@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.sf.json.JSONObject;
@@ -44,12 +43,14 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.MBeanManager;
 import com.ingby.socbox.bischeck.ObjectDefinitions;
+import com.ingby.socbox.bischeck.ServiceDef;
 import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.cache.CacheException;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CachePurgeInf;
 import com.ingby.socbox.bischeck.cache.CacheQueue;
 import com.ingby.socbox.bischeck.cache.CacheStateInf;
+import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.LastStatusNotification;
 import com.ingby.socbox.bischeck.cache.LastStatusState;
@@ -1390,21 +1391,57 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         incRedisCacheCount(1);
     }
 
-    @Override
-    public void trim(String key, Long maxSize) {
-        Jedis jedis = null;
-        try {
-            jedis = jedispool.getResource();
-            jedis.ltrim(key, 0, maxSize - 1);
-        } catch (JedisConnectionException je) {
-            connectionFailed(je);
-        } finally {
-            jedispool.returnResource(jedis);
-        }
-    }
+    //@Override
+//    public void trim(String key, Long maxSize) {
+//        Jedis jedis = null;
+//        try {
+//            jedis = jedispool.getResource();
+//            jedis.ltrim(key, 0, maxSize - 1);
+//        } catch (JedisConnectionException je) {
+//            connectionFailed(je);
+//        } finally {
+//            jedispool.returnResource(jedis);
+//        }
+//    }
+
 
     @Override
-    public void trimBatch(Map<String, Long> batch) {
+    public void purge(Map<String,String> dataSetsToPurge) {
+        Map<String, Long> trimMap = metricPurgeByTimeOrIndex(dataSetsToPurge);
+        purgeMetric(trimMap);
+    }
+    
+    private Map<String, Long> metricPurgeByTimeOrIndex(Map<String, String> purgeMap) {
+        Map<String, Long> trimMap = new HashMap<>();
+
+        for (String key : purgeMap.keySet()) {
+
+            LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
+
+            if (CacheUtil.isByTime(purgeMap.get(key))) {
+                // find the index of the time
+                ServiceDef servicedef = new ServiceDef(key);
+                Long index = getIndexByTime(
+                        servicedef.getHostName(),
+                        servicedef.getServiceName(),
+                        servicedef.getServiceItemName(),
+                        System.currentTimeMillis()
+                        + ((long) CacheUtil
+                                .calculateByTime(purgeMap
+                                        .get(key))) * 1000);
+                // if index is null there is no items in the cache older
+                // then the time offset
+                if (index != null) {
+                    trimMap.put(key, index);
+                }
+            } else {
+                trimMap.put(key, Long.valueOf(purgeMap.get(key)));
+            }
+        }
+        return trimMap;
+    }
+
+    private void purgeMetric(Map<String, Long> batch) {
         Jedis jedis = null;
         final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
                 "batchTrimTimer");

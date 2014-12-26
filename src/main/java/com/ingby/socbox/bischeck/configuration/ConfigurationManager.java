@@ -555,6 +555,19 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
                 service.setStateConfig(new StateConfig(state.getMaxsoft()
                         .intValue()));
             }
+            // Get the purge information for state and notifications
+            XMLPurge xmlPurge = state.getPurge();
+            if (xmlPurge != null) {
+            	setPurge(xmlPurge, "state/" + Util.fullHostServiceName(service));
+            	setPurge(xmlPurge, "notification/" + Util.fullHostServiceName(service));
+            } else {
+            	setPurge(null, "state/" + Util.fullHostServiceName(service));
+            	setPurge(null, "notification/" + Util.fullHostServiceName(service));
+            }
+        } else {
+        	// Set default purge if not defined
+        	setPurge(null, "state/" + Util.fullHostServiceName(service));
+        	setPurge(null, "notification/" + Util.fullHostServiceName(service));
         }
         return service;
     }
@@ -645,6 +658,21 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
                 service.setStateConfig(new StateConfig(state.getMaxsoft()
                         .intValue()));
             }
+            
+            // Get the purge information for state and notifications
+            XMLPurge xmlPurge = state.getPurge();
+            if (xmlPurge != null) {
+            	setPurge(xmlPurge, "state/" + Util.fullHostServiceName(service));
+            	setPurge(xmlPurge, "notification/" + Util.fullHostServiceName(service));
+            } else {
+            	setPurge(null, "state/" + Util.fullHostServiceName(service));
+            	setPurge(null, "notification/" + Util.fullHostServiceName(service));
+            }
+            
+        } else {
+        	// Set default purge if not defined
+        	setPurge(null, "state/" + Util.fullHostServiceName(service));
+        	setPurge(null, "notification/" + Util.fullHostServiceName(service));
         }
 
         return service;
@@ -905,6 +933,28 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
         }
     }
 
+    private void setPurge(XMLPurge xmlPurge, String key) {
+        
+        if (xmlPurge == null) {
+            // Set default
+            try {
+                purgeMap.put(key, String.valueOf(bischeckProperties
+                        .getProperty("lastStatusCacheSize", "500")));
+            } catch (NumberFormatException ne) {
+                purgeMap.put(key, String.valueOf("500"));
+            }
+        } else {
+            if (xmlPurge.getMaxcount() != null) {
+                purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
+            } else if (xmlPurge.getOffset() != null
+                    && xmlPurge.getPeriod() != null) {
+                purgeMap.put(key,
+                        "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
+            }
+        }
+    }
+
+    
     private void initServers() throws ConfigurationException {
         XMLServers serversconfig = (XMLServers) xmlFileMgr
                 .getXMLConfiguration(ConfigXMLInf.XMLCONFIG.SERVERS);

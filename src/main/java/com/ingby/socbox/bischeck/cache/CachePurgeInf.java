@@ -32,17 +32,11 @@ import java.util.Map;
 public interface CachePurgeInf {
     
     /**
-     * The method will trim the list of object in the cache
-     * @param key - the key of the type host-service-serviceitem
-     * @param maxSize - the max size of the list for the key
-     */
-    void trim(String key, Long maxSize);
-    
-    /**
-     * The method will purge all linked list specified in the
-     * batch map where the key is the redis key and the value 
+     * The method will purge specified data structures specified in the
+     * map where the key is the redis key and the value 
      * the size to purge to
      * @param batch
      */
-    void trimBatch(Map<String,Long> batch);
+    
+    void purge(Map<String,String> dataSetsToPurge);
 }
