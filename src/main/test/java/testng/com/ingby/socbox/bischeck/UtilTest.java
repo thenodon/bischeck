@@ -71,6 +71,7 @@ public class UtilTest {
         service.setHost(new Host("host"));
         ServiceItem serviceitem = new SQLServiceItem("serviceitem");
         Assert.assertEquals(Util.fullName(service, serviceitem),"host-service-serviceitem");
+        Assert.assertEquals(Util.fullHostServiceName(service),"host-service");
     }
 
     @Test (groups = { "Util" })

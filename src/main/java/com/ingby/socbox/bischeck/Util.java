@@ -156,6 +156,11 @@ public abstract class Util {
         return strbuf.toString();
     }
 
+    public static String fullHostServiceName(Service service) {
+        return new StringBuilder().append(service.getHost().getHostname())
+        		.append(ObjectDefinitions.getCacheKeySep())
+        		.append(service.getServiceName()).toString();
+    }
     /**
      * Create a host, service and service item name with - separator
      * 
