@@ -126,81 +126,11 @@ public class CachePurgeJob implements Job {
             LOGGER.info("CachePurge purging {}", purgeMap.size());
             CacheInf cache = CacheFactory.getInstance();
 
-            Map<String, Long> trimMap = new HashMap<>();
-
-            for (String key : purgeMap.keySet()) {
-                if (cache instanceof CachePurgeInf) {
-                    LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
-
-                    if (CacheUtil.isByTime(purgeMap.get(key))) {
-                        // find the index of the time
-                        ServiceDef servicedef = new ServiceDef(key);
-                        Long index = cache.getIndexByTime(
-                                servicedef.getHostName(),
-                                servicedef.getServiceName(),
-                                servicedef.getServiceItemName(),
-                                System.currentTimeMillis()
-                                        + ((long) CacheUtil
-                                                .calculateByTime(purgeMap
-                                                        .get(key))) * 1000);
-                        // if index is null there is no items in the cache older
-                        // then the time offset
-                        if (index != null) {
-                            trimMap.put(key, index);
-                        }
-                    } else {
-                        trimMap.put(key, Long.valueOf(purgeMap.get(key)));
-                    }
-                }
+            if (cache instanceof CachePurgeInf) {
+                
+                ((CachePurgeInf) cache).purge(purgeMap);
             }
-            ((CachePurgeInf) cache).trimBatch(trimMap);
 
-        } finally {
-            long duration = context.stop() / MetricsManager.TO_MILLI;
-            LOGGER.info("CachePurge executed in {} ms", duration);
-        }
-    }
-
-    // @Override
-    public void executeOLD(JobExecutionContext arg0)
-            throws JobExecutionException {
-
-        final Timer timer = MetricsManager.getTimer(CachePurgeJob.class,
-                "purgeTimer");
-        final Timer.Context context = timer.time();
-
-        try {
-            Map<String, String> purgeMap = ConfigurationManager.getInstance()
-                    .getPurgeMap();
-            LOGGER.info("CachePurge purging {}", purgeMap.size());
-            CacheInf cache = CacheFactory.getInstance();
-
-            for (String key : purgeMap.keySet()) {
-                if (cache instanceof CachePurgeInf) {
-                    LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
-
-                    if (CacheUtil.isByTime(purgeMap.get(key))) {
-                        // find the index of the time
-                        ServiceDef servicedef = new ServiceDef(key);
-                        Long index = cache.getIndexByTime(
-                                servicedef.getHostName(),
-                                servicedef.getServiceName(),
-                                servicedef.getServiceItemName(),
-                                System.currentTimeMillis()
-                                        + ((long) CacheUtil
-                                                .calculateByTime(purgeMap
-                                                        .get(key))) * 1000);
-                        // if index is null there is no items in the cache older
-                        // then the time offset
-                        if (index != null) {
-                            ((CachePurgeInf) cache).trim(key, index);
-                        }
-                    } else {
-                        ((CachePurgeInf) cache).trim(key,
-                                Long.valueOf(purgeMap.get(key)));
-                    }
-                }
-            }
         } finally {
             long duration = context.stop() / MetricsManager.TO_MILLI;
             LOGGER.info("CachePurge executed in {} ms", duration);
