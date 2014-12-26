@@ -293,7 +293,21 @@ public class ConfigurationManagerTest {
                 "host4-sshport/D/avg/weekend-response:7\n" +
                 "host4-sshport/H/avg/weekend-response:25\n" +
                 "host4-sshport/W/avg/weekend-response:5\n" +
-                "myhost-myShell-myShellItem:500\n";
+                "myhost-myShell-myShellItem:500\n" +
+                "notification/host0-ssh-port:500\n" + 
+                "notification/host1-PROPssh:500\n" +
+                "notification/host1-WEB:500\n" +
+                "notification/host2-sshport:500\n" +
+                "notification/host3-sshport:500\n" +
+                "notification/host4-sshport:500\n" +
+                "notification/myhost-myShell:-1D\n" +
+                "state/host0-ssh-port:500\n" +
+                "state/host1-PROPssh:500\n" +
+                "state/host1-WEB:500\n" +
+                "state/host2-sshport:500\n" +
+                "state/host3-sshport:500\n" +
+                "state/host4-sshport:500\n" +
+                "state/myhost-myShell:-1D\n";
 
         Assert.assertEquals(purgeConf, purgeConfExp);
     }
