@@ -1391,32 +1391,46 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         incRedisCacheCount(1);
     }
 
-    //@Override
-//    public void trim(String key, Long maxSize) {
-//        Jedis jedis = null;
-//        try {
-//            jedis = jedispool.getResource();
-//            jedis.ltrim(key, 0, maxSize - 1);
-//        } catch (JedisConnectionException je) {
-//            connectionFailed(je);
-//        } finally {
-//            jedispool.returnResource(jedis);
-//        }
-//    }
-
-
     @Override
     public void purge(Map<String,String> dataSetsToPurge) {
-        Map<String, Long> trimMap = metricPurgeByTimeOrIndex(dataSetsToPurge);
+        Map<String, String> metricMap = filterMetric(dataSetsToPurge);
+        LOGGER.debug("XPurge {} of metrics", metricMap.size());
+        Map<String, String> stateAndNotificationMap = filterStateAndNotification(dataSetsToPurge);
+        LOGGER.debug("XPurge {} of states and notifications", stateAndNotificationMap.size());
+        
+        Map<String, Long> trimMap = metricPurgeByTimeOrIndex(metricMap);
         purgeMetric(trimMap);
     }
     
+    private Map<String, String> filterMetric(Map<String, String> dataSetsToPurge) {
+        Map<String, String> filtered = new HashMap<>();
+        
+        for (String key : dataSetsToPurge.keySet()) {
+            if (!(key.matches("^state/.*") || key.matches("^notification/.*"))) {
+                filtered.put(key, dataSetsToPurge.get(key));
+            }
+        }
+        return filtered;
+    }
+
+    private Map<String, String> filterStateAndNotification(
+            Map<String, String> dataSetsToPurge) {
+        Map<String, String> filtered = new HashMap<>();
+        
+        for (String key : dataSetsToPurge.keySet()) {
+            if (key.matches("^state/.*") || key.matches("^notification/.*")) {
+                filtered.put(key, dataSetsToPurge.get(key));
+            }
+        }
+        return filtered;
+    }
+
     private Map<String, Long> metricPurgeByTimeOrIndex(Map<String, String> purgeMap) {
         Map<String, Long> trimMap = new HashMap<>();
 
         for (String key : purgeMap.keySet()) {
 
-            LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
+           LOGGER.debug("Purge metric key {}:{}", key, purgeMap.get(key));
 
             if (CacheUtil.isByTime(purgeMap.get(key))) {
                 // find the index of the time
@@ -1470,9 +1484,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         String serviceHost = Util.fullQoutedHostServiceName(service);
         key.append("state/")
         .append(serviceHost);
-//        .append(service.getHost().getHostname())
-//        .append(ObjectDefinitions.getCacheKeySep())
-//        .append(service.getServiceName());
 
         // Do not save aggregations
         if (key.toString().matches(".*/[H:D:W:M]/.*")) {
@@ -1480,7 +1491,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
             return;
         }
 
-        // Long score = null;
         Jedis jedis = null;
         final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
                 "stateWriteTimer");
@@ -1504,7 +1514,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
             }
 
             pipe.sync();
-            //
 
         } catch (JedisConnectionException je) {
             connectionFailed(je);
@@ -1512,7 +1521,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
             context.stop();
             jedispool.returnResource(jedis);
         }
-        // return score;
     }
 
     @Override
@@ -1522,9 +1530,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         
         key.append("notification/")
         .append(serviceHost);
-//        .append(service.getHost().getHostname())
-//        .append(ObjectDefinitions.getCacheKeySep())
-//        .append(service.getServiceName());
 
         Jedis jedis = null;
         final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
