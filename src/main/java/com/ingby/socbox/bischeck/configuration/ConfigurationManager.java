@@ -619,6 +619,30 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
         } else {
             service.setSendServiceData(true);
         }
+        
+        if (template.getState() != null) {
+            XMLState state = template.getState();
+            if (state.getMaxsoft() != null) {
+                service.setStateConfig(new StateConfig(state.getMaxsoft()
+                        .intValue()));
+            }
+            
+            // Get the purge information for state and notifications
+            XMLPurge xmlPurge = state.getPurge();
+            if (xmlPurge != null) {
+                setPurge(xmlPurge, "state/" + Util.fullHostServiceName(service));
+                setPurge(xmlPurge, "notification/" + Util.fullHostServiceName(service));
+            } else {
+                setPurge(null, "state/" + Util.fullHostServiceName(service));
+                setPurge(null, "notification/" + Util.fullHostServiceName(service));
+            }
+            
+        } else {
+            // Set default purge if not defined
+            setPurge(null, "state/" + Util.fullHostServiceName(service));
+            setPurge(null, "notification/" + Util.fullHostServiceName(service));
+        }
+
         // Override with template properties
         if (serviceconfig.getServiceoverride() != null) {
 
@@ -652,29 +676,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
             }
         }
 
-        if (serviceconfig.getState() != null) {
-            XMLState state = serviceconfig.getState();
-            if (state.getMaxsoft() != null) {
-                service.setStateConfig(new StateConfig(state.getMaxsoft()
-                        .intValue()));
-            }
-            
-            // Get the purge information for state and notifications
-            XMLPurge xmlPurge = state.getPurge();
-            if (xmlPurge != null) {
-            	setPurge(xmlPurge, "state/" + Util.fullHostServiceName(service));
-            	setPurge(xmlPurge, "notification/" + Util.fullHostServiceName(service));
-            } else {
-            	setPurge(null, "state/" + Util.fullHostServiceName(service));
-            	setPurge(null, "notification/" + Util.fullHostServiceName(service));
-            }
-            
-        } else {
-        	// Set default purge if not defined
-        	setPurge(null, "state/" + Util.fullHostServiceName(service));
-        	setPurge(null, "notification/" + Util.fullHostServiceName(service));
-        }
-
+        
         return service;
     }
 
