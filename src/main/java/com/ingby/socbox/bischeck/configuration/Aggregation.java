@@ -347,7 +347,14 @@ public class Aggregation {
 
     private void setRetention(AGGREGATION period, XMLAggregate aggregated,
             Service service, ServiceItem serviceItem) {
+        
+        //Init default
+        
+        retentionMap.put(Util.fullName(service, serviceItem),
+                period.minRetention());
+        
         // Calculate the retention if it exists
+        
         for (XMLRetention retention : aggregated.getRetention()) {
             if (retention.getPeriod().equals(period.prefix())) {
 

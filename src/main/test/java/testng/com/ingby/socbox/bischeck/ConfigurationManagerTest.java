@@ -268,14 +268,17 @@ public class ConfigurationManagerTest {
         String purgeConfExp = "host0-ssh-port-response:5000\n" +
                 "host0-ssh-port/D/avg/weekend-response:7\n" +
                 "host0-ssh-port/H/avg/weekend-response:25\n" +
+                "host0-ssh-port/M/avg/weekend-response:1\n" +
                 "host0-ssh-port/W/avg/weekend-response:5\n" +
                 "host1-PROPssh-response:5000\n" +
                 "host1-PROPssh/D/avg/weekend-response:7\n" +
                 "host1-PROPssh/H/avg/weekend-response:25\n" +
+                "host1-PROPssh/M/avg/weekend-response:1\n" +
                 "host1-PROPssh/W/avg/weekend-response:5\n" +
                 "host1-WEB-response:5000\n" +
                 "host1-WEB/D/max/weekend-response:60\n" +
                 "host1-WEB/H/max/weekend-response:168\n" +
+                "host1-WEB/M/max/weekend-response:1\n" +
                 "host1-WEB/W/max/weekend-response:52\n" +
                 "host2-sshport-RESPONSE:5000\n" +
                 "host2-sshport-response:5000\n" +
@@ -283,15 +286,19 @@ public class ConfigurationManagerTest {
                 "host2-sshport/D/avg/weekend-response:7\n" +
                 "host2-sshport/H/avg/weekend-RESPONSE:25\n" +
                 "host2-sshport/H/avg/weekend-response:25\n" +
+                "host2-sshport/M/avg/weekend-RESPONSE:1\n" + 
+                "host2-sshport/M/avg/weekend-response:1\n" +
                 "host2-sshport/W/avg/weekend-RESPONSE:5\n" +
                 "host2-sshport/W/avg/weekend-response:5\n" +
                 "host3-sshport-response:5000\n" +
                 "host3-sshport/D/avg/weekend-response:7\n" +
                 "host3-sshport/H/avg/weekend-response:25\n" +
+                "host3-sshport/M/avg/weekend-response:1\n" +
                 "host3-sshport/W/avg/weekend-response:5\n" +
                 "host4-sshport-response:5000\n" +
                 "host4-sshport/D/avg/weekend-response:7\n" +
                 "host4-sshport/H/avg/weekend-response:25\n" +
+                "host4-sshport/M/avg/weekend-response:1\n" +
                 "host4-sshport/W/avg/weekend-response:5\n" +
                 "myhost-myShell-myShellItem:500\n" +
                 "notification/host0-ssh-port:500\n" + 
