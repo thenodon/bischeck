@@ -1394,14 +1394,17 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     @Override
     public void purge(Map<String,String> dataSetsToPurge) {
         Map<String, String> metricMap = filterMetric(dataSetsToPurge);
-        LOGGER.debug("XPurge {} of metrics", metricMap.size());
         Map<String, String> stateAndNotificationMap = filterStateAndNotification(dataSetsToPurge);
-        LOGGER.debug("XPurge {} of states and notifications", stateAndNotificationMap.size());
         
         Map<String, Long> trimMap = metricPurgeByTimeOrIndex(metricMap);
         purgeMetric(trimMap);
+        
+            
+        purgeStateAndNotification(stateAndNotificationMap);
     }
     
+    
+
     private Map<String, String> filterMetric(Map<String, String> dataSetsToPurge) {
         Map<String, String> filtered = new HashMap<>();
         
@@ -1477,6 +1480,79 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         }
     }
 
+
+
+    private void purgeStateAndNotification(
+            Map<String, String> batch) {
+        Map<String, Long> trimMapTime = new HashMap<>();
+        Map<String, Long> trimMapIndex = new HashMap<>();
+
+        for (String key : batch.keySet()) {
+
+            LOGGER.debug("Purge state or notifiction key {}:{}", key, batch.get(key));
+     
+            if (CacheUtil.isByTime(batch.get(key))) {
+                LOGGER.debug("Purge by time {}", CacheUtil.calculateByTime(batch.get(key)));
+                long thresholdTime = System.currentTimeMillis() + CacheUtil.calculateByTime(batch.get(key)) * 1000;
+                trimMapTime.put(key, thresholdTime);
+                
+                    
+            } else {
+                Long size = getSizeStateAndNotification(key);
+                
+                if (size > Long.valueOf(batch.get(key))) {
+                    long thresholdIndex = size - Long.valueOf(batch.get(key)) - 1;
+                    if (thresholdIndex > 0) {
+                        trimMapIndex.put(key, thresholdIndex);
+                    }
+                }
+            }
+        } 
+        
+        // Purge loops
+        purgeBatchStateAndNotification(trimMapTime, trimMapIndex);
+    }
+
+    private Long getSizeStateAndNotification(String key) {
+        Jedis jedis = null;    
+        Long size = null;
+        try {
+            jedis = jedispool.getResource();
+            size = jedis.zcard(key);
+        } catch (JedisConnectionException je) {
+            connectionFailed(je);
+        } finally {
+            jedispool.returnResource(jedis);
+        }
+        return size;
+    }
+
+    
+    private void purgeBatchStateAndNotification(Map<String, Long> trimMapTime,
+            Map<String, Long> trimMapIndex) {
+        Jedis jedis = null;    
+        
+        try {
+            jedis = jedispool.getResource();
+            Pipeline pipeline = jedis.pipelined();
+            
+            for (String key : trimMapTime.keySet()) {
+                pipeline.zremrangeByScore(key, 0, trimMapTime.get(key));
+            }
+            
+            for (String key : trimMapIndex.keySet()) {
+                pipeline.zremrangeByRank(key, 0, trimMapIndex.get(key));
+            }
+            
+            pipeline.sync();
+            
+        } catch (JedisConnectionException je) {
+            connectionFailed(je);
+        } finally {
+            jedispool.returnResource(jedis);
+        }
+    }
+    
     @Override
     public void addState(Service service) {
 
