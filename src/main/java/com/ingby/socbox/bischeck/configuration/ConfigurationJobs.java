@@ -11,7 +11,7 @@ public class ConfigurationJobs {
         
     }
     
-    public static void initScheduler() throws SchedulerException {
+    public static void initAdminJobs() throws SchedulerException {
         CachePurgeJob.init(ConfigurationManager.getInstance().getProperties());
         adminJobsCount++;
         ThresholdCacheClearJob.init(ConfigurationManager.getInstance().getProperties());

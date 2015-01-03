@@ -450,7 +450,7 @@ public final class Execute implements ExecuteMBean {
         try {
             sched  = initScheduler();
             initTriggers(sched);
-            ConfigurationJobs.initScheduler();
+            ConfigurationJobs.initAdminJobs();
         } catch (SchedulerException e) {
             LOGGER.error("Scheduler init failed", e);
             return false;
