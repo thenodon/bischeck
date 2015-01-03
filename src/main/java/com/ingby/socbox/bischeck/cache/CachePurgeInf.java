@@ -21,6 +21,8 @@ package com.ingby.socbox.bischeck.cache;
 
 import java.util.Map;
 
+import com.ingby.socbox.bischeck.configuration.PurgeDefinition;
+
 
 
 
@@ -38,5 +40,5 @@ public interface CachePurgeInf {
      * @param batch
      */
     
-    void purge(Map<String,String> dataSetsToPurge);
+    void purge(Map<String, PurgeDefinition> purgeMap);
 }

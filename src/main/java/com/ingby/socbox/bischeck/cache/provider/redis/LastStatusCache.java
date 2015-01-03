@@ -21,6 +21,7 @@ package com.ingby.socbox.bischeck.cache.provider.redis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,6 +56,7 @@ import com.ingby.socbox.bischeck.cache.LastStatus;
 import com.ingby.socbox.bischeck.cache.LastStatusNotification;
 import com.ingby.socbox.bischeck.cache.LastStatusState;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
+import com.ingby.socbox.bischeck.configuration.PurgeDefinition;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.Service;
@@ -257,11 +259,11 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     }
 
     /*
-     * **********************************************
-     * **********************************************
+     * ***********************************************************************
+     * ***********************************************************************
      * Public methods 
-     * **********************************************
-     * **********************************************
+     * ***********************************************************************
+     * ***********************************************************************
      */
 
     public void disableFastCache() {
@@ -283,7 +285,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
 
         try {
             jedis = jedispool.getResource();
-            
+
             Set<String> keys = jedis.keys(pattern);
 
             for (String key : keys) {
@@ -333,62 +335,54 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     private void warmUpFastCache() {
         Map<String, Host> hostsmap = ConfigurationManager.getInstance()
                 .getHostConfig();
-//        Jedis jedis = null;
-//        try {
-//            jedis = jedispool.getResource();
+        
+        for (Map.Entry<String, Host> hostentry : hostsmap.entrySet()) {
+            Host host = hostentry.getValue();
 
-            for (Map.Entry<String, Host> hostentry : hostsmap.entrySet()) {
-                Host host = hostentry.getValue();
+            for (Map.Entry<String, Service> serviceentry : host.getServices()
+                    .entrySet()) {
+                Service service = serviceentry.getValue();
 
-                for (Map.Entry<String, Service> serviceentry : host
-                        .getServices().entrySet()) {
-                    Service service = serviceentry.getValue();
+                for (Map.Entry<String, ServiceItem> serviceItemEntry : service
+                        .getServicesItems().entrySet()) {
+                    ServiceItem serviceitem = serviceItemEntry.getValue();
+                    String key = Util.fullName(host.getHostname(),
+                            service.getServiceName(),
+                            serviceitem.getServiceItemName());
+                    List<LastStatus> lslist = (ArrayList<LastStatus>) getLastStatusListByIndex(
+                            host.getHostname(), service.getServiceName(),
+                            serviceitem.getServiceItemName(), 0L,
+                            fastCacheSize - 1);
+                    CacheQueue<LastStatus> fifo = new CacheQueue<LastStatus>(
+                            fastCacheSize);
 
-                    for (Map.Entry<String, ServiceItem> serviceItemEntry : service
-                            .getServicesItems().entrySet()) {
-                        ServiceItem serviceitem = serviceItemEntry.getValue();
-                        String key = Util.fullName(host.getHostname(),
-                                service.getServiceName(),
-                                serviceitem.getServiceItemName());
-                        List<LastStatus> lslist = (ArrayList<LastStatus>) getLastStatusListByIndex(
-                                host.getHostname(), service.getServiceName(),
-                                serviceitem.getServiceItemName(), 0L,
-                                fastCacheSize - 1);
-                        CacheQueue<LastStatus> fifo = new CacheQueue<LastStatus>(
-                                fastCacheSize);
-
-                        if (!lslist.isEmpty()) {
-                            int count = 0;
-                            for (int i = lslist.size() - 1; i >= 0; i--) {
-                                LastStatus ls = lslist.get(i);
-                                fifo.addLast(ls);
-                                count++;
-                            }
-                            fastCache.put(key, fifo);
-                            LOGGER.info("Fast cache warmup {}:{}", key, count);
+                    if (!lslist.isEmpty()) {
+                        int count = 0;
+                        for (int i = lslist.size() - 1; i >= 0; i--) {
+                            LastStatus ls = lslist.get(i);
+                            fifo.addLast(ls);
+                            count++;
                         }
+                        fastCache.put(key, fifo);
+                        LOGGER.info("Fast cache warmup {}:{}", key, count);
                     }
                 }
             }
-//        } catch (JedisConnectionException je) {
-//            connectionFailed(je);
-//        } finally {
-//            jedispool.returnResource(jedis);
-//        }
+        }
     }
 
     /*
-     * **********************************************
-     * **********************************************
-     * Implement CacheInf
-     * **********************************************
-     * **********************************************
+     * ***********************************************************************
+     * ***********************************************************************
+     * Implement CacheInf 
+     * ***********************************************************************
+     * ***********************************************************************
      */
 
     /*
-     * **********************************************
-     * Add methods
-     * **********************************************
+     * ***********************************************************************
+     * Add methods 
+     * ***********************************************************************
      */
 
     @Override
@@ -444,9 +438,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     }
 
     /*
-     * **********************************************
+     * ***********************************************************************
      * Get data methods - LastStatus
-     * **********************************************
+     * ***********************************************************************
      */
 
     @Override
@@ -596,7 +590,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
             }
 
             return lslist;
-
         }
 
         Jedis jedis = null;
@@ -638,9 +631,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     }
 
     /*
-     * **********************************************
-     * Get data methods - String
-     * **********************************************
+     * ***********************************************************************
+     * Get data methods - String 
+     * ***********************************************************************
      */
 
     @Override
@@ -736,9 +729,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     }
 
     /*
-     * **********************************************
-     * Position and size methods
-     * **********************************************
+     * ***********************************************************************
+     * Position and size methods 
+     * ***********************************************************************
      */
     @Override
     public Long size(String hostName, String serviceName, String serviceItemName) {
@@ -811,9 +804,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     }
 
     /*
-     * **********************************************
+     * ***********************************************************************
      * Clear methods
-     * **********************************************
+     * ***********************************************************************
      */
     @Override
     public void clear() {
@@ -845,16 +838,31 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         }
     }
 
-    private void connectionFailed(JedisConnectionException je) {
-        LOGGER.error("Redis connection failed, {}", je.getMessage(), je);
+    @Override
+    public void purge(Map<String, PurgeDefinition> dataSetsToPurge) {
+        final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
+                "purge");
+        final Timer.Context context = timer.time();
+
+        // TODO the two filter methods are now 50 of the total time
+        Map<String, String> metricMap = filterMetric(dataSetsToPurge);
+        Map<String, String> stateAndNotificationMap = filterStateAndNotification(dataSetsToPurge);
+
+        Map<String, Long> trimMap = metricPurgeByTimeOrIndex(metricMap);
+        purgeMetric(trimMap);
+
+        purgeStateAndNotification(stateAndNotificationMap);
+        context.stop();
     }
 
+    
+
     /*
-     * **********************************************
-     * **********************************************
-     * Implement LastStatusMBean
-     * **********************************************
-     * **********************************************
+     * ************************************************************************
+     * ************************************************************************
+     * Implement LastStatusMBean 
+     * ************************************************************************
+     * ************************************************************************
      */
 
     /*
@@ -934,13 +942,17 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     }
 
     /*
-     * **********************************************
-     * **********************************************
+     * ************************************************************************
+     * ************************************************************************
      * Private methods
-     * **********************************************
-     * **********************************************
+     * ************************************************************************
+     * ************************************************************************
      */
 
+    private void connectionFailed(JedisConnectionException je) {
+        LOGGER.error("Redis connection failed, {}", je.getMessage(), je);
+    }
+    
     private void deleteAllMetaData(Jedis jedis) {
         Set<String> runtimeEntries = jedis.keys("config/*");
         for (String entry : runtimeEntries) {
@@ -978,7 +990,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                 checkNull(serviceItem.getClassName()));
         pipe.hset(key, "serviceItemThresholdClass",
                 checkNull(serviceItem.getThresholdClassName()));
-        
+
         pipe.sync();
     }
 
@@ -990,7 +1002,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     }
 
     private void testConnection() {
-        jedispool.getResource();
+        Jedis jedis = jedispool.getResource();
+        jedispool.returnResource(jedis);
     }
 
     /**
@@ -1104,9 +1117,9 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
      *         found.
      */
     private Long nearestByIndexSlow(long time, String key) {
-        // Search the redis cache
-
+       
         Jedis jedis = null;
+
         try {
             jedis = jedispool.getResource();
             if (time > new LastStatus(string2Json(jedis.lindex(key, 0L)))
@@ -1141,7 +1154,6 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                         return mid;
                     } else {
                         return mid + 1;
-
                     }
                 }
 
@@ -1177,10 +1189,10 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                             countSearchDepth);
                     if (Math.abs(lastMid.getTimestamp() - time) < Math
                             .abs(lastMid1.getTimestamp() - time)) {
+                        
                         return mid;
                     } else {
                         return mid + 1;
-
                     }
                 }
 
@@ -1206,7 +1218,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     }
 
     /**
-     * Search for the data in the fast cache that is closest to the time
+     * Search for the data in the slow cache that is closest to the time
      * parameter
      * 
      * @param time
@@ -1391,49 +1403,46 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         incRedisCacheCount(1);
     }
 
-    @Override
-    public void purge(Map<String,String> dataSetsToPurge) {
-        Map<String, String> metricMap = filterMetric(dataSetsToPurge);
-        Map<String, String> stateAndNotificationMap = filterStateAndNotification(dataSetsToPurge);
-        
-        Map<String, Long> trimMap = metricPurgeByTimeOrIndex(metricMap);
-        purgeMetric(trimMap);
-        
-            
-        purgeStateAndNotification(stateAndNotificationMap);
-    }
-    
-    
 
-    private Map<String, String> filterMetric(Map<String, String> dataSetsToPurge) {
+    private Map<String, String> filterMetric(
+            Map<String, PurgeDefinition> dataSetsToPurge) {
         Map<String, String> filtered = new HashMap<>();
-        
+
         for (String key : dataSetsToPurge.keySet()) {
-            if (!(key.matches("^state/.*") || key.matches("^notification/.*"))) {
-                filtered.put(key, dataSetsToPurge.get(key));
+            if (dataSetsToPurge.get(key).getType()
+                    .equals(PurgeDefinition.TYPE.METRIC)) {
+                filtered.put(key, dataSetsToPurge.get(key).getPurgeDefinition());
             }
         }
         return filtered;
     }
 
     private Map<String, String> filterStateAndNotification(
-            Map<String, String> dataSetsToPurge) {
+            Map<String, PurgeDefinition> dataSetsToPurge) {
+
         Map<String, String> filtered = new HashMap<>();
-        
         for (String key : dataSetsToPurge.keySet()) {
-            if (key.matches("^state/.*") || key.matches("^notification/.*")) {
-                filtered.put(key, dataSetsToPurge.get(key));
+            if (dataSetsToPurge.get(key).getType()
+                    .equals(PurgeDefinition.TYPE.STATE)
+                    || dataSetsToPurge.get(key).getType()
+                            .equals(PurgeDefinition.TYPE.NOTIFICATION)) {
+                filtered.put(key, dataSetsToPurge.get(key).getPurgeDefinition());
             }
         }
         return filtered;
     }
 
-    private Map<String, Long> metricPurgeByTimeOrIndex(Map<String, String> purgeMap) {
+    private Map<String, Long> metricPurgeByTimeOrIndex(
+            Map<String, String> purgeMap) {
         Map<String, Long> trimMap = new HashMap<>();
+
+        final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
+                "metricPurgeByTimeOrIndex");
+        final Timer.Context context = timer.time();
 
         for (String key : purgeMap.keySet()) {
 
-           LOGGER.debug("Purge metric key {}:{}", key, purgeMap.get(key));
+            LOGGER.debug("Purge metric key {}:{}", key, purgeMap.get(key));
 
             if (CacheUtil.isByTime(purgeMap.get(key))) {
                 // find the index of the time
@@ -1443,8 +1452,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                         servicedef.getServiceName(),
                         servicedef.getServiceItemName(),
                         System.currentTimeMillis()
-                        + ((long) CacheUtil
-                                .calculateByTime(purgeMap
+                                + ((long) CacheUtil.calculateByTime(purgeMap
                                         .get(key))) * 1000);
                 // if index is null there is no items in the cache older
                 // then the time offset
@@ -1455,13 +1463,14 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
                 trimMap.put(key, Long.valueOf(purgeMap.get(key)));
             }
         }
+        context.stop();
         return trimMap;
     }
 
     private void purgeMetric(Map<String, Long> batch) {
         Jedis jedis = null;
         final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
-                "batchTrimTimer");
+                "purgeMetricTimer");
         final Timer.Context context = timer.time();
         try {
             jedis = jedispool.getResource();
@@ -1480,86 +1489,107 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
         }
     }
 
-
-
-    private void purgeStateAndNotification(
-            Map<String, String> batch) {
+    private void purgeStateAndNotification(Map<String, String> batch) {
         Map<String, Long> trimMapTime = new HashMap<>();
         Map<String, Long> trimMapIndex = new HashMap<>();
+        Set<String> keyByIndex = new HashSet<>();
+
+        final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
+                "searchStateNotificationTimer");
+        final Timer.Context context = timer.time();
 
         for (String key : batch.keySet()) {
 
-            LOGGER.debug("Purge state or notifiction key {}:{}", key, batch.get(key));
-     
+            LOGGER.debug("Purge state or notifiction key {}:{}", key,
+                    batch.get(key));
+
             if (CacheUtil.isByTime(batch.get(key))) {
-                LOGGER.debug("Purge by time {}", CacheUtil.calculateByTime(batch.get(key)));
-                long thresholdTime = System.currentTimeMillis() + CacheUtil.calculateByTime(batch.get(key)) * 1000;
+                LOGGER.debug("Purge by time {}",
+                        CacheUtil.calculateByTime(batch.get(key)));
+                long thresholdTime = System.currentTimeMillis()
+                        + CacheUtil.calculateByTime(batch.get(key)) * 1000;
                 trimMapTime.put(key, thresholdTime);
-                
-                    
             } else {
-                Long size = getSizeStateAndNotification(key);
-                
-                if (size > Long.valueOf(batch.get(key))) {
-                    long thresholdIndex = size - Long.valueOf(batch.get(key)) - 1;
-                    if (thresholdIndex > 0) {
-                        trimMapIndex.put(key, thresholdIndex);
-                    }
+                keyByIndex.add(key);
+            }
+        }
+
+        List<Object> sizeByKey = getSizeStateAndNotification(keyByIndex);
+
+        int listCount = 0;
+        for (String key : keyByIndex) {
+
+            if ((Long) sizeByKey.get(listCount) > Long.valueOf(batch.get(key))) {
+                long thresholdIndex = (Long) sizeByKey.get(listCount)
+                        - Long.valueOf(batch.get(key)) - 1;
+
+                if (thresholdIndex > 0) {
+                    trimMapIndex.put(key, thresholdIndex);
                 }
             }
-        } 
-        
+            listCount++;
+        }
+
+        context.stop();
+
         // Purge loops
         purgeBatchStateAndNotification(trimMapTime, trimMapIndex);
     }
 
-    private Long getSizeStateAndNotification(String key) {
-        Jedis jedis = null;    
-        Long size = null;
-        try {
-            jedis = jedispool.getResource();
-            size = jedis.zcard(key);
-        } catch (JedisConnectionException je) {
-            connectionFailed(je);
-        } finally {
-            jedispool.returnResource(jedis);
-        }
-        return size;
-    }
-
-    
-    private void purgeBatchStateAndNotification(Map<String, Long> trimMapTime,
-            Map<String, Long> trimMapIndex) {
-        Jedis jedis = null;    
-        
+    private List<Object> getSizeStateAndNotification(Set<String> keys) {
+        Jedis jedis = null;
+        List<Object> sizeList = null;
         try {
             jedis = jedispool.getResource();
             Pipeline pipeline = jedis.pipelined();
-            
-            for (String key : trimMapTime.keySet()) {
-                pipeline.zremrangeByScore(key, 0, trimMapTime.get(key));
+            for (String key : keys) {
+                pipeline.zcard(key);
             }
-            
-            for (String key : trimMapIndex.keySet()) {
-                pipeline.zremrangeByRank(key, 0, trimMapIndex.get(key));
-            }
-            
-            pipeline.sync();
-            
+            sizeList = pipeline.syncAndReturnAll();
+
         } catch (JedisConnectionException je) {
             connectionFailed(je);
         } finally {
             jedispool.returnResource(jedis);
         }
+        return sizeList;
     }
-    
+
+    private void purgeBatchStateAndNotification(Map<String, Long> trimMapTime,
+            Map<String, Long> trimMapIndex) {
+        Jedis jedis = null;
+        final Timer timer = MetricsManager.getTimer(LastStatusCache.class,
+                "purgeStateNotificationTimer");
+        final Timer.Context context = timer.time();
+
+        try {
+            jedis = jedispool.getResource();
+            Pipeline pipeline = jedis.pipelined();
+
+            for (String key : trimMapTime.keySet()) {
+                pipeline.zremrangeByScore(key, 0, trimMapTime.get(key));
+            }
+
+            for (String key : trimMapIndex.keySet()) {
+                pipeline.zremrangeByRank(key, 0, trimMapIndex.get(key));
+            }
+
+            pipeline.sync();
+
+        } catch (JedisConnectionException je) {
+            connectionFailed(je);
+        } finally {
+            context.stop();
+            jedispool.returnResource(jedis);
+        }
+    }
+
     @Override
     public void addState(Service service) {
 
         StringBuilder key = new StringBuilder();
         String serviceHost = Util.fullQoutedHostServiceName(service);
-        key.append("state/")
-        .append(serviceHost);
+        key.append("state/").append(serviceHost);
 
         // Do not save aggregations
         if (key.toString().matches(".*/[H:D:W:M]/.*")) {
@@ -1582,7 +1612,7 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
             pipe.zadd(key.toString(), (double) service.getLastCheckTime(),
                     lss.toJsonString());
             // Update the state if changed or check if the current is a member
-            if (!lss.getState().equals(lss.getPreviousState())) { 
+            if (!lss.getState().equals(lss.getPreviousState())) {
                 pipe.sadd(lss.getState(), serviceHost);
                 pipe.srem(lss.getPreviousState(), serviceHost);
             } else if (!jedis.sismember(lss.getState(), serviceHost)) {
@@ -1603,9 +1633,8 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf,
     public void addNotification(Service service) {
         StringBuilder key = new StringBuilder();
         String serviceHost = Util.fullQoutedHostServiceName(service);
-        
-        key.append("notification/")
-        .append(serviceHost);
+
+        key.append("notification/").append(serviceHost);
 
         Jedis jedis = null;
         final Timer timer = MetricsManager.getTimer(LastStatusCache.class,

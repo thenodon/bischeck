@@ -96,8 +96,6 @@ public class InternalSurveillance implements Job {
 
             Date ft = sched.scheduleJob(job, trigger);
 
-            sched.addJob(job, true);
-
             LOGGER.info(
                     "{} has been scheduled to run at: {} and repeat based on expression: {}",
                     job.getDescription(), ft, trigger.getCronExpression());

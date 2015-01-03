@@ -211,7 +211,7 @@ public class Aggregation {
     private XMLCache xmlconfig;
     private Service baseService;
     private ServiceItem baseServiceitem;
-    private Map<String, String> retentionMap = new HashMap<String, String>();
+    private Map<String, PurgeDefinition> retentionMap = new HashMap<>();
 
     /**
      * Create an Aggregation object for a specific {@link ServiceItem} and link
@@ -261,10 +261,11 @@ public class Aggregation {
      *             if the Service used for aggregations can not be found
      * @throws ServiceItemFactoryException
      *             if the ServiceItem used for aggregations can not be found
+     * @throws ConfigurationException 
      * 
      */
     void setAggregate(Properties urlPropeties) throws ServiceFactoryException,
-            ServiceItemFactoryException {
+            ServiceItemFactoryException, ConfigurationException {
         if (xmlconfig == null) {
             return;
         }
@@ -346,24 +347,29 @@ public class Aggregation {
     }
 
     private void setRetention(AGGREGATION period, XMLAggregate aggregated,
-            Service service, ServiceItem serviceItem) {
+            Service service, ServiceItem serviceItem) throws ConfigurationException {
         
         //Init default
         
         retentionMap.put(Util.fullName(service, serviceItem),
-                period.minRetention());
-        
+                new PurgeDefinition(Util.fullName(service, serviceItem),
+                        PurgeDefinition.TYPE.METRIC, period.minRetention()));
+
         // Calculate the retention if it exists
         
         for (XMLRetention retention : aggregated.getRetention()) {
             if (retention.getPeriod().equals(period.prefix())) {
 
                 if (retention.getOffset() >= new Integer(period.minRetention())) {
-                    retentionMap.put(Util.fullName(service, serviceItem),
-                            String.valueOf(retention.getOffset()));
+                    retentionMap.put(
+                            Util.fullName(service, serviceItem),
+                            new PurgeDefinition(Util.fullName(service,
+                                    serviceItem), PurgeDefinition.TYPE.METRIC,
+                                    String.valueOf(retention.getOffset())));
                 } else {
-                    retentionMap.put(Util.fullName(service, serviceItem),
-                            period.minRetention());
+                    retentionMap.put(Util.fullName(service, serviceItem), new PurgeDefinition(Util.fullName(service, serviceItem),
+                            PurgeDefinition.TYPE.METRIC,
+                            period.minRetention()));
                 }
 
             }
@@ -375,7 +381,7 @@ public class Aggregation {
      * 
      * @return
      */
-    Map<String, String> getRetentionMap() {
+    Map<String, PurgeDefinition> getRetentionMap() {
         return retentionMap;
     }
 

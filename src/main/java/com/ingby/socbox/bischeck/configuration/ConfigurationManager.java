@@ -128,7 +128,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
     private Map<String, XMLServiceitemtemplate> serviceItemTemplateMap = null;
     private Map<String, XMLCachetemplate> cacheTemplateMap = null;
 
-    private Map<String, String> purgeMap = null;
+    private Map<String, PurgeDefinition> purgeMap = null;
 
     private int adminJobsCount = 0;
 
@@ -198,7 +198,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
         serviceTemplateMap = new HashMap<String, XMLServicetemplate>();
         serviceItemTemplateMap = new HashMap<String, XMLServiceitemtemplate>();
         cacheTemplateMap = new HashMap<String, XMLCachetemplate>();
-        purgeMap = new HashMap<String, String>();
+        purgeMap = new HashMap<String, PurgeDefinition>();
     }
 
     /**
@@ -529,9 +529,10 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
      *            the XML configuration for the service
      * @return
      * @throws ServiceFactoryException
+     * @throws ConfigurationException 
      */
     private Service createServiceByClassic(Host host, XMLService serviceconfig)
-            throws ServiceFactoryException {
+            throws ServiceFactoryException, ConfigurationException {
         Service service;
         service = ServiceFactory.createService(serviceconfig.getName(),
                 serviceconfig.getUrl().trim(), url2service, bischeckProperties);
@@ -581,10 +582,11 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
      *            the XML configuration for the service
      * @return
      * @throws ServiceFactoryException
+     * @throws ConfigurationException 
      */
 
     private Service createServiceByTemplate(Host host, XMLService serviceconfig)
-            throws ServiceFactoryException {
+            throws ServiceFactoryException, ConfigurationException {
         Service service;
         XMLServicetemplate template = serviceTemplateMap.get(serviceconfig
                 .getTemplate());
@@ -681,7 +683,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
     }
 
     private void setupServiceItem(XMLService serviceconfig, Service service)
-            throws ServiceItemFactoryException, ServiceFactoryException {
+            throws ServiceItemFactoryException, ServiceFactoryException, ConfigurationException {
 
         Iterator<XMLServiceitem> iterserviceitem = null;
 
@@ -727,7 +729,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
 
     private ServiceItem ceateServiceitemByClassic(Service service,
             XMLServiceitem serviceitemconfig)
-            throws ServiceItemFactoryException, ServiceFactoryException {
+            throws ServiceItemFactoryException, ServiceFactoryException, ConfigurationException {
         ServiceItem serviceitem;
         Aggregation aggregation;
         serviceitem = ServiceItemFactory.createServiceItem(serviceitemconfig
@@ -792,7 +794,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
 
     private ServiceItem createServiceItemByTemplate(Service service,
             XMLServiceitem serviceitemconfig)
-            throws ServiceItemFactoryException, ServiceFactoryException {
+            throws ServiceItemFactoryException, ServiceFactoryException, ConfigurationException {
         ServiceItem serviceitem;
         Aggregation aggregation;
         XMLServiceitemtemplate template = serviceItemTemplateMap
@@ -900,7 +902,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
      * 
      * @param retentionMap
      */
-    private void setPurgeMap(Map<String, String> retentionMap) {
+    private void setPurgeMap(Map<String, PurgeDefinition> retentionMap) {
         purgeMap.putAll(retentionMap);
     }
 
@@ -914,47 +916,109 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
      * @param serviceitem
      */
     private void setPurge(XMLPurge xmlPurge, Service service,
-            ServiceItem serviceitem) {
+            ServiceItem serviceitem) throws ConfigurationException {
         String key = Util.fullName(service, serviceitem);
+        setPurge(xmlPurge, key);
+    }
+    
+    private void setPurge(XMLPurge xmlPurge, String key) throws ConfigurationException {
+        
+//        if (xmlPurge == null) {
+//            // Set default
+//            try {
+//                purgeMap.put(key, String.valueOf(bischeckProperties
+//                        .getProperty("lastStatusCacheSize", "500")));
+//            } catch (NumberFormatException ne) {
+//                purgeMap.put(key, String.valueOf("500"));
+//            }
+//        } else {
+//            if (xmlPurge.getMaxcount() != null) {
+//                purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
+//            } else if (xmlPurge.getOffset() != null
+//                    && xmlPurge.getPeriod() != null) {
+//                purgeMap.put(key,
+//                        "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
+//            }
+//        }
+        
+        PurgeDefinition.TYPE type = getTypeOfKey(key);
+        
+        PurgeDefinition purgeDef = null;
         if (xmlPurge == null) {
             // Set default
             try {
-                purgeMap.put(key, String.valueOf(bischeckProperties
+                purgeDef = new PurgeDefinition(key, type, String.valueOf(bischeckProperties
                         .getProperty("lastStatusCacheSize", "500")));
             } catch (NumberFormatException ne) {
-                purgeMap.put(key, String.valueOf("500"));
+                purgeDef = new PurgeDefinition(key, type, String.valueOf("500"));
             }
         } else {
             if (xmlPurge.getMaxcount() != null) {
-                purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
+                purgeDef = new PurgeDefinition(key, type, String.valueOf(xmlPurge.getMaxcount()));
             } else if (xmlPurge.getOffset() != null
                     && xmlPurge.getPeriod() != null) {
-                purgeMap.put(key,
-                        "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
+                purgeDef = new PurgeDefinition(key, type, "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
             }
         }
+        purgeMap.put(key,purgeDef);
     }
 
-    private void setPurge(XMLPurge xmlPurge, String key) {
-        
-        if (xmlPurge == null) {
-            // Set default
-            try {
-                purgeMap.put(key, String.valueOf(bischeckProperties
-                        .getProperty("lastStatusCacheSize", "500")));
-            } catch (NumberFormatException ne) {
-                purgeMap.put(key, String.valueOf("500"));
-            }
+    private PurgeDefinition.TYPE getTypeOfKey(String key) {
+        PurgeDefinition.TYPE type = null;
+        if (key.matches("^state/.*") ) {
+            type = PurgeDefinition.TYPE.STATE;
+        } else if (key.matches("^notification/.*")) {
+            type = PurgeDefinition.TYPE.NOTIFICATION;
         } else {
-            if (xmlPurge.getMaxcount() != null) {
-                purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
-            } else if (xmlPurge.getOffset() != null
-                    && xmlPurge.getPeriod() != null) {
-                purgeMap.put(key,
-                        "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
-            }
+            type = PurgeDefinition.TYPE.METRIC;
         }
+        return type;
     }
+
+    
+//    private void setPurge(XMLPurge xmlPurge, String key) {
+//        
+////        if (xmlPurge == null) {
+////            // Set default
+////            try {
+////                purgeMap.put(key, String.valueOf(bischeckProperties
+////                        .getProperty("lastStatusCacheSize", "500")));
+////            } catch (NumberFormatException ne) {
+////                purgeMap.put(key, String.valueOf("500"));
+////            }
+////        } else {
+////            if (xmlPurge.getMaxcount() != null) {
+////                purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
+////            } else if (xmlPurge.getOffset() != null
+////                    && xmlPurge.getPeriod() != null) {
+////                purgeMap.put(key,
+////                        "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
+////            }
+////        }
+//        PurgeDefinition.TYPE type = getTypeOfKey(key);
+//        
+//        PurgeDefinition purgeDef = null;
+//        
+//        if (xmlPurge == null) {
+//            // Set default
+//            try {
+//                purgeDef = new PurgeDefinition
+//                purgeMap.put(key, String.valueOf(bischeckProperties
+//                        .getProperty("lastStatusCacheSize", "500")));
+//            } catch (NumberFormatException ne) {
+//                purgeMap.put(key, String.valueOf("500"));
+//            }
+//        } else {
+//            if (xmlPurge.getMaxcount() != null) {
+//                purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
+//            } else if (xmlPurge.getOffset() != null
+//                    && xmlPurge.getPeriod() != null) {
+//                purgeMap.put(key,
+//                        "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
+//            }
+//        }
+//
+//    }
 
     
     private void initServers() throws ConfigurationException {
@@ -1057,7 +1121,8 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
                             service.getHost().getHostname() + "TriggerGroup")
                     .withSchedule(
                             cronSchedule(schedule)
-                                    .withMisfireHandlingInstructionDoNothing())
+                                    //.withMisfireHandlingInstructionDoNothing()
+                            )
                     .build();
 
         } else if (isIntervalTrigger(schedule)) {
@@ -1072,7 +1137,8 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
                             SimpleScheduleBuilder
                                     .repeatSecondlyForever(
                                             calculateInterval(schedule))
-                                    .withMisfireHandlingInstructionNextWithRemainingCount())
+                                    //.withMisfireHandlingInstructionNextWithRemainingCount()
+                                    )
                     .build();
 
         } else if (isRunAfterTrigger(schedule)) {
@@ -1317,7 +1383,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
      * @throws IllegalStateException
      *             if the {@link ConfigurationManager} has not been initialized
      */
-    public Map<String, String> getPurgeMap() {
+    public Map<String, PurgeDefinition> getPurgeMap() {
         if (initDone.get()) {
             return purgeMap;
         } else {
@@ -1416,12 +1482,12 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
         final String separator = System.getProperty("line.separator");
 
         StringBuilder strbuf = new StringBuilder();
-        SortedMap<String, String> treeMap = new TreeMap<String, String>();
+        SortedMap<String, PurgeDefinition> treeMap = new TreeMap<>();
 
         treeMap.putAll(getPurgeMap());
         treeMap.keySet();
-        for (String fullname : treeMap.keySet()) {
-            strbuf.append(fullname).append(":").append(treeMap.get(fullname))
+        for (String key : treeMap.keySet()) {
+            strbuf.append(key).append(":").append(treeMap.get(key).getPurgeDefinition())
                     .append(separator);
         }
         return strbuf.toString();
