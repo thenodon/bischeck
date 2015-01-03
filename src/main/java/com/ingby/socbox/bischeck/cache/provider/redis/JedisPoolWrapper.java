@@ -19,6 +19,8 @@
 package com.ingby.socbox.bischeck.cache.provider.redis;
 
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,7 @@ public class JedisPoolWrapper {
 
     private JedisPool jedispool;
 
+    private AtomicInteger poolCount = new AtomicInteger(0);
     /**
      * Create the jedis connection pool
      * @param redisserver name of the server running the redis server- IP or FQDN
@@ -46,9 +49,11 @@ public class JedisPoolWrapper {
      */
     public JedisPoolWrapper(String redisserver, Integer redisport, Integer redistimeout, String redisauth, Integer redisdb, Integer maxPoolSize) {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
-        // TODO - maxPoolSize is currently not used - need to see if it can be set
-        poolConfig.setBlockWhenExhausted(true);
-        //LOGGER.info("Max active: {} Max Idel: {} When exhusted: {}",poolConfig.getMaxActive(), poolConfig.getMaxIdle(), poolConfig.getWhenExhaustedAction());
+        poolConfig.setMaxTotal(50); 
+        poolConfig.setBlockWhenExhausted(false);
+        poolConfig.setJmxEnabled(true);
+        poolConfig.setJmxNameBase("com.ingby.socbox.bischeck:connectionpool=jedis");
+        
         LOGGER.info("Max total: {} Max Idel: {} When exhusted: {}",poolConfig.getMaxTotal(), poolConfig.getMaxIdle(), poolConfig.getBlockWhenExhausted());
         jedispool = new JedisPool(poolConfig,redisserver,redisport,redistimeout,redisauth,redisdb); 
     }
@@ -59,6 +64,9 @@ public class JedisPoolWrapper {
      */
     public Jedis getResource() {
         Jedis jedis = jedispool.getResource();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Borrow resource {}", poolCount.incrementAndGet());
+        }
         if (jedis == null) { 
             throw new JedisConnectionException("No pool resources available");
         }
@@ -72,6 +80,9 @@ public class JedisPoolWrapper {
     public void returnResource(Jedis jedis) {
         if (jedis != null) {
             jedispool.returnResource(jedis);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Return resource {}", poolCount.decrementAndGet());
+            }
         } else {
             LOGGER.warn("Tried to return a null object to the redis pool");
         }
