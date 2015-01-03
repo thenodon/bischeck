@@ -106,8 +106,6 @@ public class CachePurgeJob implements Job {
 
         Date ft = sched.scheduleJob(job, trigger);
 
-        sched.addJob(job, true);
-
         LOGGER.info(
                 "{} has been scheduled to run at: {} and repeat based on expression: {}",
                 job.getDescription(), ft, trigger.getCronExpression());
@@ -121,7 +119,7 @@ public class CachePurgeJob implements Job {
         final Timer.Context context = timer.time();
 
         try {
-            Map<String, String> purgeMap = ConfigurationManager.getInstance()
+            Map<String, PurgeDefinition> purgeMap = ConfigurationManager.getInstance()
                     .getPurgeMap();
             LOGGER.info("CachePurge purging {}", purgeMap.size());
             CacheInf cache = CacheFactory.getInstance();
