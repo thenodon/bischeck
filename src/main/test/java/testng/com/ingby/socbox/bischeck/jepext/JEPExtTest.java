@@ -185,6 +185,9 @@ public class JEPExtTest {
             expr = "avgMad(102, 104, 108, 160, 107, 60)";
             Assert.assertEquals(calc(expr),new Float(105.25));
             
+            expr = "avgMadT(3, 102, 104, 108, 160, 107, 60)";
+            Assert.assertEquals(calc(expr),new Float(105.25));
+            
         } else {
             System.out.println("Not Null in function tests");
             expr = "avg(null,null,null,4,2)";
@@ -277,6 +280,10 @@ public class JEPExtTest {
             
             expr = "avgMad(102, 104, 108, 160, 107, 60)";
             Assert.assertEquals(calc(expr),new Float(105.25));
+        
+            expr = "avgMadT(3, 102, 104, 108, 160, 107, 60)";
+            Assert.assertEquals(calc(expr),new Float(105.25));
+            
         }
 
     }
