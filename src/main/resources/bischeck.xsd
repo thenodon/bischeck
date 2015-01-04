@@ -56,6 +56,7 @@
             <xsd:element ref="url"/>
             <xsd:element ref="driver" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="state" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="notification" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="serviceitem" minOccurs="1" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:group>    
@@ -155,6 +156,7 @@
                 <xsd:element ref="url"/>
                 <xsd:element ref="driver" minOccurs="0" maxOccurs="1"/>
                 <xsd:element ref="state" minOccurs="0" maxOccurs="1"/>
+                <xsd:element ref="notification" minOccurs="0" maxOccurs="1"/>
                 <xsd:choice>                                
                     <xsd:element ref="template" minOccurs="1" maxOccurs="unbounded"/>
                     <xsd:element ref="serviceitem" minOccurs="1" maxOccurs="unbounded"/>
@@ -208,6 +210,16 @@
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
+    
+    <xsd:element name="notification">
+        <xsd:complexType>
+            <xsd:sequence>
+                <!-- specify the purging of state and notfication in cache -->
+                <xsd:element ref="purge" minOccurs="0" maxOccurs="1" />
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
     
     <xsd:element name="maxsoft" type="xsd:integer" default="3"/>
     

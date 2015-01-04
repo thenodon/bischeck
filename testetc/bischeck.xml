@@ -136,6 +136,13 @@
           <period>D</period>
         </purge>
       </state>
+      <notification>
+        <purge>
+          <offset>1</offset>
+          <period>D</period>
+        </purge>
+      </notification>
+      
       <serviceitem>
         <name>myShellItem</name>
         <execstatement>{"check":"echo Ok|time=10;;;;","label":"time"}</execstatement>

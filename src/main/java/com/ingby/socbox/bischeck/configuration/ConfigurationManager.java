@@ -75,6 +75,7 @@ import com.ingby.socbox.bischeck.xsd.bischeck.XMLBischeck;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLCache;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLCachetemplate;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLHost;
+import com.ingby.socbox.bischeck.xsd.bischeck.XMLNotification;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLPurge;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLService;
 import com.ingby.socbox.bischeck.xsd.bischeck.XMLServiceitem;
@@ -550,26 +551,45 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
             service.setSendServiceData(true);
         }
 
+        // Check if state section
         if (serviceconfig.getState() != null) {
             XMLState state = serviceconfig.getState();
             if (state.getMaxsoft() != null) {
                 service.setStateConfig(new StateConfig(state.getMaxsoft()
                         .intValue()));
             }
-            // Get the purge information for state and notifications
+            // Get the purge information for state
             XMLPurge xmlPurge = state.getPurge();
             if (xmlPurge != null) {
             	setPurge(xmlPurge, "state/" + Util.fullHostServiceName(service));
-            	setPurge(xmlPurge, "notification/" + Util.fullHostServiceName(service));
+//            	setPurge(xmlPurge, "notification/" + Util.fullHostServiceName(service));
             } else {
             	setPurge(null, "state/" + Util.fullHostServiceName(service));
-            	setPurge(null, "notification/" + Util.fullHostServiceName(service));
+//              setPurge(null, "notification/" + Util.fullHostServiceName(service));
             }
         } else {
         	// Set default purge if not defined
         	setPurge(null, "state/" + Util.fullHostServiceName(service));
-        	setPurge(null, "notification/" + Util.fullHostServiceName(service));
+//        	setPurge(null, "notification/" + Util.fullHostServiceName(service));
         }
+        
+        // Check if notification section
+        if (serviceconfig.getNotification() != null) {
+            XMLNotification notification = serviceconfig.getNotification();
+            
+            // Get the purge information for notifications
+            XMLPurge xmlPurge = notification.getPurge();
+            if (xmlPurge != null) {
+                setPurge(xmlPurge, "notification/" + Util.fullHostServiceName(service));
+            } else {
+                setPurge(null, "notification/" + Util.fullHostServiceName(service));
+            }
+        } else {
+            // Set default purge if not defined
+            setPurge(null, "notification/" + Util.fullHostServiceName(service));
+        }
+        
+        
         return service;
     }
 
@@ -622,6 +642,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
             service.setSendServiceData(true);
         }
         
+        // Check if state section
         if (template.getState() != null) {
             XMLState state = template.getState();
             if (state.getMaxsoft() != null) {
@@ -629,19 +650,34 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
                         .intValue()));
             }
             
-            // Get the purge information for state and notifications
+            // Get the purge information for state 
             XMLPurge xmlPurge = state.getPurge();
             if (xmlPurge != null) {
                 setPurge(xmlPurge, "state/" + Util.fullHostServiceName(service));
-                setPurge(xmlPurge, "notification/" + Util.fullHostServiceName(service));
+//                setPurge(xmlPurge, "notification/" + Util.fullHostServiceName(service));
             } else {
                 setPurge(null, "state/" + Util.fullHostServiceName(service));
-                setPurge(null, "notification/" + Util.fullHostServiceName(service));
-            }
-            
+//                setPurge(null, "notification/" + Util.fullHostServiceName(service));
+            }          
         } else {
             // Set default purge if not defined
             setPurge(null, "state/" + Util.fullHostServiceName(service));
+//            setPurge(null, "notification/" + Util.fullHostServiceName(service));
+        }
+
+        // Check if notification section
+        if (template.getNotification() != null) {
+            XMLNotification notification = template.getNotification();
+            
+            // Get the purge information for notifications
+            XMLPurge xmlPurge = notification.getPurge();
+            if (xmlPurge != null) {
+                setPurge(xmlPurge, "notification/" + Util.fullHostServiceName(service));
+            } else {
+                setPurge(null, "notification/" + Util.fullHostServiceName(service));
+            }            
+        } else {
+            // Set default purge if not defined
             setPurge(null, "notification/" + Util.fullHostServiceName(service));
         }
 
@@ -909,7 +945,8 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
     /**
      * For serviceitem that has <purge> defined the purging will be set up. If a
      * serviceitem do not have cache with purge then it will be set to property
-     * <code>lastStatusCacheSize</code> and default is 500.
+     * <code>xyzDefaultCacheSize</code> where xyz can be metric, state or
+     * notification and default is 500.
      * 
      * @param xmlPurge
      * @param service
@@ -923,24 +960,6 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
     
     private void setPurge(XMLPurge xmlPurge, String key) throws ConfigurationException {
         
-//        if (xmlPurge == null) {
-//            // Set default
-//            try {
-//                purgeMap.put(key, String.valueOf(bischeckProperties
-//                        .getProperty("lastStatusCacheSize", "500")));
-//            } catch (NumberFormatException ne) {
-//                purgeMap.put(key, String.valueOf("500"));
-//            }
-//        } else {
-//            if (xmlPurge.getMaxcount() != null) {
-//                purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
-//            } else if (xmlPurge.getOffset() != null
-//                    && xmlPurge.getPeriod() != null) {
-//                purgeMap.put(key,
-//                        "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
-//            }
-//        }
-        
         PurgeDefinition.TYPE type = getTypeOfKey(key);
         
         PurgeDefinition purgeDef = null;
@@ -948,7 +967,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
             // Set default
             try {
                 purgeDef = new PurgeDefinition(key, type, String.valueOf(bischeckProperties
-                        .getProperty("lastStatusCacheSize", "500")));
+                        .getProperty(type.toString()+"DefaultCacheSize", "500")));
             } catch (NumberFormatException ne) {
                 purgeDef = new PurgeDefinition(key, type, String.valueOf("500"));
             }
@@ -974,52 +993,6 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
         }
         return type;
     }
-
-    
-//    private void setPurge(XMLPurge xmlPurge, String key) {
-//        
-////        if (xmlPurge == null) {
-////            // Set default
-////            try {
-////                purgeMap.put(key, String.valueOf(bischeckProperties
-////                        .getProperty("lastStatusCacheSize", "500")));
-////            } catch (NumberFormatException ne) {
-////                purgeMap.put(key, String.valueOf("500"));
-////            }
-////        } else {
-////            if (xmlPurge.getMaxcount() != null) {
-////                purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
-////            } else if (xmlPurge.getOffset() != null
-////                    && xmlPurge.getPeriod() != null) {
-////                purgeMap.put(key,
-////                        "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
-////            }
-////        }
-//        PurgeDefinition.TYPE type = getTypeOfKey(key);
-//        
-//        PurgeDefinition purgeDef = null;
-//        
-//        if (xmlPurge == null) {
-//            // Set default
-//            try {
-//                purgeDef = new PurgeDefinition
-//                purgeMap.put(key, String.valueOf(bischeckProperties
-//                        .getProperty("lastStatusCacheSize", "500")));
-//            } catch (NumberFormatException ne) {
-//                purgeMap.put(key, String.valueOf("500"));
-//            }
-//        } else {
-//            if (xmlPurge.getMaxcount() != null) {
-//                purgeMap.put(key, String.valueOf(xmlPurge.getMaxcount()));
-//            } else if (xmlPurge.getOffset() != null
-//                    && xmlPurge.getPeriod() != null) {
-//                purgeMap.put(key,
-//                        "-" + xmlPurge.getOffset() + xmlPurge.getPeriod());
-//            }
-//        }
-//
-//    }
-
     
     private void initServers() throws ConfigurationException {
         XMLServers serversconfig = (XMLServers) xmlFileMgr
