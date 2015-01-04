@@ -40,19 +40,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.CronExpression;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
-import org.quartz.impl.StdSchedulerFactory;
-
-import ch.qos.logback.classic.Level;
 
 import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.MBeanManager;
@@ -100,8 +92,6 @@ import com.ingby.socbox.bischeck.xsd.urlservices.XMLUrlservices;
 
 public final class ConfigurationManager implements ConfigurationManagerMBean {
 
-    private static final int OKAY = 0;
-    private static final int FAILED = 1;
 
     private static final String DEFAULT_TRESHOLD = "DummyThreshold";
 
@@ -137,47 +127,6 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
 
     private MBeanManager mbsMgr = null;
 
-    public static void main(String[] args) throws Exception {
-        CommandLineParser parser = new GnuParser();
-        CommandLine line = null;
-        // create the Options
-        Options options = new Options();
-        options.addOption("u", "usage", false, "show usage.");
-        options.addOption("v", "verify", false,
-                "verify all xml configuration with their xsd");
-        options.addOption("p", "pidfile", false, "Show bischeck pid file path");
-
-        try {
-            // parse the command line arguments
-            line = parser.parse(options, args);
-
-        } catch (org.apache.commons.cli.ParseException e) {
-            System.out.println("Command parse error:" + e.getMessage());
-            Util.ShellExit(FAILED);
-        }
-
-        if (line.hasOption("usage")) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("ConfigurationManager", options);
-            Util.ShellExit(OKAY);
-        }
-
-        ConfigurationManager.initonce();
-        ConfigurationManager confMgmr = ConfigurationManager.getInstance();
-
-        ((ch.qos.logback.classic.Logger) LOGGER).setLevel(Level.WARN);
-
-        if (line.hasOption("verify")) {
-            Util.ShellExit(ValidateConfiguration.verify());
-        }
-
-        if (line.hasOption("pidfile")) {
-            System.out.println("PidFile:" + confMgmr.getPidFile().getPath());
-        }
-
-        /* Since this is running from command line stop all existing schedulers */
-        StdSchedulerFactory.getDefaultScheduler().shutdown();
-    }
 
     private ConfigurationManager() {
         mbsMgr = new MBeanManager(this, ConfigurationManagerMBean.BEANNAME);
