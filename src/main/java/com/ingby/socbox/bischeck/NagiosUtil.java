@@ -149,23 +149,23 @@ public class NagiosUtil {
                 servicePerfData.append(performanceMessage(serviceItemTo,
                         warnValue, critValue, threshold, currentMeasure));
 
-                totalexectime = (totalexectime + serviceItemTo.getExecTime());
-                count++;
+//                totalexectime = (totalexectime + serviceItemTo.getExecTime());
+//                count++;
             }
         }
 
         StringBuilder serviceOutputExecption = formatException(serviceTo);
 
         StringBuilder output = formatFinalOutput(showPerformanceData,
-                serviceOutput, servicePerfData, serviceOutputExecption, count,
-                totalexectime);
+                serviceOutput, servicePerfData, serviceOutputExecption,
+                serviceTo.getExecutionTime());
 
         return output.toString();
     }
 
     private StringBuilder formatFinalOutput(final boolean showPerformanceData,
             StringBuilder serviceOutput, StringBuilder servicePerfData,
-            StringBuilder serviceOutputExecption, int count, long totalexectime) {
+            StringBuilder serviceOutputExecption, long totalexectime) {
         StringBuilder output = new StringBuilder();
 
         if (serviceOutputExecption.length() == 0) {
@@ -173,7 +173,7 @@ public class NagiosUtil {
             if (showPerformanceData) {
                 output.append(serviceOutput).append(" | ")
                         .append(servicePerfData).append("avg-exec-time=")
-                        .append(((totalexectime / count) + "ms"));
+                        .append(((totalexectime/1000) + "ms"));
             } else {
                 output.append(serviceOutput);
             }
@@ -181,7 +181,7 @@ public class NagiosUtil {
             if (showPerformanceData) {
                 output.append(serviceOutputExecption).append(" | ")
                         .append(servicePerfData).append("avg-exec-time=")
-                        .append(((totalexectime / count) + "ms"));
+                        .append(((totalexectime / 1000) + "ms"));
             } else {
                 output.append(serviceOutputExecption);
             }

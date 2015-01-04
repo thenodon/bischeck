@@ -283,6 +283,25 @@ public interface Service {
      */
     void setStateConfig(StateConfig stateConfig);
     
+    
+    /**
+     * Set the time for executing the Service including ServiceItem's 
+     * execstatement and thresholds. 
+     * The time is stored in nano seconds
+     * 
+     * @param exectime
+     *            The time to execute the ServiceItem statement
+     */
+    void setExecutionTime(Long exectime);
+
+    /**
+     * Return the time in nano seconds it took to execute the Service including
+     * ServiceItem's execstatement and thresholds.
+     * 
+     * @return the execution time in nano seconds
+     */
+    Long getExecutionTime();
+
     StateConfig getStateConfig();
 
 }

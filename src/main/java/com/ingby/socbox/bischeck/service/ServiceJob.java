@@ -59,7 +59,6 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  * object. That include both connection setup and {@link ServiceItem} execution
  * and threshold validation
  * 
- * TODO rewrite the whole handling of states
  */
 public class ServiceJob implements Job {
 
@@ -86,85 +85,69 @@ public class ServiceJob implements Job {
                 .getInstance().getProperties()
                 .getProperty("saveNullOnConnectionError", "false")
                 .toLowerCase());
-
     }
 
     @Override
     public void execute(JobExecutionContext context)
             throws JobExecutionException {
 
-        final Timer timer = MetricsManager.getTimer(ServiceJob.class,
-                "executeTotalTimer");
-        final Timer.Context timercontext = timer.time();
-
+        
         Service service = null;
 
-        try {
-            JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+        JobDataMap dataMap = context.getJobDetail().getJobDataMap();
 
-            // Get the Service object passed by the context
-            service = (Service) dataMap.get("service");
+        // Get the Service object passed by the context
+        service = (Service) dataMap.get("service");
 
-            RunAfter runafter = new RunAfter(service.getHost().getHostname(),
-                    service.getServiceName());
+        RunAfter runafter = new RunAfter(service.getHost().getHostname(),
+                service.getServiceName());
 
-            ServiceTO serviceTo;
-            synchronized (service) {
-                try {
-                    serviceTo = executeJob(service);
-                } catch (RuntimeException e) {
-                    LOGGER.warn("Service job exception!", e);
-                    throw e;
-                }
-            }
-            // Check if there is any run after
-
-            checkRunImmediate(runafter);
-
-            if (service.isSendServiceData()) {
-
-                final Timer timerPub = MetricsManager.getTimer(
-                        ServiceJob.class, "publishTimer");
-                final Timer.Context contextPub = timerPub.time();
-
-                try {
-                    ServerMessageExecutor.getInstance()
-                            .publishServer(serviceTo);
-                } finally {
-                    Long duration = contextPub.stop() / MetricsManager.TO_MILLI;
-                    LOGGER.debug("Publish to servers time: {} ms", duration);
-                }
-            }
-
-            if (((ServiceStateInf) service).getServiceState().isNotification()) {
-
-                final Timer timerPubNotification = MetricsManager.getTimer(
-                        ServiceJob.class, "publishNotificationTimer");
-                final Timer.Context contextPubNotification = timerPubNotification
-                        .time();
-
-                try {
-                    // ServerMessageExecutor.getInstance().publishNotifiers(service);
-                    ServerMessageExecutor.getInstance().publishNotifiers(
-                            serviceTo);
-                } finally {
-                    Long duration = contextPubNotification.stop()
-                            / MetricsManager.TO_MILLI;
-                    LOGGER.debug("Publish to notifiers time: {} ms", duration);
-                }
-            }
-
-        } finally {
-            long executetime = timercontext.stop() / MetricsManager.TO_MILLI;
-            if (LOGGER.isDebugEnabled()) {
-                StringBuilder strbuf = new StringBuilder();
-                strbuf.append("Total execution time")
-                        .append(service.getHost().getHostname()).append("-")
-                        .append(service.getServiceName()).append(" : ")
-                        .append(executetime).append(" ms");
-                LOGGER.debug(strbuf.toString());
+        ServiceTO serviceTo;
+        synchronized (service) {
+            try {
+                serviceTo = executeJob(service);
+            } catch (RuntimeException e) {
+                LOGGER.warn("Service job exception!", e);
+                throw e;
             }
         }
+        // Check if there is any run after
+
+        checkRunImmediate(runafter);
+
+        if (service.isSendServiceData()) {
+
+            final Timer timerPub = MetricsManager.getTimer(
+                    ServiceJob.class, "publishTimer");
+            final Timer.Context contextPub = timerPub.time();
+
+            try {
+                ServerMessageExecutor.getInstance()
+                .publishServer(serviceTo);
+            } finally {
+                Long duration = contextPub.stop() / MetricsManager.TO_MILLI;
+                LOGGER.debug("Publish to servers time: {} ms", duration);
+            }
+        }
+
+        if (((ServiceStateInf) service).getServiceState().isNotification()) {
+
+            final Timer timerPubNotification = MetricsManager.getTimer(
+                    ServiceJob.class, "publishNotificationTimer");
+            final Timer.Context contextPubNotification = timerPubNotification
+                    .time();
+
+            try {
+                // ServerMessageExecutor.getInstance().publishNotifiers(service);
+                ServerMessageExecutor.getInstance().publishNotifiers(
+                        serviceTo);
+            } finally {
+                Long duration = contextPubNotification.stop()
+                        / MetricsManager.TO_MILLI;
+                LOGGER.debug("Publish to notifiers time: {} ms", duration);
+            }
+        }
+
     }
 
     private void checkRunImmediate(RunAfter runafter) {
@@ -252,6 +235,10 @@ public class ServiceJob implements Job {
      */
     public ServiceTO executeJob(Service service) {
 
+        final Timer timer = MetricsManager.getTimer(ServiceJob.class,
+                "executeTotalTimer");
+        final Timer.Context timercontext = timer.time();
+
         // Reset service and all it service items transient data
         service.reset();
 
@@ -289,7 +276,7 @@ public class ServiceJob implements Job {
 
                     // Collect data
                     if (service.isConnectionEstablished()) {
-                        executeService(service, serviceitem);
+                        executeServiceItem(service, serviceitem);
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("{} State after execute service {}",
                                     fullservicename, service.getLevel()
@@ -330,10 +317,21 @@ public class ServiceJob implements Job {
         builder.resolved((((ServiceStateInf) service).getServiceState()
                 .isResolved()));
 
+        long executetime_ns = timercontext.stop();
+        
+        service.setExecutionTime(executetime_ns);
+                    
+        LOGGER.info(
+                "{\"label\":\"service-execution-time\",\"key\":\"{}\",\"executeTime_us\":{}}",
+                Util.fullQoutedHostServiceName(service),
+                executetime_ns / 1000);
+
+        builder.executionTime(executetime_ns/1000);
+        
         return builder.build();
     }
 
-    private void executeService(Service service, ServiceItem serviceitem) {
+    private void executeServiceItem(Service service, ServiceItem serviceitem) {
 
         final Timer timer = MetricsManager.getTimer(ServiceJob.class,
                 "executeServiceTimer");
@@ -407,8 +405,9 @@ public class ServiceJob implements Job {
 
             if (((ServiceStateInf) service).getServiceState().isStateChange()
                     && CacheFactory.getInstance() instanceof CacheStateInf) {
-                LOGGER.info("State change {} from {} ({}) to {} ({})", Util
-                        .fullQoutedHostServiceName(service),
+                LOGGER.info(
+                        "{\"label\":\"service-state-change\",\"key\":\"{}\",\"fromState\":\"{}\",\"fromLevel\":\"{}\",\"toState\":\"{}\",\"toLevel\":\"{}\"}",
+                        Util.fullQoutedHostServiceName(service),
                         ((ServiceStateInf) service).getServiceState()
                                 .getPreviousState(),
                         ((ServiceStateInf) service).getServiceState()
@@ -416,17 +415,19 @@ public class ServiceJob implements Job {
                         ((ServiceStateInf) service).getServiceState()
                                 .getState(), ((ServiceStateInf) service)
                                 .getServiceState().getStateLevel());
-
+                        
                 ((CacheStateInf) CacheFactory.getInstance()).addState(service);
             }
 
             if (((ServiceStateInf) service).getServiceState().isNotification()
                     && CacheFactory.getInstance() instanceof CacheStateInf) {
-                LOGGER.info("Notification change {} {} {}", Util
-                        .fullQoutedHostServiceName(service),
+                LOGGER.info(
+                        "{\"label\":\"service-notification-change\",\"key\":\"{}\",\"state\":\"{}\",\"incidentKey\":\"{}\"}",
+                        Util.fullQoutedHostServiceName(service),
                         ((ServiceStateInf) service).getServiceState()
                                 .getState(), ((ServiceStateInf) service)
                                 .getServiceState().getCurrentIncidentId());
+                
                 ((CacheStateInf) CacheFactory.getInstance())
                         .addNotification(service);
 

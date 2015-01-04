@@ -28,6 +28,7 @@ public class ServiceTO {
     private Boolean notification;
     private String incidentKey;
     private Boolean isResolved;
+    private Long executionTime;
 
     private ServiceTO(ServiceTOBuilder builder) {
         this.hostName = builder.hostName;
@@ -40,6 +41,7 @@ public class ServiceTO {
         this.notification = builder.notification;
         this.incidentKey = builder.incidentKey;
         this.isResolved = builder.isResolved;
+        this.executionTime = builder.executionTime;
     }
 
     public String getHostName() {
@@ -94,6 +96,10 @@ public class ServiceTO {
         return exceptions;
     }
 
+    public Long getExecutionTime() {
+        return executionTime;
+    }
+
     public static class ServiceTOBuilder {
         private final String hostName;
         private final String serviceName;
@@ -105,6 +111,7 @@ public class ServiceTO {
         private String incidentKey;
         private Boolean isResolved;
         private boolean hasException = false;
+        private Long executionTime = 0L;
 
         @SuppressWarnings("unchecked")
         public ServiceTOBuilder(Service service) {
@@ -131,6 +138,9 @@ public class ServiceTO {
             if (service.hasException()) {
                 hasException = true;
             }
+            if (service.getExecutionTime() != null) {
+                executionTime = service.getExecutionTime();
+            }
         }
 
         public ServiceTOBuilder notification(Boolean notification) {
@@ -149,6 +159,11 @@ public class ServiceTO {
             return this;
         }
 
+        public ServiceTOBuilder executionTime(Long executionTime) {
+            this.executionTime = executionTime;
+            return this;
+        }
+        
         public ServiceTO build() {
             return new ServiceTO(this);
         }

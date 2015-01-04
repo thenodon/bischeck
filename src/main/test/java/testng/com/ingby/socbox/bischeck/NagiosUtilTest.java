@@ -57,6 +57,7 @@ public class NagiosUtilTest {
         Host host = new Host("HOST");
         host.addService(service);
         service.setHost(host);
+        service.setExecutionTime(10000L);
 
         Threshold threshold = new TestThreshold("HOST", "SERVICE",
                 "SERVICEITEM");
@@ -237,7 +238,8 @@ public class NagiosUtilTest {
         Host host = new Host("HOST");
         host.addService(service);
         service.setHost(host);
-
+        service.setExecutionTime(10000L);
+        
         Threshold threshold = new TestThreshold("HOST", "SERVICE",
                 "SERVICEITEM");
 
@@ -271,7 +273,8 @@ public class NagiosUtilTest {
         Host host = new Host("HOST");
         host.addService(service);
         service.setHost(host);
-
+        service.setExecutionTime(10000L);
+        
         Threshold threshold = new DummyThreshold("HOST", "SERVICE",
                 "SERVICEITEM");
 
@@ -298,7 +301,8 @@ public class NagiosUtilTest {
         Host host = new Host("HOST");
         host.addService(service);
         service.setHost(host);
-
+        service.setExecutionTime(10000L);
+        
         Threshold threshold = new DummyThreshold("HOST", "SERVICE",
                 "SERVICEITEM");
 
@@ -324,6 +328,7 @@ public class NagiosUtilTest {
         Host host = new Host("HOST");
         host.addService(service);
         service.setHost(host);
+        service.setExecutionTime(10000L);
         
         service.setConnectionUrl("jdbc:mysql://localhost/bischecktest?user=bischeck&amp;password=bischeck");
         service.addException(new ServiceException());
@@ -361,6 +366,7 @@ public class NagiosUtilTest {
         host = new Host("HOST");
         host.addService(service);
         service.setHost(host);
+        service.setExecutionTime(10000L);
         
         service.setConnectionUrl("jdbc:mysql://localhost/bischecktest?user=bischeck&amp;password=bischeck");
         //service.addException(new ServiceException());

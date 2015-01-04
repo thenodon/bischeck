@@ -51,6 +51,7 @@ public abstract class ServiceAbstract {
     protected String driverClassName;
     protected Host host;
     protected List<String> schedulelist;
+    protected Long executionTime;
     private boolean connectionEstablished = false;
     private Boolean sendServiceData = true;
     private List<Exception> exceptions;
@@ -237,6 +238,14 @@ public abstract class ServiceAbstract {
         return lastCheckTime;
     }
     
+    public void setExecutionTime(Long executionTime) {
+        this.executionTime = executionTime;
+    }
+
+    public Long getExecutionTime() {
+        return executionTime;
+    }
+
     public void setStateConfig(StateConfig stateConfig) {
         this.stateConfig = stateConfig;
     }
