@@ -83,10 +83,9 @@ public final class Execute implements ExecuteMBean {
 
     private MBeanManager mbsMgr = null;
     private Scheduler sched = null;
-    
+
     private static final int RESTART = 1000;
-//    private static final int OKAY = 0;
-//    private static final int FAILED = 1;
+
     private static final String XML_CONFIG_DIRECTORY = "xmlconfigdir";
     private static final String BIS_HOME_DIRECTORY = "bishome";
 
@@ -97,9 +96,9 @@ public final class Execute implements ExecuteMBean {
     private static long shutdownsleep = SHUTDOWNSLEEPDEF;
     private static String bischeckversion;
     private static Thread dumpthread;
-    
+
     private static ExecuteServiceOnDemand exon = new ExecuteServiceOnDemand();
-    
+
     public static void main(String[] args) {
 
         // create the command line parser
@@ -125,7 +124,7 @@ public final class Execute implements ExecuteMBean {
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("Bischeck", options);
-            Util.ShellExit(Util.OKAY); 
+            Util.ShellExit(Util.OKAY);
         }
 
         dumpthread = new Thread() {
@@ -152,7 +151,7 @@ public final class Execute implements ExecuteMBean {
                 LOGGER.error(
                         "Creating bischeck Configuration Manager failed with: {}",
                         e.getMessage(), e);
-                Util.ShellExit(Util.FAILED); 
+                Util.ShellExit(Util.FAILED);
             }
 
             retStat = Execute.getInstance().deamon();
@@ -160,15 +159,14 @@ public final class Execute implements ExecuteMBean {
         } while (retStat == RESTART);
 
         dumpthread.start();
-        
-        
+
         LOGGER.info("******************* Shutdown ********************");
-        
-        Util.ShellExit(retStat); 
+
+        Util.ShellExit(retStat);
     }
 
     private Execute() {
-        mbsMgr = new MBeanManager(this,ExecuteMBean.BEANNAME);
+        mbsMgr = new MBeanManager(this, ExecuteMBean.BEANNAME);
         mbsMgr.registerMBeanserver();
     }
 
@@ -205,11 +203,10 @@ public final class Execute implements ExecuteMBean {
         shutdownRequested = false;
         reloadRequested = false;
 
-        
         if (!start()) {
             return Util.FAILED;
         }
-        
+
         /*
          * Enter loop if deamonMode
          */
@@ -218,7 +215,7 @@ public final class Execute implements ExecuteMBean {
         stop();
 
         ServerMessageExecutor.getInstance().unregisterAll();
-        
+
         if (reloadRequested) {
             return RESTART;
         } else {
@@ -233,25 +230,29 @@ public final class Execute implements ExecuteMBean {
      * exit. Close all standard file - in, out and error. Add shutdown hooks for
      * OS signals to get controlled process exit.
      * 
-     * @throws Exception disable off SSL X.509 validation failed
+     * @throws Exception
+     *             disable off SSL X.509 validation failed
      */
     private void deamonInit() throws Exception {
 
-        Boolean disableCertificateValidation = Boolean.valueOf(ConfigurationManager.getInstance().getProperties().getProperty("disableCertificateValidation","false"));
+        Boolean disableCertificateValidation = Boolean
+                .valueOf(ConfigurationManager.getInstance().getProperties()
+                        .getProperty("disableCertificateValidation", "false"));
         if (disableCertificateValidation) {
-            
+
             try {
                 SSLTrustManager.disableCertificateValidation();
             } catch (KeyManagementException e) {
-                LOGGER.error("Disable SSL X.509 certification validation failed", e);
+                LOGGER.error(
+                        "Disable SSL X.509 certification validation failed", e);
                 throw new Exception(e);
             } catch (NoSuchAlgorithmException e) {
-                LOGGER.error("Disable SSL X.509 certification validation failed", e);
+                LOGGER.error(
+                        "Disable SSL X.509 certification validation failed", e);
                 throw new Exception(e);
             }
         }
-        
-        
+
         ConfigurationManager.getInstance().getPidFile().deleteOnExit();
 
         setupProperties();
@@ -434,7 +435,9 @@ public final class Execute implements ExecuteMBean {
                 try {
                     dumpthread.join();
                 } catch (InterruptedException ignore) {
-                    LOGGER.info("Interrupted while waiting on dumpthread thread to complete", ignore);
+                    LOGGER.info(
+                            "Interrupted while waiting on dumpthread thread to complete",
+                            ignore);
                 }
             }
         });
@@ -448,7 +451,7 @@ public final class Execute implements ExecuteMBean {
     @Override
     public boolean start() {
         try {
-            sched  = initScheduler();
+            sched = initScheduler();
             initTriggers(sched);
             ConfigurationJobs.initAdminJobs();
         } catch (SchedulerException e) {
@@ -457,7 +460,7 @@ public final class Execute implements ExecuteMBean {
         }
         return true;
     }
-    
+
     @Override
     public boolean stop() {
         try {
@@ -481,7 +484,9 @@ public final class Execute implements ExecuteMBean {
         try {
             Thread.sleep(shutdownsleep);
         } catch (InterruptedException ignore) {
-            LOGGER.info("Interrupted while waiting on main deamon thread to complete", ignore);
+            LOGGER.info(
+                    "Interrupted while waiting on main deamon thread to complete",
+                    ignore);
         }
     }
 
@@ -572,7 +577,6 @@ public final class Execute implements ExecuteMBean {
         return arr;
     }
 
-    
     /**
      * Count the number of active quartz jobs running. The total count is
      * subtracted with the number of admin jobs started by
@@ -599,8 +603,7 @@ public final class Execute implements ExecuteMBean {
                     se.getMessage(), se);
         }
 
-        return numberoftriggers
-                - ConfigurationJobs.numberOfAdminJobs();
+        return numberoftriggers - ConfigurationJobs.numberOfAdminJobs();
     }
 
     private String readBischeckVersion() {
@@ -613,16 +616,17 @@ public final class Execute implements ExecuteMBean {
             LOGGER.error("System property bishome must be set");
         }
 
-        try (FileInputStream fstream = new FileInputStream(path + File.separator + "version.txt");
-            DataInputStream in = new DataInputStream(fstream);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in))
-            ){
+        try (FileInputStream fstream = new FileInputStream(path
+                + File.separator + "version.txt");
+                DataInputStream in = new DataInputStream(fstream);
+                BufferedReader br = new BufferedReader(
+                        new InputStreamReader(in))) {
             version = br.readLine();
             LOGGER.info("Bisheck version is {}", version);
         } catch (Exception ioe) {
             version = "N/A";
             LOGGER.warn("Can not determine the bischeck version", ioe);
-        } 
+        }
         return version;
     }
 
