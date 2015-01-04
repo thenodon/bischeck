@@ -85,8 +85,8 @@ public final class Execute implements ExecuteMBean {
     private Scheduler sched = null;
     
     private static final int RESTART = 1000;
-    private static final int OKAY = 0;
-    private static final int FAILED = 1;
+//    private static final int OKAY = 0;
+//    private static final int FAILED = 1;
     private static final String XML_CONFIG_DIRECTORY = "xmlconfigdir";
     private static final String BIS_HOME_DIRECTORY = "bishome";
 
@@ -119,13 +119,13 @@ public final class Execute implements ExecuteMBean {
             System.out.println("Command parse error:" + e.getMessage());
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("Bischeck", options);
-            Util.ShellExit(FAILED);
+            Util.ShellExit(Util.FAILED);
         }
 
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("Bischeck", options);
-            Util.ShellExit(OKAY); 
+            Util.ShellExit(Util.OKAY); 
         }
 
         dumpthread = new Thread() {
@@ -140,7 +140,7 @@ public final class Execute implements ExecuteMBean {
 
         dumpthread.setName("dumpcache");
 
-        int retStat = OKAY;
+        int retStat = Util.OKAY;
         do {
             try {
                 if (line.hasOption("deamon")) {
@@ -152,7 +152,7 @@ public final class Execute implements ExecuteMBean {
                 LOGGER.error(
                         "Creating bischeck Configuration Manager failed with: {}",
                         e.getMessage(), e);
-                Util.ShellExit(FAILED); 
+                Util.ShellExit(Util.FAILED); 
             }
 
             retStat = Execute.getInstance().deamon();
@@ -189,13 +189,13 @@ public final class Execute implements ExecuteMBean {
                 deamonInit();
             } catch (Exception e) {
                 LOGGER.error("Deamon init failed - exit", e);
-                return FAILED;
+                return Util.FAILED;
             }
             try {
                 CacheFactory.init();
             } catch (CacheException ce) {
                 LOGGER.error("Cache factory init failed - exit", ce);
-                return FAILED;
+                return Util.FAILED;
             }
         }
 
@@ -207,7 +207,7 @@ public final class Execute implements ExecuteMBean {
 
         
         if (!start()) {
-            return FAILED;
+            return Util.FAILED;
         }
         
         /*
@@ -222,7 +222,7 @@ public final class Execute implements ExecuteMBean {
         if (reloadRequested) {
             return RESTART;
         } else {
-            return OKAY;
+            return Util.OKAY;
         }
     }
 
