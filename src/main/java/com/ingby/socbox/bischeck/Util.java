@@ -49,6 +49,9 @@ public abstract class Util {
     private final static String QOUTED_DASH = "\\\\-";
     private final static String DASH = "-";
 
+    public static final int OKAY = 0;
+    public static final int FAILED = 1;
+
     /**
      * Obfuscate a string including password= until none character or number.
      * 
