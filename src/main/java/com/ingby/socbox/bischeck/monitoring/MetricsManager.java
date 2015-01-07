@@ -19,6 +19,7 @@
 
 package com.ingby.socbox.bischeck.monitoring;
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -51,4 +52,9 @@ public class MetricsManager {
     public static Timer getTimer(Class<?> clazz, String timerName) {
         return METRICS_REGISTER.timer(MetricRegistry.name(clazz, timerName));
     }
-}
+    
+    public static Counter getCounter(Class<?> clazz, String counterName) {
+        return METRICS_REGISTER.counter(MetricRegistry.name(clazz, counterName));
+    }
+
+} 
