@@ -65,6 +65,9 @@ public class ServiceJob implements Job {
     private final static Logger LOGGER = LoggerFactory
             .getLogger(ServiceJob.class);
 
+    private final static Logger LOGGER_TRANS = LoggerFactory
+            .getLogger("transaction." + ServiceJob.class.getName());
+
     static private int runAfterDelay = 10; // in seconds
     static private boolean saveNullOnConnectionError;
 
@@ -321,8 +324,8 @@ public class ServiceJob implements Job {
         
         service.setExecutionTime(executetime_ns);
                     
-        LOGGER.info(
-                "{\"label\":\"service-execution-time\",\"key\":\"{}\",\"executeTime_us\":{}}",
+        LOGGER_TRANS.info(
+                "{\"label\":\"service-execution-time\",\"key\":\"{}\",\"time_us\":{}}",
                 Util.fullQoutedHostServiceName(service),
                 executetime_ns / 1000);
 
@@ -405,7 +408,7 @@ public class ServiceJob implements Job {
 
             if (((ServiceStateInf) service).getServiceState().isStateChange()
                     && CacheFactory.getInstance() instanceof CacheStateInf) {
-                LOGGER.info(
+                LOGGER_TRANS.info(
                         "{\"label\":\"service-state-change\",\"key\":\"{}\",\"fromState\":\"{}\",\"fromLevel\":\"{}\",\"toState\":\"{}\",\"toLevel\":\"{}\"}",
                         Util.fullQoutedHostServiceName(service),
                         ((ServiceStateInf) service).getServiceState()
@@ -421,7 +424,7 @@ public class ServiceJob implements Job {
 
             if (((ServiceStateInf) service).getServiceState().isNotification()
                     && CacheFactory.getInstance() instanceof CacheStateInf) {
-                LOGGER.info(
+                LOGGER_TRANS.info(
                         "{\"label\":\"service-notification-change\",\"key\":\"{}\",\"state\":\"{}\",\"incidentKey\":\"{}\"}",
                         Util.fullQoutedHostServiceName(service),
                         ((ServiceStateInf) service).getServiceState()
