@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
+  
+  <!-- 
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+   -->
+  
   <jmxConfigurator />
   <appender name="bischeck" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
     <File>/var/tmp/bischeck.log</File>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %t ; %c ; %m%ex{short}%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %c ; %m %ex{full}%n</pattern>
     </encoder>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -15,11 +20,40 @@
     </rollingPolicy>
 
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <MaxFileSize>1000KB</MaxFileSize>
+      <MaxFileSize>10000KB</MaxFileSize>
     </triggeringPolicy>
 
   </appender>
 
+  <appender name="bischeck-transaction" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+    <File>/var/tmp/bischeck-transaction.log</File>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %c{0} ; %m%n</pattern>
+    </encoder>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <maxHistory>7</maxHistory>
+      <FileNamePattern>/var/tmp/bischeck-transaction.%d{yyyy-MM-dd}.log</FileNamePattern>
+    </rollingPolicy>
+
+  </appender>
+
+
+  <appender name="bischeck-integration" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+    <File>/var/tmp/bischeck-integration.log</File>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %c{0} ; %m %ex{full}%n</pattern>
+    </encoder>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <maxHistory>7</maxHistory>
+      <FileNamePattern>/var/tmp/bischeck-integration.log.%d{yyyy-MM-dd}.log</FileNamePattern>
+    </rollingPolicy>
+
+  </appender>
+ 
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%L [%t] %-5p %c - %m%n</pattern>
@@ -29,9 +63,18 @@
   <logger name="com.ingby" level="INFO">
     <appender-ref ref="bischeck"/>
   </logger>
- 
-  <!--
-  <logger name="com.ingby.socbox.bischeck.configuration.ConfigurationManager" level="DEBUG">
+
+  <logger name="transaction.com.ingby" level="INFO">
+    <appender-ref ref="bischeck-transaction"/>
+  </logger>
+
+
+  <logger name="integration.com.ingby" level="INFO">
+    <appender-ref ref="bischeck-integration"/>
+  </logger>
+
+<!--     
+  <logger name="com.ingby.socbox.bischeck.cache.provider.redis" level="DEBUG"  additivity="false">
     <appender-ref ref="bischeck"/>
   </logger>
 
@@ -53,12 +96,14 @@
   </logger>
  -->
 
-  <logger name="org.quartz" level="ERROR">
+  <logger name="org.quartz" level="WARN">
     <appender-ref ref="bischeck"/>
   </logger>
 
+<!-- 
   <root level="INFO">
     <appender-ref ref="stdout"/>
   </root>
-
+-->  
+  
 </configuration>
