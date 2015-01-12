@@ -1,4 +1,5 @@
 <assembly>
+    <id>make-assembly</id>
 	<formats>
 		<format>tar.gz</format>
 		<format>zip</format>
@@ -134,7 +135,7 @@
 			<scope>runtime</scope>
 			<outputDirectory>lib</outputDirectory>
 			<useProjectArtifact>false</useProjectArtifact>
-			<unpack>false</unpack>
+			<unpack>true</unpack>
 		</dependencySet>
 	</dependencySets>
 </assembly>

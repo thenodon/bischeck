@@ -19,7 +19,7 @@
     <property name="docs.home" value="${basedir}/doc" />
     <property name="src.home" value="${basedir}/src" />
     <property name="javasrc.home" value="${basedir}/src/main/java" />
-    <property name="javasrcng.home" value="${basedir}/src/main/test/java" />
+    <property name="javasrcng.home" value="${basedir}/src/test/java" />
     <property name="javagensrc.home" value="${basedir}/src/main/generated" />
     <property name="scriptsrc.home" value="${basedir}/src/main/scripts" />
     <property name="migscriptsrc.home" value="${basedir}/src/main/migscripts" />
@@ -124,7 +124,7 @@
                     <include name="*.jar" />
                 </fileset>
             </classpath>
-            <classfileset dir="${build.home}/classes" includes="testng/**/*.class"/>
+            <classfileset dir="${build.home}/classes" includes="**/test/**/*.class"/>
         </testng>
      </target>
 
@@ -150,7 +150,7 @@
                 </fileset>
             </classpath>
 
-            <classfileset dir="${build.home}/classes" includes="testng/**/*.class"/> 
+            <classfileset dir="${build.home}/classes" includes="**/*Test.class"/> 
         </testng>
         </jacoco:coverage>           
     	
