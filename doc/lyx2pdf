@@ -21,7 +21,7 @@ exportAs=pdf2
 lyx=$(which lyx)
 if [ "x$lyx" == "x" ] ; then
   echo "lyx must be installed to generate manuals"
-  exit 1
+  exit 0
 fi
 
 $lyx -e $exportAs Bischeck\ configuration\ guide.lyx 
