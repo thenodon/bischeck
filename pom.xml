@@ -329,6 +329,7 @@
 							<bindingDirectory>src/main/resources</bindingDirectory>
 							<bindingFiles>bischeck.xjb</bindingFiles>
 							<outputDirectory>src/main/generated</outputDirectory>
+							<extension>true</extension>
 						</configuration>
 					</execution>
 
@@ -343,6 +344,7 @@
 							<bindingDirectory>src/main/resources</bindingDirectory>
 							<bindingFiles>properties.xjb</bindingFiles>
 							<outputDirectory>src/main/generated</outputDirectory>
+							<extension>true</extension>
 						</configuration>
 					</execution>
 
@@ -357,6 +359,7 @@
 							<bindingDirectory>src/main/resources</bindingDirectory>
 							<bindingFiles>urlservices.xjb</bindingFiles>
 							<outputDirectory>src/main/generated</outputDirectory>
+							<extension>true</extension>
 						</configuration>
 					</execution>
 
@@ -371,6 +374,7 @@
 							<bindingDirectory>src/main/resources</bindingDirectory>
 							<bindingFiles>twenty4threshold.xjb</bindingFiles>
 							<outputDirectory>src/main/generated</outputDirectory>
+							<extension>true</extension>
 						</configuration>
 					</execution>
 
@@ -385,6 +389,7 @@
 							<bindingDirectory>src/main/resources</bindingDirectory>
 							<bindingFiles>servers.xjb</bindingFiles>
 							<outputDirectory>src/main/generated</outputDirectory>
+							<extension>true</extension>
 						</configuration>
 					</execution>
 
@@ -410,7 +415,7 @@
 					<doctitle>Bischeck - ${project.version}</doctitle>
 					<windowtitle>Bischeck - ${project.version}</windowtitle>
 					<bottom>
-						Copyright &#169; 2010-2014 Ingeng&ouml;rsbyn
+						Copyright &#169; 2010-2014 Ingeng&#246;rsbyn
 						AB - Anders Haal. All Rights Reserved.
 					</bottom>
 					<show>public</show>
