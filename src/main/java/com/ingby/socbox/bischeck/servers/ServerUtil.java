@@ -20,6 +20,7 @@ package com.ingby.socbox.bischeck.servers;
 
 import org.slf4j.Logger;
 
+import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceTO;
 
@@ -50,7 +51,43 @@ public class ServerUtil {
 
         return logFormat(instanceName, serviceTo.getHostName(),serviceTo.getServiceName(), message);
     }
-    
+
+    public static String log(String instanceName, ServiceTO serviceTo, String message, Long sendTime) {
+
+        StringBuilder strbuf = new StringBuilder();
+        strbuf
+        .append("{\"instanceName\":\"")
+        .append(instanceName)
+        .append("\",\"key\":")
+        .append(Util.fullQouteHostServiceName(serviceTo.getHostName(),serviceTo.getServiceName()))
+        .append("\",\"time_ms\":")
+        .append(sendTime)
+        .append(",\"message\":\"")
+        .append(message)
+        .append("\"}");
+
+        return strbuf.toString();
+    }
+
+    public static String logError(String instanceName, ServiceTO serviceTo, Throwable exception, Long count) {
+
+        StringBuilder strbuf = new StringBuilder();
+        strbuf
+        .append("{\"instanceName\":\"")
+        .append(instanceName)
+        .append("\",\"key\":")
+        .append(Util.fullQouteHostServiceName(serviceTo.getHostName(),serviceTo.getServiceName()))
+        .append("\",\"count\":")
+        .append(count)
+        .append(",\"exceptionClass\":\"")
+        .append(exception.getClass().getName())
+        .append("\",\"exceptionMessage\":\"")
+        .append(exception.getMessage())
+        .append("\"}");
+
+        return strbuf.toString();
+    }
+
     /**
      * One line grep friendly log message 
      * @param instanceName name of the server instance
