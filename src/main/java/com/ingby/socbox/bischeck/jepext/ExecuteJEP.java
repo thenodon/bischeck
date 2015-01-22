@@ -94,7 +94,7 @@ public class ExecuteJEP {
             LOGGER.warn(
                     "The additonal function describtion file {} is not available in classpath",
                     RESOURCEFILENAME, e);
-        }
+        } 
 
         Properties properties = null;
         if (fileInput != null) {
@@ -107,6 +107,14 @@ public class ExecuteJEP {
             } catch (IOException e) {
                 LOGGER.warn("The property file, {}, could not be read",
                         RESOURCEFILENAME, e);
+            } finally {
+                if (fileInput != null) {
+                    try {
+                        fileInput.close();
+                    } catch (IOException ignore) {
+                        LOGGER.warn("File {} could not be closed", RESOURCEFILENAME, ignore);
+                    }
+                }
             }
         }
 
