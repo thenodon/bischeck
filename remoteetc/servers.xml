@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<servers>
+
+    <server name="NSCA-1">
+        <class>        NSCAServer    </class>
+        <property>
+            <key>hostAddress</key>
+            <value>172.25.1.212</value>
+        </property>
+        <property>
+            <key>encryptionMode</key>
+            <value>XOR</value>
+        </property>
+        <property>
+            <key>password</key>
+            <value>nsca</value>
+        </property>
+        <property>
+            <key>port</key>
+            <value>5667</value>
+        </property>
+        <property>
+            <key>connectionTimeout</key>
+            <value>5000</value>
+        </property>
+        
+        <property>
+            <key>cbEnable</key>
+            <value>false</value>
+        </property>
+        
+    </server>
+<!-- 
+    <server name="NRDP">
+        <class>        NRDPServer    </class>
+        <property>
+            <key>hostAddress</key>
+            <value>172.25.1.212</value>
+        </property>
+        <property>
+            <key>password</key>
+            <value>nrdp</value>
+        </property>
+        <property>
+            <key>cbEnable</key>
+            <value>true</value>
+        </property>
+        
+    </server>
+
+    <server name="LiveStatus">
+        <class>LiveStatusServer</class>
+        <property>
+            <key>hostAddress</key>
+            <value>172.25.1.212</value>
+        </property>
+        <property>
+            <key>cbEnable</key>
+            <value>true</value>
+        </property>
+        
+    </server>
+    <server name="Graphite-1">
+        <class>GraphiteServer</class>
+        <property>
+            <key>hostAddress</key>
+            <value>172.25.1.212</value>
+        </property>
+        <property>
+            <key>cbEnable</key>
+            <value>true</value>
+        </property>
+        
+    </server>
+ -->
+</servers>

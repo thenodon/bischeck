@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<predictivethreshold xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <servicedef>
+        <hostname>prehost</hostname>
+        <servicename>preservice</servicename>
+        <serviceitemname>predict</serviceitemname>
+
+        
+        <calcmethod>&lt;</calcmethod>
+        <warning>10</warning>
+        <critical>30</critical>
+    
+        <method>LS</method>
+<!--
+        <predicton>
+            <hostname>localhost</hostname>
+            <servicename>disk</servicename>
+            <serviceitemname>predict</serviceitemname>
+        </predicton>
+-->
+        <resolutionmethod>AVG</resolutionmethod>
+        <resolution>D</resolution>
+        <forecast>30</forecast>        
+        <threshold>100</threshold>
+    
+    </servicedef>
+
+    
+</predictivethreshold>
+
