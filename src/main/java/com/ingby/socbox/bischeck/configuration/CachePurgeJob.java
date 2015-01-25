@@ -20,7 +20,6 @@
 package com.ingby.socbox.bischeck.configuration;
 
 import java.text.ParseException;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +27,6 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -37,6 +35,7 @@ import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
+
 import static org.quartz.JobBuilder.*;
 import static org.quartz.TriggerBuilder.*;
 import static org.quartz.CronScheduleBuilder.*;
@@ -48,6 +47,7 @@ import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CachePurgeInf;
 import com.ingby.socbox.bischeck.cache.CacheUtil;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
+import com.ingby.socbox.bischeck.service.ServiceJob;
 
 /**
  * This class is executed as a Quartz job to purge cache data according to:<br>
@@ -68,6 +68,9 @@ public class CachePurgeJob implements Job {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(CachePurgeJob.class);
 
+    private final static Logger LOGGER_TRANS = LoggerFactory
+            .getLogger("transaction." + ServiceJob.class.getName());
+    
     private static Scheduler sched;
 
     private static final String DAILY_MAINTENANCE = "DailyMaintenance";
@@ -118,10 +121,10 @@ public class CachePurgeJob implements Job {
                 "purgeTimer");
         final Timer.Context context = timer.time();
 
+        Map<String, PurgeDefinition> purgeMap = ConfigurationManager.getInstance()
+                .getPurgeMap();
         try {
-            Map<String, PurgeDefinition> purgeMap = ConfigurationManager.getInstance()
-                    .getPurgeMap();
-            LOGGER.info("CachePurge purging {}", purgeMap.size());
+            LOGGER.debug("CachePurge purging {}", purgeMap.size());
             CacheInf cache = CacheFactory.getInstance();
 
             if (cache instanceof CachePurgeInf) {
@@ -131,7 +134,8 @@ public class CachePurgeJob implements Job {
 
         } finally {
             long duration = context.stop() / MetricsManager.TO_MILLI;
-            LOGGER.info("CachePurge executed in {} ms", duration);
+            LOGGER.debug("CachePurge executed in {} ms", duration);
+            LOGGER_TRANS.info("{\"label\":\"cache-purge\",\"keys\":{}\",\"time_ms\":{}}",purgeMap.size(),duration);
         }
     }
 
