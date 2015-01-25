@@ -224,9 +224,9 @@ public final class Execute implements ExecuteMBean {
     }
 
     /**
-     * The first time the deamon method is called this method will be invoked to
-     * setup specific task to become a deamon process. This include: Checking
-     * pid file so no other bischeck deamon exists. Setup pid file delete on
+     * The first time the daemon method is called this method will be invoked to
+     * setup specific task to become a daemon process. This include: Checking
+     * pid file so no other bischeck daemon exists. Setup pid file delete on
      * exit. Close all standard file - in, out and error. Add shutdown hooks for
      * OS signals to get controlled process exit.
      * 
