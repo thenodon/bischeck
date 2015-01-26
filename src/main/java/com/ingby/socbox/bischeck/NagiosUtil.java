@@ -61,9 +61,6 @@ public class NagiosUtil {
         this.formatWarnCrit = Boolean.valueOf(extended);
     }
 
-    public void setExtended() {
-        this.formatWarnCrit = true;
-    }
 
     public boolean isExtended() {
         return this.formatWarnCrit;
