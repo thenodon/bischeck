@@ -61,7 +61,6 @@ public class NagiosUtil {
         this.formatWarnCrit = Boolean.valueOf(extended);
     }
 
-
     public boolean isExtended() {
         return this.formatWarnCrit;
     }
@@ -77,9 +76,6 @@ public class NagiosUtil {
 
         serviceOutput.append(" ");
         servicePerfData.append(" ");
-
-        int count = 0;
-        long totalexectime = 0;
 
         for (String serviceItementry : serviceTo.getServiceItemTONames()) {
             ServiceItemTO serviceItemTo = serviceTo
@@ -146,8 +142,9 @@ public class NagiosUtil {
                 servicePerfData.append(performanceMessage(serviceItemTo,
                         warnValue, critValue, threshold, currentMeasure));
 
-//                totalexectime = (totalexectime + serviceItemTo.getExecTime());
-//                count++;
+                // totalexectime = (totalexectime +
+                // serviceItemTo.getExecTime());
+                // count++;
             }
         }
 
@@ -170,7 +167,7 @@ public class NagiosUtil {
             if (showPerformanceData) {
                 output.append(serviceOutput).append(" | ")
                         .append(servicePerfData).append("avg-exec-time=")
-                        .append(((totalexectime/1000) + "ms"));
+                        .append(((totalexectime / 1000) + "ms"));
             } else {
                 output.append(serviceOutput);
             }
