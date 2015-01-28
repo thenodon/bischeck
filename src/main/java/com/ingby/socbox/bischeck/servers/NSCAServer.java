@@ -19,108 +19,84 @@
 
 package com.ingby.socbox.bischeck.servers;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.jsendnsca.MessagePayload;
+import com.googlecode.jsendnsca.NagiosException;
+import com.googlecode.jsendnsca.NagiosPassiveCheckSender;
 import com.googlecode.jsendnsca.NagiosSettings;
+import com.googlecode.jsendnsca.builders.MessagePayloadBuilder;
 import com.googlecode.jsendnsca.builders.NagiosSettingsBuilder;
 import com.googlecode.jsendnsca.encryption.Encryption;
+import com.ingby.socbox.bischeck.NagiosUtil;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
 import com.ingby.socbox.bischeck.service.ServiceTO;
+import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
  * Nagios server integration over NSCA protocol, using the jnscasend package.
  * 
  */
-public final class NSCAServer implements Server, MessageServerInf {
+public final class NSCAServer extends ServerAbstract<ServiceTO> {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(NSCAServer.class);
-    private final String instanceName;
-    private final ServerCircuitBreak circuitBreak;
-
-    private static final int MAX_QUEUE = 10;
-    private static final int WAIT_TERMINIATION_MS = 10000;
-    private final LinkedBlockingQueue<ServiceTO> subTaskQueue;
-
-    private final ExecutorService execService;
 
     /**
      * The server map is used to manage multiple configuration based on the same
      * NSCAServer class.
      */
     private static Map<String, NSCAServer> servers = new HashMap<String, NSCAServer>();
-    private NagiosSettings settings;
+
+    private NagiosSettings nscaSettings;
+
+    private NagiosUtil nagutil = new NagiosUtil();
+
+    private NagiosPassiveCheckSender sender;
 
     /**
      * Retrieve the Server object. The method is invoked from class
      * ServerExecutor execute method. The created Server object is placed in the
      * class internal Server object list.
      * 
-     * @param name
+     * @param instanceName
      *            the name of the configuration in server.xml like
      *            {@code &lt;server name="my"&gt;}
      * @return Server object
      */
-    public static synchronized Server getInstance(String name) {
+    public static synchronized ServerInf<ServiceTO> getInstance(
+            String instanceName) {
 
-        if (!servers.containsKey(name)) {
-            servers.put(name, new NSCAServer(name));
+        if (!servers.containsKey(instanceName)) {
+            Properties prop = ConfigurationManager.getInstance()
+                    .getServerProperiesByName(instanceName);
+
+            servers.put(instanceName, new NSCAServer(instanceName, prop));
         }
-        return servers.get(name);
+        return servers.get(instanceName);
     }
 
     /**
      * Unregister the server and its configuration
      * 
-     * @param name
+     * @param instanceName
      *            of the server instance
      */
-    public static synchronized void unregister(String name) {
-        getInstance(name).unregister();
-        servers.remove(name);
+    public static synchronized void unregister(String instanceName) {
+        getInstance(instanceName).unregister();
+
     }
 
     @Override
     public synchronized void unregister() {
-        // check queue
-        LOGGER.info("{} - Unregister called", instanceName);
-
-        execService.shutdown();
-
-        execService.shutdownNow();
-
-        try {
-            execService.awaitTermination(WAIT_TERMINIATION_MS / 2,
-                    TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e1) {
-        }
-
-        LOGGER.info("{} - Shutdown is done", instanceName);
-
-        for (int waitCount = 0; waitCount < 3; waitCount++) {
-            try {
-                if (execService.awaitTermination(WAIT_TERMINIATION_MS,
-                        TimeUnit.MILLISECONDS) && execService.isTerminated()) {
-                    LOGGER.info(
-                            "{} - ExecutorService and all workers terminated",
-                            instanceName);
-                    break;
-                }
-            } catch (InterruptedException e) {
-            }
-        }
-        LOGGER.info("{} - All workers stopped", instanceName);
-        circuitBreak.destroy();
+        super.unregister();
+        servers.remove(instanceName);
     }
 
     /**
@@ -128,22 +104,14 @@ public final class NSCAServer implements Server, MessageServerInf {
      * 
      * @param name
      */
-    private NSCAServer(String name) {
-        instanceName = name;
-        subTaskQueue = new LinkedBlockingQueue<ServiceTO>();
-        execService = Executors.newCachedThreadPool();
-        settings = getNSCAConnection(name);
-        circuitBreak = new ServerCircuitBreak(this, ConfigurationManager
-                .getInstance().getServerProperiesByName(name));
-        execService.execute(new NSCAWorker(name, subTaskQueue, circuitBreak,
-                settings));
-
+    private NSCAServer(String instanceName, Properties prop) {
+        super(instanceName, prop);
+        nscaSettings = getNSCAConnection(prop);
+        sender = new NagiosPassiveCheckSender(nscaSettings);
     }
 
-    private NagiosSettings getNSCAConnection(String name) {
+    private NagiosSettings getNSCAConnection(Properties prop) {
         Properties defaultproperties = getServerProperties();
-        Properties prop = ConfigurationManager.getInstance()
-                .getServerProperiesByName(name);
         return new NagiosSettingsBuilder()
                 .withNagiosHost(
                         prop.getProperty("hostAddress",
@@ -167,15 +135,36 @@ public final class NSCAServer implements Server, MessageServerInf {
     }
 
     @Override
-    public String getInstanceName() {
-        return instanceName;
-    }
-
-    @Override
     public void send(ServiceTO serviceTo) throws ServerException {
-        /*
-         * Use the Worker send instead
-         */
+
+        MessagePayload payload = new MessagePayloadBuilder()
+                .withHostname(serviceTo.getHostName())
+                .withServiceName(serviceTo.getServiceName()).create();
+
+        NAGIOSSTAT level = serviceTo.getLevel();
+        payload.setMessage(level + nagutil.createNagiosMessage(serviceTo));
+        payload.setLevel(level.toString());
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(ServerUtil.logFormat(instanceName, serviceTo,
+                    payload.getMessage()));
+        }
+
+        try {
+            sender.send(payload);
+        } catch (NagiosException e) {
+            // LOGGER.warn("Nsca server error", e);
+            throw new ServerException("Nsca server error", e);
+        } catch (IOException e) {
+            // LOGGER.error(
+            // "Network error - check nsca server and that service is started",
+            // e);
+            throw new ServerException(
+                    "Network error - check nsca server and that service is started",
+                    e);
+
+        }
+
     }
 
     /**
@@ -195,20 +184,4 @@ public final class NSCAServer implements Server, MessageServerInf {
         return defaultproperties;
     }
 
-    @Override
-    public void onMessage(ServiceTO message) {
-        subTaskQueue.offer(message);
-
-        LOGGER.debug("{} - Worker pool size {} and queue size {}",
-                instanceName, ((ThreadPoolExecutor) execService).getPoolSize(),
-                subTaskQueue.size());
-
-        /* If the queue is larger then 10 start new workers */
-        if (subTaskQueue.size() > MAX_QUEUE) {
-            execService.execute(new NSCAWorker(instanceName, subTaskQueue,
-                    circuitBreak, settings));
-            LOGGER.info("{} - Increase worker pool size {}", instanceName,
-                    ((ThreadPoolExecutor) execService).getPoolSize());
-        }
-    }
 }

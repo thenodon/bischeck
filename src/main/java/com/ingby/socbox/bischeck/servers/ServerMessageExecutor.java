@@ -1,6 +1,6 @@
 /*
 #
-# Copyright (C) 2010-2013 Anders Håål, Ingenjorsbyn AB
+# Copyright (C) 2010-2015 Anders Håål, Ingenjorsbyn AB
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
 /**
  * ServerMessageExecutor manage the messages asynchronously between a executing
- * {@link ServiceJob} and the configured {@link Server} implementations. <br>
+ * {@link ServiceJob} and the configured {@link ServerInf} implementations. <br>
  * The {@link ServiceJob} call the {@link #publishServer(Service)} method that
  * will publish the {@link Service} object that will be subscribed by the
  * {@link MessageServerInf#onMessage(Service)}.
@@ -79,7 +79,6 @@ public final class ServerMessageExecutor {
     /**
      * Create an instance of the class
      */
-    @SuppressWarnings("unchecked")
     private ServerMessageExecutor() {
         serverSet = ConfigurationManager.getInstance().getServerClassMap();
 
@@ -110,7 +109,7 @@ public final class ServerMessageExecutor {
 
                     // add subscription for message on receiver thread
                     Disposable disposable = null;
-                    if (server instanceof Server) {
+                    if (server instanceof ServerInf) {
                         disposable = channelServers.subscribe(fiber,
                                 (Callback<ServiceTO>) server);
                     } else if (server instanceof Notifier) {

@@ -52,7 +52,7 @@ import com.ingby.socbox.bischeck.Util;
 import com.ingby.socbox.bischeck.host.Host;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.notifications.Notifier;
-import com.ingby.socbox.bischeck.servers.Server;
+import com.ingby.socbox.bischeck.servers.ServerInf;
 import com.ingby.socbox.bischeck.service.RunAfter;
 import com.ingby.socbox.bischeck.service.Service;
 import com.ingby.socbox.bischeck.service.ServiceFactory;
@@ -982,7 +982,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
         Class<?> clazz = null;
 
         if (isClass("com.ingby.socbox.bischeck.servers." + clazzname)) {
-            clazz = (Class<Server>) Class
+            clazz = (Class<ServerInf>) Class
                     .forName("com.ingby.socbox.bischeck.servers." + clazzname);
         } else if (isClass("com.ingby.socbox.bischeck.notifications."
                 + clazzname)) {
@@ -990,7 +990,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
                     .forName("com.ingby.socbox.bischeck.notifications."
                             + clazzname);
         } else if (isClass(clazzname)) {
-            clazz = (Class<Server>) Class.forName(clazzname);
+            clazz = (Class<ServerInf>) Class.forName(clazzname);
         } else {
             throw new ClassNotFoundException(clazzname);
         }
@@ -1335,7 +1335,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
     }
 
     /**
-     * Get all of the properties that are related to a specific {@link Server}
+     * Get all of the properties that are related to a specific {@link ServerInf}
      * instance.
      * 
      * @param name
@@ -1358,7 +1358,7 @@ public final class ConfigurationManager implements ConfigurationManagerMBean {
     }
 
     /**
-     * A map of all the {@link Server} classes mapped to their instance name.
+     * A map of all the {@link ServerInf} classes mapped to their instance name.
      * 
      * @return
      * @throws IllegalStateException

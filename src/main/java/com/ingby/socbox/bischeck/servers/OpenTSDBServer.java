@@ -15,273 +15,269 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-*/
+ */
 
 package com.ingby.socbox.bischeck.servers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.configuration.ConfigurationManager;
-import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemTO;
 
-
 /**
- * This class is responsible to send bischeck data to a opentsdb server
+ * This class is responsible to send bischeck data to a opentsdb server.
+ * Currently only sending measured value and threshold value. The metric name is
+ * servicename.serviceitemname.[measured or threshold]<br>
+ * The tag host is set for all metrics and is the hostname<br>
  * 
  */
-public final class OpenTSDBServer implements Server,  MessageServerInf {
+public final class OpenTSDBServer extends ServerBatchAbstract<List<ServiceTO>> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(OpenTSDBServer.class);
-    private static Map<String,OpenTSDBServer> servers = new HashMap<String,OpenTSDBServer>();
-    
-    
-    private final String instanceName;
+    private final static Logger LOGGER = LoggerFactory
+            .getLogger(OpenTSDBServer.class);
+    private static final String NOT_A_NUMBER = "\"NaN\"";
+    private static Map<String, OpenTSDBServer> servers = new HashMap<String, OpenTSDBServer>();
+
     private final int port;
     private final String hostAddress;
     private final int connectionTimeout;
-    
-    private OpenTSDBServer (final String name) {
+
+    private URL url = null;
+    private String urlstr;
+
+    private OpenTSDBServer(final String name, Properties prop) {
+        super(name, prop);
         final Properties defaultproperties = getServerProperties();
-        final Properties prop = ConfigurationManager.getInstance().getServerProperiesByName(name);
         hostAddress = prop.getProperty("hostAddress",
                 defaultproperties.getProperty("hostAddress"));
         port = Integer.parseInt(prop.getProperty("port",
                 defaultproperties.getProperty("port")));
-        connectionTimeout = Integer.parseInt(prop.getProperty("connectionTimeout",
+        connectionTimeout = Integer.parseInt(prop.getProperty(
+                "connectionTimeout",
                 defaultproperties.getProperty("connectionTimeout")));
-        instanceName = name;
+
+        Boolean ssl = Boolean.valueOf(prop.getProperty("ssl",
+                defaultproperties.getProperty("ssl")));
+
+        String protocol = "http://";
+        if (ssl) {
+            protocol = "https://";
+        }
+
+        String path = "api/put";
+        urlstr = protocol + hostAddress + ":" + port + "/" + path;
+
+        try {
+            url = new URL(urlstr);
+            LOGGER.debug("URL {}", urlstr);
+        } catch (MalformedURLException e) {
+            LOGGER.error("{} - The url {} is not correctly formated",
+                    instanceName, urlstr, e);
+            throw new IllegalArgumentException(e);
+        }
     }
-    
-    
+
     /**
-     * Retrieve the Server object. The method is invoked from class ServerExecutor
-     * execute method. The created Server object is placed in the class internal 
-     * Server object list.
-     * @param name the name of the configuration in server.xml like
-     * {@code &lt;server name="my"&gt;}
+     * Retrieve the Server object. The method is invoked from class
+     * ServerExecutor execute method. The created Server object is placed in the
+     * class internal Server object list.
+     * 
+     * @param instanceName
+     *            the name of the configuration in server.xml like
+     *            {@code &lt;server name="my"&gt;}
      * @return Server object
      */
-    synchronized public static Server getInstance(String name) {
-    
-        if (!servers.containsKey(name) ) {
-            servers.put(name,new OpenTSDBServer(name));
+    synchronized public static ServerInf<ServiceTO> getInstance(
+            String instanceName) {
+
+        if (!servers.containsKey(instanceName)) {
+            final Properties prop = ConfigurationManager.getInstance()
+                    .getServerProperiesByName(instanceName);
+            servers.put(instanceName, new OpenTSDBServer(instanceName, prop));
         }
-        return servers.get(name);
+        return servers.get(instanceName);
     }
-    
-    
+
     /**
      * Unregister the server and its configuration
-     * @param name of the server instance
+     * 
+     * @param name
+     *            of the server instance
      */
-    synchronized public static void unregister(String name) {
-        servers.remove(name);
+    synchronized public static void unregister(String instanceName) {
+        getInstance(instanceName).unregister();
     }
-    
-    
+
     @Override
     public String getInstanceName() {
         return instanceName;
     }
-    
-    
+
     @Override
-    synchronized public void send(ServiceTO serviceTo) {
-
-        String message;    
-        if ( serviceTo.isConnectionEstablished()) {
-            message = getMessage(serviceTo);
-        } else {
-            message = null;
+    synchronized public void send(List<ServiceTO> serviceToList)
+            throws ServerException {
+        if (serviceToList.isEmpty()) {
+            return;
         }
 
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info(ServerUtil.logFormat(instanceName, serviceTo, message));
-        }
-        
+        String message = getMessage(serviceToList);
         connectAndSend(message);
 
     }
 
+    private String getMessage(List<ServiceTO> serviceToList) {
+        StringBuilder strbuf = new StringBuilder();
+        strbuf.append("[");
+        String sep = "";
+        for (ServiceTO serviceTo : serviceToList) {
+            final long currenttime = serviceTo.getLastCheckTime() / 1000;
+            strbuf.append(sep);
 
-    private void connectAndSend(String message) {
-        Socket opentsdbSocket = null;
-        PrintWriter out = null;
-        
-        final String timerName = instanceName+"_sendTimer";
-        final Timer timer = MetricsManager.getTimer(OpenTSDBServer.class,timerName);
-        final Timer.Context context = timer.time();
-        
+            for (Map.Entry<String, ServiceItemTO> serviceItementry : serviceTo
+                    .getServiceItemTO().entrySet()) {
+                ServiceItemTO serviceItemTo = serviceItementry.getValue();
+                StringBuilder metrics = new StringBuilder();
+
+                metrics.append(serviceTo.getServiceName()).append(".")
+                        .append(serviceItemTo.getName()).append(".");
+
+                strbuf.append("{")
+                        .append(format(metrics.toString() + "measured",
+                                checkNull(serviceItemTo.getValue()),
+                                currenttime, serviceTo.getHostName()))
+                        .append("},");
+
+                strbuf.append("{")
+                        .append(format(metrics.toString() + "threshold",
+                                checkNull(serviceItemTo.getThreshold()),
+                                currenttime, serviceTo.getHostName()))
+                        .append("}");
+
+            }
+            sep = ",";
+        }
+        strbuf.append("]");
+        return strbuf.toString();
+
+    }
+
+    private StringBuilder format(String metricName, String value,
+            final long currenttime, String hostTag) {
+        StringBuilder strbuf = new StringBuilder();
+
+        strbuf.append("\"metric\":\"").append(metricName)
+                .append("\",\"timestamp\":").append(currenttime)
+                .append(",\"value\":").append(value)
+                .append(",\"tags\":{ \"host\":\"").append(hostTag)
+                .append("\"}");
+
+        return strbuf;
+    }
+
+    private void connectAndSend(String payload) throws ServerException {
+        HttpURLConnection conn = null;
+        OutputStreamWriter wr = null;
 
         try {
-            
-            InetAddress addr = InetAddress.getByName(hostAddress);
-            SocketAddress sockaddr = new InetSocketAddress(addr, port);
 
-            opentsdbSocket = new Socket();
-            
-            opentsdbSocket.connect(sockaddr,connectionTimeout);
-                        
-            out = new PrintWriter(opentsdbSocket.getOutputStream(), true);
-            out.println(message);
-            out.flush();
-            
-        } catch (UnknownHostException e) {
-            LOGGER.error("Network error - don't know about host: {}", hostAddress, e);
-        } catch (IOException e) {
-            LOGGER.error("Network error - check OpenTSDB server and that service is started", e);
-        }
-        finally {
-            if (out != null) {
-                out.close();
+            if (payload == null || payload.length() == 0) {
+                LOGGER.debug("IS NULL SIZE");
+                return;
             }
+            conn = createHTTPConnection(payload);
+            wr = new OutputStreamWriter(conn.getOutputStream());
+            wr.write(payload);
+            wr.flush();
+
+            // 400 is okay since some data points may be NaN
+            int httpResponseCode = conn.getResponseCode();
+            LOGGER.debug("HTTP response {}", httpResponseCode);
+
+            if (!(httpResponseCode == 200 || httpResponseCode == 204 || httpResponseCode == 400)) {
+                LOGGER.error("OpenTSDB server responded with "
+                        + httpResponseCode);
+                throw new ServerException("OpenTSDB server responded with "
+                        + httpResponseCode);
+            }
+        } catch (IOException ioe) {
+            LOGGER.error("Error", ioe);
+            throw new ServerException(ioe);
+        } finally {
             try {
-                if (opentsdbSocket != null) {
-                    opentsdbSocket.close();
-                }
-            } catch (IOException ignore) {
-            	LOGGER.info("Closing rerources was interupted", ignore);
-            }    
-            
-            final long duration = context.stop()/1000000;
-            LOGGER.debug("OpenTSDB send execute: {} ms", duration);
-            
+                wr.close();
+            } catch (IOException e) {
+            }
+            conn.disconnect();
         }
+
     }
 
-    private String getMessage(ServiceTO serviceTo) {
+    private HttpURLConnection createHTTPConnection(String payload)
+            throws IOException {
+        LOGGER.debug("{} - Message: {}", instanceName, payload);
+        HttpURLConnection conn;
 
-        StringBuilder strbuf = new StringBuilder();
-        final long currenttime = System.currentTimeMillis()/1000;
-        for (Map.Entry<String, ServiceItemTO> serviceItementry: serviceTo.getServiceItemTO().entrySet()) {
-            ServiceItemTO serviceItemTo = serviceItementry.getValue();
-            //put proc.loadavg.1m 1288946927 0.36 host=foo
-            
-            strbuf = formatRow(strbuf, 
-                    currenttime,
-                    serviceTo.getHostName(), 
-                    serviceTo.getServiceName(), 
-                    serviceItemTo.getName(), 
-                    "measured", 
-                    checkNull(serviceItemTo.getValue()));
+        conn = (HttpURLConnection) url.openConnection();
 
-            strbuf = formatRow(strbuf, 
-                    currenttime,
-                    serviceTo.getHostName(), 
-                    serviceTo.getServiceName(), 
-                    serviceItemTo.getName(), 
-                    "threshold", 
-                    checkNull(serviceItemTo.getThreshold()));
+        conn.setDoOutput(true);
 
-            strbuf = formatRow(strbuf, 
-                    currenttime,
-                    serviceTo.getHostName(), 
-                    serviceTo.getServiceName(), 
-                    serviceItemTo.getName(), 
-                    "warning", 
-                    checkNullMultiple(serviceItemTo.getWarning(),
-                            serviceItemTo.getThreshold()));
+        conn.setRequestMethod("POST");
 
-            strbuf = formatRow(strbuf, 
-                    currenttime,
-                    serviceTo.getHostName(), 
-                    serviceTo.getServiceName(), 
-                    serviceItemTo.getName(), 
-                    "critical", 
-                    checkNullMultiple(serviceItemTo.getCritical(),
-                            serviceItemTo.getThreshold()));
-        }
-        return strbuf.toString();
+        conn.setConnectTimeout(connectionTimeout);
+        conn.setRequestProperty("Content-Length",
+                "" + Integer.toString(payload.getBytes().length));
+
+        conn.setRequestProperty("User-Agent", "bischeck");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Accept", "application/json");
+        conn.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
+        conn.setRequestProperty("Accept-Charset", "ISO-8859-1,utf-8");
+        return conn;
+
     }
-    
-    
+
     private String checkNull(final String str) {
         if (str == null) {
-            return "NaN";
+            return NOT_A_NUMBER;
         } else {
             return str;
         }
     }
 
-    
     private String checkNull(final Float number) {
         if (number == null) {
-            return "NaN";
+            return NOT_A_NUMBER;
         } else {
             return String.valueOf(number);
         }
     }
-    
-    
-    private String checkNullMultiple(final Float number1, final Float number2) {
-        Float sum;
-        try {
-            sum = number1 * number2;
-        } catch (NullPointerException e) {
-            return "NaN";
-        }
-        return String.valueOf(sum);
-    }
-    
-    
-    private StringBuilder formatRow(final StringBuilder strbuf, 
-            final long currenttime, 
-            final String host, 
-            final String servicename, 
-            final String serviceitemname, 
-            final String metric, 
-            final String value) {
-        
-        strbuf.
-        append("put bischeck.").
-        append(metric).
-        append(" ").
-        append(currenttime).
-        append(" ").
-        append(value).
-        append(" host=").
-        append(host).
-        append(" service=").
-        append(servicename).
-        append(" serviceitem=").
-        append(serviceitemname).
-        append("\n");
-        
-        return strbuf;
-    }
-    
-    
+
     public static Properties getServerProperties() {
         final Properties defaultproperties = new Properties();
-        
-        defaultproperties.setProperty("hostAddress","localhost");
-        defaultproperties.setProperty("port","5667");
-        defaultproperties.setProperty("connectionTimeout","5000");
-    
+
+        defaultproperties.setProperty("hostAddress", "localhost");
+        defaultproperties.setProperty("port", "4242");
+        defaultproperties.setProperty("connectionTimeout", "5000");
+        defaultproperties.setProperty("ssl", "false");
+
         return defaultproperties;
     }
-    
-    @Override
-    public void onMessage(ServiceTO message) {
-        send(message);
-    }
+
     @Override
     synchronized public void unregister() {
+        super.unregister();
+        servers.remove(instanceName);
     }
 }

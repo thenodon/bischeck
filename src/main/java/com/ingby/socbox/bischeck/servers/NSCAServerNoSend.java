@@ -25,11 +25,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.Timer;
 import com.googlecode.jsendnsca.MessagePayload;
 import com.googlecode.jsendnsca.builders.MessagePayloadBuilder;
 import com.ingby.socbox.bischeck.NagiosUtil;
-import com.ingby.socbox.bischeck.monitoring.MetricsManager;
 import com.ingby.socbox.bischeck.service.ServiceTO;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
 
@@ -38,8 +36,7 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  * The class is for pure testing. It do the same as NSCAServer except the send.
  * 
  */
-public final class NSCAServerNoSend implements Server, ServerInternal,
-        MessageServerInf {
+public final class NSCAServerNoSend extends ServerAbstract<ServiceTO> {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(NSCAServerNoSend.class);
@@ -49,7 +46,6 @@ public final class NSCAServerNoSend implements Server, ServerInternal,
      */
     static Map<String, NSCAServerNoSend> servers = new HashMap<String, NSCAServerNoSend>();
 
-    private String instanceName;
     private NagiosUtil nagutil = new NagiosUtil();
 
     /**
@@ -57,27 +53,28 @@ public final class NSCAServerNoSend implements Server, ServerInternal,
      * ServerExecutor execute method. The created Server object is placed in the
      * class internal Server object list.
      * 
-     * @param name
+     * @param instanceName
      *            the name of the configuration in server.xml like
      *            {@code &lt;server name="my"&gt;}
      * @return Server object
      */
-    public synchronized static Server getInstance(String name) {
+    public synchronized static ServerInf<ServiceTO> getInstance(
+            String instanceName) {
 
-        if (!servers.containsKey(name)) {
-            servers.put(name, new NSCAServerNoSend(name));
+        if (!servers.containsKey(instanceName)) {
+            servers.put(instanceName, new NSCAServerNoSend(instanceName));
         }
-        return servers.get(name);
+        return servers.get(instanceName);
     }
 
     /**
      * Unregister the server and its configuration
      * 
-     * @param name
+     * @param instanceName
      *            of the server instance
      */
-    public synchronized static void unregister(String name) {
-        servers.remove(name);
+    public synchronized static void unregister(String instanceName) {
+        getInstance(instanceName).unregister();
     }
 
     /**
@@ -85,64 +82,33 @@ public final class NSCAServerNoSend implements Server, ServerInternal,
      * 
      * @param name
      */
-    private NSCAServerNoSend(String name) {
-        instanceName = name;
+    private NSCAServerNoSend(String instanceName) {
+        super(instanceName, null);
     }
 
     @Override
-    public synchronized void sendInternal(String host, String service,
-            NAGIOSSTAT level, String message) {
-        MessagePayload payload = new MessagePayloadBuilder().withHostname(host)
-                .withServiceName(service).create();
-        payload.setMessage(level + "|" + message);
-        payload.setLevel(level.toString());
-    }
-
-    @Override
-    public String getInstanceName() {
-        return instanceName;
-    }
-
-    @Override
-    synchronized public void send(ServiceTO serviceTo) {
-        NAGIOSSTAT level;
+    public void send(ServiceTO serviceTo) {
 
         MessagePayload payload = new MessagePayloadBuilder()
                 .withHostname(serviceTo.getHostName())
                 .withServiceName(serviceTo.getServiceName()).create();
 
-        /*
-         * Check the last connection status for the Service
-         */
-        level = serviceTo.getLevel();
+        NAGIOSSTAT level = serviceTo.getLevel();
         payload.setMessage(level + nagutil.createNagiosMessage(serviceTo));
-
         payload.setLevel(level.toString());
 
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info(ServerUtil.logFormat(instanceName, serviceTo,
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(ServerUtil.logFormat(instanceName, serviceTo,
                     payload.getMessage()));
         }
 
-        final String timerName = instanceName + "_send";
-        final Timer timer = MetricsManager.getTimer(NSCAServerNoSend.class,
-                timerName);
-        final Timer.Context context = timer.time();
+        // Do nothing
 
-        try {
-            // Do nothing
-        } finally {
-            long duration = context.stop() / MetricsManager.TO_MILLI;
-            LOGGER.debug("NscaNoSend send execute: {} ms", duration);
-        }
-    }
-
-    @Override
-    public void onMessage(ServiceTO message) {
-        send(message);
     }
 
     @Override
     public synchronized void unregister() {
+        super.unregister();
+        servers.remove(instanceName);
     }
 }

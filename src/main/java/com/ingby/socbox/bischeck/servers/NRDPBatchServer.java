@@ -31,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -67,12 +68,12 @@ import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
  * <code>
  */
 
-public final class NRDPServer extends ServerAbstract<ServiceTO> {
+public final class NRDPBatchServer extends ServerBatchAbstract<List<ServiceTO>> {
 
     private final static Logger LOGGER = LoggerFactory
-            .getLogger(NRDPServer.class);
+            .getLogger(NRDPBatchServer.class);
 
-    private static Map<String, NRDPServer> servers = new HashMap<String, NRDPServer>();
+    private static Map<String, NRDPBatchServer> servers = new HashMap<String, NRDPBatchServer>();
 
     private NagiosUtil nagutil = new NagiosUtil();
 
@@ -81,7 +82,7 @@ public final class NRDPServer extends ServerAbstract<ServiceTO> {
     private final Integer connectionTimeout;
     private URL url;
 
-    private NRDPServer(String instanceName, Properties prop) {
+    private NRDPBatchServer(String instanceName, Properties prop) {
         super(instanceName, prop);
         Properties defaultproperties = getServerProperties();
         String hostAddress = prop.getProperty("hostAddress",
@@ -136,7 +137,7 @@ public final class NRDPServer extends ServerAbstract<ServiceTO> {
         if (!servers.containsKey(instanceName)) {
             Properties prop = ConfigurationManager.getInstance()
                     .getServerProperiesByName(instanceName);
-            servers.put(instanceName, new NRDPServer(instanceName, prop));
+            servers.put(instanceName, new NRDPBatchServer(instanceName, prop));
         }
         return servers.get(instanceName);
     }
@@ -149,7 +150,6 @@ public final class NRDPServer extends ServerAbstract<ServiceTO> {
      */
     synchronized public static void unregister(String instanceName) {
         getInstance(instanceName).unregister();
-
     }
 
     @Override
@@ -160,17 +160,14 @@ public final class NRDPServer extends ServerAbstract<ServiceTO> {
     }
 
     @Override
-    public void send(ServiceTO serviceTo) throws ServerException {
+    public void send(List<ServiceTO> serviceToList) throws ServerException {
 
-        NAGIOSSTAT level = serviceTo.getLevel();
-        String xml = xmlNRDPFormat(level, serviceTo.getHostName(),
-                serviceTo.getServiceName(),
-                nagutil.createNagiosMessage(serviceTo));
+        String xml = xmlNRDPFormat(serviceToList);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(ServerUtil.logFormat(instanceName, serviceTo, xml));
+            LOGGER.debug(ServerUtil.log(instanceName, serviceToList, xml));
         }
-
+        
         connectAndSend(xml);
     }
 
@@ -305,22 +302,30 @@ public final class NRDPServer extends ServerAbstract<ServiceTO> {
      *            the performance string
      * @return the formated xml
      */
-    private String xmlNRDPFormat(NAGIOSSTAT level, String hostname,
-            String servicename, String serviceOutput) {
+    private String xmlNRDPFormat(List<ServiceTO> serviceToList) {
         StringBuilder strbuf = new StringBuilder();
 
-        // Check encoding and character set and how it works out
         strbuf.append("<?xml version='1.0' encoding='utf-8'?>");
         strbuf.append("<checkresults>");
-        strbuf.append("<checkresult type='service'>");
-        strbuf.append("<hostname>").append(hostname).append("</hostname>");
-        strbuf.append("<servicename>").append(servicename)
-                .append("</servicename>");
-        strbuf.append("<state>").append(level.val()).append("</state>");
-        strbuf.append("<output>")
-                .append(StringEscapeUtils.escapeHtml(serviceOutput))
-                .append("</output>");
-        strbuf.append("</checkresult>");
+
+        for (ServiceTO serviceTo : serviceToList) {
+            NAGIOSSTAT level = serviceTo.getLevel();
+
+            String hostname = serviceTo.getHostName();
+            String servicename = serviceTo.getServiceName();
+            String serviceOutput = nagutil.createNagiosMessage(serviceTo);
+
+            // Check encoding and character set and how it works out
+            strbuf.append("<checkresult type='service'>");
+            strbuf.append("<hostname>").append(hostname).append("</hostname>");
+            strbuf.append("<servicename>").append(servicename)
+                    .append("</servicename>");
+            strbuf.append("<state>").append(level.val()).append("</state>");
+            strbuf.append("<output>")
+                    .append(StringEscapeUtils.escapeHtml(serviceOutput))
+                    .append("</output>");
+            strbuf.append("</checkresult>");
+        }
         strbuf.append("</checkresults>");
 
         String utfenc = null;

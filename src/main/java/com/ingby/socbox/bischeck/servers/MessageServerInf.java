@@ -31,7 +31,7 @@ public interface MessageServerInf extends Callback<ServiceTO>{
     
     
     /**
-     * The callback method used by any {@link Server} to receive messages with 
+     * The callback method used by any {@link ServerInf} to receive messages with 
      * the {@link Service} data to processes 
      */
     void onMessage(ServiceTO message);    
