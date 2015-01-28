@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.derby.iapi.services.locks.Latch;
-
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemTO;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
