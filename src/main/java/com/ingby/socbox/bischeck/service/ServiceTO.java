@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.derby.iapi.services.locks.Latch;
+
 import com.ingby.socbox.bischeck.serviceitem.ServiceItem;
 import com.ingby.socbox.bischeck.serviceitem.ServiceItemTO;
 import com.ingby.socbox.bischeck.threshold.Threshold.NAGIOSSTAT;
@@ -29,6 +31,7 @@ public class ServiceTO {
     private String incidentKey;
     private Boolean isResolved;
     private Long executionTime;
+    private Long lastCheckTime;
 
     private ServiceTO(ServiceTOBuilder builder) {
         this.hostName = builder.hostName;
@@ -42,6 +45,7 @@ public class ServiceTO {
         this.incidentKey = builder.incidentKey;
         this.isResolved = builder.isResolved;
         this.executionTime = builder.executionTime;
+        this.lastCheckTime = builder.lastCheckTime;
     }
 
     public String getHostName() {
@@ -99,7 +103,37 @@ public class ServiceTO {
     public Long getExecutionTime() {
         return executionTime;
     }
-
+    
+    public Long getLastCheckTime() {
+        return lastCheckTime;
+    }
+    
+    public String toString() {
+        StringBuilder strbu = new StringBuilder();
+        strbu.append("{\"hostname\":\"").append(hostName)
+        .append(",\"servicename\":\"").append(serviceName)
+        .append(",\"lastCheckTime\":").append(lastCheckTime)
+        .append(",\"lastExecutionTime\":").append(executionTime)
+        .append(",\"serviceItems\":[");
+        String sep = "";
+        for(ServiceItemTO serviceItemTo: serviceItems.values()) {
+            strbu.append(sep)
+            .append("\"serviceItem\": {")
+            .append("\"serviceItemName\":\"")
+            .append(serviceItemTo.getName())
+            .append(",\"value\":")
+            .append(serviceItemTo.getValue())
+            .append(",\"threshold\":")
+            .append(serviceItemTo.getThreshold());
+               
+            sep = ",";
+        }
+        strbu.append("]}");
+        
+        
+        return strbu.toString();
+    }
+    
     public static class ServiceTOBuilder {
         private final String hostName;
         private final String serviceName;
@@ -112,6 +146,7 @@ public class ServiceTO {
         private Boolean isResolved;
         private boolean hasException = false;
         private Long executionTime = 0L;
+        private Long lastCheckTime = System.currentTimeMillis();
 
         @SuppressWarnings("unchecked")
         public ServiceTOBuilder(Service service) {
@@ -140,6 +175,9 @@ public class ServiceTO {
             }
             if (service.getExecutionTime() != null) {
                 executionTime = service.getExecutionTime();
+            }
+            if(service.getLastCheckTime() != null) {
+                lastCheckTime = service.getLastCheckTime();
             }
         }
 
