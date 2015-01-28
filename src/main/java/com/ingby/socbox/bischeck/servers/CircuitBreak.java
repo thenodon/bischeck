@@ -18,7 +18,6 @@
  */
 package com.ingby.socbox.bischeck.servers;
 
-import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -46,7 +45,6 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Timer;
 import com.ingby.socbox.bischeck.MBeanManager;
 import com.ingby.socbox.bischeck.monitoring.MetricsManager;
-//import com.ingby.socbox.bischeck.servers.Server;
 
 /**
  * This is a circuit break solution for the send method of the
@@ -80,7 +78,7 @@ import com.ingby.socbox.bischeck.monitoring.MetricsManager;
  * 
  * @param <E>
  */
-abstract public class CircuitBreak<E> implements ServerInf<E>,
+public abstract class CircuitBreak<E> implements ServerInf<E>,
         DynamicMBean {
 
     private static final Logger LOGGER = LoggerFactory
@@ -128,16 +126,7 @@ abstract public class CircuitBreak<E> implements ServerInf<E>,
 
     protected String instanceName;
 
-    public abstract void send(E serviceTo) throws ServerException;
-
-    public abstract void send(List<E> serviceTo) throws ServerException;
-
-    /**
-     * Constructor for the circuit break
-     * 
-     * @param server
-     *            the server object that the circuit break should be used for
-     */
+    
     public CircuitBreak(String instanceName) {
         this(instanceName, null);
     }
@@ -162,6 +151,12 @@ abstract public class CircuitBreak<E> implements ServerInf<E>,
 
     }
 
+    
+    public abstract void send(E serviceTo) throws ServerException;
+
+    public abstract void send(List<E> serviceTo) throws ServerException;
+
+    
     private void setProperties(Properties prop) {
         isEnabled = "true".equalsIgnoreCase(prop.getProperty("cbEnable",
                 "false"));
