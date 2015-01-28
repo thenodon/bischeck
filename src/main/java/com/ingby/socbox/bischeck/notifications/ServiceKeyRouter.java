@@ -50,7 +50,7 @@ public class ServiceKeyRouter {
             serviceKeyRouting = true;
             parseServiceKeys(json);
         } catch (JSONException e) {
-            LOGGER.warn("Could not create json from object {}",serviceKey.toString(), e);
+            LOGGER.warn("Could not create json from object {} using default",serviceKey.toString(), e);
             serviceKeyRouting = false;
         }
     }
