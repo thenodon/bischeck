@@ -291,6 +291,7 @@
     <xsd:element name="period">
         <xsd:simpleType>
             <xsd:restriction base="xsd:normalizedString">
+                <xsd:enumeration value="M"/>
                 <xsd:enumeration value="H"/>
                 <xsd:enumeration value="D"/>
                 <xsd:enumeration value="W"/>

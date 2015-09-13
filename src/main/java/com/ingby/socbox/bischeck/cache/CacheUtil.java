@@ -78,6 +78,9 @@ public abstract class CacheUtil {
             	case 'M' : return (Integer.parseInt(value)*60); 
             	case 'H' : return (Integer.parseInt(value)*60*60);
             	case 'D' : return (Integer.parseInt(value)*60*60*24);
+            	case 'W' : return (Integer.parseInt(value)*60*60*24*7);
+            	case 'Y' : return (Integer.parseInt(value)*60*60*24*7*365);
+            	default: throw new IllegalArgumentException("The specified time operator " + time + " is not valid");
             }
         }
         LOGGER.warn("Cache calculate by time do not parse string " + schedule + " correctly");
