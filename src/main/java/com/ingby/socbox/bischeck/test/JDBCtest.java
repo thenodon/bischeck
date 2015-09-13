@@ -72,7 +72,7 @@ public class JDBCtest {
 		if (line.hasOption("usage")) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("Bischeck", options);
-			System.exit(0); // NOPMD - System.exit okay from main()
+			System.exit(0); 
 		}
 
 		String driverclassname = null;
