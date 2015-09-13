@@ -77,13 +77,13 @@ public class DocManager implements ConfigXMLInf {
 
         } catch (org.apache.commons.cli.ParseException e) {
             System.out.println( "Command parse error:" + e.getMessage() );
-            System.exit(FAILED); // NOPMD - System.exit okay from main()
+            System.exit(FAILED); 
         }
         
         if (line.hasOption("usage")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "DocManager", options );
-            System.exit(OKAY); // NOPMD - System.exit okay from main()
+            System.exit(OKAY); 
         }
 
         DocManager dmgmt = null;
@@ -94,14 +94,14 @@ public class DocManager implements ConfigXMLInf {
                 dmgmt = new DocManager(dirname);
             } catch (IOException ioe) {
                 System.out.println(ioe.getMessage());
-                System.exit(FAILED); // NOPMD - System.exit okay from main()
+                System.exit(FAILED); 
             }
         } else {
             try {
                 dmgmt= new DocManager();
             } catch (IOException ioe) {
                 System.out.println(ioe.getMessage());
-                System.exit(FAILED); // NOPMD - System.exit okay from main()
+                System.exit(FAILED); 
             }
         }
         
@@ -118,7 +118,7 @@ public class DocManager implements ConfigXMLInf {
         	}
         } catch (Exception e) {
         	System.out.println(e.getMessage());
-            System.exit(FAILED); // NOPMD - System.exit okay from main()
+            System.exit(FAILED); 
         }
     }
 
