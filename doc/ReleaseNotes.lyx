@@ -212,6 +212,47 @@ LatexCommand tableofcontents
 \end_layout
 
 \begin_layout Section
+Release 1.1.2 - 2015-09-15
+\end_layout
+
+\begin_layout Standard
+Release 1.1.2 is a bug fix release.
+\end_layout
+
+\begin_layout Subsection
+New features
+\end_layout
+
+\begin_layout Itemize
+Not applicable
+\end_layout
+
+\begin_layout Subsection
+Bugs fixed and important issues
+\end_layout
+
+\begin_layout Itemize
+[TR-264] - 
+\begin_inset Quotes eld
+\end_inset
+
+Using 2 periods for cache purge.
+\begin_inset Quotes erd
+\end_inset
+
+ When using purge with period of week or year a NumberFormatException was
+ thrown due to the fact that week and year was calculated to a timestamp.
+\end_layout
+
+\begin_layout Subsection
+Upgrading
+\end_layout
+
+\begin_layout Standard
+Release 1.1.2 support upgrade from release 1.1.0.
+\end_layout
+
+\begin_layout Section
 Release 1.1.1 - 2014-09-23
 \end_layout
 
