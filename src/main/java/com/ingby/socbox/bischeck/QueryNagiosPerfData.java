@@ -134,12 +134,15 @@ public abstract class QueryNagiosPerfData {
      * @return
      */
     private static String removeUOM(String s) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();        
         for(int i = 0; i < s.length(); i++) {
            char ch = s.charAt(i);
-           if (Character.isDigit(ch) || ch == ',' || ch == '.') {
+           if (i==0 && ch == '-' ) {
+               sb.append(ch);
+           } else if (Character.isDigit(ch) || ch == ',' || ch == '.') {
              sb.append(ch);
            }
+           
         }
         return sb.toString();
     }
