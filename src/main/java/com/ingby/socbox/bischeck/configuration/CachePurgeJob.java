@@ -114,42 +114,104 @@ public class CachePurgeJob implements Job {
     }
     
 
-	@Override
+    @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        final Timer timer = Metrics.newTimer(CachePurgeJob.class, 
-				"purgeTimer" , TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-		final TimerContext context = timer.time();
-		
-		try {
-			Map<String, String> purgeMap = ConfigurationManager.getInstance().getPurgeMap();
-			LOGGER.info("CachePurge purging {}", purgeMap.size());
-			CacheInf cache = CacheFactory.getInstance();
-			
-			for (String key : purgeMap.keySet()) {
-				if (cache instanceof CachePurgeInf) {
-					LOGGER.debug("Purge key {}:{}", key, purgeMap.get(key));
-					
-					if (CacheUtil.isByTime(purgeMap.get(key))) {
-						// find the index of the time
-						ServiceDef servicedef = new ServiceDef(key);
-						Long index = cache.getIndexByTime( 
-								servicedef.getHostName(),
-								servicedef.getServiceName(), 
-								servicedef.getServiceItemName(),
-								System.currentTimeMillis() + ((long) CacheUtil.calculateByTime(purgeMap.get(key)))*1000);
-						// if index is null there is no items in the cache older then the time offset
-						 if (index != null) {
-							 ((CachePurgeInf) cache).trim(key, index);
-						 } 
-					} else {
-						((CachePurgeInf) cache).trim(key, Long.valueOf(purgeMap.get(key)));
-					}
-				}
-			}
-		} finally {
-			long duration = context.stop()/1000000;
-			LOGGER.info("CachePurge executed in {} ms", duration);
-		}
+        final Timer timer = Metrics.newTimer(CachePurgeJob.class, "purgeTimer",
+                TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final TimerContext context = timer.time();
+
+        try {
+            Map<String, String> purgeMap = ConfigurationManager.getInstance()
+                    .getPurgeMap();
+            LOGGER.info("CachePurge purging {}", purgeMap.size());
+            CacheInf cache = CacheFactory.getInstance();
+
+            for (String key : purgeMap.keySet()) {
+                if (cache instanceof CachePurgeInf) {
+                    
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Purge key {} with rule {}", key,
+                                purgeMap.get(key));
+                        
+                        ServiceDef servicedef = new ServiceDef(key);
+
+                        LOGGER.debug("Key {} size {} before purge", key, cache.size(servicedef.getHostName(),
+                                servicedef.getServiceName(),
+                                servicedef.getServiceItemName()
+                                ));
+                        LOGGER.debug(
+                                "Key {} time at 0 <{}> time at end <{}> before purge",
+                                key,
+                                new Date (cache.getLastStatusByIndex(
+                                        servicedef.getHostName(),
+                                        servicedef.getServiceName(),
+                                        servicedef.getServiceItemName(), 0).getTimestamp()).toString(),
+                                new Date (cache.getLastStatusByIndex(
+                                        servicedef.getHostName(),
+                                        servicedef.getServiceName(),
+                                        servicedef.getServiceItemName(),
+                                        cache.size(servicedef.getHostName(),
+                                                servicedef.getServiceName(),
+                                                servicedef.getServiceItemName()) - 1).getTimestamp()).toString());
+
+                    }
+
+                    if (CacheUtil.isByTime(purgeMap.get(key))) {
+                        // find the index of the time
+                        LOGGER.debug("Purge key {} by time", key);
+                        ServiceDef servicedef = new ServiceDef(key);
+                        Long index = cache.getIndexByTime(
+                                servicedef.getHostName(),
+                                servicedef.getServiceName(),
+                                servicedef.getServiceItemName(),
+                                System.currentTimeMillis()
+                                        + ((long) CacheUtil
+                                                .calculateByTime(purgeMap
+                                                        .get(key))) * 1000);
+                        // if index is null there is no items in the cache older
+                        // then the time offset
+                        
+                        LOGGER.debug("Purge key {} purge from index 0 to index {}", key, index);
+                        if (index != null) {
+                            ((CachePurgeInf) cache).trim(key, index);
+                        }
+                    } else {
+                        LOGGER.debug("Purge key {} by index", key);
+                        LOGGER.debug("Purge key {} purge from index 0 to index {}", key, Long.valueOf(purgeMap.get(key)));
+                        ((CachePurgeInf) cache).trim(key,
+                                Long.valueOf(purgeMap.get(key)));
+                    }
+                }
+                
+                if (LOGGER.isDebugEnabled()) {
+                    
+                    ServiceDef servicedef = new ServiceDef(key);
+
+                    LOGGER.debug("Key {} size {} after purge", key, cache.size(servicedef.getHostName(),
+                            servicedef.getServiceName(),
+                            servicedef.getServiceItemName()
+                            ));
+                    LOGGER.debug(
+                            "Key {} time at 0 <{}> time at end <{}> after purge",
+                            key,
+                            new Date (cache.getLastStatusByIndex(
+                                    servicedef.getHostName(),
+                                    servicedef.getServiceName(),
+                                    servicedef.getServiceItemName(), 0).getTimestamp()).toString(),
+                            new Date (cache.getLastStatusByIndex(
+                                    servicedef.getHostName(),
+                                    servicedef.getServiceName(),
+                                    servicedef.getServiceItemName(),
+                                    cache.size(servicedef.getHostName(),
+                                            servicedef.getServiceName(),
+                                            servicedef.getServiceItemName()) - 1).getTimestamp()).toString());
+                }
+
+            }
+        } finally {
+            long duration = context.stop() / 1000000;
+            LOGGER.info("CachePurge executed in {} ms", duration);
+        }
     }
 
 }
