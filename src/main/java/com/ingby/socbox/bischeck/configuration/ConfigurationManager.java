@@ -326,18 +326,6 @@ public final class ConfigurationManager  implements ConfigurationManagerMBean {
     }
 
     
-    private void initScheduler() throws ConfigurationException {
-        try {
-        	CachePurgeJob.init(bischeckProperties);
-            ThresholdCacheClearJob.init(bischeckProperties);
-            adminJobsCount = 2;
-        } catch (SchedulerException e) {
-            LOGGER.error("Quartz scheduler failed with exception {}", e.getMessage(), e);
-            throw new ConfigurationException(e);
-        }
-     }
-    
-    
     private void initBischeckServices(boolean once) 
     		throws ConfigurationException {
         XMLBischeck bischeckconfig  =
