@@ -9,7 +9,7 @@
     <!-- ==== File and Directory Names =================================== -->
     <property name="app.name" value="bischeck" />
     <property name="app.path" value="/${app.name}" />
-    <property name="app.version" value="1.1.2RC3"/>
+    <property name="app.version" value="1.1.2RC4"/>
     <property name="build.home" value="${basedir}/target" />
     <property name="dist.home" value="${basedir}/dist" />
     <property name="bin.home" value="${basedir}/bin" />
