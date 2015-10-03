@@ -139,20 +139,25 @@ public class CachePurgeJob implements Job {
                                 servicedef.getServiceName(),
                                 servicedef.getServiceItemName()
                                 ));
-                        LOGGER.debug(
-                                "Key {} time at 0 <{}> time at end <{}> before purge",
-                                key,
-                                new Date (cache.getLastStatusByIndex(
-                                        servicedef.getHostName(),
-                                        servicedef.getServiceName(),
-                                        servicedef.getServiceItemName(), 0).getTimestamp()).toString(),
-                                new Date (cache.getLastStatusByIndex(
-                                        servicedef.getHostName(),
-                                        servicedef.getServiceName(),
-                                        servicedef.getServiceItemName(),
-                                        cache.size(servicedef.getHostName(),
-                                                servicedef.getServiceName(),
-                                                servicedef.getServiceItemName()) - 1).getTimestamp()).toString());
+                        if (cache.size(servicedef.getHostName(),
+                                servicedef.getServiceName(),
+                                servicedef.getServiceItemName()
+                                ) > 0) {
+                            LOGGER.debug(
+                                    "Key {} time at 0 <{}> and time at end <{}> before purge",
+                                    key,
+                                    new Date (cache.getLastStatusByIndex(
+                                            servicedef.getHostName(),
+                                            servicedef.getServiceName(),
+                                            servicedef.getServiceItemName(), 0).getTimestamp()).toString(),
+                                            new Date (cache.getLastStatusByIndex(
+                                                    servicedef.getHostName(),
+                                                    servicedef.getServiceName(),
+                                                    servicedef.getServiceItemName(),
+                                                    cache.size(servicedef.getHostName(),
+                                                            servicedef.getServiceName(),
+                                                            servicedef.getServiceItemName()) - 1).getTimestamp()).toString());
+                        }
 
                     }
 
@@ -191,20 +196,25 @@ public class CachePurgeJob implements Job {
                             servicedef.getServiceName(),
                             servicedef.getServiceItemName()
                             ));
-                    LOGGER.debug(
-                            "Key {} time at 0 <{}> time at end <{}> after purge",
-                            key,
-                            new Date (cache.getLastStatusByIndex(
-                                    servicedef.getHostName(),
-                                    servicedef.getServiceName(),
-                                    servicedef.getServiceItemName(), 0).getTimestamp()).toString(),
-                            new Date (cache.getLastStatusByIndex(
-                                    servicedef.getHostName(),
-                                    servicedef.getServiceName(),
-                                    servicedef.getServiceItemName(),
-                                    cache.size(servicedef.getHostName(),
-                                            servicedef.getServiceName(),
-                                            servicedef.getServiceItemName()) - 1).getTimestamp()).toString());
+                    if (cache.size(servicedef.getHostName(),
+                            servicedef.getServiceName(),
+                            servicedef.getServiceItemName()
+                            ) > 0) {
+                        LOGGER.debug(
+                                "Key {} time at 0 <{}> and time at end <{}> after purge",
+                                key,
+                                new Date (cache.getLastStatusByIndex(
+                                        servicedef.getHostName(),
+                                        servicedef.getServiceName(),
+                                        servicedef.getServiceItemName(), 0).getTimestamp()).toString(),
+                                        new Date (cache.getLastStatusByIndex(
+                                                servicedef.getHostName(),
+                                                servicedef.getServiceName(),
+                                                servicedef.getServiceItemName(),
+                                                cache.size(servicedef.getHostName(),
+                                                        servicedef.getServiceName(),
+                                                        servicedef.getServiceItemName()) - 1).getTimestamp()).toString());
+                    }
                 }
 
             }
