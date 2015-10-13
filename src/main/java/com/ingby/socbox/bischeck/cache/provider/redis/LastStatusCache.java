@@ -437,14 +437,15 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	}
 
 	@Override
-	public LastStatus getLastStatusByIndex(String hostName, String serviceName,
-			String serviceItemName, long index) {
+    public LastStatus getLastStatusByIndex(String hostName, String serviceName,
+            String serviceItemName, long index) {
 
-
-
-		String key = Util.fullName( hostName, serviceName, serviceItemName);
-
-		//lu.setOptimizIndex(key, index);
+        String key = Util.fullName( hostName, serviceName, serviceItemName);
+        return getLastStatusByIndex(key, index);
+	}
+	
+	@Override
+	public LastStatus getLastStatusByIndex(String key, long index) {
 
 		LastStatus ls = null;
 
@@ -698,26 +699,31 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 	 * Position and size methods
 	 ***********************************************
 	 */
+	
 	 @Override
 	 public Long size(String hostName, String serviceName,
 			 String serviceItemName) {
 
 		String key = Util.fullName( hostName, serviceName, serviceItemName);
-
-		Long size = 0L;
-		Jedis jedis = null;
-		try {    
-			jedis = jedispool.getResource();
-
-			size = jedis.llen(key);
-		} catch (JedisConnectionException je) {
-			connectionFailed(je);
-		} finally {
-			jedispool.returnResource(jedis);
-		}
-		return size;
+		return size(key);
 	 }
 
+	 @Override
+     public Long size(String key) {
+
+        Long size = 0L;
+        Jedis jedis = null;
+        try {    
+            jedis = jedispool.getResource();
+
+            size = jedis.llen(key);
+        } catch (JedisConnectionException je) {
+            connectionFailed(je);
+        } finally {
+            jedispool.returnResource(jedis);
+        }
+        return size;
+     }
 
 	 @Override
 	 public Long getIndexByTime(String hostname, String serviceName,
@@ -726,29 +732,34 @@ public final class LastStatusCache implements CacheInf, CachePurgeInf, LastStatu
 		 String key = Util.fullName( hostname, serviceName, serviceItemName);
 		 LOGGER.debug("Find cache index for key {} at timestamp {}", key, new java.util.Date(stime));
 
-		 Long index = null;
-		 Jedis jedis = null;
-		 try {
-			 jedis = jedispool.getResource();
-
-			 if (jedis.llen(key) == 0) {
-				 return null;
-			 }
-
-			 index = nearestByIndex(stime, key);
-
-		 } catch (JedisConnectionException je) {
-			 connectionFailed(je);
-		 } finally {
-			 jedispool.returnResource(jedis);
-		 }
-		 if (index == null) { 
-			 return null;
-		 } else {
-			 return index;
-		 }
+		 return getIndexByTime(key, stime);
 	 }
 
+	 @Override
+	 public Long getIndexByTime(String key, long stime) {
+
+         Long index = null;
+         Jedis jedis = null;
+         try {
+             jedis = jedispool.getResource();
+
+             if (jedis.llen(key) == 0) {
+                 return null;
+             }
+
+             index = nearestByIndex(stime, key);
+
+         } catch (JedisConnectionException je) {
+             connectionFailed(je);
+         } finally {
+             jedispool.returnResource(jedis);
+         }
+         if (index == null) { 
+             return null;
+         } else {
+             return index;
+         }
+     }
 
 
 	 @Override

@@ -105,6 +105,15 @@ public interface CacheInf {
     		String serviceName, 
     		String serviceItemName,
     		long index);
+    
+    /**
+     * Get a the LastStatus object at the index. 
+     * @param key
+     * @param index
+     * @return LastStatus object at index. If the index is out of range null is 
+     * returned
+     */
+    LastStatus getLastStatusByIndex(String key, long index);
 
     /**
      * Get a List of LastStatus objects from the from timestamp to the to 
@@ -237,6 +246,13 @@ public interface CacheInf {
     Long size(String hostname, String serviceName,
 			String serviceItemName);
 
+    /**
+     * The size for the specific key
+     * @param key
+     * @return size of cached values for a specific host-service-serviceitem
+     */
+    Long size(String key);
+
 	/**
 	 * Get cache index for element closest to the timestamp, where timestamp is the time
 	 * in milliseconds "back" in time.
@@ -250,6 +266,17 @@ public interface CacheInf {
 			String serviceName,
 			String serviceItemName, 
 			long timestamp);
+	
+	/**
+    * Get cache index for element closest to the timestamp, where timestamp is the time
+    * in milliseconds "back" in time.
+    * @param key
+    * @param timestamp
+    * @return
+    */
+   Long getIndexByTime(String key, 
+           long timestamp);
+
 
 	/**
 	 * Get the last index in the cache for the host, service and serviceitem 

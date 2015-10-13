@@ -243,12 +243,17 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 	}
 
 	@Override
-	public LastStatus getLastStatusByIndex(String hostName, 
-			String serviceName,
-			String serviceItemName, 
-			long index) {
+    public LastStatus getLastStatusByIndex(String hostName, 
+            String serviceName,
+            String serviceItemName, 
+            long index) {
 
-		String key = Util.fullName( hostName, serviceName, serviceItemName);
+        String key = Util.fullName( hostName, serviceName, serviceItemName);
+        return getLastStatusByIndex(key, index);
+	}
+	
+	@Override
+	public LastStatus getLastStatusByIndex(String key, long index) {
 		LastStatus ls = null;
 
 		synchronized (cache) {
@@ -440,9 +445,15 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 			String serviceItemName) {
 
     	String key = Util.fullName( hostname, serviceName, serviceItemName);
-		return (long) cache.get(key).size();
+    	return size(key);
 	}
 
+	@Override
+    public Long size(String key) {
+
+        return (long) cache.get(key).size();
+    }
+	
 	@Override
 	public Long getIndexByTime(String hostname, String serviceName,
 			String serviceItemName, long stime) {
@@ -451,24 +462,35 @@ public final class LastStatusCache implements CacheInf, LastStatusCacheMBean {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Find cache index for {} at time {}", key, new java.util.Date(stime));
 		}
+		return getIndexByTime(key, stime);
 		
-		Integer index = null;
-
-		synchronized (cache) {
-			LinkedList<LastStatus> list = cache.get(key); 
-			// list has no size
-			if (list == null || list.size() == 0) { 
-				return null;
-			}
-			index = nearestByIndex(stime, list);
-		}
-	
-		if (index == null) { 
-			return null;
-		} else {
-			return (long) index;    
-		}
 	}
+	
+	@Override
+    public Long getIndexByTime(String key, long stime) {
+        
+       
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Find cache index for {} at time {}", key, new java.util.Date(stime));
+        }
+        
+        Integer index = null;
+
+        synchronized (cache) {
+            LinkedList<LastStatus> list = cache.get(key); 
+            // list has no size
+            if (list == null || list.size() == 0) { 
+                return null;
+            }
+            index = nearestByIndex(stime, list);
+        }
+    
+        if (index == null) { 
+            return null;
+        } else {
+            return (long) index;    
+        }
+    }
 	
 	@Override
 	public long getLastIndex(String hostname, String serviceName,

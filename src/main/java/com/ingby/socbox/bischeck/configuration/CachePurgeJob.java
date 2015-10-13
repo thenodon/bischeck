@@ -42,7 +42,6 @@ import static org.quartz.JobBuilder.*;
 import static org.quartz.TriggerBuilder.*;
 import static org.quartz.CronScheduleBuilder.*;
 
-import com.ingby.socbox.bischeck.ServiceDef;
 import com.ingby.socbox.bischeck.cache.CacheFactory;
 import com.ingby.socbox.bischeck.cache.CacheInf;
 import com.ingby.socbox.bischeck.cache.CachePurgeInf;
@@ -133,30 +132,15 @@ public class CachePurgeJob implements Job {
                         LOGGER.debug("Purge key {} with rule {}", key,
                                 purgeMap.get(key));
                         
-                        ServiceDef servicedef = new ServiceDef(key);
 
-                        LOGGER.debug("Key {} size {} before purge", key, cache.size(servicedef.getHostName(),
-                                servicedef.getServiceName(),
-                                servicedef.getServiceItemName()
-                                ));
-                        if (cache.size(servicedef.getHostName(),
-                                servicedef.getServiceName(),
-                                servicedef.getServiceItemName()
-                                ) > 0) {
+                        LOGGER.debug("Key {} size {} before purge", key, cache.size(key));
+                        if (cache.size(key) > 0) {
                             LOGGER.debug(
                                     "Key {} time at 0 <{}> and time at end <{}> before purge",
                                     key,
-                                    new Date (cache.getLastStatusByIndex(
-                                            servicedef.getHostName(),
-                                            servicedef.getServiceName(),
-                                            servicedef.getServiceItemName(), 0).getTimestamp()).toString(),
-                                            new Date (cache.getLastStatusByIndex(
-                                                    servicedef.getHostName(),
-                                                    servicedef.getServiceName(),
-                                                    servicedef.getServiceItemName(),
-                                                    cache.size(servicedef.getHostName(),
-                                                            servicedef.getServiceName(),
-                                                            servicedef.getServiceItemName()) - 1).getTimestamp()).toString());
+                                    new Date (cache.getLastStatusByIndex(key, 0).getTimestamp()).toString(),
+                                            new Date (cache.getLastStatusByIndex(key,
+                                                    cache.size(key) - 1).getTimestamp()).toString());
                         }
 
                     }
@@ -164,11 +148,9 @@ public class CachePurgeJob implements Job {
                     if (CacheUtil.isByTime(purgeMap.get(key))) {
                         // find the index of the time
                         LOGGER.debug("Purge key {} by time", key);
-                        ServiceDef servicedef = new ServiceDef(key);
+                        
                         Long index = cache.getIndexByTime(
-                                servicedef.getHostName(),
-                                servicedef.getServiceName(),
-                                servicedef.getServiceItemName(),
+                                key,
                                 System.currentTimeMillis()
                                         + ((long) CacheUtil
                                                 .calculateByTime(purgeMap
@@ -190,30 +172,14 @@ public class CachePurgeJob implements Job {
                 
                 if (LOGGER.isDebugEnabled()) {
                     
-                    ServiceDef servicedef = new ServiceDef(key);
-
-                    LOGGER.debug("Key {} size {} after purge", key, cache.size(servicedef.getHostName(),
-                            servicedef.getServiceName(),
-                            servicedef.getServiceItemName()
-                            ));
-                    if (cache.size(servicedef.getHostName(),
-                            servicedef.getServiceName(),
-                            servicedef.getServiceItemName()
-                            ) > 0) {
+                    LOGGER.debug("Key {} size {} after purge", key, cache.size(key));
+                    if (cache.size(key) > 0) {
                         LOGGER.debug(
                                 "Key {} time at 0 <{}> and time at end <{}> after purge",
                                 key,
-                                new Date (cache.getLastStatusByIndex(
-                                        servicedef.getHostName(),
-                                        servicedef.getServiceName(),
-                                        servicedef.getServiceItemName(), 0).getTimestamp()).toString(),
-                                        new Date (cache.getLastStatusByIndex(
-                                                servicedef.getHostName(),
-                                                servicedef.getServiceName(),
-                                                servicedef.getServiceItemName(),
-                                                cache.size(servicedef.getHostName(),
-                                                        servicedef.getServiceName(),
-                                                        servicedef.getServiceItemName()) - 1).getTimestamp()).toString());
+                                new Date (cache.getLastStatusByIndex(key, 0).getTimestamp()).toString(),
+                                        new Date (cache.getLastStatusByIndex(key,
+                                                cache.size(key) - 1).getTimestamp()).toString());
                     }
                 }
 
