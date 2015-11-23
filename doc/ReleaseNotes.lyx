@@ -232,7 +232,7 @@ Bugs fixed and important issues
 \end_layout
 
 \begin_layout Itemize
-[TR-264] - 
+[TR-266,264] - 
 \begin_inset Quotes eld
 \end_inset
 
@@ -242,6 +242,21 @@ Using 2 periods for cache purge.
 
  When using purge with period of week or year a NumberFormatException was
  thrown due to the fact that week and year was calculated to a timestamp.
+ 
+\end_layout
+
+\begin_layout Itemize
+[TR-265] - 
+\begin_inset Quotes eld
+\end_inset
+
+Problem with negative values
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Negative metrics values became positive.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -249,7 +264,7 @@ Upgrading
 \end_layout
 
 \begin_layout Standard
-Release 1.1.2 support upgrade from release 1.1.0.
+Release 1.1.2 support upgrade from release 1.1.X.
 \end_layout
 
 \begin_layout Section
