@@ -11,7 +11,7 @@
     <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
     <File>/var/tmp/bischeck.log</File>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %c ; %m %ex{full}%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %t ; %c ; %m %ex{full}%n</pattern>
     </encoder>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -29,7 +29,7 @@
     <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
     <File>/var/tmp/bischeck-transaction.log</File>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %c{0} ; %m%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %t ; %c{0} ; %m%n</pattern>
     </encoder>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -44,7 +44,7 @@
     <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
     <File>/var/tmp/bischeck-integration.log</File>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %c{0} ; %m %ex{full}%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,Europe/Stockholm} ; %p ; %t ; %c{0} ; %m %ex{full}%n</pattern>
     </encoder>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -73,8 +73,12 @@
     <appender-ref ref="bischeck-integration"/>
   </logger>
 
-<!--     
-  <logger name="com.ingby.socbox.bischeck.cache.provider.redis" level="DEBUG"  additivity="false">
+<!--
+  <logger name="com.ingby.socbox.bischeck.serversnew" level="DEBUG"  additivity="false">
+    <appender-ref ref="bischeck"/>
+  </logger>
+
+  <logger name="com.ingby.socbox.bischeck.servers" level="DEBUG"  additivity="false">
     <appender-ref ref="bischeck"/>
   </logger>
 
