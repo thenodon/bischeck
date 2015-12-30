@@ -216,7 +216,9 @@ public final class OpenTSDBServer extends ServerBatchAbstract<List<ServiceTO>> {
             throw new ServerException(ioe);
         } finally {
             try {
-                wr.close();
+                if (wr != null) {
+                    wr.close();
+                }
             } catch (IOException e) {
             }
             conn.disconnect();
