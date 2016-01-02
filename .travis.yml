@@ -1,11 +1,15 @@
 language: java
+
 services:
 - redis-server
+
 branches:
   only:
   - master
+
 jdk:
 - oraclejdk8
-- openjdk8
+
 script:
-- mvn -Djavax.xml.accessExternalSchema=all package
+- mvn -Djavax.xml.accessExternalSchema=all clean compile
+- mvn package 
