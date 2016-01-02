@@ -12,4 +12,6 @@ jdk:
 
 script:
 - mvn -Djavax.xml.accessExternalSchema=all clean compile
-- mvn package 
+- mvn package
+
+install: /bin/true 
