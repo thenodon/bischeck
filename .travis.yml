@@ -8,5 +8,4 @@ jdk:
 - oraclejdk8
 - openjdk8
 script:
-- mvn test
-- mvn package
+- mvn -Djavax.xml.accessExternalSchema=all package
