@@ -1,0 +1,12 @@
+language: java
+services:
+- redis-server
+branches:
+  only:
+  - master
+jdk:
+- oraclejdk8
+- openjdk8
+script:
+- mvn test
+- mvn package
