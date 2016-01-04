@@ -29,6 +29,8 @@
 			<id>andersh</id>
 			<name>Anders Håål</name>
 			<email>anders.haal@ingby.com</email>
+            <url>https://github.com/thenodon</url>
+            <id>thenodon</id>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -46,15 +48,15 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:svn:http://gforge.ingby.com/svn/bischeck/bischeck/trunk</connection>
-		<developerConnection>scm:svn:http://gforge.ingby.com/svn/bischeck/bischeck/trunk</developerConnection>
-		<url>http://gforge.ingby.com/gf/project/bischeck/scmsvn</url>
+		<connection>scm:git:https://github.com/thenodon/bischeck.git</connection>
+		<developerConnection>scm:git:https://github.com/thenodon/bischeck.git</developerConnection>
+		<url>https://github.com/thenodon/bischeck.git</url>
 		<tag>HEAD</tag>
 	</scm>
 
 	<issueManagement>
-		<system>gforge.ingby.com</system>
-		<url>http://gforge.ingby.com/gf/project/bischeck/tracker/</url>
+		<system>GitHub Issues</system>
+		<url>https://github.com/thenodon/bischeck/issues</url>
 	</issueManagement>
 
 
