@@ -11,6 +11,6 @@ jdk:
 - oraclejdk7
 
 script:
-- ant -Djavax.xml.accessExternalSchema=all clean dist
+- ant -Djavax.xml.accessExternalSchema=all clean dist testng
 
 install: /bin/true 
