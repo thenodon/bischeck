@@ -1,0 +1,16 @@
+language: java
+
+services:
+- redis-server
+
+branches:
+  only:
+  - bischeck_maintenance-1.x.x
+
+jdk:
+- oraclejdk7
+
+script:
+- ant -Djavax.xml.accessExternalSchema=all clean dist
+
+install: /bin/true 
