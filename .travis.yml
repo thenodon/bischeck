@@ -1,5 +1,11 @@
 language: java
 
+before_install:
+  - pip install codecov
+
+after_success:
+  - codecov
+
 services:
 - redis-server
 
