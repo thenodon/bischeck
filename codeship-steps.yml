@@ -1,2 +1,3 @@
-- service: app
+- name: ci
+  service: app
   command: mvn -Djavax.xml.accessExternalSchema=all package
