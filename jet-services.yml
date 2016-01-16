@@ -1,0 +1,8 @@
+app:
+  build:
+    image: myapp
+    dockerfile_path: Dockerfile
+  links:
+    - redis
+redis:
+  image: redis:2.8.19
